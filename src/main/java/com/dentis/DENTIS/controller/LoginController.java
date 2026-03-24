@@ -8,7 +8,17 @@ public class LoginController {
 
     @GetMapping("/login")
     public String loginPage(){
-        return "DentIS-login";
+        return "login";
+    }
+
+    @GetMapping("/clinician-dashboard")
+    public String clinicianDashboard(){
+        return "dashboard-clinician";
+    }
+
+    @GetMapping("/chartrequest-clinician")
+    public String chartRequestClinician(){
+        return "chartrequest-clinician";
     }
 
 }

@@ -173,6 +173,11 @@ transform:translateY(-1px);
 box-shadow:0 4px 10px rgba(0,0,0,0.15);
 }
 
+.google-btn-link{
+text-decoration:none;
+color:inherit;
+}
+
 /* RESPONSIVE DESIGN */
 
 @media (max-width: 768px) {
