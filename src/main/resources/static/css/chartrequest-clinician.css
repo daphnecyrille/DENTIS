@@ -1,0 +1,377 @@
+
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    height: 100vh;
+    overflow: hidden;
+}
+
+.background {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(rgba(217,217,217,0.9), rgba(217,217,217,0.9)),
+        url('/images/DentFacade.png') center/cover no-repeat;
+    z-index: -1;
+}
+
+/* MAIN LAYOUT */
+.chartrequest-clinician {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* HEADER */
+.header {
+    background: black;
+    color: white;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo h1 {
+    font-size: 35px;
+    margin: 0;
+}
+
+.upm-logo {
+    height: 45px;
+    width: auto;
+}
+
+.menu-icon {
+    font-size: 22px;
+    cursor: pointer;
+    color: white;
+    margin-right: 5px;
+}
+
+/* USER */
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    cursor: pointer;
+    position: relative;
+}
+
+.user-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.9;
+    width: 32px;
+    height: 32px;
+}
+
+.username {
+    font-size: 13px;
+}
+
+.dropdown-icon {
+    font-size: 10px;
+    margin-left: 2px;
+    opacity: 0.8;
+}
+
+/* USER DROPDOWN */
+.user-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    min-width: 120px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    margin-top: 8px;
+}
+
+.user-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: block;
+    padding: 10px 16px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #f5f5f5;
+}
+
+/* LAYOUT */
+.main-container {
+    display: flex;
+    height: 100%;
+}
+
+/* MAIN CONTENT */
+.main-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    margin-left: 70px;
+    transition: margin-left 0.3s ease;
+}
+
+/* SIDEBAR */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 77px;
+    width: 70px;
+    height: calc(100vh - 77px);
+    background: #FFFFFF;
+    display: flex;
+    justify-content: center;
+    padding-top: 20px;
+    border-right: 1px solid #ccc;
+    transition: width 0.3s ease;
+    z-index: 100;
+}
+
+.sidebar.expanded {
+    width: 220px;
+}
+
+.nav-menu ul {
+    list-style: none;
+    width: 100%;
+}
+
+.nav-item {
+    margin: 10px 0;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    text-decoration: none;
+    color: #333;
+}
+
+/* ICON */
+.nav-icon {
+    width: 30px;
+    height: 30px;
+}
+
+.nav-icon2 {
+    width: 38px;
+    height: 38px;
+}
+
+.nav-link span {
+    display: none;
+}
+
+.sidebar.expanded .nav-link {
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 10px 15px;
+}
+
+.sidebar.expanded .nav-link span {
+    display: inline;
+    font-size: 13px;
+}
+
+.nav-item.active {
+    background: #f0f0f0;
+    border-radius: 6px;
+}
+
+.nav-link:hover {
+    background: #f5f5f5;
+    border-radius: 6px;
+}
+
+/* 🔥 CARD STYLE (important for matching UI) */
+.section {
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+/* SECTION HEADER */
+.section-header {
+    background: #324966;
+    color: white;
+    padding: 12px 20px;
+    font-weight: 500;
+}
+
+/* FORM CONTAINER */
+.form-container {
+    padding: 20px;
+}
+
+/* ROW */
+.form-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* GROUP */
+.form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* LABEL */
+.form-group label {
+    font-size: 13px;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+/* INPUT */
+.form-group input {
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+}
+
+/* DATE INPUTS */
+.date-inputs {
+    display: flex;
+    gap: 8px;
+}
+
+.date-inputs input {
+    width: 100%;
+}
+
+/* SUBMIT BUTTON */
+.btn-submit {
+    background: #061F40;
+    color: white;
+    width: 180px;
+    height: 40px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+}
+
+.btn-submit:hover {
+    background: #2c5282;
+}
+
+/* TABLE STYLES */
+.table-container {
+    padding: 10px 15px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+thead {
+    background: #f1f1f1;
+}
+
+th {
+    text-align: center;
+    padding: 10px;
+    border-right: 1px solid #e9ecef;
+    border-bottom: 1px solid #e9ecef;
+}
+
+th:last-child {
+    border-right: none;
+}
+
+td {
+    padding: 10px;
+    border-right: 1px solid #e9ecef;
+    border-bottom: 1px solid #e9ecef;
+    text-align: center;
+}
+
+td:last-child {
+    border-right: none;
+}
+
+tr {
+    border-bottom: 1px solid #ddd;
+}
+
+/* BUTTONS */
+button {
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.btn-view-details {
+    background: #061F40;
+    color: white;
+}
+
+.btn-view-details:hover {
+    background: #2c5282;
+}
+
+/* STATUS */
+.status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+}
+
+.status.pending {
+    background: #f0ad4e;
+    color: white;
+}

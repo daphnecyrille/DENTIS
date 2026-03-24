@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clinician Dashboard - DentIS</title>
+    <link rel="stylesheet" href="/css/dashboard-clinician.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div class="background"></div>
+<div class="clinician-dashboard">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+
+                <span class="username">dsbaui [Clinician]</span>
+
+                <div class="dropdown-icon">▼</div>
+                
+                <!-- Dropdown Menu -->
+                <div class="user-dropdown">
+                    <a href="/login" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item active">
+                        <a href="#dashboard" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/chartrequest-clinician" class="nav-link">
+                            <img src="/images/chart-icon.png" alt="Chart" class="nav-icon2">
+                            <span>Chart Request</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#profile" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Patient List Section -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>Patient List</h2>
+                </div>
+                <div class="table-container">
+                    <table class="patient-table">
+                        <thead>
+                            <tr>
+                                <th>Chart Number</th>
+                                <th>Patient Name</th>
+                                <th>Contact Number</th>
+                                <th>Email</th>
+                                <th>Patient Charts</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>001</td>
+                                <td>John Smith</td>
+                                <td>+1234567890</td>
+                                <td>john.smith@email.com</td>
+                                <td>
+                                    <button class="btn-view-chart">View Chart</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>002</td>
+                                <td>Sarah Johnson</td>
+                                <td>+1234567891</td>
+                                <td>sarah.j@email.com</td>
+                                <td>
+                                    <button class="btn-view-chart">View Chart</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>003</td>
+                                <td>Michael Brown</td>
+                                <td>+1234567892</td>
+                                <td>michael.brown@email.com</td>
+                                <td>
+                                    <button class="btn-view-chart">View Chart</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Request List Section -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>Request List</h2>
+                </div>
+                <div class="table-container">
+                    <table class="request-table">
+                        <thead>
+                            <tr>
+                                <th>Requested Chart No.</th>
+                                <th>Patient Name</th>
+                                <th>Email</th>
+                                <th>Date Requested</th>
+                                <th>Request Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>001</td>
+                                <td>John Smith</td>
+                                <td>john.smith@email.com</td>
+                                <td>2024-01-15</td>
+                                <td>
+                                    <span class="status pending">Pending</span>
+                                </td>
+                                <td>
+                                    <button class="btn-view-details">View Patient Details</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>002</td>
+                                <td>Sarah Johnson</td>
+                                <td>sarah.j@email.com</td>
+                                <td>2024-01-14</td>
+                                <td>
+                                    <span class="status pending">Pending</span>
+                                </td>
+                                <td>
+                                    <button class="btn-view-details">View Patient Details</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>003</td>
+                                <td>Michael Brown</td>
+                                <td>michael.brown@email.com</td>
+                                <td>2024-01-13</td>
+                                <td>
+                                    <span class="status pending">Pending</span>
+                                </td>
+                                <td>
+                                    <button class="btn-view-details">View Patient Details</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script>
+document.querySelector('.menu-icon').onclick = function() {
+    document.querySelector('.sidebar').classList.toggle('expanded');
+};
+
+// Dropdown functionality
+document.querySelector('.dropdown-icon').onclick = function(e) {
+    e.stopPropagation();
+    const dropdown = document.querySelector('.user-dropdown');
+    dropdown.classList.toggle('show');
+};
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function() {
+    const dropdown = document.querySelector('.user-dropdown');
+    if (dropdown.classList.contains('show')) {
+        dropdown.classList.remove('show');
+    }
+});
+
+// Prevent dropdown from closing when clicking inside
+document.querySelector('.user-dropdown').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+</script>
+
+</body>
+</html>
