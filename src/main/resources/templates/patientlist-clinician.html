@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Clinician Dashboard - DentIS</title>
-    <link rel="stylesheet" href="/css/dashboard-clinician.css">
+    <title>Patient List - DentIS</title>
+    <link rel="stylesheet" href="/css/patientlist-clinician.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 
 <body>
 <div class="background"></div>
-<div class="clinician-dashboard">
+<div class="patientlist-clinician">
     <!-- Header -->
     <header class="header">
         <div class="header-left">
@@ -45,8 +45,8 @@
         <aside class="sidebar">
             <nav class="nav-menu">
                 <ul>
-                    <li class="nav-item active">
-                        <a href="#dashboard" class="nav-link">
+                    <li class="nav-item">
+                        <a href="/clinician-dashboard" class="nav-link">
                             <img src="/images/home-icon.png" alt="Home" class="nav-icon">
                             <span>Home</span>
                         </a>
@@ -57,8 +57,8 @@
                             <span>Chart Request</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="/patientlist-clinician" class="nav-link">
+                    <li class="nav-item active">
+                        <a href="/patient-list-clinician" class="nav-link">
                             <img src="/images/patient-icon.png" alt="Patient" class="nav-icon">
                             <span>Patient List</span>
                         </a>
@@ -113,63 +113,49 @@
                                     <button class="btn-view-chart">View Chart</button>
                                 </td>
                             </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Request List Section -->
-            <section class="section">
-                <div class="section-header">
-                    <h2>Request List</h2>
-                </div>
-                <div class="table-container">
-                    <table class="request-table">
-                        <thead>
                             <tr>
-                                <th>Requested Chart No.</th>
-                                <th>Patient Name</th>
-                                <th>Email</th>
-                                <th>Date Requested</th>
-                                <th>Request Status</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>001</td>
-                                <td>John Smith</td>
-                                <td>john.smith@email.com</td>
-                                <td>2024-01-15</td>
+                                <td>004</td>
+                                <td>Emily Davis</td>
+                                <td>+1234567893</td>
+                                <td>emily.davis@email.com</td>
                                 <td>
-                                    <span class="status pending">Pending</span>
-                                </td>
-                                <td>
-                                    <button class="btn-view-details">View Patient Details</button>
+                                    <button class="btn-view-chart">View Chart</button>
                                 </td>
                             </tr>
                             <tr>
-                                <td>002</td>
-                                <td>Sarah Johnson</td>
-                                <td>sarah.j@email.com</td>
-                                <td>2024-01-14</td>
+                                <td>005</td>
+                                <td>Robert Wilson</td>
+                                <td>+1234567894</td>
+                                <td>robert.wilson@email.com</td>
                                 <td>
-                                    <span class="status pending">Pending</span>
-                                </td>
-                                <td>
-                                    <button class="btn-view-details">View Patient Details</button>
+                                    <button class="btn-view-chart">View Chart</button>
                                 </td>
                             </tr>
                             <tr>
-                                <td>003</td>
-                                <td>Michael Brown</td>
-                                <td>michael.brown@email.com</td>
-                                <td>2024-01-13</td>
+                                <td>006</td>
+                                <td>Jessica Martinez</td>
+                                <td>+1234567895</td>
+                                <td>jessica.martinez@email.com</td>
                                 <td>
-                                    <span class="status pending">Pending</span>
+                                    <button class="btn-view-chart">View Chart</button>
                                 </td>
+                            </tr>
+                            <tr>
+                                <td>007</td>
+                                <td>David Anderson</td>
+                                <td>+1234567896</td>
+                                <td>david.anderson@email.com</td>
                                 <td>
-                                    <button class="btn-view-details">View Patient Details</button>
+                                    <button class="btn-view-chart">View Chart</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>008</td>
+                                <td>Lisa Thompson</td>
+                                <td>+1234567897</td>
+                                <td>lisa.thompson@email.com</td>
+                                <td>
+                                    <button class="btn-view-chart">View Chart</button>
                                 </td>
                             </tr>
                         </tbody>
