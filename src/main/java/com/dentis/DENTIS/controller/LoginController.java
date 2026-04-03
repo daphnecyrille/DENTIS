@@ -21,4 +21,9 @@ public class LoginController {
         return "chartrequest-clinician";
     }
 
+    @GetMapping("/patientlist-clinician")
+    public String patientListClinician(){
+        return "patientlist-clinician";
+    }
+
 }
