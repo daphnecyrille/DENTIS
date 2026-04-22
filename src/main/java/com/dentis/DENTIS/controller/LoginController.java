@@ -41,4 +41,14 @@ public class LoginController {
         return "admitting-view-clinician";
     }
 
+    @GetMapping("/oralsurgery-clinician")
+    public String oralSurgeryClinician(){
+        return "oralsurgery-clinician";
+    }
+
+    @GetMapping("/oralsurgery2-clinician")
+    public String oralSurgery2Clinician(){
+        return "oralsurgery2-clinician";
+    }
+
 }
