@@ -316,6 +316,11 @@ button {
 .btn-view-chart {
     background: #061F40;
     color: white;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    display: inline-block;
+    font-size: 12px;
 }
 
 .btn-view-chart:hover {

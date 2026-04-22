@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Patient Details - DentIS</title>
+    <link rel="stylesheet" href="/css/dashboard-clinician(chartview).css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div class="background"></div>
+<div class="patient-details">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username">dsbaui [Clinician]</span>
+                <div class="dropdown-icon">▼</div>
+                <div class="user-dropdown">
+                    <a href="/login" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="/clinician-dashboard" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/chartrequest-clinician" class="nav-link">
+                            <img src="/images/chart-icon.png" alt="Chart" class="nav-icon2">
+                            <span>Chart Request</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/patientlist-clinician" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Patient Information Section -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>Patient Information</h2>
+                </div>
+                <div class="patient-info-container">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Chart Number</span>
+                            <span class="info-value">20250101-00001</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Name</span>
+                            <span class="info-value">Baui, Daphne Cyrille S.</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Contact Number</span>
+                            <span class="info-value">09XX-XXX-XXXX</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Email</span>
+                            <a href="mailto:upcd@up.edu.ph" class="info-value email-link">upcd@up.edu.ph</a>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Civil Status</span>
+                            <span class="info-value">Single</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Educational Attainment</span>
+                            <span class="info-value">High School Graduate</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Age</span>
+                            <span class="info-value">22</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Address</span>
+                            <span class="info-value">1X, XXXXXXX, XXXXX, Philippines</span>
+                        </div>
+                    </div>
+                    <div class="emergency-contact">
+                        <h3>Emergency Contact</h3>
+                        <div class="emergency-info">
+                            <div class="info-item">
+                                <span class="info-label">Name</span>
+                                <span class="info-value">Lo</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Relationship</span>
+                                <span class="info-value">Father</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Number</span>
+                                <span class="info-value">09XX XXX XXXX</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Patient Charts Section -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>Patient Charts</h2>
+                </div>
+                <div class="table-container">
+                    <table class="charts-table">
+                        <thead>
+                            <tr>
+                                <th>Chart Type</th>
+                                <th>Chart Status</th>
+                                <th>Date Created</th>
+                                <th>View Chart</th>
+                                <th>Edit Chart</th>
+                                <th>Submit for Approval</th>
+                                <th>Faculty</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Admitting Section Chart</td>
+                                <td class="status approved">Approved</td>
+                                <td>December 31, 2025</td>
+                                <td><button class="btn-action btn-view">View Chart</button></td>
+                                <td><button class="btn-action btn-edit">Edit Chart</button></td>
+                                <td><button class="btn-action btn-submit">Submit</button></td>
+                                <td>Faculty Member Name</td>
+                                <td><button class="btn-delete"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button></td>
+                            </tr>
+                            <tr>
+                                <td>Clinical Oral Surgery Forms</td>
+                                <td class="status update">Update</td>
+                                <td>January 01, 2026</td>
+                                <td><button class="btn-action btn-view">View Chart</button></td>
+                                <td><button class="btn-action btn-edit">Edit Chart</button></td>
+                                <td><button class="btn-action btn-submit">Submit</button></td>
+                                <td></td>
+                                <td><button class="btn-delete"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button></td>
+                            </tr>
+                            <tr>
+                                <td>Informed Consent Form</td>
+                                <td class="status awaiting">Awaiting Approval</td>
+                                <td>December 31, 2025</td>
+                                <td><button class="btn-action btn-view">View Chart</button></td>
+                                <td><button class="btn-action btn-edit">Edit Chart</button></td>
+                                <td><button class="btn-action btn-submit">Submit</button></td>
+                                <td></td>
+                                <td><button class="btn-delete"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="add-chart-row">
+                        <button class="btn-add-chart">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script>
+document.querySelector('.menu-icon').onclick = function() {
+    document.querySelector('.sidebar').classList.toggle('expanded');
+};
+
+// Dropdown functionality
+document.querySelector('.dropdown-icon').onclick = function(e) {
+    e.stopPropagation();
+    const dropdown = document.querySelector('.user-dropdown');
+    dropdown.classList.toggle('show');
+};
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function() {
+    const dropdown = document.querySelector('.user-dropdown');
+    if (dropdown.classList.contains('show')) {
+        dropdown.classList.remove('show');
+    }
+});
+
+// Prevent dropdown from closing when clicking inside
+document.querySelector('.user-dropdown').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+</script>
+
+</body>
+</html>
