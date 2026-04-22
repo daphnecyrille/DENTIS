@@ -140,7 +140,7 @@ body {
 /* MAIN CONTENT */
 .main-content {
     flex: 1;
-    padding: 20px;
+    padding: 20px 83px;
     overflow-y: auto;
     margin-left: 70px;
     transition: margin-left 0.3s ease;

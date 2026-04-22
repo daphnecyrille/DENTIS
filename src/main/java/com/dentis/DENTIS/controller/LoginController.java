@@ -26,9 +26,19 @@ public class LoginController {
         return "patientlist-clinician";
     }
 
-    @GetMapping("/patient-details")
-    public String patientDetails(){
-        return "dashboard-clinician(chartview)";
+    @GetMapping("/chartsview-clinician")
+    public String chartsviewClinician(){
+        return "chartsview-clinician";
+    }
+
+    @GetMapping("/admitting-clinicmanager")
+    public String admittingClinicManager(){
+        return "admitting-clinicmanager";
+    }
+
+    @GetMapping("/admitting-view-clinician")
+    public String admittingViewClinician(){
+        return "admitting-view-clinician";
     }
 
 }

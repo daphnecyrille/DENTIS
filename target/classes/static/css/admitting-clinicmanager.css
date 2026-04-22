@@ -10,6 +10,12 @@ body {
     overflow: hidden;
 }
 
+.admitting-form {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
 .background {
     position: fixed;
     width: 100%;
@@ -20,12 +26,6 @@ body {
     z-index: -1;
 }
 
-/* MAIN LAYOUT */
-.patient-details {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
 
 /* HEADER */
 .header {
@@ -140,10 +140,11 @@ body {
 /* MAIN CONTENT */
 .main-content {
     flex: 1;
-    padding: 20px;
+    padding: 20px 83px 0 83px;
     overflow-y: auto;
     margin-left: 70px;
     transition: margin-left 0.3s ease;
+    height: calc(100vh - 77px);
 }
 
 /* SIDEBAR */
@@ -220,224 +221,162 @@ body {
     border-radius: 6px;
 }
 
-/* SECTION STYLES */
-.section {
-    background: rgba(255, 255, 255, 0.92);
-    border-radius: 8px;
-    margin-bottom: 20px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    position: relative;
+/* PAGE TITLE */
+.page-title {
+    font-size: 34px;
+    font-weight: 700;
+    color: #061F40;
+    margin-bottom: 16px;
 }
 
-/* SECTION HEADER */
-.section-header {
+/* FORM CARD */
+.form-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 27px;
+}
+
+/* PERSONAL INFO SUB-HEADER */
+.sub-header {
     background: #324966;
     color: white;
     padding: 12px 20px;
-    font-weight: 500;
-}
-
-/* PATIENT INFO CONTAINER */
-.patient-info-container {
-    padding: 20px;
-}
-
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    font-size: 30px;
+    font-weight: 600;
     margin-bottom: 20px;
 }
 
-.info-item {
+/* SECTION TITLES (In case of emergency, Chief Complaint) */
+.section-title {
+    font-size: 30px;
+    font-weight: 700;
+    color: #061F40;
+    margin: 24px 20px 16px 20px;
+}
+
+/* FORM ROWS */
+.form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    padding: 0 20px;
+}
+
+/* FORM GROUP */
+.form-group {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 5px;
 }
 
-.info-label {
+.form-group.full-width {
+    flex: 1;
+}
+
+.form-group.form-group-small {
+    flex: 0 0 200px;
+}
+
+/* LABELS */
+.form-group label {
     font-size: 12px;
-    color: #666;
+    margin-bottom: 5px;
+    color: #333;
     font-weight: 500;
 }
 
-.info-value {
-    font-size: 14px;
-    color: #333;
-    font-weight: 400;
-}
-
-.email-link {
-    color: #061F40;
-    text-decoration: none;
-}
-
-.email-link:hover {
-    text-decoration: underline;
-}
-
-/* EMERGENCY CONTACT */
-.emergency-contact {
-    border-top: 1px solid #e0e0e0;
-    padding-top: 20px;
-}
-
-.emergency-contact h3 {
-    font-size: 14px;
-    color: #333;
-    margin-bottom: 15px;
-    font-weight: 600;
-}
-
-.emergency-info {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-}
-
-/* TABLE STYLES */
-.table-container {
-    padding: 10px 15px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-}
-
-thead {
-    background: #f1f1f1;
-}
-
-th {
-    text-align: center;
-    padding: 10px;
-    border-right: 1px solid #e9ecef;
-    border-bottom: 1px solid #e9ecef;
-    font-weight: 600;
-}
-
-th:last-child {
-    border-right: none;
-}
-
-td {
-    padding: 10px;
-    border-right: 1px solid #e9ecef;
-    border-bottom: 1px solid #e9ecef;
-    text-align: center;
-}
-
-td:last-child {
-    border-right: none;
-}
-
-tr {
-    border-bottom: 1px solid #ddd;
-}
-
-/* STATUS CELL STYLES */
-.status {
-    padding: 8px;
-    font-size: 11px;
-    font-weight: 500;
-    text-align: center;
-}
-
-.status.approved {
-    background: #d4edda;
-    color: #155724;
-}
-
-.status.update {
-    background: #f8d7da;
-    color: #721c24;
-}
-
-.status.awaiting {
-    background: #fff3cd;
-    color: #856404;
-}
-
-/* ACTION BUTTONS */
-.btn-action {
-    border: none;
-    padding: 6px 12px;
+/* INPUTS */
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 8px 10px;
+    border: 1px solid #ccc;
     border-radius: 4px;
+    font-size: 13px;
+    outline: none;
+    font-family: 'Poppins', sans-serif;
+    transition: border-color 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #324966;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #aaa;
+    font-size: 12px;
+}
+
+/* TEXTAREA */
+.form-group textarea {
+    resize: vertical;
+    min-height: 70px;
+}
+
+/* DATE PICKER */
+.date-picker {
     cursor: pointer;
-    font-size: 11px;
-    font-weight: 500;
-    transition: background-color 0.3s ease;
 }
 
-.btn-view {
-    background: #061F40;
-    color: white;
+.date-picker::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.7;
 }
 
-.btn-view:hover {
-    background: #2c5282;
+.date-picker::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
 }
 
-.btn-edit {
-    background: #061F40;
-    color: white;
+/* SELECT */
+.select-input {
+    cursor: pointer;
+    background: white;
+    color: #555;
 }
 
-.btn-edit:hover {
-    background: #2c5282;
+/* SPLIT INPUTS (MM/DD/YYYY) */
+.split-input {
+    display: flex;
+    gap: 8px;
 }
+
+.split-input input {
+    flex: 1;
+}
+
+.split-input input.input-wide {
+    flex: 3;
+}
+
+.split-input input.input-narrow {
+    flex: 0 0 50px;
+}
+
+/* FORM ACTIONS */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 20px 20px 20px;
+}
+
 
 .btn-submit {
     background: #061F40;
     color: white;
+    padding: 10px 30px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
 }
 
 .btn-submit:hover {
-    background: #2c5282;
-}
-
-/* DELETE BUTTON */
-.btn-delete {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: #dc3545;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.btn-delete:hover {
-    background: #f8d7da;
-    border-radius: 4px;
-}
-
-/* ADD CHART ROW */
-.add-chart-row {
-    padding: 15px;
-    text-align: center;
-    border-top: 1px solid #e9ecef;
-}
-
-.btn-add-chart {
-    background: #061F40;
-    color: white;
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.3s ease;
-    margin: 0 auto;
-}
-
-.btn-add-chart:hover {
     background: #2c5282;
 }
