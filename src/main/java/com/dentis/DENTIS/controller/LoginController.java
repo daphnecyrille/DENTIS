@@ -26,4 +26,9 @@ public class LoginController {
         return "patientlist-clinician";
     }
 
+    @GetMapping("/patient-details")
+    public String patientDetails(){
+        return "dashboard-clinician(chartview)";
+    }
+
 }
