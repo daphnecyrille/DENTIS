@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clinical Oral Surgery - Odontectomy - DentIS</title>
+    <link rel="stylesheet" href="/css/oralsurgery2-clinician.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div class="background"></div>
+<div class="oralsurgery2-page">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username">dsbaui [Clinician]</span>
+                <div class="dropdown-icon">&#9660;</div>
+                <div class="user-dropdown">
+                    <a href="/login" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="/clinician-dashboard" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/chartrequest-clinician" class="nav-link">
+                            <img src="/images/chart-icon.png" alt="Chart" class="nav-icon2">
+                            <span>Chart Request</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/patientlist-clinician" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <h2 class="page-title">Clinical Oral Surgery</h2>
+
+            <!-- Form Card -->
+            <div class="form-card">
+
+                <!-- Banner -->
+                <div class="form-banner">Odontectomy Case Patient Workup Form</div>
+
+                <div class="form-body">
+
+                    <!-- Clinician + Date -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Clinician</label>
+                            <input type="text" placeholder="Clinician Name">
+                        </div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" class="date-picker">
+                        </div>
+                    </div>
+
+                    <!-- Patient Name -->
+                    <div class="form-group">
+                        <label>Patient Name</label>
+                        <div class="split-input">
+                            <input type="text" placeholder="Surname">
+                            <input type="text" placeholder="First Name" class="input-wide">
+                            <input type="text" placeholder="M.I." class="input-narrow">
+                        </div>
+                    </div>
+
+                    <!-- Age, Sex, Chart No. -->
+                    <div class="form-row row-small">
+                        <div class="form-group">
+                            <label>Age</label>
+                            <input type="text" placeholder="Age">
+                        </div>
+                        <div class="form-group">
+                            <label>Sex</label>
+                            <select class="select-input">
+                                <option value="">Enter Sex</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Chart No.</label>
+                            <input type="text" placeholder="Chart No.">
+                        </div>
+                    </div>
+
+                    <!-- Chief Complaint -->
+                    <div class="form-group">
+                        <label>Chief Complaint</label>
+                        <textarea placeholder="Value" rows="2"></textarea>
+                    </div>
+
+                    <!-- History of Present Illness -->
+                    <div class="form-group">
+                        <label>History of Present Illness</label>
+                        <textarea placeholder="Value" rows="2"></textarea>
+                    </div>
+
+                    <!-- Clinical Findings -->
+                    <div class="form-group">
+                        <label>Clinical Findings</label>
+                        <textarea placeholder="Value" rows="2"></textarea>
+                    </div>
+
+                    <!-- Radiographic Findings + Classification of Impaction -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Radiographic Findings</label>
+                            <textarea placeholder="Value" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Classification of Impaction</label>
+                            <textarea placeholder="Value" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Diagnosis & Treatment Plan -->
+                    <div class="form-group">
+                        <label>Diagnosis &amp; Treatment Plan</label>
+                        <textarea placeholder="Value" rows="2"></textarea>
+                    </div>
+
+                    <!-- Patient Workup Checklist -->
+                    <div class="checklist-section">
+                        <h3 class="checklist-title">Patient Workup Checklist</h3>
+                        <div class="checklist-grid">
+                            <label class="checkbox-label"><input type="checkbox" checked> AS Chart</label>
+                            <div></div>
+                            <label class="checkbox-label"><input type="checkbox" checked> Intraoral Photo/s</label>
+                            <div></div>
+                            <div class="checklist-inline">
+                                <label class="checkbox-label"><input type="checkbox" checked> Radiograph</label>
+                                <select class="select-input select-small">
+                                    <option value="">Indicate what type</option>
+                                    <option value="periapical">Periapical</option>
+                                    <option value="panoramic">Panoramic</option>
+                                </select>
+                            </div>
+                            <div></div>
+                            <label class="checkbox-label"><input type="checkbox" checked> Impression/Diagnostic Cast</label>
+                            <div></div>
+                            <div class="checklist-inline">
+                                <label class="checkbox-label"><input type="checkbox" checked> Other supplemental diagnostic aids</label>
+                                <input type="text" placeholder="Value" class="input-inline">
+                            </div>
+                            <div></div>
+                        </div>
+                    </div>
+
+                    <!-- Patient Workup Checked By -->
+                    <div class="form-group">
+                        <label>Patient Workup Checked By:</label>
+                        <input type="text" placeholder="Clinical OS Faculty" class="input-medium">
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">Submit</button>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.select-input').forEach(function(sel) {
+    sel.addEventListener('change', function() {
+        if (this.value) {
+            this.classList.add('selected');
+        } else {
+            this.classList.remove('selected');
+        }
+    });
+});
+
+document.querySelector('.menu-icon').onclick = function() {
+    document.querySelector('.sidebar').classList.toggle('expanded');
+};
+
+document.querySelector('.dropdown-icon').onclick = function(e) {
+    e.stopPropagation();
+    const dropdown = document.querySelector('.user-dropdown');
+    dropdown.classList.toggle('show');
+};
+
+document.addEventListener('click', function() {
+    const dropdown = document.querySelector('.user-dropdown');
+    if (dropdown.classList.contains('show')) {
+        dropdown.classList.remove('show');
+    }
+});
+
+document.querySelector('.user-dropdown').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+</script>
+
+</body>
+</html>

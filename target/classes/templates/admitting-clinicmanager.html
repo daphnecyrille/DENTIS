@@ -82,8 +82,8 @@
                             <input type="date" class="date-picker">
                         </div>
                         <div class="form-group">
-                            <label>Patient No.</label>
-                            <input type="text" placeholder="Patient No.">
+                            <label>Chart No.</label>
+                            <input type="text" placeholder="Chart No." class="input-medium">
                         </div>
                     </div>
 
@@ -144,7 +144,6 @@
                                 <option value="single">Single</option>
                                 <option value="married">Married</option>
                                 <option value="widowed">Widowed</option>
-                                <option value="divorced">Divorced</option>
                             </select>
                         </div>
                     </div>
@@ -190,8 +189,15 @@
                     <!-- Description -->
                     <div class="form-row">
                         <div class="form-group full-width">
-                            <label>Description</label>
-                            <textarea placeholder="Value" rows="3"></textarea>
+                            <textarea placeholder="Description" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- History of Present Illness -->
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label>History of Present Illness</label>
+                            <textarea placeholder="Enter History of Present Illness" rows="3"></textarea>
                         </div>
                     </div>
 
@@ -201,6 +207,15 @@
                             <label>Service Code</label>
                             <select class="select-input">
                                 <option value="">Select Service Code</option>
+                                <option value="Resto">Resto</option>
+                                <option value="FPD">FPD</option>
+                                <option value="PEDO">PEDO</option>
+                                <option value="CD">CD</option>
+                                <option value="RPD">RPD</option>
+                                <option value="ENDO">ENDO</option>
+                                <option value="PERIO">PERIO</option>
+                                <option value="OS">OS</option>
+                                <option value="Ortho">Ortho</option>
                             </select>
                         </div>
                     </div>

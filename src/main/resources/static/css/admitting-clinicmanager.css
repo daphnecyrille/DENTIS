@@ -253,7 +253,7 @@ body {
     font-size: 30px;
     font-weight: 700;
     color: #061F40;
-    margin: 24px 20px 16px 20px;
+    margin: 24px 45px 16px 45px;
 }
 
 /* FORM ROWS */
@@ -261,7 +261,7 @@ body {
     display: flex;
     gap: 16px;
     margin-bottom: 16px;
-    padding: 0 20px;
+    padding: 0 45px;
 }
 
 /* FORM GROUP */
@@ -332,6 +332,10 @@ body {
     opacity: 1;
 }
 
+.input-medium {
+    max-width: 220px;
+}
+
 /* SELECT */
 .select-input {
     cursor: pointer;
@@ -361,7 +365,7 @@ body {
 .form-actions {
     display: flex;
     justify-content: flex-end;
-    padding: 16px 20px 20px 20px;
+    padding: 16px 45px 20px 45px;
 }
 
 
