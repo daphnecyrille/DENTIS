@@ -26,6 +26,9 @@ public class LoginController {
     @GetMapping("/oralsurgery2-clinician")
     public String oralSurgery2Clinician() { return "oralsurgery2-clinician"; }
 
+    @GetMapping("/endodontics-clinician")
+    public String endodonticsClinician() { return "endodontics-clinician"; }
+
     @GetMapping("/admin-dashboard")
     public String adminDashboard() { return "dashboard-clinician"; } // placeholder
 }

@@ -46,7 +46,8 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/clinician-dashboard", "/chartsview-clinician/**", "/chartrequest-clinician",
                     "/patientlist-clinician", "/admitting-edit-clinician/**",
-                    "/admitting-view-clinician/**", "/oralsurgery-clinician/**", "/oralsurgery2-clinician/**"
+                    "/admitting-view-clinician/**", "/oralsurgery-clinician/**", "/oralsurgery2-clinician/**",
+                    "/endodontics-clinician/**"
                 ).hasRole("CLINICIAN")
                 .anyRequest().authenticated()
             )

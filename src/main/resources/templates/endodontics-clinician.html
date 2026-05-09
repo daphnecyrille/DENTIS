@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Clinical Endodontics - DentIS</title>
+    <link rel="stylesheet" href="/css/endodontics-clinician.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div class="background"></div>
+<div class="endodontics-page">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.firstName + ' ' + currentUser.lastName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
+                <div class="dropdown-icon">&#9660;</div>
+                <div class="user-dropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="/clinician-dashboard" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/chartrequest-clinician" class="nav-link">
+                            <img src="/images/request-icon.png" alt="Chart" class="nav-icon2">
+                            <span>Chart Request</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/patientlist-clinician" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <h2 class="page-title">Clinical Endodontics</h2>
+
+            <!-- Form Card -->
+            <div class="form-card">
+
+                <!-- Patient Workup Form Banner -->
+                <div class="form-banner">Patient Workup Form</div>
+
+                <div class="form-body">
+
+                    <!-- Clinician, Chart No., Date -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Clinician</label>
+                            <input type="text" placeholder="Clinician">
+                        </div>
+                        <div class="form-group">
+                            <label>Chart No.</label>
+                            <input type="text" placeholder="Chart No.">
+                        </div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" class="date-picker">
+                        </div>
+                    </div>
+
+                    <!-- Patient Name -->
+                    <div class="form-group">
+                        <label>Patient Name</label>
+                        <div class="split-input">
+                            <input type="text" placeholder="Surname">
+                            <input type="text" placeholder="First Name" class="input-wide">
+                            <input type="text" placeholder="M.I." class="input-narrow">
+                        </div>
+                    </div>
+
+                    <!-- Age, Sex, Tooth# -->
+                    <div class="form-row row-small">
+                        <div class="form-group">
+                            <label>Age</label>
+                            <input type="text" placeholder="Age">
+                        </div>
+                        <div class="form-group">
+                            <label>Sex</label>
+                            <select class="select-input">
+                                <option value="">Enter Sex</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tooth#</label>
+                            <select class="select-input">
+                                <option value="">Select Tooth#</option>
+                                <option>11</option><option>12</option><option>13</option><option>14</option><option>15</option>
+                                <option>16</option><option>17</option><option>18</option><option>21</option><option>22</option>
+                                <option>23</option><option>24</option><option>25</option><option>26</option><option>27</option>
+                                <option>28</option><option>31</option><option>32</option><option>33</option><option>34</option>
+                                <option>35</option><option>36</option><option>37</option><option>38</option><option>41</option>
+                                <option>42</option><option>43</option><option>44</option><option>45</option><option>46</option>
+                                <option>47</option><option>48</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="form-group">
+                        <label>Address</label>
+                        <input type="text" placeholder="Enter Address">
+                    </div>
+
+                    <!-- Occupation, Contact Number -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Occupation</label>
+                            <input type="text" placeholder="Value">
+                        </div>
+                        <div class="form-group">
+                            <label>Contact Number</label>
+                            <input type="text" placeholder="Enter Contact Number">
+                        </div>
+                    </div>
+
+                    <!-- Referred By, Clinician's Contact Number -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Referred By:</label>
+                            <input type="text" placeholder="Value">
+                        </div>
+                        <div class="form-group">
+                            <label>Clinician's Contact Number</label>
+                            <input type="text" placeholder="Value">
+                        </div>
+                    </div>
+
+                    <!-- Chief Complaint -->
+                    <div class="form-group">
+                        <label>Chief Complaint</label>
+                        <textarea placeholder="Value" rows="3"></textarea>
+                    </div>
+
+                    <!-- History of Present Illness -->
+                    <div class="form-group">
+                        <label>History of Present Illness</label>
+                        <textarea placeholder="Value" rows="3"></textarea>
+                    </div>
+
+                    <!-- Medical History -->
+                    <div class="form-group">
+                        <label>Medical History</label>
+                        <textarea placeholder="Value" rows="3"></textarea>
+                    </div>
+
+                    <!-- Dental History -->
+                    <div class="form-group">
+                        <label>Dental History</label>
+                        <textarea placeholder="Value" rows="3"></textarea>
+                    </div>
+
+                    <!-- Pain Symptoms -->
+                    <div class="symptom-section">
+                        <h3 class="symptom-title">Pain Symptoms:</h3>
+
+                        <div class="pain-row">
+                            <div class="pain-tag">Quality</div>
+                            <select class="select-input pain-select">
+                                <option value="">Select</option>
+                                <option>Sharp</option>
+                                <option>Dull</option>
+                                <option>Throbbing</option>
+                            </select>
+                        </div>
+
+                        <div class="pain-row">
+                            <div class="pain-tag">Location</div>
+                            <select class="select-input pain-select">
+                                <option value="">Select</option>
+                                <option>Localized</option>
+                                <option>Diffused</option>
+                                <option>Reffered</option>
+                            </select>
+                        </div>
+
+                        <div class="pain-row">
+                            <div class="pain-tag">Course/<br>Frequency</div>
+                            <select class="select-input pain-select">
+                                <option value="">Select</option>
+                                <option>Constant</option>
+                                <option>Momentary</option>
+                                <option>Intermittent</option>
+                            </select>
+                        </div>
+
+                        <div class="pain-row">
+                            <div class="pain-tag">Onset</div>
+                            <select class="select-input pain-select">
+                                <option value="">Select</option>
+                                <option>Spontaneous</option>
+                                <option>Provoked</option>
+                            </select>
+                        </div>
+
+                        <div class="pain-row">
+                            <div class="pain-tag">Affected by</div>
+                            <select class="select-input pain-select">
+                                <option value="">Select</option>
+                                <option>Heat [relieved, increased]</option>
+                                <option>Palpation</option>
+                                <option>Cold [relieved, increased]</option>
+                                <option>Time of day</option>
+                                <option>Chewing/Biting</option>
+                                <option>Patient's Position</option>
+                            </select>
+                        </div>
+
+                        <!-- Level of Intensity -->
+                        <div class="intensity-row">
+                            <span class="intensity-label">Level of Intensity - scale of 1 (mild) to 10 (severe):</span>
+                            <select class="select-input intensity-select">
+                                <option value="">Value</option>
+                                <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                                <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Radiographic Examination -->
+                    <div class="exam-section">
+                        <h3 class="exam-title">Radiographic Examination of the Tooth:</h3>
+                        <div class="exam-select-group">
+                            <select class="select-input exam-select">
+                                <option value="">Select finding</option>
+                                <option>WNL/caries</option>
+                                <option>Restoration</option>
+                                <option>Prior RCT</option>
+                                <option>Post/build up</option>
+                                <option>Int./ext. resorption</option>
+                                <option>Calcification</option>
+                                <option>Open apex/extra canal</option>
+                                <option>Broken instrument</option>
+                                <option>Others</option>
+                            </select>
+                            <input type="text" placeholder="Others (specify)" class="others-text">
+                        </div>
+                    </div>
+
+                    <!-- Attachment Apparatus -->
+                    <div class="exam-section">
+                        <h3 class="exam-title">Attachment Apparatus:</h3>
+                        <div class="exam-select-group">
+                            <select class="select-input exam-select">
+                                <option value="">Select finding</option>
+                                <option>PDL normal</option>
+                                <option>PDL thickened</option>
+                                <option>Hypercementosis</option>
+                                <option>Alv. bone normal</option>
+                                <option>Radiolucency</option>
+                                <option>Others</option>
+                            </select>
+                            <input type="text" placeholder="Others (specify)" class="others-text">
+                        </div>
+                    </div>
+
+                    <!-- Clinical Condition of the Tooth -->
+                    <div class="exam-section">
+                        <h3 class="exam-title">Clinical Condition of the Tooth:</h3>
+                        <div class="exam-select-group">
+                            <select class="select-input exam-select">
+                                <option value="">Select condition</option>
+                                <option>WNL</option>
+                                <option>Discoloration</option>
+                                <option>Caries</option>
+                                <option>Pulp exposure</option>
+                                <option>Prior access</option>
+                                <option>Restoration</option>
+                            </select>
+                            <input type="text" placeholder="Restoration (specify)" class="others-text">
+                        </div>
+                    </div>
+
+                    <!-- Soft Tissue Examination -->
+                    <div class="exam-section">
+                        <h3 class="exam-title">Soft Tissue Examination:</h3>
+                        <div class="exam-select-group">
+                            <select class="select-input exam-select">
+                                <option value="">Select finding</option>
+                                <option>WNL</option>
+                                <option>Swelling</option>
+                                <option>Sinus Tract</option>
+                                <option>Lymphadenopathy</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Diagnostic Tests Table -->
+                    <div class="diag-table-wrapper">
+                        <table class="diag-table">
+                            <thead>
+                                <tr>
+                                    <th class="diag-header-main">DIAGNOSTIC TESTS<br><span>Indicate tooth number &#8594;</span></th>
+                                    <th>Suspected</th>
+                                    <th>Adjacent</th>
+                                    <th>Contralateral</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Pocket probing depths</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                <tr><td>Mobility grade</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                <tr><td>Percussion (+++, + or -)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                <tr><td>Palpation (+++, + or -)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                <tr><td>Cold (+++, + or -), (lasts for ...)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                <tr><td>Heat (+++, + or -), (lasts for ...)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                <tr><td>EPT values</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                <tr><td>Test cavity (optional)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Diagnosis -->
+                    <div class="diagnosis-section">
+                        <h3 class="exam-title">Diagnosis:</h3>
+
+                        <div class="diag-row">
+                            <div class="diag-tag">PULPAL</div>
+                            <select class="select-input pain-select">
+                                <option value="">Select diagnosis</option>
+                                <option>Normal Pulp</option>
+                                <option>Previously treated</option>
+                                <option>Reversible Pulpitis</option>
+                                <option>Previously initiated theraphy</option>
+                                <option>Symptomatic Irreversible Pulpitis</option>
+                                <option>Asymptomatic Irreversible Pulpitis</option>
+                                <option>Necrosis</option>
+                            </select>
+                        </div>
+
+                        <div class="diag-row">
+                            <div class="diag-tag">PERIAPICAL</div>
+                            <select class="select-input pain-select">
+                                <option value="">Select diagnosis</option>
+                                <option>Normal periapical tissues</option>
+                                <option>Symptomatic Apical Periodontitis</option>
+                                <option>Asymptomatic Apical Periodontitis</option>
+                                <option>Acute Apical Abscess</option>
+                                <option>Chronic Apical Abscess</option>
+                                <option>Condensing Osteitis</option>
+                            </select>
+                        </div>
+
+                        <!-- Recommended Treatment -->
+                        <div class="form-group" style="margin-top: 8px;">
+                            <label>Recommended Treatment:</label>
+                            <input type="text" placeholder="Value">
+                        </div>
+                    </div>
+
+                    <!-- Proposed Treatment Plan -->
+                    <div class="treatment-section">
+                        <h3 class="treatment-title">Proposed Treatment Plan:</h3>
+
+                        <div class="form-group">
+                            <label>Emergency Treatment:</label>
+                            <input type="text" placeholder="Value">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Pre-treatment:</label>
+                            <input type="text" placeholder="Value">
+                        </div>
+
+                        <div class="anesthesia-row">
+                            <div class="diag-tag">Anesthesia</div>
+                            <div class="anesthesia-options">
+                                <div class="anesthesia-item">
+                                    <select class="select-input exam-select">
+                                        <option value="">Select type</option>
+                                        <option>Infiltration; location</option>
+                                        <option>Block; location</option>
+                                        <option>Supplemental</option>
+                                    </select>
+                                    <input type="text" placeholder="Location / details" class="inline-input anesthesia-detail">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Proposed Restoration:</label>
+                            <input type="text" placeholder="Value">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Consultations done:</label>
+                            <input type="text" placeholder="Value">
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="form-actions">
+                        <button type="button" class="btn-next">Submit</button>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.select-input, .pain-select, .exam-select').forEach(function(sel) {
+    sel.addEventListener('change', function() {
+        if (this.value) {
+            this.classList.add('selected');
+        } else {
+            this.classList.remove('selected');
+        }
+    });
+});
+
+document.querySelector('.menu-icon').onclick = function() {
+    document.querySelector('.sidebar').classList.toggle('expanded');
+};
+
+document.querySelector('.user-profile').onclick = function(e) {
+    e.stopPropagation();
+    const dropdown = document.querySelector('.user-dropdown');
+    dropdown.classList.toggle('show');
+};
+
+document.addEventListener('click', function() {
+    const dropdown = document.querySelector('.user-dropdown');
+    if (dropdown.classList.contains('show')) {
+        dropdown.classList.remove('show');
+    }
+});
+
+document.querySelector('.user-dropdown').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+</script>
+
+</body>
+</html>
