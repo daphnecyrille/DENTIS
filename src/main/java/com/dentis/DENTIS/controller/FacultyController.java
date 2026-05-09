@@ -73,6 +73,12 @@ public class FacultyController {
         return "admitting-view-faculty";
     }
 
+    @GetMapping("/endodontics2-faculty")
+    public String endodontics2Faculty(Model model, Authentication authentication) {
+        model.addAttribute("currentUser", getCurrentUser(authentication));
+        return "endodontics2-faculty";
+    }
+
     @PostMapping("/faculty-dashboard/{id}/assign-clinician")
     public String assignClinician(@PathVariable Long id,
                                   @RequestParam Long clinicianId,

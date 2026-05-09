@@ -36,7 +36,8 @@ public class SecurityConfig {
                 .requestMatchers("/css/**", "/images/**", "/js/**", "/login", "/oauth2/**").permitAll()
                 .requestMatchers(
                     "/faculty-dashboard", "/faculty-assign", "/faculty-patientlist",
-                    "/chartsview-faculty/**", "/faculty-dashboard/**", "/admitting-view-faculty/**"
+                    "/chartsview-faculty/**", "/faculty-dashboard/**", "/admitting-view-faculty/**",
+                    "/endodontics2-faculty/**"
                 ).hasRole("FACULTY")
                 .requestMatchers(
                     "/dashboard-clinicmanager", "/patientlist-clinicmanager", "/requestlist-clinicmanager",
