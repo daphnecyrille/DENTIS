@@ -1,0 +1,8 @@
+# Copy this file to `application-local.properties` and fill in the password.
+# `application-local.properties` is gitignored — it stays on your machine only.
+#
+# Get the database password from:
+#   Supabase dashboard -> Project Settings -> Database -> Database password
+# (If you didn't save it at project creation, click "Reset database password".)
+
+SUPABASE_DB_PASSWORD=your-supabase-db-password-here
