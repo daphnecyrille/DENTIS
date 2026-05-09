@@ -28,10 +28,10 @@
                         <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
                     </svg>
                 </div>
-                <span class="username">dsbaui (Clinic Manager)</span>
+                <span class="username" th:text="${currentUser != null ? currentUser.firstName + ' ' + currentUser.lastName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
                 <div class="dropdown-icon">▼</div>
                 <div class="user-dropdown">
-                    <a href="/login" class="dropdown-item">Logout</a>
+                    <a href="/logout" class="dropdown-item">Logout</a>
                 </div>
             </div>
         </div>

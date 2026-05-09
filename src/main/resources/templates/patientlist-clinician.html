@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Patient List - DentIS</title>
@@ -28,13 +28,13 @@
                     </svg>
                 </div>
 
-                <span class="username">dsbaui [Clinician]</span>
+                <span class="username" th:text="${currentUser != null ? currentUser.firstName + ' ' + currentUser.lastName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
 
                 <div class="dropdown-icon">▼</div>
                 
                 <!-- Dropdown Menu -->
                 <div class="user-dropdown">
-                    <a href="/login" class="dropdown-item">Logout</a>
+                    <a href="/logout" class="dropdown-item">Logout</a>
                 </div>
             </div>
         </div>
@@ -86,77 +86,17 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>001</td>
-                                <td>John Smith</td>
-                                <td>+1234567890</td>
-                                <td>john.smith@email.com</td>
+                            <tr th:each="patient : ${patients}">
+                                <td th:text="${patient.chartNo}"></td>
+                                <td th:text="${patient.surname + ', ' + patient.firstName + (patient.middleInitial != null ? ' ' + patient.middleInitial + '.' : '')}"></td>
+                                <td th:text="${patient.contactNumber}"></td>
+                                <td th:text="${patient.email}"></td>
                                 <td>
-                                    <a href="/patient-details" class="btn-view-chart">View</a>
+                                    <a th:href="@{/chartsview-clinician}" class="btn-view-chart">View</a>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>002</td>
-                                <td>Sarah Johnson</td>
-                                <td>+1234567891</td>
-                                <td>sarah.j@email.com</td>
-                                <td>
-                                    <a href="/patient-details" class="btn-view-chart">View</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>003</td>
-                                <td>Michael Brown</td>
-                                <td>+1234567892</td>
-                                <td>michael.brown@email.com</td>
-                                <td>
-                                    <a href="/patient-details" class="btn-view-chart">View</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>004</td>
-                                <td>Emily Davis</td>
-                                <td>+1234567893</td>
-                                <td>emily.davis@email.com</td>
-                                <td>
-                                    <a href="/patient-details" class="btn-view-chart">View</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>005</td>
-                                <td>Robert Wilson</td>
-                                <td>+1234567894</td>
-                                <td>robert.wilson@email.com</td>
-                                <td>
-                                    <a href="/patient-details" class="btn-view-chart">View</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>006</td>
-                                <td>Jessica Martinez</td>
-                                <td>+1234567895</td>
-                                <td>jessica.martinez@email.com</td>
-                                <td>
-                                    <a href="/patient-details" class="btn-view-chart">View</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>007</td>
-                                <td>David Anderson</td>
-                                <td>+1234567896</td>
-                                <td>david.anderson@email.com</td>
-                                <td>
-                                    <a href="/patient-details" class="btn-view-chart">View</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>008</td>
-                                <td>Lisa Thompson</td>
-                                <td>+1234567897</td>
-                                <td>lisa.thompson@email.com</td>
-                                <td>
-                                    <a href="/patient-details" class="btn-view-chart">View</a>
-                                </td>
+                            <tr th:if="${#lists.isEmpty(patients)}">
+                                <td colspan="5" style="text-align:center; color:#888;">No approved patients yet.</td>
                             </tr>
                         </tbody>
                     </table>

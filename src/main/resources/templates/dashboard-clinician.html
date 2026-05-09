@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Clinician Dashboard - DentIS</title>
@@ -28,13 +28,13 @@
                     </svg>
                 </div>
 
-                <span class="username">dsbaui [Clinician]</span>
+                <span class="username" th:text="${currentUser != null ? currentUser.firstName + ' ' + currentUser.lastName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
 
                 <div class="dropdown-icon">▼</div>
                 
                 <!-- Dropdown Menu -->
                 <div class="user-dropdown">
-                    <a href="/login" class="dropdown-item">Logout</a>
+                    <a href="/logout" class="dropdown-item">Logout</a>
                 </div>
             </div>
         </div>
@@ -86,32 +86,17 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>001</td>
-                                <td>John Smith</td>
-                                <td>+1234567890</td>
-                                <td>john.smith@email.com</td>
+                            <tr th:each="patient : ${patients}">
+                                <td th:text="${patient.chartNo}"></td>
+                                <td th:text="${patient.surname + ', ' + patient.firstName + (patient.middleInitial != null ? ' ' + patient.middleInitial + '.' : '')}"></td>
+                                <td th:text="${patient.contactNumber}"></td>
+                                <td th:text="${patient.email}"></td>
                                 <td>
                                     <a href="/chartsview-clinician" class="btn-view-chart">View</a>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>002</td>
-                                <td>Sarah Johnson</td>
-                                <td>+1234567891</td>
-                                <td>sarah.j@email.com</td>
-                                <td>
-                                    <a href="/chartsview-clinician" class="btn-view-chart">View</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>003</td>
-                                <td>Michael Brown</td>
-                                <td>+1234567892</td>
-                                <td>michael.brown@email.com</td>
-                                <td>
-                                    <a href="/chartsview-clinician" class="btn-view-chart">View</a>
-                                </td>
+                            <tr th:if="${#lists.isEmpty(patients)}">
+                                <td colspan="5" style="text-align:center; color:#888;">No approved patients yet.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -136,35 +121,19 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>001</td>
-                                <td>John Smith</td>
-                                <td>john.smith@email.com</td>
-                                <td>2024-01-15</td>
-                                <td class="status pending">Pending</td>
+                            <tr th:each="req : ${requests}">
+                                <td th:text="${req.chartNo}"></td>
+                                <td th:text="${req.patientName}"></td>
+                                <td th:text="${req.patient != null ? req.patient.email : '—'}"></td>
+                                <td th:text="${req.requestDate}"></td>
+                                <td th:class="'status ' + ${req.status.cssClass}" th:text="${req.status}"></td>
                                 <td>
-                                    <a href="/admitting-view-clinician" class="btn-view-details">View Patient Details</a>
+                                    <a th:if="${req.patient != null}" th:href="@{/admitting-view-clinician/{id}(id=${req.patient.id})}" class="btn-view-details">View Patient Details</a>
+                                    <span th:if="${req.patient == null}">—</span>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>002</td>
-                                <td>Sarah Johnson</td>
-                                <td>sarah.j@email.com</td>
-                                <td>2024-01-14</td>
-                                <td class="status pending">Pending</td>
-                                <td>
-                                    <a href="/admitting-view-clinician" class="btn-view-details">View Patient Details</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>003</td>
-                                <td>Michael Brown</td>
-                                <td>michael.brown@email.com</td>
-                                <td>2024-01-13</td>
-                                <td class="status pending">Pending</td>
-                                <td>
-                                    <a href="/admitting-view-clinician" class="btn-view-details">View Patient Details</a>
-                                </td>
+                            <tr th:if="${#lists.isEmpty(requests)}">
+                                <td colspan="6" style="text-align:center; color:#888;">No requests yet.</td>
                             </tr>
                         </tbody>
                     </table>

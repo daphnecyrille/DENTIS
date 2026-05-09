@@ -28,10 +28,10 @@
                         <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
                     </svg>
                 </div>
-                <span class="username">dsbaui (Clinic Manager)</span>
+                <span class="username" th:text="${currentUser != null ? currentUser.firstName + ' ' + currentUser.lastName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
                 <div class="dropdown-icon">▼</div>
                 <div class="user-dropdown">
-                    <a href="/login" class="dropdown-item">Logout</a>
+                    <a href="/logout" class="dropdown-item">Logout</a>
                 </div>
             </div>
         </div>
@@ -118,38 +118,37 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Daphne Cyrille S. Baui</td>
-                                <td>11-23-2025</td>
-                                <td>20250101-00001</td>
-                                <td>BAUI, Daphne Cyrille S.</td>
-                                <td>Activity</td>
+                            <tr th:each="req : ${requests}">
+                                <td>
+                                    <span th:if="${req.clinician != null}"
+                                          class="clinician-link"
+                                          th:data-name="${req.clinician.fullName}"
+                                          th:data-email="${req.clinician.email}"
+                                          th:data-student="${req.clinician.studentNumber}"
+                                          th:data-year="${req.clinician.yearLevel}"
+
+                                          th:text="${req.clinician.fullName}"
+                                          onclick="showClinicianModal(this)">
+                                    </span>
+                                    <span th:if="${req.clinician == null}">—</span>
+                                </td>
+                                <td th:text="${req.requestDate}"></td>
+                                <td th:text="${req.chartNo}"></td>
+                                <td th:text="${req.patientName}"></td>
+                                <td th:text="${req.purpose}"></td>
                                 <td class="action-cell">
-                                    <button class="btn-accept">Accept</button>
-                                    <button class="btn-deny">Deny</button>
+                                    <form th:action="@{/requestlist-clinicmanager/{id}/approve(id=${req.id})}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn-accept"
+                                                th:disabled="${req.status.name() != 'PENDING'}">Accept</button>
+                                    </form>
+                                    <form th:action="@{/requestlist-clinicmanager/{id}/deny(id=${req.id})}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn-deny"
+                                                th:disabled="${req.status.name() != 'PENDING'}">Deny</button>
+                                    </form>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>Daphne Cyrille S. Baui</td>
-                                <td>11-23-2025</td>
-                                <td>20250101-00002</td>
-                                <td>BAUI, Daphne Cyrille S.</td>
-                                <td>Activity</td>
-                                <td class="action-cell">
-                                    <button class="btn-accept">Accept</button>
-                                    <button class="btn-deny">Deny</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Daphne Cyrille S. Baui</td>
-                                <td>11-23-2025</td>
-                                <td>20250101-00003</td>
-                                <td>BAUI, Daphne Cyrille S.</td>
-                                <td>Activity</td>
-                                <td class="action-cell">
-                                    <button class="btn-accept">Accept</button>
-                                    <button class="btn-deny">Deny</button>
-                                </td>
+                            <tr th:if="${#lists.isEmpty(requests)}">
+                                <td colspan="6" style="text-align:center; color:#888;">No requests yet.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -158,6 +157,19 @@
 
 
         </main>
+    </div>
+</div>
+
+<!-- Clinician Modal -->
+<div id="clinicianModal" class="modal-overlay" onclick="closeModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <h3 id="modal-name"></h3>
+        <div class="modal-details">
+            <div class="modal-row"><span class="modal-label">Email</span><span id="modal-email"></span></div>
+            <div class="modal-row"><span class="modal-label">Student No.</span><span id="modal-student"></span></div>
+            <div class="modal-row"><span class="modal-label">Year Level</span><span id="modal-year"></span></div>
+        </div>
     </div>
 </div>
 
@@ -179,6 +191,18 @@ document.addEventListener('click', function() {
 document.querySelector('.user-dropdown').addEventListener('click', function(e) {
     e.stopPropagation();
 });
+
+function showClinicianModal(el) {
+    document.getElementById('modal-name').textContent = el.dataset.name || '—';
+    document.getElementById('modal-email').textContent = el.dataset.email || '—';
+    document.getElementById('modal-student').textContent = el.dataset.student || '—';
+    document.getElementById('modal-year').textContent = el.dataset.year || '—';
+    document.getElementById('clinicianModal').style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('clinicianModal').style.display = 'none';
+}
 </script>
 
 </body>
