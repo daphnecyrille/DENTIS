@@ -236,7 +236,24 @@ body {
     color: white;
     padding: 12px 20px;
     font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
+
+.btn-add {
+    background: white;
+    color: #324966;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-add:hover { background: #e8edf2; }
 
 /* TABLE STYLES */
 .table-container {

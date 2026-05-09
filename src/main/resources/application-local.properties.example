@@ -6,3 +6,10 @@
 # (If you didn't save it at project creation, click "Reset database password".)
 
 SUPABASE_DB_PASSWORD=your-supabase-db-password-here
+
+# Google OAuth2 credentials
+# Get these from: https://console.cloud.google.com -> APIs & Services -> Credentials
+# Create an OAuth 2.0 Client ID (Web application)
+# Add authorized redirect URI: http://localhost:8080/login/oauth2/code/google
+GOOGLE_CLIENT_ID=your-google-client-id-here
+GOOGLE_CLIENT_SECRET=your-google-client-secret-here

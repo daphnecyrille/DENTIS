@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Request List - Clinic Manager</title>
+    <link rel="stylesheet" href="/css/requestlist-clinicmanager.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div class="background"></div>
+<div class="clinicmanager-requestlist">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username">dsbaui (Clinic Manager)</span>
+                <div class="dropdown-icon">▼</div>
+                <div class="user-dropdown">
+                    <a href="/login" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="/dashboard-clinicmanager" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="/requestlist-clinicmanager" class="nav-link">
+                            <img src="/images/request-icon.png" alt="Request List" class="nav-icon">
+                            <span>Request List</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/patientlist-clinicmanager" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient List" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <section class="section">
+                <div class="section-header">
+                    <h2>Request List</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Clinician</th>
+                                <th>Date Requested</th>
+                                <th>Requested Chart No.</th>
+                                <th>Patient Name</th>
+                                <th>Purpose</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Daphne Cyrille S. Baui</td>
+                                <td>11-23-2025</td>
+                                <td>20250101-00001</td>
+                                <td>BAUI, Daphne Cyrille S.</td>
+                                <td>Activity</td>
+                                <td class="action-cell">
+                                    <button class="btn-accept">Accept</button>
+                                    <button class="btn-deny">Deny</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Daphne Cyrille S. Baui</td>
+                                <td>11-23-2025</td>
+                                <td>20250101-00002</td>
+                                <td>BAUI, Daphne Cyrille S.</td>
+                                <td>Activity</td>
+                                <td class="action-cell">
+                                    <button class="btn-accept">Accept</button>
+                                    <button class="btn-deny">Deny</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Daphne Cyrille S. Baui</td>
+                                <td>11-23-2025</td>
+                                <td>20250101-00003</td>
+                                <td>BAUI, Daphne Cyrille S.</td>
+                                <td>Activity</td>
+                                <td class="action-cell">
+                                    <button class="btn-accept">Accept</button>
+                                    <button class="btn-deny">Deny</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script>
+document.querySelector('.menu-icon').onclick = function() {
+    document.querySelector('.sidebar').classList.toggle('expanded');
+};
+
+document.querySelector('.user-profile').onclick = function(e) {
+    e.stopPropagation();
+    document.querySelector('.user-dropdown').classList.toggle('show');
+};
+
+document.addEventListener('click', function() {
+    const dropdown = document.querySelector('.user-dropdown');
+    if (dropdown.classList.contains('show')) dropdown.classList.remove('show');
+});
+
+document.querySelector('.user-dropdown').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+</script>
+
+</body>
+</html>

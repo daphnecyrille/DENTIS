@@ -1,15 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Clinician Dashboard - DentIS</title>
-    <link rel="stylesheet" href="/css/dashboard-clinician.css">
+    <title>Dashboard - Clinic Manager</title>
+    <link rel="stylesheet" href="/css/dashboard-clinicmanager.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 
 <body>
 <div class="background"></div>
-<div class="clinician-dashboard">
+<div class="clinicmanager-dashboard">
+
     <!-- Header -->
     <header class="header">
         <div class="header-left">
@@ -27,12 +28,8 @@
                         <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
                     </svg>
                 </div>
-
-                <span class="username">dsbaui [Clinician]</span>
-
+                <span class="username">dsbaui (Clinic Manager)</span>
                 <div class="dropdown-icon">▼</div>
-                
-                <!-- Dropdown Menu -->
                 <div class="user-dropdown">
                     <a href="/login" class="dropdown-item">Logout</a>
                 </div>
@@ -41,25 +38,26 @@
     </header>
 
     <div class="main-container">
+
         <!-- Sidebar -->
         <aside class="sidebar">
             <nav class="nav-menu">
                 <ul>
                     <li class="nav-item active">
-                        <a href="#dashboard" class="nav-link">
+                        <a href="/dashboard-clinicmanager" class="nav-link">
                             <img src="/images/home-icon.png" alt="Home" class="nav-icon">
                             <span>Home</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/chartrequest-clinician" class="nav-link">
-                            <img src="/images/request-icon.png" alt="Chart" class="nav-icon2">
-                            <span>Chart Request</span>
+                        <a href="/requestlist-clinicmanager" class="nav-link">
+                            <img src="/images/request-icon.png" alt="Request List" class="nav-icon">
+                            <span>Request List</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/patientlist-clinician" class="nav-link">
-                            <img src="/images/patient-icon.png" alt="Patient" class="nav-icon">
+                        <a href="/patientlist-clinicmanager" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient List" class="nav-icon">
                             <span>Patient List</span>
                         </a>
                     </li>
@@ -69,13 +67,14 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Patient List Section -->
+
+            <!-- Patient List -->
             <section class="section">
                 <div class="section-header">
                     <h2>Patient List</h2>
                 </div>
                 <div class="table-container">
-                    <table class="patient-table">
+                    <table>
                         <thead>
                             <tr>
                                 <th>Chart Number</th>
@@ -86,31 +85,70 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <tr th:each="patient : ${patients}">
+                                <td th:text="${patient.chartNo}"></td>
+                                <td th:text="${patient.surname + ', ' + patient.firstName + (patient.middleInitial != null ? ' ' + patient.middleInitial + '.' : '')}"></td>
+                                <td th:text="${patient.contactNumber}"></td>
+                                <td th:text="${patient.email}"></td>
+                                <td><a th:href="@{/chartsview-clinicmanager/{id}(id=${patient.id})}" class="btn-view">View Chart</a></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(patients)}">
+                                <td colspan="5" style="text-align:center; color:#888;">No patients registered yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Request List (Clinician chart access requests) -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>Request List</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
                             <tr>
-                                <td>001</td>
-                                <td>John Smith</td>
-                                <td>+1234567890</td>
-                                <td>john.smith@email.com</td>
-                                <td>
-                                    <a href="/chartsview-clinician" class="btn-view-chart">View</a>
+                                <th>Clinician</th>
+                                <th>Date Requested</th>
+                                <th>Requested Chart No.</th>
+                                <th>Patient Name</th>
+                                <th>Purpose</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Daphne Cyrille S. Baui</td>
+                                <td>11-23-2025</td>
+                                <td>20250101-00001</td>
+                                <td>BAUI, Daphne Cyrille S.</td>
+                                <td>Activity</td>
+                                <td class="action-cell">
+                                    <button class="btn-accept">Accept</button>
+                                    <button class="btn-deny">Deny</button>
                                 </td>
                             </tr>
                             <tr>
-                                <td>002</td>
-                                <td>Sarah Johnson</td>
-                                <td>+1234567891</td>
-                                <td>sarah.j@email.com</td>
-                                <td>
-                                    <a href="/chartsview-clinician" class="btn-view-chart">View</a>
+                                <td>Daphne Cyrille S. Baui</td>
+                                <td>11-23-2025</td>
+                                <td>20250101-00002</td>
+                                <td>BAUI, Daphne Cyrille S.</td>
+                                <td>Activity</td>
+                                <td class="action-cell">
+                                    <button class="btn-accept">Accept</button>
+                                    <button class="btn-deny">Deny</button>
                                 </td>
                             </tr>
                             <tr>
-                                <td>003</td>
-                                <td>Michael Brown</td>
-                                <td>+1234567892</td>
-                                <td>michael.brown@email.com</td>
-                                <td>
-                                    <a href="/chartsview-clinician" class="btn-view-chart">View</a>
+                                <td>Daphne Cyrille S. Baui</td>
+                                <td>11-23-2025</td>
+                                <td>20250101-00003</td>
+                                <td>BAUI, Daphne Cyrille S.</td>
+                                <td>Activity</td>
+                                <td class="action-cell">
+                                    <button class="btn-accept">Accept</button>
+                                    <button class="btn-deny">Deny</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -118,58 +156,7 @@
                 </div>
             </section>
 
-            <!-- Request List Section -->
-            <section class="section">
-                <div class="section-header">
-                    <h2>Request List</h2>
-                </div>
-                <div class="table-container">
-                    <table class="request-table">
-                        <thead>
-                            <tr>
-                                <th>Requested Chart No.</th>
-                                <th>Patient Name</th>
-                                <th>Email</th>
-                                <th>Date Requested</th>
-                                <th>Request Status</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>001</td>
-                                <td>John Smith</td>
-                                <td>john.smith@email.com</td>
-                                <td>2024-01-15</td>
-                                <td class="status pending">Pending</td>
-                                <td>
-                                    <a href="/admitting-view-clinician" class="btn-view-details">View Patient Details</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>002</td>
-                                <td>Sarah Johnson</td>
-                                <td>sarah.j@email.com</td>
-                                <td>2024-01-14</td>
-                                <td class="status pending">Pending</td>
-                                <td>
-                                    <a href="/admitting-view-clinician" class="btn-view-details">View Patient Details</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>003</td>
-                                <td>Michael Brown</td>
-                                <td>michael.brown@email.com</td>
-                                <td>2024-01-13</td>
-                                <td class="status pending">Pending</td>
-                                <td>
-                                    <a href="/admitting-view-clinician" class="btn-view-details">View Patient Details</a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
+
         </main>
     </div>
 </div>
@@ -179,22 +166,16 @@ document.querySelector('.menu-icon').onclick = function() {
     document.querySelector('.sidebar').classList.toggle('expanded');
 };
 
-// Dropdown functionality
 document.querySelector('.user-profile').onclick = function(e) {
     e.stopPropagation();
-    const dropdown = document.querySelector('.user-dropdown');
-    dropdown.classList.toggle('show');
+    document.querySelector('.user-dropdown').classList.toggle('show');
 };
 
-// Close dropdown when clicking outside
 document.addEventListener('click', function() {
     const dropdown = document.querySelector('.user-dropdown');
-    if (dropdown.classList.contains('show')) {
-        dropdown.classList.remove('show');
-    }
+    if (dropdown.classList.contains('show')) dropdown.classList.remove('show');
 });
 
-// Prevent dropdown from closing when clicking inside
 document.querySelector('.user-dropdown').addEventListener('click', function(e) {
     e.stopPropagation();
 });

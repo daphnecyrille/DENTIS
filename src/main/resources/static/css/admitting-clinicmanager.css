@@ -336,6 +336,12 @@ body {
     max-width: 220px;
 }
 
+.auto-field {
+    background: #f0f0f0;
+    color: #888;
+    cursor: not-allowed;
+}
+
 /* SELECT */
 .select-input {
     cursor: pointer;

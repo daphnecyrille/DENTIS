@@ -238,10 +238,10 @@ body {
 }
 
 .pain-options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    flex: 1;
 }
 
 .checkbox-label {
@@ -254,17 +254,41 @@ body {
 }
 
 .checkbox-label input[type="checkbox"] {
+    appearance: none;
     width: 14px;
     height: 14px;
+    border: 1px solid #333;
+    border-radius: 2px;
     cursor: pointer;
-    accent-color: #2d4a6b;
+    position: relative;
+    background: white;
 }
 
-.others-row { margin-top: 2px; padding-left: 102px; }
-.others-label { font-size: 13px; color: #333; white-space: nowrap; }
+.checkbox-label input[type="checkbox"]:checked {
+    background: #8B0000;
+    border-color: #8B0000;
+}
+
+.checkbox-label input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 4px;
+    height: 7px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.others-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-left: 102px;
+}
 .others-input {
-    flex: 1;
-    max-width: 200px;
+    width: 200px;
     padding: 6px 10px;
     border: 1px solid #ccc;
     border-radius: 4px;

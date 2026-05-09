@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <title>DentIS Login</title>
@@ -36,7 +36,9 @@
         <h2>Welcome</h2>
         <p>Sign in with your account to continue</p>
 
-        <a href="/clinician-dashboard" class="google-btn-link">
+        <div th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></div>
+
+        <a href="/oauth2/authorization/google" class="google-btn-link">
             <button class="google-btn">
                 <img src="/images/GoogleLogo.png" alt="Google">
                 Login with Google

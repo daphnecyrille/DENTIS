@@ -244,3 +244,14 @@ color:inherit;
         height:40px;
     }
 }
+
+.error-message {
+    background-color: #fdecea;
+    color: #b71c1c;
+    border: 1px solid #f5c6cb;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    text-align: center;
+}

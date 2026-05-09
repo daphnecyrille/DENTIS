@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Admitting Section Form - DentIS</title>
@@ -27,7 +27,7 @@
                         <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
                     </svg>
                 </div>
-                <span class="username">dsbaui [Clinician]</span>
+                <span class="username">dsbaui [Clinic Manager]</span>
                 <div class="dropdown-icon">▼</div>
                 <div class="user-dropdown">
                     <a href="/login" class="dropdown-item">Logout</a>
@@ -42,20 +42,20 @@
             <nav class="nav-menu">
                 <ul>
                     <li class="nav-item">
-                        <a href="/clinician-dashboard" class="nav-link">
+                        <a href="/dashboard-clinicmanager" class="nav-link">
                             <img src="/images/home-icon.png" alt="Home" class="nav-icon">
                             <span>Home</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/chartrequest-clinician" class="nav-link">
-                            <img src="/images/chart-icon.png" alt="Chart" class="nav-icon2">
-                            <span>Chart Request</span>
+                        <a href="/requestlist-clinicmanager" class="nav-link">
+                            <img src="/images/request-icon.png" alt="Request List" class="nav-icon">
+                            <span>Request List</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/patientlist-clinician" class="nav-link">
-                            <img src="/images/patient-icon.png" alt="Patient" class="nav-icon">
+                        <a href="/patientlist-clinicmanager" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient List" class="nav-icon">
                             <span>Patient List</span>
                         </a>
                     </li>
@@ -70,20 +70,16 @@
 
             <!-- Form Card -->
             <div class="form-card">
-                <form class="admitting-form-content">
+                <form class="admitting-form-content" th:action="@{/admitting-clinicmanager}" th:object="${patient}" method="post">
 
                     <!-- Personal Information Sub-header -->
                     <div class="sub-header">Personal Information</div>
 
-                    <!-- Registration Date + Patient No. -->
+                    <!-- Registration Date -->
                     <div class="form-row">
                         <div class="form-group">
                             <label>Registration Date</label>
-                            <input type="date" class="date-picker">
-                        </div>
-                        <div class="form-group">
-                            <label>Chart No.</label>
-                            <input type="text" placeholder="Chart No." class="input-medium">
+                            <input type="date" class="date-picker" th:field="*{registrationDate}">
                         </div>
                     </div>
 
@@ -92,9 +88,9 @@
                         <div class="form-group full-width">
                             <label>Patient Name</label>
                             <div class="split-input">
-                                <input type="text" placeholder="Surname">
-                                <input type="text" placeholder="First Name" class="input-wide">
-                                <input type="text" placeholder="M.I." class="input-narrow">
+                                <input type="text" placeholder="Surname" th:field="*{surname}">
+                                <input type="text" placeholder="First Name" class="input-wide" th:field="*{firstName}">
+                                <input type="text" placeholder="M.I." class="input-narrow" th:field="*{middleInitial}">
                             </div>
                         </div>
                     </div>
@@ -103,18 +99,18 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Age</label>
-                            <input type="text" placeholder="Age">
+                            <input type="number" placeholder="Age" th:field="*{age}">
                         </div>
                         <div class="form-group">
                             <label>Birthdate</label>
-                            <input type="date" class="date-picker">
+                            <input type="date" class="date-picker" th:field="*{birthdate}">
                         </div>
                         <div class="form-group">
                             <label>Sex</label>
-                            <select class="select-input">
+                            <select class="select-input" th:field="*{sex}">
                                 <option value="">Enter Sex</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
                             </select>
                         </div>
                     </div>
@@ -123,7 +119,7 @@
                     <div class="form-row">
                         <div class="form-group full-width">
                             <label>Address</label>
-                            <input type="text" placeholder="Enter Address">
+                            <input type="text" placeholder="Enter Address" th:field="*{address}">
                         </div>
                     </div>
 
@@ -131,19 +127,19 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Contact Number</label>
-                            <input type="tel" placeholder="Enter Contact Number">
+                            <input type="tel" placeholder="Enter Contact Number" th:field="*{contactNumber}">
                         </div>
                         <div class="form-group">
                             <label>Email</label>
-                            <input type="email" placeholder="Enter Email Address">
+                            <input type="email" placeholder="Enter Email Address" th:field="*{email}">
                         </div>
                         <div class="form-group">
                             <label>Civil Status</label>
-                            <select class="select-input">
+                            <select class="select-input" th:field="*{civilStatus}">
                                 <option value="">Civil Status</option>
-                                <option value="single">Single</option>
-                                <option value="married">Married</option>
-                                <option value="widowed">Widowed</option>
+                                <option value="Single">Single</option>
+                                <option value="Married">Married</option>
+                                <option value="Widowed">Widowed</option>
                             </select>
                         </div>
                     </div>
@@ -152,11 +148,11 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Occupation</label>
-                            <input type="text" placeholder="Value">
+                            <input type="text" placeholder="Occupation" th:field="*{occupation}">
                         </div>
                         <div class="form-group">
                             <label>Educational Attainment</label>
-                            <input type="text" placeholder="Value">
+                            <input type="text" placeholder="Educational Attainment" th:field="*{educationalAttainment}">
                         </div>
                     </div>
 
@@ -167,11 +163,11 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Contact Person</label>
-                            <input type="text" placeholder="Surname, First Name M.I.">
+                            <input type="text" placeholder="Surname, First Name M.I." th:field="*{emergencyContactName}">
                         </div>
                         <div class="form-group">
                             <label>Relationship</label>
-                            <input type="text" placeholder="Value">
+                            <input type="text" placeholder="Relationship" th:field="*{emergencyContactRelation}">
                         </div>
                     </div>
 
@@ -179,17 +175,16 @@
                     <div class="form-row">
                         <div class="form-group form-group-small">
                             <label>Contact Number</label>
-                            <input type="tel" placeholder="Value">
+                            <input type="tel" placeholder="Emergency Contact Number" th:field="*{emergencyContactNumber}">
                         </div>
                     </div>
 
                     <!-- Chief Complaint -->
                     <h3 class="section-title">Chief Complaint</h3>
 
-                    <!-- Description -->
                     <div class="form-row">
                         <div class="form-group full-width">
-                            <textarea placeholder="Description" rows="3"></textarea>
+                            <textarea placeholder="Description" rows="3" th:field="*{chiefComplaint}"></textarea>
                         </div>
                     </div>
 
@@ -197,7 +192,7 @@
                     <div class="form-row">
                         <div class="form-group full-width">
                             <label>History of Present Illness</label>
-                            <textarea placeholder="Enter History of Present Illness" rows="3"></textarea>
+                            <textarea placeholder="Enter History of Present Illness" rows="3" th:field="*{historyOfPresentIllness}"></textarea>
                         </div>
                     </div>
 
@@ -205,7 +200,7 @@
                     <div class="form-row">
                         <div class="form-group form-group-small">
                             <label>Service Code</label>
-                            <select class="select-input">
+                            <select class="select-input" th:field="*{serviceCode}">
                                 <option value="">Select Service Code</option>
                                 <option value="Resto">Resto</option>
                                 <option value="FPD">FPD</option>
@@ -224,7 +219,7 @@
                     <div class="form-row">
                         <div class="form-group full-width">
                             <label>Proposed Treatment Plan</label>
-                            <textarea placeholder="Enter Proposed Treatment Plan" rows="3"></textarea>
+                            <textarea placeholder="Enter Proposed Treatment Plan" rows="3" th:field="*{proposedTreatmentPlan}"></textarea>
                         </div>
                     </div>
 
