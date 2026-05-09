@@ -1,9 +1,11 @@
 package com.dentis.DENTIS.controller;
 
 import com.dentis.DENTIS.model.ChartRequest;
+import com.dentis.DENTIS.model.Patient;
 import com.dentis.DENTIS.model.User;
 import com.dentis.DENTIS.repository.UserRepository;
 import com.dentis.DENTIS.service.ChartRequestService;
+import com.dentis.DENTIS.service.OralSurgeryChartService;
 import com.dentis.DENTIS.service.PatientService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -18,13 +20,16 @@ public class ChartRequestController {
 
     private final ChartRequestService chartRequestService;
     private final PatientService patientService;
+    private final OralSurgeryChartService oralSurgeryChartService;
     private final UserRepository userRepository;
 
     public ChartRequestController(ChartRequestService chartRequestService,
                                   PatientService patientService,
+                                  OralSurgeryChartService oralSurgeryChartService,
                                   UserRepository userRepository) {
         this.chartRequestService = chartRequestService;
         this.patientService = patientService;
+        this.oralSurgeryChartService = oralSurgeryChartService;
         this.userRepository = userRepository;
     }
 
@@ -104,10 +109,14 @@ public class ChartRequestController {
     @GetMapping("/chartsview-clinician/{id}")
     public String chartsViewClinician(@PathVariable Long id, Model model, Authentication authentication) {
         User clinician = getCurrentUser(authentication);
-        model.addAttribute("patient", chartRequestService.getPatientById(id));
+        Patient patient = patientService.getPatientById(id);
+        model.addAttribute("currentUser", clinician);
+        model.addAttribute("patient", patient);
         model.addAttribute("approvedCharts", clinician != null
                 ? chartRequestService.getApprovedRequestsForClinicianAndPatient(clinician, id)
                 : List.of());
+        model.addAttribute("oralSurgeryChart",
+                oralSurgeryChartService.findByPatient(patient).orElse(null));
         return "chartsview-clinician";
     }
 }

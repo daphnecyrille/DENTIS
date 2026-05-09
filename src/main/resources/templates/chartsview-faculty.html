@@ -176,6 +176,14 @@
                                 <td><a th:href="@{/admitting-view-faculty/{id}(id=${patient.id})}" class="btn-action btn-view">View Chart</a></td>
                                 <td th:text="${patient.assignedClinician != null ? patient.assignedClinician.fullName : '—'}">—</td>
                             </tr>
+                            <tr th:if="${oralSurgeryChart != null}">
+                                <td>Oral Surgery Chart</td>
+                                <td th:class="'status ' + ${oralSurgeryChart.status.cssClass}"
+                                    th:text="${oralSurgeryChart.status.displayName}"></td>
+                                <td th:text="${oralSurgeryChart.createdAt.toLocalDate()}"></td>
+                                <td><a th:href="@{/oralsurgery-view-faculty/{id}(id=${oralSurgeryChart.id})}" class="btn-action btn-view">View Chart</a></td>
+                                <td th:text="${patient.assignedClinician != null ? patient.assignedClinician.fullName : '—'}">—</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

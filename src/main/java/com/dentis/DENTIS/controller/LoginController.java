@@ -20,14 +20,14 @@ public class LoginController {
         return "login";
     }
 
-    @GetMapping("/oralsurgery-clinician")
-    public String oralSurgeryClinician() { return "oralsurgery-clinician"; }
-
-    @GetMapping("/oralsurgery2-clinician")
-    public String oralSurgery2Clinician() { return "oralsurgery2-clinician"; }
-
     @GetMapping("/endodontics-clinician")
     public String endodonticsClinician() { return "endodontics-clinician"; }
+
+    @GetMapping("/periodonticsa-clinician")
+    public String periodonticsaClinician() { return "periodonticsa-clinician"; }
+
+    @GetMapping("/periodonticsb-clinician")
+    public String periodonticsbClinician() { return "periodonticsb-clinician"; }
 
     @GetMapping("/admin-dashboard")
     public String adminDashboard() { return "dashboard-clinician"; } // placeholder

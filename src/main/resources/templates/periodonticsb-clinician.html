@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Clinical Periodontics B - DentIS</title>
+    <link rel="stylesheet" href="/css/periodonticsb-clinician.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div class="background"></div>
+<div class="perio-page">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.firstName + ' ' + currentUser.lastName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
+                <div class="dropdown-icon">&#9660;</div>
+                <div class="user-dropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="/clinician-dashboard" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/chartrequest-clinician" class="nav-link">
+                            <img src="/images/request-icon.png" alt="Chart" class="nav-icon2">
+                            <span>Chart Request</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/patientlist-clinician" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <h2 class="page-title">Clinical Periodontics</h2>
+
+            <div class="form-card">
+
+                <!-- Banner -->
+                <div class="form-banner">Periodontal Chart</div>
+
+                <div class="form-body">
+
+                    <!-- Plaque score formula -->
+                    <div class="plaque-formula">
+                        <label class="formula-label">Total Number of Sites with Plaque/<br>Number of Sites Examined x100 =</label>
+                        <input type="text" placeholder="%" class="formula-input">
+                    </div>
+
+                    <!-- Periodontal Chart -->
+                    <div class="perio-chart-wrapper">
+
+                        <!-- Upper Arch -->
+                        <div class="arch-section">
+                            <div class="tooth-numbers">
+                                <span></span>
+                                <span>18</span><span>17</span><span>16</span><span>15</span><span>14</span><span>13</span><span>12</span><span>11</span>
+                                <span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span>
+                            </div>
+                            <table class="perio-grid">
+                                <tbody>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                </tbody>
+                            </table>
+                            <div class="tooth-diagram-placeholder">
+                                <img src="/images/perio-chart-upper.png" alt="Upper Arch" class="arch-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="arch-img-missing">Upper Arch Diagram</div>
+                            </div>
+                            <table class="perio-grid">
+                                <tbody>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Lower Arch -->
+                        <div class="arch-section">
+                            <table class="perio-grid">
+                                <tbody>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                </tbody>
+                            </table>
+                            <div class="tooth-diagram-placeholder">
+                                <img src="/images/perio-chart-lower.png" alt="Lower Arch" class="arch-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="arch-img-missing">Lower Arch Diagram</div>
+                            </div>
+                            <table class="perio-grid">
+                                <tbody>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                </tbody>
+                            </table>
+                            <div class="tooth-numbers lower-nums">
+                                <span></span>
+                                <span>48</span><span>47</span><span>46</span><span>45</span><span>44</span><span>43</span><span>42</span><span>41</span>
+                                <span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Plaque Index Box -->
+                    <div class="plaque-index-box">
+                        <div class="plaque-index-left">
+                            <p><em><strong>Plaque Index</strong><br>O'Leary et al.</em></p>
+                            <p><em><strong>Silness &amp; Loe (Scoring<br>and description)</strong></em></p>
+                        </div>
+                        <div class="plaque-index-right">
+                            <input type="text" placeholder="%" class="plaque-pct-input">
+                            <div class="scoring-list">
+                                <p>0 - No plaque</p>
+                                <p>1 - Thin film of plaque at the gingival margin visible only when scraped with an explorer</p>
+                                <p>2 - Moderate amount of plaque along the gingival margin; interdental space free of plaque; visible with the naked eye</p>
+                                <p>3 - Heavy plaque accumulation at the gingival margin; interdental space filled with plaque</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Plaque Table + Other Findings -->
+                    <div class="plaque-table-row">
+                        <table class="plaque-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>MB</th>
+                                    <th>MidB</th>
+                                    <th>DB</th>
+                                    <th>L</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="tooth-num-cell">12</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                <tr><td class="tooth-num-cell">16</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                <tr><td class="tooth-num-cell">24</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                <tr><td class="tooth-num-cell">32</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                <tr><td class="tooth-num-cell">36</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                <tr><td class="tooth-num-cell">44</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                            </tbody>
+                        </table>
+                        <div class="other-findings">
+                            <label>Other relevant findings:</label>
+                            <textarea placeholder="Value" rows="7"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Recall 1 -->
+                    <div class="recall-section">
+                        <h3 class="recall-title"><em>Recall 1</em></h3>
+                        <div class="form-group">
+                            <label>Diagnosis</label>
+                            <textarea placeholder="Value" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Relevant Findings</label>
+                            <textarea placeholder="Value" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Recommendation</label>
+                            <textarea placeholder="Value" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Recall 2 -->
+                    <div class="recall-section">
+                        <h3 class="recall-title"><em>Recall 2</em></h3>
+                        <div class="form-group">
+                            <label>Diagnosis</label>
+                            <textarea placeholder="Value" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Relevant Findings</label>
+                            <textarea placeholder="Value" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Recommendation</label>
+                            <textarea placeholder="Value" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="form-actions">
+                        <button type="button" class="btn-submit">Submit</button>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+document.querySelector('.menu-icon').onclick = function() {
+    document.querySelector('.sidebar').classList.toggle('expanded');
+};
+
+document.querySelector('.user-profile').onclick = function(e) {
+    e.stopPropagation();
+    document.querySelector('.user-dropdown').classList.toggle('show');
+};
+
+document.addEventListener('click', function() {
+    const dropdown = document.querySelector('.user-dropdown');
+    if (dropdown.classList.contains('show')) dropdown.classList.remove('show');
+});
+
+document.querySelector('.user-dropdown').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+</script>
+
+</body>
+</html>

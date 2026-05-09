@@ -4,8 +4,10 @@ import com.dentis.DENTIS.model.AccountStatus;
 import com.dentis.DENTIS.model.Patient;
 import com.dentis.DENTIS.model.Role;
 import com.dentis.DENTIS.model.User;
+import com.dentis.DENTIS.repository.OralSurgeryChartRepository;
 import com.dentis.DENTIS.repository.PatientRepository;
 import com.dentis.DENTIS.repository.UserRepository;
+import com.dentis.DENTIS.service.OralSurgeryChartService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,10 +21,14 @@ public class PatientService {
 
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
+    private final OralSurgeryChartService oralSurgeryChartService;
 
-    public PatientService(PatientRepository patientRepository, UserRepository userRepository) {
+    public PatientService(PatientRepository patientRepository,
+                          UserRepository userRepository,
+                          OralSurgeryChartService oralSurgeryChartService) {
         this.patientRepository = patientRepository;
         this.userRepository = userRepository;
+        this.oralSurgeryChartService = oralSurgeryChartService;
     }
 
     public List<User> getFacultyBySection(String section) {
@@ -44,11 +50,16 @@ public class PatientService {
         return patientRepository.findByAssignedFacultyAndAssignedClinicianIsNullOrderByCreatedAtDesc(faculty);
     }
 
-    public void assignClinician(Long patientId, Long clinicianId) {
+    public void assignClinician(Long patientId, Long clinicianId, User faculty) {
         Patient patient = patientRepository.findById(patientId).orElseThrow();
         User clinician = userRepository.findById(clinicianId).orElseThrow();
         patient.setAssignedClinician(clinician);
         patientRepository.save(patient);
+
+        if ("OS".equalsIgnoreCase(patient.getServiceCode())
+                && oralSurgeryChartService.findByPatient(patient).isEmpty()) {
+            oralSurgeryChartService.createForPatient(patient, clinician, faculty);
+        }
     }
 
     public List<Patient> getPatientsForClinician(User clinician) {

@@ -161,32 +161,30 @@
                         </thead>
                         <tbody>
                             <tr th:each="chart : ${approvedCharts}">
-                                <td th:text="${chart.section != null ? chart.section : 'Admitting Section Chart'}"></td>
+                                <td>Admitting Section Chart</td>
                                 <td class="status approved">Approved</td>
                                 <td th:text="${chart.createdAt != null ? chart.createdAt.toLocalDate() : chart.requestDate}"></td>
+                                <td><a th:href="@{/admitting-view-clinician/{id}(id=${patient.id})}" class="btn-action btn-view">View</a></td>
+                                <td><a th:href="@{/admitting-edit-clinician/{id}(id=${patient.id})}" class="btn-action btn-edit">Edit</a></td>
+                                <td><button class="btn-action btn-submit">Submit</button></td>
+                                <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
+                            </tr>
+                            <tr th:if="${oralSurgeryChart != null}">
+                                <td>Oral Surgery Chart</td>
+                                <td th:class="'status ' + ${oralSurgeryChart.status.cssClass}"
+                                    th:text="${oralSurgeryChart.status.displayName}"></td>
+                                <td th:text="${oralSurgeryChart.createdAt.toLocalDate()}"></td>
+                                <td><a th:href="@{/oralsurgery-clinician/{id}(id=${oralSurgeryChart.id})}" class="btn-action btn-view">View</a></td>
+                                <td><a th:href="@{/oralsurgery-clinician/{id}(id=${oralSurgeryChart.id})}" class="btn-action btn-edit">Edit</a></td>
                                 <td>
-                                    <a th:if="${chart.section == 'OS'}"
-                                       th:href="@{/oralsurgery-clinician/{id}(id=${patient.id})}"
-                                       class="btn-action btn-view">View Chart</a>
-                                    <a th:if="${chart.section != 'OS'}"
-                                       th:href="@{/admitting-view-clinician/{id}(id=${patient.id})}"
-                                       class="btn-action btn-view">View Chart</a>
-                                </td>
-                                <td>
-                                    <a th:if="${chart.section == 'OS'}"
-                                       th:href="@{/oralsurgery-clinician/{id}(id=${patient.id})}"
-                                       class="btn-action btn-edit">Edit Chart</a>
-                                    <a th:if="${chart.section != 'OS'}"
-                                       th:href="@{/admitting-edit-clinician/{id}(id=${patient.id})}"
-                                       class="btn-action btn-edit">Edit Chart</a>
-                                </td>
-                                <td>
-                                    <button class="btn-action btn-submit">Submit</button>
+                                    <form th:action="@{/oralsurgery-clinician/{id}/submit(id=${oralSurgeryChart.id})}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn-action btn-submit">Submit</button>
+                                    </form>
                                 </td>
                                 <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
                             </tr>
-                            <tr th:if="${#lists.isEmpty(approvedCharts)}">
-                                <td colspan="7" style="text-align:center; color:#888;">No approved charts yet.</td>
+                            <tr th:if="${#lists.isEmpty(approvedCharts) and oralSurgeryChart == null}">
+                                <td colspan="7" style="text-align:center; color:#888;">No charts yet.</td>
                             </tr>
                         </tbody>
                     </table>

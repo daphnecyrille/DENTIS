@@ -1,7 +1,9 @@
 package com.dentis.DENTIS.controller;
 
+import com.dentis.DENTIS.model.Patient;
 import com.dentis.DENTIS.model.User;
 import com.dentis.DENTIS.repository.UserRepository;
+import com.dentis.DENTIS.service.OralSurgeryChartService;
 import com.dentis.DENTIS.service.PatientService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -13,10 +15,14 @@ import org.springframework.web.bind.annotation.*;
 public class FacultyController {
 
     private final PatientService patientService;
+    private final OralSurgeryChartService oralSurgeryChartService;
     private final UserRepository userRepository;
 
-    public FacultyController(PatientService patientService, UserRepository userRepository) {
+    public FacultyController(PatientService patientService,
+                             OralSurgeryChartService oralSurgeryChartService,
+                             UserRepository userRepository) {
         this.patientService = patientService;
+        this.oralSurgeryChartService = oralSurgeryChartService;
         this.userRepository = userRepository;
     }
 
@@ -61,8 +67,11 @@ public class FacultyController {
 
     @GetMapping("/chartsview-faculty/{id}")
     public String chartsView(@PathVariable Long id, Model model, Authentication authentication) {
+        Patient patient = patientService.getPatientById(id);
         model.addAttribute("currentUser", getCurrentUser(authentication));
-        model.addAttribute("patient", patientService.getPatientById(id));
+        model.addAttribute("patient", patient);
+        model.addAttribute("oralSurgeryChart",
+                oralSurgeryChartService.findByPatient(patient).orElse(null));
         return "chartsview-faculty";
     }
 
@@ -82,8 +91,10 @@ public class FacultyController {
     @PostMapping("/faculty-dashboard/{id}/assign-clinician")
     public String assignClinician(@PathVariable Long id,
                                   @RequestParam Long clinicianId,
-                                  @RequestParam(required = false, defaultValue = "assign") String returnTo) {
-        patientService.assignClinician(id, clinicianId);
+                                  @RequestParam(required = false, defaultValue = "faculty-assign") String returnTo,
+                                  Authentication authentication) {
+        User faculty = getCurrentUser(authentication);
+        patientService.assignClinician(id, clinicianId, faculty);
         return "redirect:/" + returnTo;
     }
 }

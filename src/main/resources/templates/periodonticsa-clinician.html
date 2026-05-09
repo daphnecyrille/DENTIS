@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Clinical Periodontics - DentIS</title>
+    <link rel="stylesheet" href="/css/periodonticsa-clinician.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div class="background"></div>
+<div class="perio-page">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.firstName + ' ' + currentUser.lastName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
+                <div class="dropdown-icon">&#9660;</div>
+                <div class="user-dropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="/clinician-dashboard" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/chartrequest-clinician" class="nav-link">
+                            <img src="/images/request-icon.png" alt="Chart" class="nav-icon2">
+                            <span>Chart Request</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/patientlist-clinician" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <h2 class="page-title">Clinical Periodontics</h2>
+
+            <div class="form-card">
+
+                <!-- Banner -->
+                <div class="form-banner">Periodontal Chart</div>
+
+                <div class="form-body">
+
+                    <!-- Learning Outcome + Clinician/Date -->
+                    <div class="top-row">
+                        <div class="learning-outcome-box">
+                            <p class="lo-title"><em>Learning Outcome</em></p>
+                            <p class="lo-text">To manage patients with periodontal disease within the recommended time frame, while maintaining professional attitudes and demonstrating empathy.</p>
+                        </div>
+                        <div class="clinician-date-group">
+                            <div class="form-group">
+                                <label>Clinician</label>
+                                <input type="text" placeholder="Patient No.">
+                            </div>
+                            <div class="form-group">
+                                <label>Date</label>
+                                <input type="date">
+                            </input>
+                        </div>
+                    </div>
+
+                    <!-- Patient Name -->
+                    <div class="form-group">
+                        <label>Patient Name</label>
+                        <div class="split-input">
+                            <input type="text" placeholder="Surname">
+                            <input type="text" placeholder="First Name" class="input-wide">
+                            <input type="text" placeholder="M.I." class="input-narrow">
+                        </div>
+                    </div>
+
+                    <!-- Age | Sex | Chart No. -->
+                    <div class="form-row">
+                        <div class="form-group col-small">
+                            <label>Age</label>
+                            <input type="text" placeholder="Age">
+                        </div>
+                        <div class="form-group col-small">
+                            <label>Sex</label>
+                            <select class="select-input">
+                                <option value="">Enter Sex</option>
+                                <option>Male</option>
+                                <option>Female</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-large">
+                            <label>Chart No.</label>
+                            <input type="text" placeholder="Patient No.">
+                        </div>
+                    </div>
+
+                    <!-- Periodontal Chief Complaint -->
+                    <div class="form-group">
+                        <label>Periodontal Chief Complaint</label>
+                        <textarea placeholder="Value" rows="3"></textarea>
+                    </div>
+
+                    <!-- History of Chief Complaint -->
+                    <div class="form-group">
+                        <label>History of Chief Complaint</label>
+                        <textarea placeholder="Value" rows="3"></textarea>
+                    </div>
+
+                    <!-- Modifying Factors -->
+                    <div class="form-group">
+                        <label>Modifying Factors</label>
+                        <input type="text" placeholder="Value">
+                    </div>
+
+                    <!-- Predisposing Factors -->
+                    <div class="form-group">
+                        <label>Predisposing Factors</label>
+                        <input type="text" placeholder="Value">
+                    </div>
+
+                    <!-- Risk Factors -->
+                    <div class="form-group">
+                        <label>Risk Factors</label>
+                        <input type="text" placeholder="Value">
+                    </div>
+
+                    <!-- Periodontal Chart -->
+                    <div class="perio-chart-wrapper">
+
+                        <!-- Upper Arch -->
+                        <div class="arch-section">
+                            <div class="tooth-numbers upper">
+                                <span></span>
+                                <span>18</span><span>17</span><span>16</span><span>15</span><span>14</span><span>13</span><span>12</span><span>11</span>
+                                <span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span>
+                            </div>
+                            <table class="perio-grid">
+                                <tbody>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                </tbody>
+                            </table>
+                            <div class="tooth-diagram-placeholder">
+                                <img src="/images/perio-chart-upper.png" alt="Upper Arch" class="arch-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="arch-img-missing">Upper Arch Diagram</div>
+                            </div>
+                            <table class="perio-grid">
+                                <tbody>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Lower Arch -->
+                        <div class="arch-section">
+                            <table class="perio-grid">
+                                <tbody>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                </tbody>
+                            </table>
+                            <div class="tooth-diagram-placeholder">
+                                <img src="/images/perio-chart-lower.png" alt="Lower Arch" class="arch-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="arch-img-missing">Lower Arch Diagram</div>
+                            </div>
+                            <table class="perio-grid">
+                                <tbody>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                </tbody>
+                            </table>
+                            <div class="tooth-numbers lower">
+                                <span></span>
+                                <span>48</span><span>47</span><span>46</span><span>45</span><span>44</span><span>43</span><span>42</span><span>41</span>
+                                <span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span>
+                            </div>
+                        </div>
+
+                        <!-- Legend -->
+                        <div class="perio-legend">
+                            <div class="legend-col">
+                                <span>- - no bleeding</span>
+                                <span>•- Pinpoint/multiple pinpoint</span>
+                            </div>
+                            <div class="legend-col">
+                                <span>|- Thin Linear</span>
+                                <span>||- Thick Linear</span>
+                            </div>
+                            <div class="legend-col">
+                                <span>o-Pooling</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Occlular Examination -->
+                    <div class="occlular-section">
+                        <h3 class="occlular-title"><em>Occlular Examination</em></h3>
+
+                        <div class="occlular-grid">
+                            <div class="occlular-header">
+                                <div class="occ-label-col"></div>
+                                <div class="occ-col-header">Buccal</div>
+                                <div class="occ-col-header">Lingual</div>
+                            </div>
+
+                            <div class="occlular-row">
+                                <div class="occ-tag">Color</div>
+                                <textarea placeholder="Value"></textarea>
+                                <textarea placeholder="Value"></textarea>
+                            </div>
+                            <div class="occlular-row">
+                                <div class="occ-tag">Texture</div>
+                                <textarea placeholder="Value"></textarea>
+                                <textarea placeholder="Value"></textarea>
+                            </div>
+                            <div class="occlular-row">
+                                <div class="occ-tag">Adaptation</div>
+                                <textarea placeholder="Value"></textarea>
+                                <textarea placeholder="Value"></textarea>
+                            </div>
+                            <div class="occlular-row">
+                                <div class="occ-tag">Consistency</div>
+                                <textarea placeholder="Value"></textarea>
+                                <textarea placeholder="Value"></textarea>
+                            </div>
+                            <div class="occlular-row">
+                                <div class="occ-tag">Form</div>
+                                <textarea placeholder="Value"></textarea>
+                                <textarea placeholder="Value"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Diagnosis -->
+                    <div class="form-group">
+                        <label>Diagnosis</label>
+                        <textarea placeholder="Value" rows="3"></textarea>
+                    </div>
+
+                    <!-- Treatment Plan -->
+                    <div class="form-group">
+                        <label>Treatment Plan</label>
+                        <textarea placeholder="Value" rows="3"></textarea>
+                    </div>
+
+                    <!-- Next Button -->
+                    <div class="form-actions">
+                        <button type="button" class="btn-next">Next</button>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.select-input').forEach(function(sel) {
+    sel.addEventListener('change', function() {
+        if (this.value) {
+            this.classList.add('selected');
+        } else {
+            this.classList.remove('selected');
+        }
+    });
+});
+
+document.querySelector('.menu-icon').onclick = function() {
+    document.querySelector('.sidebar').classList.toggle('expanded');
+};
+
+document.querySelector('.user-profile').onclick = function(e) {
+    e.stopPropagation();
+    document.querySelector('.user-dropdown').classList.toggle('show');
+};
+
+document.addEventListener('click', function() {
+    const dropdown = document.querySelector('.user-dropdown');
+    if (dropdown.classList.contains('show')) dropdown.classList.remove('show');
+});
+
+document.querySelector('.user-dropdown').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+</script>
+
+</body>
+</html>

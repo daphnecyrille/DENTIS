@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Oral Surgery Chart - Faculty View</title>
+    <link rel="stylesheet" href="/css/oralsurgery-clinician.css">
+    <link rel="stylesheet" href="/css/admitting-view-clinicmanager.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div class="background"></div>
+<div class="admitting-view">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
+                <div class="dropdown-icon">▼</div>
+                <div class="user-dropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="/faculty-dashboard" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/faculty-assign" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17 21V19C17 17.9 16.1 17 15 17H9C7.9 17 7 17.9 7 19V21" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+                                <circle cx="12" cy="11" r="3" stroke="#333" stroke-width="2"/>
+                                <path d="M19 8L21 10L19 12" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M21 10H16" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span>Assign Patients</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="/faculty-patientlist" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient List" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <a th:href="@{/chartsview-faculty/{id}(id=${chart.patient.id})}" class="btn-back">&#8592; Back to Patient Charts</a>
+
+            <div class="form-card">
+
+                <!-- ── Form 1: Patient Workup ────────────────────────────── -->
+                <div class="chart-header">
+                    <h2>Oral Surgery Chart — Patient Workup Form</h2>
+                </div>
+
+                <div class="sub-header">Patient Information</div>
+                <div class="view-grid">
+                    <div class="view-item">
+                        <span class="view-label">Chart No.</span>
+                        <span class="view-value" th:text="${chart.chartNo}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Name</span>
+                        <span class="view-value" th:text="${chart.patient.surname + ', ' + chart.patient.firstName + (chart.patient.middleInitial != null ? ' ' + chart.patient.middleInitial + '.' : '')}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Age</span>
+                        <span class="view-value" th:text="${chart.patient.age}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Sex</span>
+                        <span class="view-value" th:text="${chart.patient.sex}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Clinician</span>
+                        <span class="view-value" th:text="${chart.clinician != null ? chart.clinician.fullName : '—'}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Visit Date</span>
+                        <span class="view-value" th:text="${chart.visitDate}">—</span>
+                    </div>
+                </div>
+
+                <div class="sub-header">Chief Complaint &amp; History</div>
+                <div class="view-grid">
+                    <div class="view-item full-span">
+                        <span class="view-label">Chief Complaint</span>
+                        <span class="view-value" th:text="${chart.chiefComplaint}">—</span>
+                    </div>
+                    <div class="view-item full-span">
+                        <span class="view-label">History of Present Illness</span>
+                        <span class="view-value" th:text="${chart.historyOfPresentIllness}">—</span>
+                    </div>
+                </div>
+
+                <div class="sub-header">Pain History</div>
+                <div class="view-grid">
+                    <div class="view-item">
+                        <span class="view-label">Type</span>
+                        <span class="view-value">
+                            <span th:if="${chart.painMild}">Mild </span>
+                            <span th:if="${chart.painSevere}">Severe </span>
+                            <span th:if="${chart.painThrobbing}">Throbbing </span>
+                            <span th:if="${chart.painDull}">Dull </span>
+                            <span th:if="${chart.painSharp}">Sharp</span>
+                        </span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Onset</span>
+                        <span class="view-value">
+                            <span th:if="${chart.painProvoked}">Provoked </span>
+                            <span th:if="${chart.painUnprovoked}">Unprovoked</span>
+                        </span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Duration</span>
+                        <span class="view-value">
+                            <span th:if="${chart.painProlonged}">Prolonged </span>
+                            <span th:if="${chart.painIntermittent}">Intermittent</span>
+                        </span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Caused By</span>
+                        <span class="view-value">
+                            <span th:if="${chart.painHeat}">Heat </span>
+                            <span th:if="${chart.painCold}">Cold </span>
+                            <span th:if="${chart.painPercussion}">Percussion </span>
+                            <span th:if="${chart.painPalpation}">Palpation </span>
+                            <span th:if="${chart.painTactile}">Tactile</span>
+                        </span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Others</span>
+                        <span class="view-value" th:text="${chart.painOthers}">—</span>
+                    </div>
+                </div>
+
+                <div class="sub-header">Vital Signs</div>
+                <div class="view-grid">
+                    <div class="view-item"><span class="view-label">BP</span><span class="view-value" th:text="${chart.bp}">—</span></div>
+                    <div class="view-item"><span class="view-label">PR</span><span class="view-value" th:text="${chart.pr}">—</span></div>
+                    <div class="view-item"><span class="view-label">RR</span><span class="view-value" th:text="${chart.rr}">—</span></div>
+                    <div class="view-item"><span class="view-label">Temp</span><span class="view-value" th:text="${chart.temp}">—</span></div>
+                    <div class="view-item"><span class="view-label">O₂ Sat</span><span class="view-value" th:text="${chart.o2Sat}">—</span></div>
+                </div>
+
+                <div class="sub-header">Examination &amp; Diagnosis</div>
+                <div class="view-grid">
+                    <div class="view-item full-span">
+                        <span class="view-label">Physical &amp; Oral Exam</span>
+                        <span class="view-value" th:text="${chart.physicalOralExam}">—</span>
+                    </div>
+                    <div class="view-item full-span">
+                        <span class="view-label">Intraoral Exam</span>
+                        <span class="view-value" th:text="${chart.intraoralExam}">—</span>
+                    </div>
+                    <div class="view-item full-span">
+                        <span class="view-label">Radiographic Findings</span>
+                        <span class="view-value" th:text="${chart.radiographicFindings}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Diagnosis</span>
+                        <span class="view-value" th:text="${chart.diagnosis}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Tooth Number</span>
+                        <span class="view-value" th:text="${chart.toothNumber}">—</span>
+                    </div>
+                    <div class="view-item full-span">
+                        <span class="view-label">Treatment</span>
+                        <span class="view-value" th:text="${chart.treatment}">—</span>
+                    </div>
+                    <div class="view-item full-span">
+                        <span class="view-label">Follow-up</span>
+                        <span class="view-value" th:text="${chart.followUp}">—</span>
+                    </div>
+                </div>
+
+                <!-- ── Form 2: Odontectomy Workup ───────────────────────── -->
+                <div class="chart-header" style="margin-top:2rem;">
+                    <h2>Odontectomy Case Patient Workup Form</h2>
+                </div>
+
+                <div class="sub-header">Odontectomy Details</div>
+                <div class="view-grid">
+                    <div class="view-item">
+                        <span class="view-label">Date</span>
+                        <span class="view-value" th:text="${chart.odontectomyDate}">—</span>
+                    </div>
+                    <div class="view-item full-span">
+                        <span class="view-label">Clinical Findings</span>
+                        <span class="view-value" th:text="${chart.clinicalFindings}">—</span>
+                    </div>
+                    <div class="view-item full-span">
+                        <span class="view-label">Radiographic Findings</span>
+                        <span class="view-value" th:text="${chart.odontectomyRadiographicFindings}">—</span>
+                    </div>
+                    <div class="view-item full-span">
+                        <span class="view-label">Classification of Impaction</span>
+                        <span class="view-value" th:text="${chart.classificationOfImpaction}">—</span>
+                    </div>
+                    <div class="view-item full-span">
+                        <span class="view-label">Diagnosis &amp; Treatment Plan</span>
+                        <span class="view-value" th:text="${chart.diagnosisTreatmentPlan}">—</span>
+                    </div>
+                </div>
+
+                <div class="sub-header">Patient Workup Checklist</div>
+                <div class="view-grid">
+                    <div class="view-item"><span class="view-label">AS Chart</span><span class="view-value" th:text="${chart.hasAsChart ? 'Yes' : 'No'}">—</span></div>
+                    <div class="view-item"><span class="view-label">Intraoral Photo/s</span><span class="view-value" th:text="${chart.hasIntraoralPhoto ? 'Yes' : 'No'}">—</span></div>
+                    <div class="view-item"><span class="view-label">Radiograph</span><span class="view-value" th:text="${chart.hasRadiograph ? 'Yes — ' + (chart.radiographType != null ? chart.radiographType : '') : 'No'}">—</span></div>
+                    <div class="view-item"><span class="view-label">Impression/Diagnostic Cast</span><span class="view-value" th:text="${chart.hasImpression ? 'Yes' : 'No'}">—</span></div>
+                    <div class="view-item full-span"><span class="view-label">Other Diagnostic Aids</span><span class="view-value" th:text="${chart.hasOtherDiagnosticAids ? 'Yes — ' + (chart.otherDiagnosticAids != null ? chart.otherDiagnosticAids : '') : 'No'}">—</span></div>
+                    <div class="view-item"><span class="view-label">Checked By</span><span class="view-value" th:text="${chart.checkedBy}">—</span></div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+document.querySelector('.menu-icon').onclick = function() {
+    document.querySelector('.sidebar').classList.toggle('expanded');
+};
+
+document.querySelector('.user-profile').onclick = function(e) {
+    e.stopPropagation();
+    document.querySelector('.user-dropdown').classList.toggle('show');
+};
+
+document.addEventListener('click', function() {
+    const dropdown = document.querySelector('.user-dropdown');
+    if (dropdown.classList.contains('show')) dropdown.classList.remove('show');
+});
+
+document.querySelector('.user-dropdown').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+</script>
+
+</body>
+</html>
