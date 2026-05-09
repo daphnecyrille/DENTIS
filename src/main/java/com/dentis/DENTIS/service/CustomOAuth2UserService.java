@@ -3,14 +3,18 @@ package com.dentis.DENTIS.service;
 import com.dentis.DENTIS.model.AccountStatus;
 import com.dentis.DENTIS.model.User;
 import com.dentis.DENTIS.repository.UserRepository;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
 
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
@@ -51,6 +55,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         log.info("Login successful for: {}", email);
-        return oAuth2User;
+        String userNameAttributeName = userRequest.getClientRegistration()
+                .getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
+        return new DefaultOAuth2User(
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())),
+                oAuth2User.getAttributes(),
+                userNameAttributeName);
     }
 }

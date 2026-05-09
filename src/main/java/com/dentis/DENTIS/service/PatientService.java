@@ -7,12 +7,14 @@ import com.dentis.DENTIS.model.User;
 import com.dentis.DENTIS.repository.PatientRepository;
 import com.dentis.DENTIS.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
+@Transactional
 public class PatientService {
 
     private final PatientRepository patientRepository;
@@ -47,6 +49,10 @@ public class PatientService {
         User clinician = userRepository.findById(clinicianId).orElseThrow();
         patient.setAssignedClinician(clinician);
         patientRepository.save(patient);
+    }
+
+    public List<Patient> getPatientsForClinician(User clinician) {
+        return patientRepository.findByAssignedClinicianOrderByCreatedAtDesc(clinician);
     }
 
     public List<User> getAllClinicians() {

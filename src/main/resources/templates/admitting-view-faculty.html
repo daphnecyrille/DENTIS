@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admitting Section Chart - Faculty</title>
+    <link rel="stylesheet" href="/css/admitting-view-clinicmanager.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div class="background"></div>
+<div class="admitting-view">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
+                <div class="dropdown-icon">▼</div>
+                <div class="user-dropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="/faculty-dashboard" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/faculty-assign" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17 21V19C17 17.9 16.1 17 15 17H9C7.9 17 7 17.9 7 19V21" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+                                <circle cx="12" cy="11" r="3" stroke="#333" stroke-width="2"/>
+                                <path d="M19 8L21 10L19 12" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M21 10H16" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span>Assign Patients</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="/faculty-patientlist" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient List" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <a th:href="@{/chartsview-faculty/{id}(id=${patient.id})}" class="btn-back">&#8592; Back to Patient Charts</a>
+
+            <div class="form-card">
+
+                <div class="chart-header">
+                    <h2>Admitting Section Chart</h2>
+                </div>
+
+                <!-- Personal Information -->
+                <div class="sub-header">Personal Information</div>
+
+                <div class="view-grid">
+                    <div class="view-item">
+                        <span class="view-label">Registration Date</span>
+                        <span class="view-value" th:text="${patient.registrationDate}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Chart No.</span>
+                        <span class="view-value" th:text="${patient.chartNo}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Surname</span>
+                        <span class="view-value" th:text="${patient.surname}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">First Name</span>
+                        <span class="view-value" th:text="${patient.firstName}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Middle Initial</span>
+                        <span class="view-value" th:text="${patient.middleInitial}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Age</span>
+                        <span class="view-value" th:text="${patient.age}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Birthdate</span>
+                        <span class="view-value" th:text="${patient.birthdate}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Sex</span>
+                        <span class="view-value" th:text="${patient.sex}">—</span>
+                    </div>
+                    <div class="view-item full-span">
+                        <span class="view-label">Address</span>
+                        <span class="view-value" th:text="${patient.address}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Contact Number</span>
+                        <span class="view-value" th:text="${patient.contactNumber}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Email</span>
+                        <span class="view-value" th:text="${patient.email}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Civil Status</span>
+                        <span class="view-value" th:text="${patient.civilStatus}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Occupation</span>
+                        <span class="view-value" th:text="${patient.occupation}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Educational Attainment</span>
+                        <span class="view-value" th:text="${patient.educationalAttainment}">—</span>
+                    </div>
+                </div>
+
+                <!-- Emergency Contact -->
+                <div class="sub-header">In Case of Emergency</div>
+
+                <div class="view-grid">
+                    <div class="view-item">
+                        <span class="view-label">Contact Person</span>
+                        <span class="view-value" th:text="${patient.emergencyContactName}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Relationship</span>
+                        <span class="view-value" th:text="${patient.emergencyContactRelation}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Contact Number</span>
+                        <span class="view-value" th:text="${patient.emergencyContactNumber}">—</span>
+                    </div>
+                </div>
+
+                <!-- Chief Complaint -->
+                <div class="sub-header">Chief Complaint</div>
+
+                <div class="view-grid">
+                    <div class="view-item full-span">
+                        <span class="view-label">Description</span>
+                        <span class="view-value" th:text="${patient.chiefComplaint}">—</span>
+                    </div>
+                    <div class="view-item full-span">
+                        <span class="view-label">History of Present Illness</span>
+                        <span class="view-value" th:text="${patient.historyOfPresentIllness}">—</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">Service Code</span>
+                        <span class="view-value" th:text="${patient.serviceCode}">—</span>
+                    </div>
+                    <div class="view-item full-span">
+                        <span class="view-label">Proposed Treatment Plan</span>
+                        <span class="view-value" th:text="${patient.proposedTreatmentPlan}">—</span>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+document.querySelector('.menu-icon').onclick = function() {
+    document.querySelector('.sidebar').classList.toggle('expanded');
+};
+
+document.querySelector('.user-profile').onclick = function(e) {
+    e.stopPropagation();
+    document.querySelector('.user-dropdown').classList.toggle('show');
+};
+
+document.addEventListener('click', function() {
+    const dropdown = document.querySelector('.user-dropdown');
+    if (dropdown.classList.contains('show')) dropdown.classList.remove('show');
+});
+
+document.querySelector('.user-dropdown').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+</script>
+
+</body>
+</html>

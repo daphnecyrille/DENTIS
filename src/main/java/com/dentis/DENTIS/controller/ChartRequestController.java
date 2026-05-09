@@ -4,6 +4,7 @@ import com.dentis.DENTIS.model.ChartRequest;
 import com.dentis.DENTIS.model.User;
 import com.dentis.DENTIS.repository.UserRepository;
 import com.dentis.DENTIS.service.ChartRequestService;
+import com.dentis.DENTIS.service.PatientService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
@@ -16,10 +17,14 @@ import java.util.List;
 public class ChartRequestController {
 
     private final ChartRequestService chartRequestService;
+    private final PatientService patientService;
     private final UserRepository userRepository;
 
-    public ChartRequestController(ChartRequestService chartRequestService, UserRepository userRepository) {
+    public ChartRequestController(ChartRequestService chartRequestService,
+                                  PatientService patientService,
+                                  UserRepository userRepository) {
         this.chartRequestService = chartRequestService;
+        this.patientService = patientService;
         this.userRepository = userRepository;
     }
 
@@ -34,7 +39,10 @@ public class ChartRequestController {
     @GetMapping("/clinician-dashboard")
     public String clinicianDashboard(Model model, Authentication authentication) {
         User clinician = getCurrentUser(authentication);
-        model.addAttribute("approvedRequests", chartRequestService.getApprovedRequests());
+        model.addAttribute("currentUser", clinician);
+        model.addAttribute("assignedPatients", clinician != null
+                ? patientService.getPatientsForClinician(clinician)
+                : List.of());
         model.addAttribute("requests", clinician != null
                 ? chartRequestService.getClinicianRequests(clinician)
                 : List.of());
@@ -80,7 +88,10 @@ public class ChartRequestController {
     @GetMapping("/patientlist-clinician")
     public String patientList(Model model, Authentication authentication) {
         User clinician = getCurrentUser(authentication);
-        model.addAttribute("approvedRequests", chartRequestService.getApprovedRequests());
+        model.addAttribute("currentUser", clinician);
+        model.addAttribute("assignedPatients", clinician != null
+                ? patientService.getPatientsForClinician(clinician)
+                : List.of());
         return "patientlist-clinician";
     }
 

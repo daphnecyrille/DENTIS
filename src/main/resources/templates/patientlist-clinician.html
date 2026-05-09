@@ -87,18 +87,18 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="req : ${approvedRequests}">
-                                <td th:text="${req.patient.chartNo}"></td>
-                                <td th:text="${req.patient.surname + ', ' + req.patient.firstName + (req.patient.middleInitial != null ? ' ' + req.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${req.patient.contactNumber}"></td>
-                                <td th:text="${req.patient.email}"></td>
-                                <td th:text="${req.clinician != null ? req.clinician.fullName : '—'}"></td>
+                            <tr th:each="patient : ${assignedPatients}">
+                                <td th:text="${patient.chartNo}"></td>
+                                <td th:text="${patient.surname + ', ' + patient.firstName + (patient.middleInitial != null ? ' ' + patient.middleInitial + '.' : '')}"></td>
+                                <td th:text="${patient.contactNumber}"></td>
+                                <td th:text="${patient.email}"></td>
+                                <td th:text="${patient.assignedClinician != null ? patient.assignedClinician.fullName : '—'}"></td>
                                 <td>
-                                    <a th:href="@{/chartsview-clinician/{id}(id=${req.patient.id})}" class="btn-view-chart">View</a>
+                                    <a th:href="@{/chartsview-clinician/{id}(id=${patient.id})}" class="btn-view-chart">View</a>
                                 </td>
                             </tr>
-                            <tr th:if="${#lists.isEmpty(approvedRequests)}">
-                                <td colspan="6" style="text-align:center; color:#888;">No approved patients yet.</td>
+                            <tr th:if="${#lists.isEmpty(assignedPatients)}">
+                                <td colspan="6" style="text-align:center; color:#888;">No patients assigned yet.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -114,7 +114,7 @@ document.querySelector('.menu-icon').onclick = function() {
 };
 
 // Dropdown functionality
-document.querySelector('.dropdown-icon').onclick = function(e) {
+document.querySelector('.user-profile').onclick = function(e) {
     e.stopPropagation();
     const dropdown = document.querySelector('.user-dropdown');
     dropdown.classList.toggle('show');

@@ -87,7 +87,6 @@ public class ChartRequestService {
     }
 
     public List<ChartRequest> getApprovedRequestsForClinicianAndPatient(User clinician, Long patientId) {
-        return chartRequestRepository.findByClinicianAndPatientIdAndStatus(
-                clinician, patientId, ChartRequestStatus.APPROVED);
+        return chartRequestRepository.findApprovedForClinicianAndPatient(clinician, patientId, ChartRequestStatus.APPROVED);
     }
 }

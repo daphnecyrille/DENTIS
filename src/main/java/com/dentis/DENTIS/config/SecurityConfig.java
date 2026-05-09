@@ -1,10 +1,18 @@
 package com.dentis.DENTIS.config;
 
 import com.dentis.DENTIS.service.CustomOAuth2UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
+
+import java.io.IOException;
 
 @Configuration
 public class SecurityConfig {
@@ -25,7 +33,22 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll()
+                .requestMatchers("/css/**", "/images/**", "/js/**", "/login", "/oauth2/**").permitAll()
+                .requestMatchers(
+                    "/faculty-dashboard", "/faculty-assign", "/faculty-patientlist",
+                    "/chartsview-faculty/**", "/faculty-dashboard/**", "/admitting-view-faculty/**"
+                ).hasRole("FACULTY")
+                .requestMatchers(
+                    "/dashboard-clinicmanager", "/patientlist-clinicmanager", "/requestlist-clinicmanager",
+                    "/chartsview-clinicmanager/**", "/admitting-clinicmanager/**",
+                    "/admitting-view-clinicmanager/**"
+                ).hasRole("CLINIC_MANAGER")
+                .requestMatchers(
+                    "/clinician-dashboard", "/chartsview-clinician/**", "/chartrequest-clinician",
+                    "/patientlist-clinician", "/admitting-edit-clinician/**",
+                    "/admitting-view-clinician/**", "/oralsurgery-clinician/**", "/oralsurgery2-clinician/**"
+                ).hasRole("CLINICIAN")
+                .anyRequest().authenticated()
             )
             .oauth2Login(oauth2 -> oauth2
                 .loginPage("/login")
@@ -40,8 +63,29 @@ public class SecurityConfig {
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
             )
+            .exceptionHandling(ex -> ex
+                .accessDeniedHandler(roleBasedAccessDeniedHandler())
+            )
             .csrf(csrf -> csrf.disable());
 
         return http.build();
+    }
+
+    private AccessDeniedHandler roleBasedAccessDeniedHandler() {
+        return (HttpServletRequest request, HttpServletResponse response, AccessDeniedException ex) -> {
+            Authentication auth = org.springframework.security.core.context.SecurityContextHolder
+                    .getContext().getAuthentication();
+            String redirect = "/login";
+            if (auth != null) {
+                if (auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_FACULTY"))) {
+                    redirect = "/faculty-dashboard";
+                } else if (auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLINIC_MANAGER"))) {
+                    redirect = "/dashboard-clinicmanager";
+                } else if (auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLINICIAN"))) {
+                    redirect = "/clinician-dashboard";
+                }
+            }
+            response.sendRedirect(redirect);
+        };
     }
 }

@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard - Faculty</title>
+    <title>Assign Patients - Faculty</title>
     <link rel="stylesheet" href="/css/dashboard-faculty.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
@@ -43,13 +43,13 @@
         <aside class="sidebar">
             <nav class="nav-menu">
                 <ul>
-                    <li class="nav-item active">
+                    <li class="nav-item">
                         <a href="/faculty-dashboard" class="nav-link">
                             <img src="/images/home-icon.png" alt="Home" class="nav-icon">
                             <span>Home</span>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item active">
                         <a href="/faculty-assign" class="nav-link">
                             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M17 21V19C17 17.9 16.1 17 15 17H9C7.9 17 7 17.9 7 19V21" stroke="#333" stroke-width="2" stroke-linecap="round"/>
@@ -74,7 +74,7 @@
         <main class="main-content">
             <section class="section">
                 <div class="section-header">
-                    <h2>Patient List</h2>
+                    <h2>Assign Patients</h2>
                 </div>
                 <div class="table-container">
                     <table>
@@ -84,8 +84,7 @@
                                 <th>Patient Name</th>
                                 <th>Contact Number</th>
                                 <th>Email</th>
-                                <th>Assigned Clinician</th>
-                                <th>Action</th>
+                                <th>Assign Clinician</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -94,13 +93,23 @@
                                 <td th:text="${patient.surname + ', ' + patient.firstName + (patient.middleInitial != null ? ' ' + patient.middleInitial + '.' : '')}"></td>
                                 <td th:text="${patient.contactNumber}"></td>
                                 <td th:text="${patient.email}"></td>
-                                <td th:text="${patient.assignedClinician != null ? patient.assignedClinician.fullName : 'Unassigned'}"></td>
                                 <td>
-                                    <a th:href="@{/chartsview-faculty/{id}(id=${patient.id})}" class="btn-view">View Chart</a>
+                                    <form th:action="@{/faculty-dashboard/{id}/assign-clinician(id=${patient.id})}" method="post" style="display:flex; gap:6px; align-items:center; justify-content:center;">
+                                        <input type="hidden" name="returnTo" value="faculty-assign">
+                                        <select name="clinicianId" style="font-size:13px; padding:4px 8px; border:1px solid #ccc; border-radius:4px;">
+                                            <option value="">Select Clinician</option>
+                                            <option th:each="c : ${clinicians}"
+                                                    th:value="${c.id}"
+                                                    th:text="${c.fullName}"
+                                                    th:selected="${patient.assignedClinician != null and patient.assignedClinician.id == c.id}">
+                                            </option>
+                                        </select>
+                                        <button type="submit" class="btn-accept">Assign</button>
+                                    </form>
                                 </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(patients)}">
-                                <td colspan="6" style="text-align:center; color:#888;">No patients assigned yet.</td>
+                                <td colspan="5" style="text-align:center; color:#888;">No patients assigned yet.</td>
                             </tr>
                         </tbody>
                     </table>

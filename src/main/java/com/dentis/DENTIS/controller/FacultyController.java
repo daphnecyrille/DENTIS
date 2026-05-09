@@ -31,21 +31,53 @@ public class FacultyController {
     @GetMapping("/faculty-dashboard")
     public String dashboard(Model model, Authentication authentication) {
         User faculty = getCurrentUser(authentication);
+        model.addAttribute("currentUser", faculty);
         model.addAttribute("patients", faculty != null
                 ? patientService.getPatientsForFaculty(faculty)
                 : java.util.List.of());
-        model.addAttribute("unassignedPatients", faculty != null
-                ? patientService.getUnassignedPatientsForFaculty(faculty)
+        return "dashboard-faculty";
+    }
+
+    @GetMapping("/faculty-patientlist")
+    public String patientList(Model model, Authentication authentication) {
+        User faculty = getCurrentUser(authentication);
+        model.addAttribute("currentUser", faculty);
+        model.addAttribute("patients", faculty != null
+                ? patientService.getPatientsForFaculty(faculty)
+                : java.util.List.of());
+        return "patientlist-faculty";
+    }
+
+    @GetMapping("/faculty-assign")
+    public String assignPatients(Model model, Authentication authentication) {
+        User faculty = getCurrentUser(authentication);
+        model.addAttribute("currentUser", faculty);
+        model.addAttribute("patients", faculty != null
+                ? patientService.getPatientsForFaculty(faculty)
                 : java.util.List.of());
         model.addAttribute("clinicians", patientService.getAllClinicians());
-        return "dashboard-faculty";
+        return "assign-patients-faculty";
+    }
+
+    @GetMapping("/chartsview-faculty/{id}")
+    public String chartsView(@PathVariable Long id, Model model, Authentication authentication) {
+        model.addAttribute("currentUser", getCurrentUser(authentication));
+        model.addAttribute("patient", patientService.getPatientById(id));
+        return "chartsview-faculty";
+    }
+
+    @GetMapping("/admitting-view-faculty/{id}")
+    public String admittingView(@PathVariable Long id, Model model, Authentication authentication) {
+        model.addAttribute("currentUser", getCurrentUser(authentication));
+        model.addAttribute("patient", patientService.getPatientById(id));
+        return "admitting-view-faculty";
     }
 
     @PostMapping("/faculty-dashboard/{id}/assign-clinician")
     public String assignClinician(@PathVariable Long id,
                                   @RequestParam Long clinicianId,
-                                  @RequestParam(required = false, defaultValue = "home") String tab) {
+                                  @RequestParam(required = false, defaultValue = "assign") String returnTo) {
         patientService.assignClinician(id, clinicianId);
-        return "redirect:/faculty-dashboard?tab=" + tab;
+        return "redirect:/" + returnTo;
     }
 }

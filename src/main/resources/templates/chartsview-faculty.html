@@ -2,14 +2,15 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Patient Details - DentIS</title>
-    <link rel="stylesheet" href="/css/chartsview-clinician.css">
+    <title>Patient Charts - Faculty</title>
+    <link rel="stylesheet" href="/css/chartsview-clinicmanager.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 
 <body>
 <div class="background"></div>
 <div class="patient-details">
+
     <!-- Header -->
     <header class="header">
         <div class="header-left">
@@ -37,25 +38,31 @@
     </header>
 
     <div class="main-container">
+
         <!-- Sidebar -->
         <aside class="sidebar">
             <nav class="nav-menu">
                 <ul>
                     <li class="nav-item">
-                        <a href="/clinician-dashboard" class="nav-link">
+                        <a href="/faculty-dashboard" class="nav-link">
                             <img src="/images/home-icon.png" alt="Home" class="nav-icon">
                             <span>Home</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/chartrequest-clinician" class="nav-link">
-                            <img src="/images/request-icon.png" alt="Chart" class="nav-icon2">
-                            <span>Chart Request</span>
+                        <a href="/faculty-assign" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17 21V19C17 17.9 16.1 17 15 17H9C7.9 17 7 17.9 7 19V21" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+                                <circle cx="12" cy="11" r="3" stroke="#333" stroke-width="2"/>
+                                <path d="M19 8L21 10L19 12" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M21 10H16" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span>Assign Patients</span>
                         </a>
                     </li>
                     <li class="nav-item active">
-                        <a href="/patientlist-clinician" class="nav-link">
-                            <img src="/images/patient-icon.png" alt="Patient" class="nav-icon">
+                        <a href="/faculty-patientlist" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient List" class="nav-icon">
                             <span>Patient List</span>
                         </a>
                     </li>
@@ -65,7 +72,10 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Patient Information Section -->
+
+            <a href="/faculty-dashboard" class="btn-back">&#8592; Back to Dashboard</a>
+
+            <!-- Patient Information -->
             <section class="section">
                 <div class="section-header">
                     <h2>Patient Information</h2>
@@ -121,6 +131,7 @@
                             <span class="info-value" th:text="${patient.serviceCode}">—</span>
                         </div>
                     </div>
+
                     <div class="emergency-contact">
                         <h3>Emergency Contact</h3>
                         <div class="emergency-info">
@@ -133,7 +144,7 @@
                                 <span class="info-value" th:text="${patient.emergencyContactRelation}">—</span>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">Number</span>
+                                <span class="info-label">Contact Number</span>
                                 <span class="info-value" th:text="${patient.emergencyContactNumber}">—</span>
                             </div>
                         </div>
@@ -141,7 +152,7 @@
                 </div>
             </section>
 
-            <!-- Patient Charts Section -->
+            <!-- Patient Charts -->
             <section class="section">
                 <div class="section-header">
                     <h2>Patient Charts</h2>
@@ -154,44 +165,22 @@
                                 <th>Chart Status</th>
                                 <th>Date Created</th>
                                 <th>View Chart</th>
-                                <th>Edit Chart</th>
-                                <th>Submit for Approval</th>
-                                <th>Faculty</th>
+                                <th>Assigned Clinician</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="chart : ${approvedCharts}">
-                                <td th:text="${chart.section != null ? chart.section : 'Admitting Section Chart'}"></td>
+                            <tr>
+                                <td>Admitting Section Chart</td>
                                 <td class="status approved">Approved</td>
-                                <td th:text="${chart.createdAt != null ? chart.createdAt.toLocalDate() : chart.requestDate}"></td>
-                                <td>
-                                    <a th:if="${chart.section == 'OS'}"
-                                       th:href="@{/oralsurgery-clinician/{id}(id=${patient.id})}"
-                                       class="btn-action btn-view">View Chart</a>
-                                    <a th:if="${chart.section != 'OS'}"
-                                       th:href="@{/admitting-view-clinician/{id}(id=${patient.id})}"
-                                       class="btn-action btn-view">View Chart</a>
-                                </td>
-                                <td>
-                                    <a th:if="${chart.section == 'OS'}"
-                                       th:href="@{/oralsurgery-clinician/{id}(id=${patient.id})}"
-                                       class="btn-action btn-edit">Edit Chart</a>
-                                    <a th:if="${chart.section != 'OS'}"
-                                       th:href="@{/admitting-edit-clinician/{id}(id=${patient.id})}"
-                                       class="btn-action btn-edit">Edit Chart</a>
-                                </td>
-                                <td>
-                                    <button class="btn-action btn-submit">Submit</button>
-                                </td>
-                                <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
-                            </tr>
-                            <tr th:if="${#lists.isEmpty(approvedCharts)}">
-                                <td colspan="7" style="text-align:center; color:#888;">No approved charts yet.</td>
+                                <td th:text="${patient.registrationDate}">—</td>
+                                <td><a th:href="@{/admitting-view-faculty/{id}(id=${patient.id})}" class="btn-action btn-view">View Chart</a></td>
+                                <td th:text="${patient.assignedClinician != null ? patient.assignedClinician.fullName : '—'}">—</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </section>
+
         </main>
     </div>
 </div>

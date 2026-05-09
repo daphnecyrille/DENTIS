@@ -20,33 +20,12 @@ public class LoginController {
         return "login";
     }
 
-    // --- Clinician routes ---
-    @GetMapping("/clinician-dashboard")
-    public String clinicianDashboard() { return "dashboard-clinician"; }
-
-    @GetMapping("/chartrequest-clinician")
-    public String chartRequestClinician() { return "chartrequest-clinician"; }
-
-    @GetMapping("/patientlist-clinician")
-    public String patientListClinician() { return "patientlist-clinician"; }
-
-    @GetMapping("/chartsview-clinician")
-    public String chartsviewClinician() { return "chartsview-clinician"; }
-
-    @GetMapping("/admitting-view-clinician")
-    public String admittingViewClinician() { return "admitting-view-clinician"; }
-
     @GetMapping("/oralsurgery-clinician")
     public String oralSurgeryClinician() { return "oralsurgery-clinician"; }
 
     @GetMapping("/oralsurgery2-clinician")
     public String oralSurgery2Clinician() { return "oralsurgery2-clinician"; }
 
-    // --- Clinic Manager routes ---
-    @GetMapping("/requestlist-clinicmanager")
-    public String requestListClinicManager() { return "requestlist-clinicmanager"; }
-
-    // --- Admin routes ---
     @GetMapping("/admin-dashboard")
     public String adminDashboard() { return "dashboard-clinician"; } // placeholder
 }
