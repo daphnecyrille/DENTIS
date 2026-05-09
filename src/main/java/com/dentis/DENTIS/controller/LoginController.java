@@ -46,10 +46,6 @@ public class LoginController {
     @GetMapping("/requestlist-clinicmanager")
     public String requestListClinicManager() { return "requestlist-clinicmanager"; }
 
-    // --- Faculty routes ---
-    @GetMapping("/faculty-dashboard")
-    public String facultyDashboard() { return "dashboard-clinician"; } // placeholder
-
     // --- Admin routes ---
     @GetMapping("/admin-dashboard")
     public String adminDashboard() { return "dashboard-clinician"; } // placeholder

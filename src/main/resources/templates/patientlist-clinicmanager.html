@@ -83,8 +83,7 @@
                                 <th>Patient Name</th>
                                 <th>Contact Number</th>
                                 <th>Email</th>
-                                <th>Service Code</th>
-                                <th>Date Registered</th>
+                                <th>Assigned Clinician</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -94,12 +93,11 @@
                                 <td th:text="${patient.surname + ', ' + patient.firstName + (patient.middleInitial != null ? ' ' + patient.middleInitial + '.' : '')}"></td>
                                 <td th:text="${patient.contactNumber}"></td>
                                 <td th:text="${patient.email}"></td>
-                                <td th:text="${patient.serviceCode}"></td>
-                                <td th:text="${patient.registrationDate}"></td>
+                                <td th:text="${patient.assignedClinician != null ? patient.assignedClinician.fullName : '—'}"></td>
                                 <td><a th:href="@{/chartsview-clinicmanager/{id}(id=${patient.id})}" class="btn-view">View</a></td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(patients)}">
-                                <td colspan="7" style="text-align:center; color:#888;">No patients registered yet.</td>
+                                <td colspan="6" style="text-align:center; color:#888;">No patients registered yet.</td>
                             </tr>
                         </tbody>
                     </table>

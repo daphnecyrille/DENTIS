@@ -170,10 +170,19 @@
                                 <td class="status approved">Approved</td>
                                 <td th:text="${patient.registrationDate}"></td>
                                 <td><a th:href="@{/admitting-view-clinicmanager/{id}(id=${patient.id})}" class="btn-action btn-view">View Chart</a></td>
-                                <td></td>
-                            </tr>
-                            <tr th:if="${true}">
-                                <td colspan="5" style="text-align:center; color:#888; font-size:12px;" th:if="${false}">No additional charts yet.</td>
+                                <td>
+                                    <form th:action="@{/chartsview-clinicmanager/{id}/assign-faculty(id=${patient.id})}" method="post" style="display:flex; gap:6px; align-items:center; justify-content:center;">
+                                        <select name="facultyId" style="font-size:13px; padding:4px 8px; border:1px solid #ccc; border-radius:4px;">
+                                            <option value="">Select Faculty</option>
+                                            <option th:each="f : ${facultyOptions}"
+                                                    th:value="${f.id}"
+                                                    th:text="${f.fullName}"
+                                                    th:selected="${patient.assignedFaculty != null and patient.assignedFaculty.id == f.id}">
+                                            </option>
+                                        </select>
+                                        <button type="submit" style="background:#324966;color:white;border:none;padding:5px 10px;border-radius:4px;font-size:12px;cursor:pointer;font-family:'Poppins',sans-serif;">Assign</button>
+                                    </form>
+                                </td>
                             </tr>
                         </tbody>
                     </table>

@@ -86,16 +86,16 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="patient : ${patients}">
-                                <td th:text="${patient.chartNo}"></td>
-                                <td th:text="${patient.surname + ', ' + patient.firstName + (patient.middleInitial != null ? ' ' + patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${patient.contactNumber}"></td>
-                                <td th:text="${patient.email}"></td>
+                            <tr th:each="req : ${approvedRequests}">
+                                <td th:text="${req.patient.chartNo}"></td>
+                                <td th:text="${req.patient.surname + ', ' + req.patient.firstName + (req.patient.middleInitial != null ? ' ' + req.patient.middleInitial + '.' : '')}"></td>
+                                <td th:text="${req.patient.contactNumber}"></td>
+                                <td th:text="${req.patient.email}"></td>
                                 <td>
-                                    <a href="/chartsview-clinician" class="btn-view-chart">View</a>
+                                    <a th:href="@{/chartsview-clinician/{id}(id=${req.patient.id})}" class="btn-view-chart">View</a>
                                 </td>
                             </tr>
-                            <tr th:if="${#lists.isEmpty(patients)}">
+                            <tr th:if="${#lists.isEmpty(approvedRequests)}">
                                 <td colspan="5" style="text-align:center; color:#888;">No approved patients yet.</td>
                             </tr>
                         </tbody>

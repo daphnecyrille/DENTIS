@@ -76,6 +76,14 @@ public class Patient {
     @Column(name = "proposed_treatment_plan", columnDefinition = "TEXT")
     private String proposedTreatmentPlan;
 
+    @ManyToOne
+    @JoinColumn(name = "assigned_faculty_id")
+    private User assignedFaculty;
+
+    @ManyToOne
+    @JoinColumn(name = "assigned_clinician_id")
+    private User assignedClinician;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 }

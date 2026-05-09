@@ -72,4 +72,22 @@ public class ChartRequestService {
                 .distinct()
                 .collect(Collectors.toList());
     }
+
+    public List<ChartRequest> getPendingRequests() {
+        return chartRequestRepository.findByStatusOrderByCreatedAtDesc(ChartRequestStatus.PENDING);
+    }
+
+    public List<ChartRequest> getClinicianRequests(User clinician) {
+        return chartRequestRepository.findByClinicianAndStatusInOrderByCreatedAtDesc(
+                clinician, List.of(ChartRequestStatus.PENDING, ChartRequestStatus.DENIED));
+    }
+
+    public List<ChartRequest> getApprovedRequests() {
+        return chartRequestRepository.findByStatusOrderByCreatedAtDesc(ChartRequestStatus.APPROVED);
+    }
+
+    public List<ChartRequest> getApprovedRequestsForClinicianAndPatient(User clinician, Long patientId) {
+        return chartRequestRepository.findByClinicianAndPatientIdAndStatus(
+                clinician, patientId, ChartRequestStatus.APPROVED);
+    }
 }

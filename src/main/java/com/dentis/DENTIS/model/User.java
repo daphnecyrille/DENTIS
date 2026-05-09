@@ -38,10 +38,16 @@ public class User {
     private String studentNumber;
     private String yearLevel;
 
+    @Column(name = "middle_name")
+    private String middleName;
+
+    private String section;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public String getFullName() {
-        return lastName + ", " + firstName;
+        return lastName + ", " + firstName
+                + (middleName != null && !middleName.isBlank() ? " " + middleName.charAt(0) + "." : "");
     }
 }

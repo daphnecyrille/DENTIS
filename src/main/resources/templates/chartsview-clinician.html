@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Patient Details - DentIS</title>
@@ -27,7 +27,7 @@
                         <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
                     </svg>
                 </div>
-                <span class="username" th:text="${currentUser != null ? currentUser.firstName + ' ' + currentUser.lastName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
+                <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
                 <div class="dropdown-icon">▼</div>
                 <div class="user-dropdown">
                     <a href="/logout" class="dropdown-item">Logout</a>
@@ -53,7 +53,7 @@
                             <span>Chart Request</span>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item active">
                         <a href="/patientlist-clinician" class="nav-link">
                             <img src="/images/patient-icon.png" alt="Patient" class="nav-icon">
                             <span>Patient List</span>
@@ -74,35 +74,51 @@
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">Chart Number</span>
-                            <span class="info-value">20250101-00001</span>
+                            <span class="info-value" th:text="${patient.chartNo}">—</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Name</span>
-                            <span class="info-value">Baui, Daphne Cyrille S.</span>
+                            <span class="info-value" th:text="${patient.surname + ', ' + patient.firstName + (patient.middleInitial != null ? ' ' + patient.middleInitial + '.' : '')}">—</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Contact Number</span>
-                            <span class="info-value">09XX-XXX-XXXX</span>
+                            <span class="info-value" th:text="${patient.contactNumber}">—</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Email</span>
-                            <a href="mailto:upcd@up.edu.ph" class="info-value email-link">upcd@up.edu.ph</a>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Civil Status</span>
-                            <span class="info-value">Single</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Educational Attainment</span>
-                            <span class="info-value">High School Graduate</span>
+                            <a th:href="'mailto:' + ${patient.email}" class="info-value email-link" th:text="${patient.email}">—</a>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Age</span>
-                            <span class="info-value">22</span>
+                            <span class="info-value" th:text="${patient.age}">—</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Birthdate</span>
+                            <span class="info-value" th:text="${patient.birthdate}">—</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Sex</span>
+                            <span class="info-value" th:text="${patient.sex}">—</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Civil Status</span>
+                            <span class="info-value" th:text="${patient.civilStatus}">—</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Address</span>
-                            <span class="info-value">1X, XXXXXXX, XXXXX, Philippines</span>
+                            <span class="info-value" th:text="${patient.address}">—</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Occupation</span>
+                            <span class="info-value" th:text="${patient.occupation}">—</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Educational Attainment</span>
+                            <span class="info-value" th:text="${patient.educationalAttainment}">—</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Service Code</span>
+                            <span class="info-value" th:text="${patient.serviceCode}">—</span>
                         </div>
                     </div>
                     <div class="emergency-contact">
@@ -110,15 +126,15 @@
                         <div class="emergency-info">
                             <div class="info-item">
                                 <span class="info-label">Name</span>
-                                <span class="info-value">Lo</span>
+                                <span class="info-value" th:text="${patient.emergencyContactName}">—</span>
                             </div>
                             <div class="info-item">
                                 <span class="info-label">Relationship</span>
-                                <span class="info-value">Father</span>
+                                <span class="info-value" th:text="${patient.emergencyContactRelation}">—</span>
                             </div>
                             <div class="info-item">
                                 <span class="info-label">Number</span>
-                                <span class="info-value">09XX XXX XXXX</span>
+                                <span class="info-value" th:text="${patient.emergencyContactNumber}">—</span>
                             </div>
                         </div>
                     </div>
@@ -136,40 +152,35 @@
                             <tr>
                                 <th>Chart Type</th>
                                 <th>Chart Status</th>
-                                <th>Date Created</th>
+                                <th>Date Requested</th>
                                 <th>View Chart</th>
                                 <th>Edit Chart</th>
-                                <th>Submit for Approval</th>
-                                <th>Faculty</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Admitting Section Chart</td>
+                            <tr th:each="chart : ${approvedCharts}">
+                                <td th:text="${chart.section != null ? chart.section : 'Admitting Section Chart'}"></td>
                                 <td class="status approved">Approved</td>
-                                <td>December 31, 2025</td>
-                                <td><button class="btn-action btn-view">View Chart</button></td>
-                                <td><button class="btn-action btn-edit">Edit Chart</button></td>
-                                <td><button class="btn-action btn-submit">Submit</button></td>
-                                <td>Faculty Member Name</td>
+                                <td th:text="${chart.requestDate}"></td>
+                                <td>
+                                    <a th:if="${chart.section == 'OS'}"
+                                       th:href="@{/oralsurgery-clinician/{id}(id=${patient.id})}"
+                                       class="btn-action btn-view">View Chart</a>
+                                    <a th:if="${chart.section != 'OS'}"
+                                       th:href="@{/admitting-view-clinician/{id}(id=${patient.id})}"
+                                       class="btn-action btn-view">View Chart</a>
+                                </td>
+                                <td>
+                                    <a th:if="${chart.section == 'OS'}"
+                                       th:href="@{/oralsurgery-clinician/{id}(id=${patient.id})}"
+                                       class="btn-action btn-edit">Edit Chart</a>
+                                    <a th:if="${chart.section != 'OS'}"
+                                       th:href="@{/admitting-edit-clinician/{id}(id=${patient.id})}"
+                                       class="btn-action btn-edit">Edit Chart</a>
+                                </td>
                             </tr>
-                            <tr>
-                                <td>Clinical Oral Surgery Forms</td>
-                                <td class="status update">Update</td>
-                                <td>January 01, 2026</td>
-                                <td><button class="btn-action btn-view">View Chart</button></td>
-                                <td><button class="btn-action btn-edit">Edit Chart</button></td>
-                                <td><button class="btn-action btn-submit">Submit</button></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Informed Consent Form</td>
-                                <td class="status awaiting">Pending</td>
-                                <td>December 31, 2025</td>
-                                <td><button class="btn-action btn-view">View Chart</button></td>
-                                <td><button class="btn-action btn-edit">Edit Chart</button></td>
-                                <td><button class="btn-action btn-submit">Submit</button></td>
-                                <td></td>
+                            <tr th:if="${#lists.isEmpty(approvedCharts)}">
+                                <td colspan="5" style="text-align:center; color:#888;">No approved charts yet.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -184,22 +195,16 @@ document.querySelector('.menu-icon').onclick = function() {
     document.querySelector('.sidebar').classList.toggle('expanded');
 };
 
-// Dropdown functionality
-document.querySelector('.dropdown-icon').onclick = function(e) {
+document.querySelector('.user-profile').onclick = function(e) {
     e.stopPropagation();
-    const dropdown = document.querySelector('.user-dropdown');
-    dropdown.classList.toggle('show');
+    document.querySelector('.user-dropdown').classList.toggle('show');
 };
 
-// Close dropdown when clicking outside
 document.addEventListener('click', function() {
     const dropdown = document.querySelector('.user-dropdown');
-    if (dropdown.classList.contains('show')) {
-        dropdown.classList.remove('show');
-    }
+    if (dropdown.classList.contains('show')) dropdown.classList.remove('show');
 });
 
-// Prevent dropdown from closing when clicking inside
 document.querySelector('.user-dropdown').addEventListener('click', function(e) {
     e.stopPropagation();
 });
