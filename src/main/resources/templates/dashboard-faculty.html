@@ -73,6 +73,38 @@
         <!-- Main Content -->
         <main class="main-content">
 
+            <!-- Awaiting Approval Section -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>Awaiting Approval</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Chart Number</th>
+                                <th>Chart Type</th>
+                                <th>Patient Name</th>
+                                <th>Assigned Clinician</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="osc : ${awaitingApprovalCharts}">
+                                <td th:text="${osc.chartNo}"></td>
+                                <td th:text="${osc.chartType != null ? osc.chartType.displayName : '—'}"></td>
+                                <td th:text="${osc.patient.surname + ', ' + osc.patient.firstName + (osc.patient.middleInitial != null ? ' ' + osc.patient.middleInitial + '.' : '')}"></td>
+                                <td th:text="${osc.clinician != null ? osc.clinician.fullName : '—'}"></td>
+                                <td><a th:href="@{/chartsview-faculty/{id}(id=${osc.patient.id})}" class="btn-view">Review</a></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(awaitingApprovalCharts)}">
+                                <td colspan="5" style="text-align:center; color:#888;">No charts awaiting approval.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
             <!-- Patient List Preview -->
             <section class="section">
                 <div class="section-header">

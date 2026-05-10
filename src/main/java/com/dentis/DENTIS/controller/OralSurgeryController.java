@@ -39,16 +39,32 @@ public class OralSurgeryController {
     @GetMapping("/oralsurgery-clinician/{id}")
     public String form1(@PathVariable Long id, Model model, Authentication authentication) {
         OralSurgeryChart chart = oralSurgeryChartService.getById(id);
+        if (chart.getChiefComplaint() == null || chart.getChiefComplaint().isBlank()) {
+            chart.setChiefComplaint(chart.getPatient().getChiefComplaint());
+        }
         model.addAttribute("currentUser", getCurrentUser(authentication));
         model.addAttribute("chart", chart);
+        model.addAttribute("viewOnly", false);
+        return "oralsurgery-clinician";
+    }
+
+    @GetMapping("/oralsurgery-clinician/{id}/view")
+    public String viewForm1(@PathVariable Long id, Model model, Authentication authentication) {
+        OralSurgeryChart chart = oralSurgeryChartService.getById(id);
+        if (chart.getChiefComplaint() == null || chart.getChiefComplaint().isBlank()) {
+            chart.setChiefComplaint(chart.getPatient().getChiefComplaint());
+        }
+        model.addAttribute("currentUser", getCurrentUser(authentication));
+        model.addAttribute("chart", chart);
+        model.addAttribute("viewOnly", true);
         return "oralsurgery-clinician";
     }
 
     @PostMapping("/oralsurgery-clinician/{id}")
     public String saveForm1(@PathVariable Long id,
                             @ModelAttribute("chart") OralSurgeryChart updated) {
-        oralSurgeryChartService.saveForm1(id, updated);
-        return "redirect:/oralsurgery2-clinician/" + id;
+        OralSurgeryChart chart = oralSurgeryChartService.saveForm1(id, updated);
+        return "redirect:/chartsview-clinician/" + chart.getPatient().getId();
     }
 
     // ── Clinician: Form 2 (Odontectomy Workup) ───────────────────────────────
@@ -56,8 +72,24 @@ public class OralSurgeryController {
     @GetMapping("/oralsurgery2-clinician/{id}")
     public String form2(@PathVariable Long id, Model model, Authentication authentication) {
         OralSurgeryChart chart = oralSurgeryChartService.getById(id);
+        if (chart.getChiefComplaint() == null || chart.getChiefComplaint().isBlank()) {
+            chart.setChiefComplaint(chart.getPatient().getChiefComplaint());
+        }
         model.addAttribute("currentUser", getCurrentUser(authentication));
         model.addAttribute("chart", chart);
+        model.addAttribute("viewOnly", false);
+        return "oralsurgery2-clinician";
+    }
+
+    @GetMapping("/oralsurgery2-clinician/{id}/view")
+    public String viewForm2(@PathVariable Long id, Model model, Authentication authentication) {
+        OralSurgeryChart chart = oralSurgeryChartService.getById(id);
+        if (chart.getChiefComplaint() == null || chart.getChiefComplaint().isBlank()) {
+            chart.setChiefComplaint(chart.getPatient().getChiefComplaint());
+        }
+        model.addAttribute("currentUser", getCurrentUser(authentication));
+        model.addAttribute("chart", chart);
+        model.addAttribute("viewOnly", true);
         return "oralsurgery2-clinician";
     }
 
@@ -70,7 +102,7 @@ public class OralSurgeryController {
 
     @PostMapping("/oralsurgery-clinician/{id}/submit")
     public String submitChart(@PathVariable Long id) {
-        OralSurgeryChart chart = oralSurgeryChartService.getById(id);
+        OralSurgeryChart chart = oralSurgeryChartService.submit(id);
         return "redirect:/chartsview-clinician/" + chart.getPatient().getId();
     }
 
@@ -82,5 +114,13 @@ public class OralSurgeryController {
         model.addAttribute("currentUser", getCurrentUser(authentication));
         model.addAttribute("chart", chart);
         return "oralsurgery-view-faculty";
+    }
+
+    @GetMapping("/oralsurgery2-view-faculty/{id}")
+    public String facultyView2(@PathVariable Long id, Model model, Authentication authentication) {
+        OralSurgeryChart chart = oralSurgeryChartService.getById(id);
+        model.addAttribute("currentUser", getCurrentUser(authentication));
+        model.addAttribute("chart", chart);
+        return "oralsurgery2-view-faculty";
     }
 }

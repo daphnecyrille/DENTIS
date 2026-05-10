@@ -1,5 +1,6 @@
 package com.dentis.DENTIS.controller;
 
+import com.dentis.DENTIS.model.OralSurgeryChart;
 import com.dentis.DENTIS.model.Patient;
 import com.dentis.DENTIS.model.User;
 import com.dentis.DENTIS.repository.UserRepository;
@@ -42,6 +43,9 @@ public class FacultyController {
         model.addAttribute("currentUser", faculty);
         model.addAttribute("osCharts", faculty != null
                 ? oralSurgeryChartService.findByFacultyOrderByCreatedAtDesc(faculty).stream().limit(3).toList()
+                : List.of());
+        model.addAttribute("awaitingApprovalCharts", faculty != null
+                ? oralSurgeryChartService.findAwaitingApprovalByFaculty(faculty)
                 : List.of());
         model.addAttribute("unassignedPatients", faculty != null
                 ? patientService.getUnassignedPatientsForFaculty(faculty).stream().limit(3).toList()
@@ -91,6 +95,18 @@ public class FacultyController {
     public String endodontics2Faculty(Model model, Authentication authentication) {
         model.addAttribute("currentUser", getCurrentUser(authentication));
         return "endodontics2-faculty";
+    }
+
+    @PostMapping("/oralsurgery-faculty/{id}/approve")
+    public String approveChart(@PathVariable Long id) {
+        OralSurgeryChart chart = oralSurgeryChartService.approve(id);
+        return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
+    }
+
+    @PostMapping("/oralsurgery-faculty/{id}/revise")
+    public String reviseChart(@PathVariable Long id) {
+        OralSurgeryChart chart = oralSurgeryChartService.revise(id);
+        return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 
     @PostMapping("/faculty-dashboard/{id}/assign-clinician")

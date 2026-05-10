@@ -62,7 +62,6 @@
         </aside>
 
         <main class="main-content">
-            <a th:href="@{/chartsview-clinician/{id}(id=${patient.id})}" class="btn-back">&#8592; Back to Patient Charts</a>
 
             <form th:action="@{/admitting-edit-clinician/{id}(id=${patient.id})}" th:object="${patient}" method="post">
             <div class="form-card">
@@ -169,7 +168,6 @@
 
                 <div class="form-row">
                     <div class="form-group full-width">
-                        <label>Description</label>
                         <textarea th:field="*{chiefComplaint}" class="field-input-area" rows="3"></textarea>
                     </div>
                 </div>

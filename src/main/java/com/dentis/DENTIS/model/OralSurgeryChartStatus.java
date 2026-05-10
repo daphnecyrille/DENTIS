@@ -3,21 +3,27 @@ package com.dentis.DENTIS.model;
 public enum OralSurgeryChartStatus {
     CREATED,
     IN_PROGRESS,
-    SUBMITTED;
+    SUBMITTED,
+    APPROVED,
+    REVISE;
 
     public String getDisplayName() {
         return switch (this) {
-            case CREATED -> "Pending";
+            case CREATED -> "In Progress";
             case IN_PROGRESS -> "In Progress";
-            case SUBMITTED -> "Submitted";
+            case SUBMITTED -> "Awaiting Approval";
+            case APPROVED -> "Approved";
+            case REVISE -> "For Revision";
         };
     }
 
     public String getCssClass() {
         return switch (this) {
-            case CREATED -> "pending";
+            case CREATED -> "created";
             case IN_PROGRESS -> "in-progress";
-            case SUBMITTED -> "submitted";
+            case SUBMITTED -> "pending";
+            case APPROVED -> "approved";
+            case REVISE -> "revise";
         };
     }
 }

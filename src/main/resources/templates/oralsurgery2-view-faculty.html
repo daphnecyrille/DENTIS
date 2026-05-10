@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Clinical Oral Surgery - Odontectomy - DentIS</title>
+    <title>Clinical Oral Surgery - Odontectomy - Faculty</title>
     <link rel="stylesheet" href="/css/oralsurgery2-clinician.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
@@ -42,20 +42,25 @@
             <nav class="nav-menu">
                 <ul>
                     <li class="nav-item">
-                        <a href="/clinician-dashboard" class="nav-link">
+                        <a href="/faculty-dashboard" class="nav-link">
                             <img src="/images/home-icon.png" alt="Home" class="nav-icon">
                             <span>Home</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/chartrequest-clinician" class="nav-link">
-                            <img src="/images/request-icon.png" alt="Chart" class="nav-icon2">
-                            <span>Chart Request</span>
+                        <a href="/faculty-assign" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17 21V19C17 17.9 16.1 17 15 17H9C7.9 17 7 17.9 7 19V21" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+                                <circle cx="12" cy="11" r="3" stroke="#333" stroke-width="2"/>
+                                <path d="M19 8L21 10L19 12" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M21 10H16" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span>Assign Patients</span>
                         </a>
                     </li>
                     <li class="nav-item active">
-                        <a href="/patientlist-clinician" class="nav-link">
-                            <img src="/images/patient-icon.png" alt="Patient" class="nav-icon">
+                        <a href="/faculty-patientlist" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient List" class="nav-icon">
                             <span>Patient List</span>
                         </a>
                     </li>
@@ -66,13 +71,12 @@
         <!-- Main Content -->
         <main class="main-content">
 
-
             <h2 class="page-title">Clinical Oral Surgery</h2>
 
             <div class="form-card">
                 <div class="form-banner">Odontectomy Case Patient Workup Form</div>
 
-                <form th:action="@{/oralsurgery2-clinician/{id}(id=${chart.id})}" th:object="${chart}" method="post">
+                <form th:object="${chart}" action="#" method="post">
                 <div class="form-body">
 
                     <!-- Chart No. -->
@@ -89,7 +93,7 @@
                         </div>
                         <div class="form-group">
                             <label>Date</label>
-                            <input type="date" th:field="*{odontectomyDate}" class="date-picker" th:readonly="${viewOnly}">
+                            <input type="date" th:field="*{odontectomyDate}" class="date-picker" readonly>
                         </div>
                     </div>
 
@@ -118,61 +122,61 @@
                     <!-- Chief Complaint -->
                     <div class="form-group">
                         <label>Chief Complaint</label>
-                        <textarea th:field="*{chiefComplaint}" rows="2" th:readonly="${viewOnly}"></textarea>
+                        <textarea th:field="*{chiefComplaint}" rows="2" readonly></textarea>
                     </div>
 
                     <!-- History of Present Illness -->
                     <div class="form-group">
                         <label>History of Present Illness</label>
-                        <textarea th:field="*{historyOfPresentIllness}" rows="2" th:readonly="${viewOnly}"></textarea>
+                        <textarea th:field="*{historyOfPresentIllness}" rows="2" readonly></textarea>
                     </div>
 
                     <!-- Clinical Findings -->
                     <div class="form-group">
                         <label>Clinical Findings</label>
-                        <textarea th:field="*{clinicalFindings}" rows="2" th:readonly="${viewOnly}"></textarea>
+                        <textarea th:field="*{clinicalFindings}" rows="2" readonly></textarea>
                     </div>
 
                     <!-- Radiographic Findings + Classification of Impaction -->
                     <div class="form-row">
                         <div class="form-group">
                             <label>Radiographic Findings</label>
-                            <textarea th:field="*{odontectomyRadiographicFindings}" rows="3" th:readonly="${viewOnly}"></textarea>
+                            <textarea th:field="*{odontectomyRadiographicFindings}" rows="3" readonly></textarea>
                         </div>
                         <div class="form-group">
                             <label>Classification of Impaction</label>
-                            <textarea th:field="*{classificationOfImpaction}" rows="3" th:readonly="${viewOnly}"></textarea>
+                            <textarea th:field="*{classificationOfImpaction}" rows="3" readonly></textarea>
                         </div>
                     </div>
 
                     <!-- Diagnosis & Treatment Plan -->
                     <div class="form-group">
                         <label>Diagnosis &amp; Treatment Plan</label>
-                        <textarea th:field="*{diagnosisTreatmentPlan}" rows="2" th:readonly="${viewOnly}"></textarea>
+                        <textarea th:field="*{diagnosisTreatmentPlan}" rows="2" readonly></textarea>
                     </div>
 
                     <!-- Patient Workup Checklist -->
                     <div class="checklist-section">
                         <h3 class="checklist-title">Patient Workup Checklist</h3>
                         <div class="checklist-grid">
-                            <label class="checkbox-label"><input type="checkbox" th:field="*{hasAsChart}" th:disabled="${viewOnly}"> AS Chart</label>
+                            <label class="checkbox-label"><input type="checkbox" th:field="*{hasAsChart}" disabled> AS Chart</label>
                             <div></div>
-                            <label class="checkbox-label"><input type="checkbox" th:field="*{hasIntraoralPhoto}" th:disabled="${viewOnly}"> Intraoral Photo/s</label>
+                            <label class="checkbox-label"><input type="checkbox" th:field="*{hasIntraoralPhoto}" disabled> Intraoral Photo/s</label>
                             <div></div>
                             <div class="checklist-inline">
-                                <label class="checkbox-label"><input type="checkbox" th:field="*{hasRadiograph}" th:disabled="${viewOnly}"> Radiograph</label>
-                                <select th:field="*{radiographType}" class="select-input select-small" th:disabled="${viewOnly}">
+                                <label class="checkbox-label"><input type="checkbox" th:field="*{hasRadiograph}" disabled> Radiograph</label>
+                                <select th:field="*{radiographType}" class="select-input select-small" disabled>
                                     <option value="">Indicate what type</option>
                                     <option value="periapical">Periapical</option>
                                     <option value="panoramic">Panoramic</option>
                                 </select>
                             </div>
                             <div></div>
-                            <label class="checkbox-label"><input type="checkbox" th:field="*{hasImpression}" th:disabled="${viewOnly}"> Impression/Diagnostic Cast</label>
+                            <label class="checkbox-label"><input type="checkbox" th:field="*{hasImpression}" disabled> Impression/Diagnostic Cast</label>
                             <div></div>
                             <div class="checklist-inline">
-                                <label class="checkbox-label"><input type="checkbox" th:field="*{hasOtherDiagnosticAids}" th:disabled="${viewOnly}"> Other supplemental diagnostic aids</label>
-                                <input type="text" th:field="*{otherDiagnosticAids}" class="input-inline" th:readonly="${viewOnly}">
+                                <label class="checkbox-label"><input type="checkbox" th:field="*{hasOtherDiagnosticAids}" disabled> Other supplemental diagnostic aids</label>
+                                <input type="text" th:field="*{otherDiagnosticAids}" class="input-inline" readonly>
                             </div>
                             <div></div>
                         </div>
@@ -181,12 +185,7 @@
                     <!-- Patient Workup Checked By -->
                     <div class="form-group">
                         <label>Patient Workup Checked By:</label>
-                        <input type="text" th:field="*{checkedBy}" class="input-medium" th:readonly="${viewOnly}">
-                    </div>
-
-                    <!-- Save -->
-                    <div class="form-actions" th:if="${!viewOnly}">
-                        <button type="submit" class="btn-submit">Save</button>
+                        <input type="text" th:field="*{checkedBy}" class="input-medium" readonly>
                     </div>
 
                 </div>
@@ -197,26 +196,17 @@
 </div>
 
 <script>
-document.querySelectorAll('.select-input').forEach(function(sel) {
-    sel.addEventListener('change', function() {
-        this.classList.toggle('selected', !!this.value);
-    });
-});
-
 document.querySelector('.menu-icon').onclick = function() {
     document.querySelector('.sidebar').classList.toggle('expanded');
 };
-
 document.querySelector('.user-profile').onclick = function(e) {
     e.stopPropagation();
     document.querySelector('.user-dropdown').classList.toggle('show');
 };
-
 document.addEventListener('click', function() {
     const dropdown = document.querySelector('.user-dropdown');
     if (dropdown.classList.contains('show')) dropdown.classList.remove('show');
 });
-
 document.querySelector('.user-dropdown').addEventListener('click', function(e) {
     e.stopPropagation();
 });

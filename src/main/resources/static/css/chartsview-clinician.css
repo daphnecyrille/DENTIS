@@ -377,6 +377,16 @@ tr {
     color: #856404;
 }
 
+.status.revise {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status.created {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
 /* ACTION BUTTONS */
 .btn-action {
     border: none;

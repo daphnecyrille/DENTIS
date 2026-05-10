@@ -73,7 +73,6 @@
         <!-- Main Content -->
         <main class="main-content">
 
-            <a href="/faculty-dashboard" class="btn-back">&#8592; Back to Dashboard</a>
 
             <!-- Patient Information -->
             <section class="section">
@@ -161,8 +160,9 @@
                                 <th>Chart Type</th>
                                 <th>Chart Status</th>
                                 <th>Date Created</th>
-                                <th>View Chart</th>
+                                <th>View</th>
                                 <th>Assigned Clinician</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -171,17 +171,34 @@
                                 <td>Admitting Section Chart</td>
                                 <td class="status submitted">Submitted</td>
                                 <td th:text="${patient.registrationDate}">—</td>
-                                <td><a th:href="@{/admitting-view-faculty/{id}(id=${patient.id})}" class="btn-action btn-view">View Chart</a></td>
+                                <td><a th:href="@{/admitting-view-faculty/{id}(id=${patient.id})}" class="btn-action btn-view">View</a></td>
                                 <td th:text="${patient.assignedClinician != null ? patient.assignedClinician.fullName : '—'}">—</td>
+                                <td>—</td>
                             </tr>
                             <tr th:each="osc : ${osCharts}">
                                 <td th:text="${osc.chartNo}"></td>
-                                <td th:text="${osc.chartType.displayName}"></td>
+                                <td th:text="${osc.chartType != null ? osc.chartType.displayName : '—'}"></td>
                                 <td th:class="'status ' + ${osc.status.cssClass}"
                                     th:text="${osc.status.displayName}"></td>
                                 <td th:text="${osc.createdAt.toLocalDate()}"></td>
-                                <td><a th:href="@{/oralsurgery-view-faculty/{id}(id=${osc.id})}" class="btn-action btn-view">View Chart</a></td>
+                                <td>
+                                    <a th:if="${osc.chartType != null and osc.chartType.name() == 'OSF2'}"
+                                       th:href="@{/oralsurgery2-view-faculty/{id}(id=${osc.id})}" class="btn-action btn-view">View</a>
+                                    <a th:if="${osc.chartType == null or osc.chartType.name() == 'OSF1'}"
+                                       th:href="@{/oralsurgery-view-faculty/{id}(id=${osc.id})}" class="btn-action btn-view">View</a>
+                                </td>
                                 <td th:text="${osc.clinician != null ? osc.clinician.fullName : '—'}"></td>
+                                <td>
+                                    <span th:if="${osc.status.name() == 'SUBMITTED'}" style="display:flex; gap:6px;">
+                                        <form th:action="@{/oralsurgery-faculty/{id}/approve(id=${osc.id})}" method="post" style="display:inline;">
+                                            <button type="submit" class="btn-action btn-accept">Approve</button>
+                                        </form>
+                                        <form th:action="@{/oralsurgery-faculty/{id}/revise(id=${osc.id})}" method="post" style="display:inline;">
+                                            <button type="submit" class="btn-action btn-deny">Revise</button>
+                                        </form>
+                                    </span>
+                                    <span th:if="${osc.status.name() != 'SUBMITTED'}">—</span>
+                                </td>
                             </tr>
                         </tbody>
                     </table>

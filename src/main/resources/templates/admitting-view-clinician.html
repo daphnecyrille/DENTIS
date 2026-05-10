@@ -47,13 +47,13 @@
                             <span>Home</span>
                         </a>
                     </li>
-                    <li class="nav-item active">
+                    <li class="nav-item">
                         <a href="/chartrequest-clinician" class="nav-link">
                             <img src="/images/request-icon.png" alt="Chart" class="nav-icon2">
                             <span>Chart Request</span>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item active">
                         <a href="/patientlist-clinician" class="nav-link">
                             <img src="/images/patient-icon.png" alt="Patient" class="nav-icon">
                             <span>Patient List</span>
@@ -66,7 +66,6 @@
         <!-- Main Content -->
         <main class="main-content">
 
-            <a href="/chartrequest-clinician" class="btn-back">&#8592; Back to Chart Request</a>
 
             <div class="form-card">
 
@@ -171,7 +170,6 @@
 
                 <div class="form-row">
                     <div class="form-group full-width">
-                        <label>Description</label>
                         <div class="field-value field-value-area" th:text="${patient.chiefComplaint}">—</div>
                     </div>
                 </div>

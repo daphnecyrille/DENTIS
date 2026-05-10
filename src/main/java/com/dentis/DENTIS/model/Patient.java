@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,6 +37,7 @@ public class Patient {
 
     private Integer age;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate birthdate;
 
     private String sex;

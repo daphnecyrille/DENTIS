@@ -1,6 +1,7 @@
 package com.dentis.DENTIS.repository;
 
 import com.dentis.DENTIS.model.OralSurgeryChart;
+import com.dentis.DENTIS.model.OralSurgeryChartStatus;
 import com.dentis.DENTIS.model.OralSurgeryChartType;
 import com.dentis.DENTIS.model.Patient;
 import com.dentis.DENTIS.model.User;
@@ -15,5 +16,7 @@ public interface OralSurgeryChartRepository extends JpaRepository<OralSurgeryCha
     Optional<OralSurgeryChart> findByPatientAndChartType(Patient patient, OralSurgeryChartType chartType);
     List<OralSurgeryChart> findByClinicianOrderByCreatedAtDesc(User clinician);
     List<OralSurgeryChart> findByFacultyOrderByCreatedAtDesc(User faculty);
+    List<OralSurgeryChart> findByClinicianAndStatusInOrderByCreatedAtDesc(User clinician, List<OralSurgeryChartStatus> statuses);
+    List<OralSurgeryChart> findByFacultyAndStatusOrderByCreatedAtDesc(User faculty, OralSurgeryChartStatus status);
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }

@@ -214,6 +214,8 @@ td:last-child { border-right: none; }
 .status.in-progress { background: #cce5ff; color: #004085; }
 .status.update { background: #f8d7da; color: #721c24; }
 .status.awaiting { background: #fff3cd; color: #856404; }
+.status.revise { background: #f8d7da; color: #721c24; }
+.status.created { background: #e2e8f0; color: #4a5568; }
 
 /* BUTTONS */
 .btn-action {
@@ -228,3 +230,7 @@ td:last-child { border-right: none; }
 
 .btn-view { background: #061F40; color: white; }
 .btn-view:hover { background: #2c5282; }
+.btn-accept { background: #c9980a; color: white; }
+.btn-accept:hover { background: #b8860b; }
+.btn-deny { background: #061F40; color: white; }
+.btn-deny:hover { background: #2c5282; }

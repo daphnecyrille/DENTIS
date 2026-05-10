@@ -79,26 +79,26 @@
                         <thead>
                             <tr>
                                 <th>Chart Number</th>
+                                <th>Chart Type</th>
                                 <th>Patient Name</th>
                                 <th>Contact Number</th>
                                 <th>Email</th>
-                                <th>Assigned Clinician</th>
-                                <th>Patient Charts</th>
+                                <th>View</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="patient : ${assignedPatients}">
-                                <td th:text="${patient.chartNo}"></td>
-                                <td th:text="${patient.surname + ', ' + patient.firstName + (patient.middleInitial != null ? ' ' + patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${patient.contactNumber}"></td>
-                                <td th:text="${patient.email}"></td>
-                                <td th:text="${patient.assignedClinician != null ? patient.assignedClinician.fullName : '—'}"></td>
+                            <tr th:each="osc : ${osCharts}">
+                                <td th:text="${osc.chartNo}"></td>
+                                <td th:text="${osc.chartType != null ? osc.chartType.displayName : '—'}"></td>
+                                <td th:text="${osc.patient.surname + ', ' + osc.patient.firstName + (osc.patient.middleInitial != null ? ' ' + osc.patient.middleInitial + '.' : '')}"></td>
+                                <td th:text="${osc.patient.contactNumber}"></td>
+                                <td th:text="${osc.patient.email}"></td>
                                 <td>
-                                    <a th:href="@{/chartsview-clinician/{id}(id=${patient.id})}" class="btn-view-chart">View</a>
+                                    <a th:href="@{/chartsview-clinician/{id}(id=${osc.patient.id})}" class="btn-view-chart">View</a>
                                 </td>
                             </tr>
-                            <tr th:if="${#lists.isEmpty(assignedPatients)}">
-                                <td colspan="6" style="text-align:center; color:#888;">No patients assigned yet.</td>
+                            <tr th:if="${#lists.isEmpty(osCharts)}">
+                                <td colspan="6" style="text-align:center; color:#888;">No charts assigned yet.</td>
                             </tr>
                         </tbody>
                     </table>

@@ -45,8 +45,11 @@ public class ChartRequestController {
     public String clinicianDashboard(Model model, Authentication authentication) {
         User clinician = getCurrentUser(authentication);
         model.addAttribute("currentUser", clinician);
-        model.addAttribute("assignedPatients", clinician != null
-                ? getUniquePatientsForClinician(clinician).stream().limit(3).toList()
+        model.addAttribute("osCharts", clinician != null
+                ? oralSurgeryChartService.findByClinicianOrderByCreatedAtDesc(clinician).stream().limit(3).toList()
+                : List.of());
+        model.addAttribute("actionNeededCharts", clinician != null
+                ? oralSurgeryChartService.findActionNeededByClinician(clinician)
                 : List.of());
         model.addAttribute("requests", clinician != null
                 ? chartRequestService.getClinicianRequests(clinician).stream().limit(3).toList()
@@ -102,8 +105,8 @@ public class ChartRequestController {
     public String patientList(Model model, Authentication authentication) {
         User clinician = getCurrentUser(authentication);
         model.addAttribute("currentUser", clinician);
-        model.addAttribute("assignedPatients", clinician != null
-                ? getUniquePatientsForClinician(clinician)
+        model.addAttribute("osCharts", clinician != null
+                ? oralSurgeryChartService.findByClinicianOrderByCreatedAtDesc(clinician)
                 : List.of());
         return "patientlist-clinician";
     }

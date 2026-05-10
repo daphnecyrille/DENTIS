@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -98,10 +99,12 @@ public class OralSurgeryChart {
     @Column(columnDefinition = "TEXT")
     private String followUp;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate visitDate;
 
     // ── Form 2: Odontectomy Workup ────────────────────────────────────────────
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate odontectomyDate;
 
     @Column(columnDefinition = "TEXT")

@@ -66,7 +66,6 @@
         <!-- Main Content -->
         <main class="main-content">
 
-            <a th:href="@{/chartsview-clinician/{id}(id=${chart.patient.id})}" class="btn-back">&#8592; Back to Patient Charts</a>
 
             <h2 class="page-title">Clinical Oral Surgery</h2>
 
@@ -107,13 +106,13 @@
                     <!-- Chief Complaint -->
                     <div class="form-group">
                         <label>Chief Complaint</label>
-                        <textarea th:field="*{chiefComplaint}" rows="3" placeholder="Value"></textarea>
+                        <textarea th:field="*{chiefComplaint}" rows="3" th:readonly="${viewOnly}"></textarea>
                     </div>
 
                     <!-- History of Present Illness -->
                     <div class="form-group">
                         <label>History of Present Illness</label>
-                        <textarea th:field="*{historyOfPresentIllness}" rows="3" placeholder="Value"></textarea>
+                        <textarea th:field="*{historyOfPresentIllness}" rows="3" th:readonly="${viewOnly}"></textarea>
                     </div>
 
                     <!-- Pain History -->
@@ -123,44 +122,44 @@
                         <div class="pain-row">
                             <div class="pain-tag">Type</div>
                             <div class="pain-options">
-                                <label class="checkbox-label"><input type="checkbox" th:field="*{painMild}"> Mild</label>
-                                <label class="checkbox-label"><input type="checkbox" th:field="*{painSevere}"> Severe</label>
-                                <label class="checkbox-label"><input type="checkbox" th:field="*{painThrobbing}"> Throbbing</label>
-                                <label class="checkbox-label"><input type="checkbox" th:field="*{painDull}"> Dull</label>
-                                <label class="checkbox-label"><input type="checkbox" th:field="*{painSharp}"> Sharp</label>
+                                <label class="checkbox-label"><input type="checkbox" th:field="*{painMild}" th:disabled="${viewOnly}"> Mild</label>
+                                <label class="checkbox-label"><input type="checkbox" th:field="*{painSevere}" th:disabled="${viewOnly}"> Severe</label>
+                                <label class="checkbox-label"><input type="checkbox" th:field="*{painThrobbing}" th:disabled="${viewOnly}"> Throbbing</label>
+                                <label class="checkbox-label"><input type="checkbox" th:field="*{painDull}" th:disabled="${viewOnly}"> Dull</label>
+                                <label class="checkbox-label"><input type="checkbox" th:field="*{painSharp}" th:disabled="${viewOnly}"> Sharp</label>
                             </div>
                         </div>
 
                         <div class="pain-row">
                             <div class="pain-tag">Onset</div>
                             <div class="pain-options">
-                                <label class="checkbox-label"><input type="checkbox" th:field="*{painProvoked}"> Provoked</label>
-                                <label class="checkbox-label"><input type="checkbox" th:field="*{painUnprovoked}"> Unprovoked</label>
+                                <label class="checkbox-label"><input type="checkbox" th:field="*{painProvoked}" th:disabled="${viewOnly}"> Provoked</label>
+                                <label class="checkbox-label"><input type="checkbox" th:field="*{painUnprovoked}" th:disabled="${viewOnly}"> Unprovoked</label>
                             </div>
                         </div>
 
                         <div class="pain-row">
                             <div class="pain-tag">Duration</div>
                             <div class="pain-options">
-                                <label class="checkbox-label"><input type="checkbox" th:field="*{painProlonged}"> Prolonged</label>
-                                <label class="checkbox-label"><input type="checkbox" th:field="*{painIntermittent}"> Intermittent</label>
+                                <label class="checkbox-label"><input type="checkbox" th:field="*{painProlonged}" th:disabled="${viewOnly}"> Prolonged</label>
+                                <label class="checkbox-label"><input type="checkbox" th:field="*{painIntermittent}" th:disabled="${viewOnly}"> Intermittent</label>
                             </div>
                         </div>
 
                         <div class="pain-row">
                             <div class="pain-tag">Caused By</div>
                             <div class="pain-options">
-                                <label class="checkbox-label"><input type="checkbox" th:field="*{painHeat}"> Heat</label>
-                                <label class="checkbox-label"><input type="checkbox" th:field="*{painCold}"> Cold</label>
-                                <label class="checkbox-label"><input type="checkbox" th:field="*{painPercussion}"> Percussion</label>
-                                <label class="checkbox-label"><input type="checkbox" th:field="*{painPalpation}"> Palpation</label>
-                                <label class="checkbox-label"><input type="checkbox" th:field="*{painTactile}"> Tactile</label>
+                                <label class="checkbox-label"><input type="checkbox" th:field="*{painHeat}" th:disabled="${viewOnly}"> Heat</label>
+                                <label class="checkbox-label"><input type="checkbox" th:field="*{painCold}" th:disabled="${viewOnly}"> Cold</label>
+                                <label class="checkbox-label"><input type="checkbox" th:field="*{painPercussion}" th:disabled="${viewOnly}"> Percussion</label>
+                                <label class="checkbox-label"><input type="checkbox" th:field="*{painPalpation}" th:disabled="${viewOnly}"> Palpation</label>
+                                <label class="checkbox-label"><input type="checkbox" th:field="*{painTactile}" th:disabled="${viewOnly}"> Tactile</label>
                             </div>
                         </div>
 
                         <div class="pain-row others-row">
                             <label class="checkbox-label">Others:</label>
-                            <input type="text" th:field="*{painOthers}" placeholder="Value" class="others-input">
+                            <input type="text" th:field="*{painOthers}" class="others-input" th:readonly="${viewOnly}">
                         </div>
                     </div>
 
@@ -170,23 +169,23 @@
                         <div class="vital-row">
                             <div class="vital-group">
                                 <label>BP</label>
-                                <input type="text" th:field="*{bp}" placeholder="Value">
+                                <input type="text" th:field="*{bp}" th:readonly="${viewOnly}">
                             </div>
                             <div class="vital-group">
                                 <label>PR</label>
-                                <input type="text" th:field="*{pr}" placeholder="Value">
+                                <input type="number" th:field="*{pr}" th:readonly="${viewOnly}">
                             </div>
                             <div class="vital-group">
                                 <label>RR</label>
-                                <input type="text" th:field="*{rr}" placeholder="Value">
+                                <input type="number" th:field="*{rr}" th:readonly="${viewOnly}">
                             </div>
                             <div class="vital-group">
                                 <label>Temp</label>
-                                <input type="text" th:field="*{temp}" placeholder="Value">
+                                <input type="number" step="0.1" th:field="*{temp}" th:readonly="${viewOnly}">
                             </div>
                             <div class="vital-group">
                                 <label>O<sub>2</sub> Sat</label>
-                                <input type="text" th:field="*{o2Sat}" placeholder="Value">
+                                <input type="number" th:field="*{o2Sat}" th:readonly="${viewOnly}">
                             </div>
                         </div>
                     </div>
@@ -194,50 +193,50 @@
                     <!-- Physical & Oral Exam -->
                     <div class="form-group">
                         <label>Physical &amp; Oral Exam</label>
-                        <textarea th:field="*{physicalOralExam}" rows="2" placeholder="Value"></textarea>
+                        <textarea th:field="*{physicalOralExam}" rows="2" th:readonly="${viewOnly}"></textarea>
                     </div>
 
                     <!-- Intraoral Exam -->
                     <div class="form-group">
                         <label>Intraoral Exam</label>
-                        <textarea th:field="*{intraoralExam}" rows="2" placeholder="Value"></textarea>
+                        <textarea th:field="*{intraoralExam}" rows="2" th:readonly="${viewOnly}"></textarea>
                     </div>
 
                     <!-- Radiographic Findings -->
                     <div class="form-group">
                         <label>Radiographic Findings</label>
-                        <textarea th:field="*{radiographicFindings}" rows="2" placeholder="Value"></textarea>
+                        <textarea th:field="*{radiographicFindings}" rows="2" th:readonly="${viewOnly}"></textarea>
                     </div>
 
                     <!-- Diagnosis + Tooth Number -->
                     <div class="form-row">
                         <div class="form-group">
                             <label>Diagnosis</label>
-                            <textarea th:field="*{diagnosis}" rows="2" placeholder="Value"></textarea>
+                            <textarea th:field="*{diagnosis}" rows="2" th:readonly="${viewOnly}"></textarea>
                         </div>
                         <div class="form-group">
                             <label>Tooth Number</label>
-                            <input type="text" th:field="*{toothNumber}" placeholder="e.g. 18">
+                            <input type="number" th:field="*{toothNumber}" th:readonly="${viewOnly}">
                         </div>
                     </div>
 
                     <!-- Treatment -->
                     <div class="form-group">
                         <label>Treatment</label>
-                        <textarea th:field="*{treatment}" rows="2" placeholder="Value"></textarea>
+                        <textarea th:field="*{treatment}" rows="2" th:readonly="${viewOnly}"></textarea>
                     </div>
 
                     <!-- Follow-up -->
                     <div class="form-group">
                         <label>Follow-up <span class="label-note">as needed</span></label>
-                        <textarea th:field="*{followUp}" rows="2" placeholder="Value"></textarea>
+                        <textarea th:field="*{followUp}" rows="2" th:readonly="${viewOnly}"></textarea>
                     </div>
 
                     <!-- Date, Clinician, Faculty -->
                     <div class="form-row">
                         <div class="form-group">
                             <label>Date</label>
-                            <input type="date" th:field="*{visitDate}" class="date-picker">
+                            <input type="date" th:field="*{visitDate}" class="date-picker" th:readonly="${viewOnly}">
                         </div>
                         <div class="form-group">
                             <label>Clinician</label>
@@ -249,9 +248,9 @@
                         </div>
                     </div>
 
-                    <!-- Next Button -->
-                    <div class="form-actions">
-                        <button type="submit" class="btn-next">Save &amp; Next</button>
+                    <!-- Save Button -->
+                    <div class="form-actions" th:if="${!viewOnly}">
+                        <button type="submit" class="btn-next">Save</button>
                     </div>
 
                 </div>

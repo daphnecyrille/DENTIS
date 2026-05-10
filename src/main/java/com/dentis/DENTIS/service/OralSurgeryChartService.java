@@ -29,6 +29,7 @@ public class OralSurgeryChartService {
         chart.setFaculty(faculty);
         chart.setChartType(chartType);
         chart.setChartNo(generateChartNo(chartType));
+        chart.setChiefComplaint(patient.getChiefComplaint());
         return repo.save(chart);
     }
 
@@ -64,6 +65,15 @@ public class OralSurgeryChartService {
 
     public List<OralSurgeryChart> findByFacultyOrderByCreatedAtDesc(User faculty) {
         return repo.findByFacultyOrderByCreatedAtDesc(faculty);
+    }
+
+    public List<OralSurgeryChart> findActionNeededByClinician(User clinician) {
+        return repo.findByClinicianAndStatusInOrderByCreatedAtDesc(clinician,
+                List.of(OralSurgeryChartStatus.CREATED, OralSurgeryChartStatus.IN_PROGRESS, OralSurgeryChartStatus.REVISE));
+    }
+
+    public List<OralSurgeryChart> findAwaitingApprovalByFaculty(User faculty) {
+        return repo.findByFacultyAndStatusOrderByCreatedAtDesc(faculty, OralSurgeryChartStatus.SUBMITTED);
     }
 
     public OralSurgeryChart saveForm1(Long id, OralSurgeryChart updated) {
@@ -116,8 +126,28 @@ public class OralSurgeryChartService {
         chart.setHasImpression(updated.getHasImpression());
         chart.setHasOtherDiagnosticAids(updated.getHasOtherDiagnosticAids());
         chart.setOtherDiagnosticAids(updated.getOtherDiagnosticAids());
+        chart.setChiefComplaint(updated.getChiefComplaint());
+        chart.setHistoryOfPresentIllness(updated.getHistoryOfPresentIllness());
         chart.setCheckedBy(updated.getCheckedBy());
+        chart.setStatus(OralSurgeryChartStatus.IN_PROGRESS);
+        return repo.save(chart);
+    }
+
+    public OralSurgeryChart submit(Long id) {
+        OralSurgeryChart chart = repo.findById(id).orElseThrow();
         chart.setStatus(OralSurgeryChartStatus.SUBMITTED);
+        return repo.save(chart);
+    }
+
+    public OralSurgeryChart approve(Long id) {
+        OralSurgeryChart chart = repo.findById(id).orElseThrow();
+        chart.setStatus(OralSurgeryChartStatus.APPROVED);
+        return repo.save(chart);
+    }
+
+    public OralSurgeryChart revise(Long id) {
+        OralSurgeryChart chart = repo.findById(id).orElseThrow();
+        chart.setStatus(OralSurgeryChartStatus.REVISE);
         return repo.save(chart);
     }
 }

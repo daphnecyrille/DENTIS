@@ -157,14 +157,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="chart : ${approvedCharts}">
+                            <tr>
                                 <td th:text="${patient.chartNo}">—</td>
                                 <td>Admitting Section Chart</td>
                                 <td class="status submitted">Submitted</td>
-                                <td th:text="${chart.createdAt != null ? chart.createdAt.toLocalDate() : chart.requestDate}"></td>
+                                <td th:text="${patient.createdAt != null ? patient.createdAt.toLocalDate() : '—'}"></td>
                                 <td><a th:href="@{/admitting-view-clinician/{id}(id=${patient.id})}" class="btn-action btn-view">View</a></td>
-                                <td><a th:href="@{/admitting-edit-clinician/{id}(id=${patient.id})}" class="btn-action btn-edit">Edit</a></td>
-                                <td><button class="btn-action btn-submit">Submit</button></td>
+                                <td>—</td>
+                                <td>—</td>
                                 <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
                             </tr>
                             <tr th:each="osc : ${osCharts}">
@@ -175,10 +175,10 @@
                                 <td th:text="${osc.createdAt.toLocalDate()}"></td>
                                 <td>
                                     <a th:if="${osc.chartType != null and osc.chartType.name() == 'OSF2'}"
-                                       th:href="@{/oralsurgery2-clinician/{id}(id=${osc.id})}"
+                                       th:href="@{/oralsurgery2-clinician/{id}/view(id=${osc.id})}"
                                        class="btn-action btn-view">View</a>
                                     <a th:if="${osc.chartType == null or osc.chartType.name() == 'OSF1'}"
-                                       th:href="@{/oralsurgery-clinician/{id}(id=${osc.id})}"
+                                       th:href="@{/oralsurgery-clinician/{id}/view(id=${osc.id})}"
                                        class="btn-action btn-view">View</a>
                                 </td>
                                 <td>
@@ -195,9 +195,6 @@
                                     </form>
                                 </td>
                                 <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
-                            </tr>
-                            <tr th:if="${#lists.isEmpty(approvedCharts) and #lists.isEmpty(osCharts)}">
-                                <td colspan="8" style="text-align:center; color:#888;">No charts yet.</td>
                             </tr>
                         </tbody>
                     </table>
