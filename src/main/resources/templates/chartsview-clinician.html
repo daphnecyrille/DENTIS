@@ -73,10 +73,6 @@
                 <div class="patient-info-container">
                     <div class="info-grid">
                         <div class="info-item">
-                            <span class="info-label">Chart Number</span>
-                            <span class="info-value" th:text="${patient.chartNo}">—</span>
-                        </div>
-                        <div class="info-item">
                             <span class="info-label">Name</span>
                             <span class="info-value" th:text="${patient.surname + ', ' + patient.firstName + (patient.middleInitial != null ? ' ' + patient.middleInitial + '.' : '')}">—</span>
                         </div>
@@ -150,6 +146,7 @@
                     <table class="charts-table">
                         <thead>
                             <tr>
+                                <th>Chart Number</th>
                                 <th>Chart Type</th>
                                 <th>Chart Status</th>
                                 <th>Date Created</th>
@@ -161,30 +158,46 @@
                         </thead>
                         <tbody>
                             <tr th:each="chart : ${approvedCharts}">
+                                <td th:text="${patient.chartNo}">—</td>
                                 <td>Admitting Section Chart</td>
-                                <td class="status approved">Approved</td>
+                                <td class="status submitted">Submitted</td>
                                 <td th:text="${chart.createdAt != null ? chart.createdAt.toLocalDate() : chart.requestDate}"></td>
                                 <td><a th:href="@{/admitting-view-clinician/{id}(id=${patient.id})}" class="btn-action btn-view">View</a></td>
                                 <td><a th:href="@{/admitting-edit-clinician/{id}(id=${patient.id})}" class="btn-action btn-edit">Edit</a></td>
                                 <td><button class="btn-action btn-submit">Submit</button></td>
                                 <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
                             </tr>
-                            <tr th:if="${oralSurgeryChart != null}">
-                                <td>Oral Surgery Chart</td>
-                                <td th:class="'status ' + ${oralSurgeryChart.status.cssClass}"
-                                    th:text="${oralSurgeryChart.status.displayName}"></td>
-                                <td th:text="${oralSurgeryChart.createdAt.toLocalDate()}"></td>
-                                <td><a th:href="@{/oralsurgery-clinician/{id}(id=${oralSurgeryChart.id})}" class="btn-action btn-view">View</a></td>
-                                <td><a th:href="@{/oralsurgery-clinician/{id}(id=${oralSurgeryChart.id})}" class="btn-action btn-edit">Edit</a></td>
+                            <tr th:each="osc : ${osCharts}">
+                                <td th:text="${osc.chartNo}"></td>
+                                <td th:text="${osc.chartType != null ? osc.chartType.displayName : 'Oral Surgery Chart'}"></td>
+                                <td th:class="'status ' + ${osc.status.cssClass}"
+                                    th:text="${osc.status.displayName}"></td>
+                                <td th:text="${osc.createdAt.toLocalDate()}"></td>
                                 <td>
-                                    <form th:action="@{/oralsurgery-clinician/{id}/submit(id=${oralSurgeryChart.id})}" method="post" style="display:inline;">
+                                    <a th:if="${osc.chartType != null and osc.chartType.name() == 'OSF2'}"
+                                       th:href="@{/oralsurgery2-clinician/{id}(id=${osc.id})}"
+                                       class="btn-action btn-view">View</a>
+                                    <a th:if="${osc.chartType == null or osc.chartType.name() == 'OSF1'}"
+                                       th:href="@{/oralsurgery-clinician/{id}(id=${osc.id})}"
+                                       class="btn-action btn-view">View</a>
+                                </td>
+                                <td>
+                                    <a th:if="${osc.chartType != null and osc.chartType.name() == 'OSF2'}"
+                                       th:href="@{/oralsurgery2-clinician/{id}(id=${osc.id})}"
+                                       class="btn-action btn-edit">Edit</a>
+                                    <a th:if="${osc.chartType == null or osc.chartType.name() == 'OSF1'}"
+                                       th:href="@{/oralsurgery-clinician/{id}(id=${osc.id})}"
+                                       class="btn-action btn-edit">Edit</a>
+                                </td>
+                                <td>
+                                    <form th:action="@{/oralsurgery-clinician/{id}/submit(id=${osc.id})}" method="post" style="display:inline;">
                                         <button type="submit" class="btn-action btn-submit">Submit</button>
                                     </form>
                                 </td>
                                 <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
                             </tr>
-                            <tr th:if="${#lists.isEmpty(approvedCharts) and oralSurgeryChart == null}">
-                                <td colspan="7" style="text-align:center; color:#888;">No charts yet.</td>
+                            <tr th:if="${#lists.isEmpty(approvedCharts) and #lists.isEmpty(osCharts)}">
+                                <td colspan="8" style="text-align:center; color:#888;">No charts yet.</td>
                             </tr>
                         </tbody>
                     </table>

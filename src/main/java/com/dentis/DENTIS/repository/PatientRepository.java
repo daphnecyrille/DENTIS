@@ -14,5 +14,6 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
     Optional<Patient> findByChartNo(String chartNo);
     List<Patient> findByAssignedFacultyOrderByCreatedAtDesc(User faculty);
     List<Patient> findByAssignedFacultyAndAssignedClinicianIsNullOrderByCreatedAtDesc(User faculty);
+    List<Patient> findByAssignedFacultyAndAssignedClinicianIsNotNullOrderByCreatedAtDesc(User faculty);
     List<Patient> findByAssignedClinicianOrderByCreatedAtDesc(User clinician);
 }

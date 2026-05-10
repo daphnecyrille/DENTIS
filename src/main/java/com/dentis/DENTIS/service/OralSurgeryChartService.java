@@ -1,9 +1,6 @@
 package com.dentis.DENTIS.service;
 
-import com.dentis.DENTIS.model.OralSurgeryChart;
-import com.dentis.DENTIS.model.OralSurgeryChartStatus;
-import com.dentis.DENTIS.model.Patient;
-import com.dentis.DENTIS.model.User;
+import com.dentis.DENTIS.model.*;
 import com.dentis.DENTIS.repository.OralSurgeryChartRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,22 +21,25 @@ public class OralSurgeryChartService {
         this.repo = repo;
     }
 
-    public OralSurgeryChart createForPatient(Patient patient, User clinician, User faculty) {
+    public OralSurgeryChart createForPatient(Patient patient, User clinician, User faculty,
+                                             OralSurgeryChartType chartType) {
         OralSurgeryChart chart = new OralSurgeryChart();
         chart.setPatient(patient);
         chart.setClinician(clinician);
         chart.setFaculty(faculty);
-        chart.setChartNo(generateChartNo());
+        chart.setChartType(chartType);
+        chart.setChartNo(generateChartNo(chartType));
         return repo.save(chart);
     }
 
-    private String generateChartNo() {
+    private String generateChartNo(OralSurgeryChartType type) {
         LocalDate today = LocalDate.now();
         LocalDateTime start = today.atStartOfDay();
         LocalDateTime end = today.plusDays(1).atStartOfDay();
         long count = repo.countByCreatedAtBetween(start, end);
         String dateStr = today.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        return String.format("OS-%s-%05d", dateStr, count + 1);
+        String prefix = type == OralSurgeryChartType.OSF1 ? "OSF1" : "OSF2";
+        return String.format("%s-%s-%05d", prefix, dateStr, count + 1);
     }
 
     public OralSurgeryChart getById(Long id) {
@@ -47,11 +47,23 @@ public class OralSurgeryChartService {
     }
 
     public Optional<OralSurgeryChart> findByPatient(Patient patient) {
-        return repo.findByPatient(patient);
+        return repo.findByPatientOrderByCreatedAtDesc(patient).stream().findFirst();
+    }
+
+    public Optional<OralSurgeryChart> findByPatientAndType(Patient patient, OralSurgeryChartType type) {
+        return repo.findByPatientAndChartType(patient, type);
     }
 
     public List<OralSurgeryChart> findAllByPatient(Patient patient) {
         return repo.findByPatientOrderByCreatedAtDesc(patient);
+    }
+
+    public List<OralSurgeryChart> findByClinicianOrderByCreatedAtDesc(User clinician) {
+        return repo.findByClinicianOrderByCreatedAtDesc(clinician);
+    }
+
+    public List<OralSurgeryChart> findByFacultyOrderByCreatedAtDesc(User faculty) {
+        return repo.findByFacultyOrderByCreatedAtDesc(faculty);
     }
 
     public OralSurgeryChart saveForm1(Long id, OralSurgeryChart updated) {

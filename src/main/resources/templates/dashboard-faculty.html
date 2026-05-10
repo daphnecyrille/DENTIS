@@ -72,6 +72,8 @@
 
         <!-- Main Content -->
         <main class="main-content">
+
+            <!-- Patient List Preview -->
             <section class="section">
                 <div class="section-header">
                     <h2>Patient List</h2>
@@ -81,6 +83,7 @@
                         <thead>
                             <tr>
                                 <th>Chart No.</th>
+                                <th>Chart Type</th>
                                 <th>Patient Name</th>
                                 <th>Contact Number</th>
                                 <th>Email</th>
@@ -89,23 +92,68 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="patient : ${patients}">
-                                <td th:text="${patient.chartNo}"></td>
-                                <td th:text="${patient.surname + ', ' + patient.firstName + (patient.middleInitial != null ? ' ' + patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${patient.contactNumber}"></td>
-                                <td th:text="${patient.email}"></td>
-                                <td th:text="${patient.assignedClinician != null ? patient.assignedClinician.fullName : 'Unassigned'}"></td>
-                                <td>
-                                    <a th:href="@{/chartsview-faculty/{id}(id=${patient.id})}" class="btn-view">View Chart</a>
-                                </td>
+                            <tr th:each="osc : ${osCharts}">
+                                <td th:text="${osc.chartNo}"></td>
+                                <td th:text="${osc.chartType != null ? osc.chartType.displayName : '—'}"></td>
+                                <td th:text="${osc.patient.surname + ', ' + osc.patient.firstName + (osc.patient.middleInitial != null ? ' ' + osc.patient.middleInitial + '.' : '')}"></td>
+                                <td th:text="${osc.patient.contactNumber}"></td>
+                                <td th:text="${osc.patient.email}"></td>
+                                <td th:text="${osc.clinician != null ? osc.clinician.fullName : '—'}"></td>
+                                <td><a th:href="@{/chartsview-faculty/{id}(id=${osc.patient.id})}" class="btn-view">View Chart</a></td>
                             </tr>
-                            <tr th:if="${#lists.isEmpty(patients)}">
-                                <td colspan="6" style="text-align:center; color:#888;">No patients assigned yet.</td>
+                            <tr th:if="${#lists.isEmpty(osCharts)}">
+                                <td colspan="7" style="text-align:center; color:#888;">No assigned patients yet.</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </section>
+
+            <!-- Assign Patients Preview -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>Assign Patients</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Chart No.</th>
+                                <th>Patient Name</th>
+                                <th>Contact Number</th>
+                                <th>Email</th>
+                                <th>Assign Clinician</th>
+                                <th>View Chart</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="patient : ${unassignedPatients}">
+                                <td th:text="${patient.chartNo}"></td>
+                                <td th:text="${patient.surname + ', ' + patient.firstName + (patient.middleInitial != null ? ' ' + patient.middleInitial + '.' : '')}"></td>
+                                <td th:text="${patient.contactNumber}"></td>
+                                <td th:text="${patient.email}"></td>
+                                <td>
+                                    <form th:action="@{/faculty-dashboard/{id}/assign-clinician(id=${patient.id})}" method="post" style="display:flex; gap:6px; align-items:center; justify-content:center;">
+                                        <input type="hidden" name="returnTo" value="faculty-dashboard">
+                                        <select name="clinicianId" style="font-size:13px; padding:4px 8px; border:1px solid #ccc; border-radius:4px;">
+                                            <option value="">Select Clinician</option>
+                                            <option th:each="c : ${clinicians}"
+                                                    th:value="${c.id}"
+                                                    th:text="${c.fullName}"></option>
+                                        </select>
+                                        <button type="submit" class="btn-accept">Assign</button>
+                                    </form>
+                                </td>
+                                <td><a th:href="@{/admitting-view-faculty/{id}(id=${patient.id})}" class="btn-view">View Chart</a></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(unassignedPatients)}">
+                                <td colspan="6" style="text-align:center; color:#888;">No unassigned patients.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
         </main>
     </div>
 </div>
@@ -128,6 +176,7 @@ document.addEventListener('click', function() {
 document.querySelector('.user-dropdown').addEventListener('click', function(e) {
     e.stopPropagation();
 });
+
 </script>
 
 </body>

@@ -1,10 +1,10 @@
 package com.dentis.DENTIS.service;
 
 import com.dentis.DENTIS.model.AccountStatus;
+import com.dentis.DENTIS.model.OralSurgeryChartType;
 import com.dentis.DENTIS.model.Patient;
 import com.dentis.DENTIS.model.Role;
 import com.dentis.DENTIS.model.User;
-import com.dentis.DENTIS.repository.OralSurgeryChartRepository;
 import com.dentis.DENTIS.repository.PatientRepository;
 import com.dentis.DENTIS.repository.UserRepository;
 import com.dentis.DENTIS.service.OralSurgeryChartService;
@@ -55,11 +55,17 @@ public class PatientService {
         User clinician = userRepository.findById(clinicianId).orElseThrow();
         patient.setAssignedClinician(clinician);
         patientRepository.save(patient);
-
-        if ("OS".equalsIgnoreCase(patient.getServiceCode())
-                && oralSurgeryChartService.findByPatient(patient).isEmpty()) {
-            oralSurgeryChartService.createForPatient(patient, clinician, faculty);
+        // auto-create OSF1 and OSF2 if not already assigned
+        if (oralSurgeryChartService.findByPatientAndType(patient, OralSurgeryChartType.OSF1).isEmpty()) {
+            oralSurgeryChartService.createForPatient(patient, clinician, faculty, OralSurgeryChartType.OSF1);
         }
+        if (oralSurgeryChartService.findByPatientAndType(patient, OralSurgeryChartType.OSF2).isEmpty()) {
+            oralSurgeryChartService.createForPatient(patient, clinician, faculty, OralSurgeryChartType.OSF2);
+        }
+    }
+
+    public List<Patient> getAssignedPatientsForFaculty(User faculty) {
+        return patientRepository.findByAssignedFacultyAndAssignedClinicianIsNotNullOrderByCreatedAtDesc(faculty);
     }
 
     public List<Patient> getPatientsForClinician(User clinician) {

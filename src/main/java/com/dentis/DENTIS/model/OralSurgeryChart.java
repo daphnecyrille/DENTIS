@@ -35,6 +35,9 @@ public class OralSurgeryChart {
     private User faculty;
 
     @Enumerated(EnumType.STRING)
+    private OralSurgeryChartType chartType;
+
+    @Enumerated(EnumType.STRING)
     private OralSurgeryChartStatus status = OralSurgeryChartStatus.CREATED;
 
     // ── Form 1: Patient Workup ────────────────────────────────────────────────

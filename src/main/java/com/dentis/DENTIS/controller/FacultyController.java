@@ -11,6 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 public class FacultyController {
 
@@ -38,9 +40,13 @@ public class FacultyController {
     public String dashboard(Model model, Authentication authentication) {
         User faculty = getCurrentUser(authentication);
         model.addAttribute("currentUser", faculty);
-        model.addAttribute("patients", faculty != null
-                ? patientService.getPatientsForFaculty(faculty)
-                : java.util.List.of());
+        model.addAttribute("osCharts", faculty != null
+                ? oralSurgeryChartService.findByFacultyOrderByCreatedAtDesc(faculty).stream().limit(3).toList()
+                : List.of());
+        model.addAttribute("unassignedPatients", faculty != null
+                ? patientService.getUnassignedPatientsForFaculty(faculty).stream().limit(3).toList()
+                : List.of());
+        model.addAttribute("clinicians", patientService.getAllClinicians());
         return "dashboard-faculty";
     }
 
@@ -48,9 +54,9 @@ public class FacultyController {
     public String patientList(Model model, Authentication authentication) {
         User faculty = getCurrentUser(authentication);
         model.addAttribute("currentUser", faculty);
-        model.addAttribute("patients", faculty != null
-                ? patientService.getPatientsForFaculty(faculty)
-                : java.util.List.of());
+        model.addAttribute("osCharts", faculty != null
+                ? oralSurgeryChartService.findByFacultyOrderByCreatedAtDesc(faculty)
+                : List.of());
         return "patientlist-faculty";
     }
 
@@ -59,8 +65,8 @@ public class FacultyController {
         User faculty = getCurrentUser(authentication);
         model.addAttribute("currentUser", faculty);
         model.addAttribute("patients", faculty != null
-                ? patientService.getPatientsForFaculty(faculty)
-                : java.util.List.of());
+                ? patientService.getUnassignedPatientsForFaculty(faculty)
+                : List.of());
         model.addAttribute("clinicians", patientService.getAllClinicians());
         return "assign-patients-faculty";
     }
@@ -70,8 +76,7 @@ public class FacultyController {
         Patient patient = patientService.getPatientById(id);
         model.addAttribute("currentUser", getCurrentUser(authentication));
         model.addAttribute("patient", patient);
-        model.addAttribute("oralSurgeryChart",
-                oralSurgeryChartService.findByPatient(patient).orElse(null));
+        model.addAttribute("osCharts", oralSurgeryChartService.findAllByPatient(patient));
         return "chartsview-faculty";
     }
 

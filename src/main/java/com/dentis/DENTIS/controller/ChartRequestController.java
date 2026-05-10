@@ -46,12 +46,20 @@ public class ChartRequestController {
         User clinician = getCurrentUser(authentication);
         model.addAttribute("currentUser", clinician);
         model.addAttribute("assignedPatients", clinician != null
-                ? patientService.getPatientsForClinician(clinician)
+                ? getUniquePatientsForClinician(clinician).stream().limit(3).toList()
                 : List.of());
         model.addAttribute("requests", clinician != null
-                ? chartRequestService.getClinicianRequests(clinician)
+                ? chartRequestService.getClinicianRequests(clinician).stream().limit(3).toList()
                 : List.of());
         return "dashboard-clinician";
+    }
+
+    private List<com.dentis.DENTIS.model.Patient> getUniquePatientsForClinician(User clinician) {
+        return oralSurgeryChartService.findByClinicianOrderByCreatedAtDesc(clinician)
+                .stream()
+                .map(c -> c.getPatient())
+                .distinct()
+                .toList();
     }
 
     @GetMapping("/chartrequest-clinician")
@@ -95,7 +103,7 @@ public class ChartRequestController {
         User clinician = getCurrentUser(authentication);
         model.addAttribute("currentUser", clinician);
         model.addAttribute("assignedPatients", clinician != null
-                ? patientService.getPatientsForClinician(clinician)
+                ? getUniquePatientsForClinician(clinician)
                 : List.of());
         return "patientlist-clinician";
     }
@@ -115,8 +123,7 @@ public class ChartRequestController {
         model.addAttribute("approvedCharts", clinician != null
                 ? chartRequestService.getApprovedRequestsForClinicianAndPatient(clinician, id)
                 : List.of());
-        model.addAttribute("oralSurgeryChart",
-                oralSurgeryChartService.findByPatient(patient).orElse(null));
+        model.addAttribute("osCharts", oralSurgeryChartService.findAllByPatient(patient));
         return "chartsview-clinician";
     }
 }

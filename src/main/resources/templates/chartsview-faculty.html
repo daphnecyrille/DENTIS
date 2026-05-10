@@ -83,10 +83,6 @@
                 <div class="patient-info-container">
                     <div class="info-grid">
                         <div class="info-item">
-                            <span class="info-label">Chart Number</span>
-                            <span class="info-value" th:text="${patient.chartNo}">—</span>
-                        </div>
-                        <div class="info-item">
                             <span class="info-label">Name</span>
                             <span class="info-value" th:text="${patient.surname + ', ' + patient.firstName + (patient.middleInitial != null ? ' ' + patient.middleInitial + '.' : '')}">—</span>
                         </div>
@@ -161,6 +157,7 @@
                     <table class="charts-table">
                         <thead>
                             <tr>
+                                <th>Chart Number</th>
                                 <th>Chart Type</th>
                                 <th>Chart Status</th>
                                 <th>Date Created</th>
@@ -170,19 +167,21 @@
                         </thead>
                         <tbody>
                             <tr>
+                                <td th:text="${patient.chartNo}">—</td>
                                 <td>Admitting Section Chart</td>
-                                <td class="status approved">Approved</td>
+                                <td class="status submitted">Submitted</td>
                                 <td th:text="${patient.registrationDate}">—</td>
                                 <td><a th:href="@{/admitting-view-faculty/{id}(id=${patient.id})}" class="btn-action btn-view">View Chart</a></td>
                                 <td th:text="${patient.assignedClinician != null ? patient.assignedClinician.fullName : '—'}">—</td>
                             </tr>
-                            <tr th:if="${oralSurgeryChart != null}">
-                                <td>Oral Surgery Chart</td>
-                                <td th:class="'status ' + ${oralSurgeryChart.status.cssClass}"
-                                    th:text="${oralSurgeryChart.status.displayName}"></td>
-                                <td th:text="${oralSurgeryChart.createdAt.toLocalDate()}"></td>
-                                <td><a th:href="@{/oralsurgery-view-faculty/{id}(id=${oralSurgeryChart.id})}" class="btn-action btn-view">View Chart</a></td>
-                                <td th:text="${patient.assignedClinician != null ? patient.assignedClinician.fullName : '—'}">—</td>
+                            <tr th:each="osc : ${osCharts}">
+                                <td th:text="${osc.chartNo}"></td>
+                                <td th:text="${osc.chartType.displayName}"></td>
+                                <td th:class="'status ' + ${osc.status.cssClass}"
+                                    th:text="${osc.status.displayName}"></td>
+                                <td th:text="${osc.createdAt.toLocalDate()}"></td>
+                                <td><a th:href="@{/oralsurgery-view-faculty/{id}(id=${osc.id})}" class="btn-action btn-view">View Chart</a></td>
+                                <td th:text="${osc.clinician != null ? osc.clinician.fullName : '—'}"></td>
                             </tr>
                         </tbody>
                     </table>

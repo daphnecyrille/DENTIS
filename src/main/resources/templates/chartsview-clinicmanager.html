@@ -79,10 +79,6 @@
                 <div class="patient-info-container">
                     <div class="info-grid">
                         <div class="info-item">
-                            <span class="info-label">Chart Number</span>
-                            <span class="info-value" th:text="${patient.chartNo}">—</span>
-                        </div>
-                        <div class="info-item">
                             <span class="info-label">Name</span>
                             <span class="info-value" th:text="${patient.surname + ', ' + patient.firstName + (patient.middleInitial != null ? ' ' + patient.middleInitial + '.' : '')}">—</span>
                         </div>
@@ -157,6 +153,7 @@
                     <table class="charts-table">
                         <thead>
                             <tr>
+                                <th>Chart Number</th>
                                 <th>Chart Type</th>
                                 <th>Chart Status</th>
                                 <th>Date Created</th>
@@ -166,8 +163,9 @@
                         </thead>
                         <tbody>
                             <tr>
+                                <td th:text="${patient.chartNo}">—</td>
                                 <td>Admitting Section Chart</td>
-                                <td class="status approved">Approved</td>
+                                <td class="status submitted">Submitted</td>
                                 <td th:text="${patient.registrationDate}"></td>
                                 <td><a th:href="@{/admitting-view-clinicmanager/{id}(id=${patient.id})}" class="btn-action btn-view">View Chart</a></td>
                                 <td>

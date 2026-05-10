@@ -85,6 +85,7 @@
                                 <th>Contact Number</th>
                                 <th>Email</th>
                                 <th>Assign Clinician</th>
+                                <th>View Chart</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -100,16 +101,17 @@
                                             <option value="">Select Clinician</option>
                                             <option th:each="c : ${clinicians}"
                                                     th:value="${c.id}"
-                                                    th:text="${c.fullName}"
-                                                    th:selected="${patient.assignedClinician != null and patient.assignedClinician.id == c.id}">
-                                            </option>
+                                                    th:text="${c.fullName}"></option>
                                         </select>
                                         <button type="submit" class="btn-accept">Assign</button>
                                     </form>
                                 </td>
+                                <td>
+                                    <a th:href="@{/admitting-view-faculty/{id}(id=${patient.id})}" class="btn-view">View Chart</a>
+                                </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(patients)}">
-                                <td colspan="5" style="text-align:center; color:#888;">No patients assigned yet.</td>
+                                <td colspan="6" style="text-align:center; color:#888;">No unassigned patients.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -137,6 +139,7 @@ document.addEventListener('click', function() {
 document.querySelector('.user-dropdown').addEventListener('click', function(e) {
     e.stopPropagation();
 });
+
 </script>
 
 </body>
