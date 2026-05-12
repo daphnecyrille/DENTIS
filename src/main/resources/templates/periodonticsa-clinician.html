@@ -11,7 +11,6 @@
 <div class="background"></div>
 <div class="perio-page">
 
-    <!-- Header -->
     <header class="header">
         <div class="header-left">
             <div class="logo">
@@ -38,7 +37,6 @@
     </header>
 
     <div class="main-container">
-        <!-- Sidebar -->
         <aside class="sidebar">
             <nav class="nav-menu">
                 <ul>
@@ -64,14 +62,10 @@
             </nav>
         </aside>
 
-        <!-- Main Content -->
         <main class="main-content">
-
             <h2 class="page-title">Clinical Periodontics</h2>
 
             <div class="form-card">
-
-                <!-- Banner -->
                 <div class="form-banner">Periodontal Chart</div>
 
                 <div class="form-body">
@@ -90,7 +84,7 @@
                             <div class="form-group">
                                 <label>Date</label>
                                 <input type="date">
-                            </input>
+                            </div>
                         </div>
                     </div>
 
@@ -104,13 +98,13 @@
                         </div>
                     </div>
 
-                    <!-- Age | Sex | Chart No. -->
+                    <!-- Age | Sex | Occupation -->
                     <div class="form-row">
-                        <div class="form-group col-small">
+                        <div class="form-group col-tiny">
                             <label>Age</label>
                             <input type="text" placeholder="Age">
                         </div>
-                        <div class="form-group col-small">
+                        <div class="form-group col-tiny">
                             <label>Sex</label>
                             <select class="select-input">
                                 <option value="">Enter Sex</option>
@@ -119,169 +113,157 @@
                             </select>
                         </div>
                         <div class="form-group col-large">
-                            <label>Chart No.</label>
-                            <input type="text" placeholder="Patient No.">
+                            <label>Occupation</label>
+                            <input type="text" placeholder="Occupation">
                         </div>
                     </div>
 
-                    <!-- Periodontal Chief Complaint -->
                     <div class="form-group">
                         <label>Periodontal Chief Complaint</label>
                         <textarea placeholder="Value" rows="3"></textarea>
                     </div>
 
-                    <!-- History of Chief Complaint -->
                     <div class="form-group">
                         <label>History of Chief Complaint</label>
                         <textarea placeholder="Value" rows="3"></textarea>
                     </div>
 
-                    <!-- Modifying Factors -->
                     <div class="form-group">
                         <label>Modifying Factors</label>
                         <input type="text" placeholder="Value">
                     </div>
 
-                    <!-- Predisposing Factors -->
                     <div class="form-group">
                         <label>Predisposing Factors</label>
                         <input type="text" placeholder="Value">
                     </div>
 
-                    <!-- Risk Factors -->
                     <div class="form-group">
                         <label>Risk Factors</label>
                         <input type="text" placeholder="Value">
                     </div>
 
-                    <!-- Periodontal Chart -->
-                    <div class="perio-chart-wrapper">
+                    <!-- ═══════════ PERIODONTAL CHART ═══════════ -->
+                    <div class="perio-interactive-chart">
 
-                        <!-- Upper Arch -->
-                        <div class="arch-section">
-                            <div class="tooth-numbers upper">
-                                <span></span>
-                                <span>18</span><span>17</span><span>16</span><span>15</span><span>14</span><span>13</span><span>12</span><span>11</span>
-                                <span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span>
-                            </div>
-                            <table class="perio-grid">
-                                <tbody>
-                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                                </tbody>
-                            </table>
-                            <div class="tooth-diagram-placeholder">
-                                <img src="/images/perio-chart-upper.png" alt="Upper Arch" class="arch-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                <div class="arch-img-missing">Upper Arch Diagram</div>
-                            </div>
-                            <table class="perio-grid">
-                                <tbody>
-                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                                </tbody>
-                            </table>
+                        <!-- ── UPPER ARCH (top → image) ──
+                             Order: tooth numbers → [extra rows] → empty → B → L -->
+                        <div class="perio-grid-row tooth-num-row">
+                            <div class="grid-label empty-row-controls"><button class="btn-pm" onclick="addUpperRow()">+</button><button class="btn-pm" onclick="removeUpperRow()">&#8722;</button></div>
+                            <div class="grid-num-cell">18</div><div class="grid-num-cell">17</div><div class="grid-num-cell">16</div><div class="grid-num-cell">15</div><div class="grid-num-cell">14</div><div class="grid-num-cell">13</div><div class="grid-num-cell">12</div><div class="grid-num-cell">11</div><div class="grid-num-cell">21</div><div class="grid-num-cell">22</div><div class="grid-num-cell">23</div><div class="grid-num-cell">24</div><div class="grid-num-cell">25</div><div class="grid-num-cell">26</div><div class="grid-num-cell">27</div><div class="grid-num-cell">28</div>
                         </div>
 
-                        <!-- Lower Arch -->
-                        <div class="arch-section">
-                            <table class="perio-grid">
-                                <tbody>
-                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                                </tbody>
-                            </table>
-                            <div class="tooth-diagram-placeholder">
-                                <img src="/images/perio-chart-lower.png" alt="Lower Arch" class="arch-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                <div class="arch-img-missing">Lower Arch Diagram</div>
-                            </div>
-                            <table class="perio-grid">
-                                <tbody>
-                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                                    <tr><td class="grid-label"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                                </tbody>
-                            </table>
-                            <div class="tooth-numbers lower">
-                                <span></span>
-                                <span>48</span><span>47</span><span>46</span><span>45</span><span>44</span><span>43</span><span>42</span><span>41</span>
-                                <span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span>
+                        <!-- Extra rows added here (between tooth numbers and empty row) -->
+                        <div id="upperExtraRows"></div>
+
+                        <!-- Empty row -->
+                        <div class="perio-grid-row">
+                            <div class="grid-label"></div>
+                            <div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div>
+                        </div>
+
+                        <!-- B row -->
+                        <div class="perio-grid-row">
+                            <div class="grid-label">B</div>
+                            <div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div>
+                        </div>
+
+                        <!-- L row (closest to teeth image) -->
+                        <div class="perio-grid-row">
+                            <div class="grid-label">L</div>
+                            <div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div>
+                        </div>
+
+                        <!-- Teeth image: cropped to teeth area only + canvas for symbols -->
+                        <div class="teeth-canvas-wrapper">
+                            <img src="/images/perio-chart.png" alt="Periodontal Chart" class="perio-chart-img-cropped">
+                            <canvas id="perioCanvas"></canvas>
+                            <div class="symbol-picker" id="symbolPicker">
+                                <button class="sym-btn" data-sym="-">-</button>
+                                <button class="sym-btn" data-sym="&bull;">&bull;</button>
+                                <button class="sym-btn" data-sym="|">|</button>
+                                <button class="sym-btn" data-sym="||">||</button>
+                                <button class="sym-btn" data-sym="o">o</button>
+                                <button class="sym-btn sym-clear" data-sym="">&#10005;</button>
                             </div>
                         </div>
 
-                        <!-- Legend -->
+                        <!-- ── LOWER ARCH (image → bottom) ──
+                             Order: L → B → empty → [extra rows] → tooth numbers -->
+
+                        <!-- L row (closest to teeth image) -->
+                        <div class="perio-grid-row">
+                            <div class="grid-label">L</div>
+                            <div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div>
+                        </div>
+
+                        <!-- B row -->
+                        <div class="perio-grid-row">
+                            <div class="grid-label">B</div>
+                            <div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div>
+                        </div>
+
+                        <!-- Empty row -->
+                        <div class="perio-grid-row">
+                            <div class="grid-label"></div>
+                            <div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div>
+                        </div>
+
+                        <!-- Extra rows added here (between empty row and tooth numbers) -->
+                        <div id="lowerExtraRows"></div>
+
+                        <div class="perio-grid-row tooth-num-row">
+                            <div class="grid-label empty-row-controls"><button class="btn-pm" onclick="addLowerRow()">+</button><button class="btn-pm" onclick="removeLowerRow()">&#8722;</button></div>
+                            <div class="grid-num-cell">48</div><div class="grid-num-cell">47</div><div class="grid-num-cell">46</div><div class="grid-num-cell">45</div><div class="grid-num-cell">44</div><div class="grid-num-cell">43</div><div class="grid-num-cell">42</div><div class="grid-num-cell">41</div><div class="grid-num-cell">31</div><div class="grid-num-cell">32</div><div class="grid-num-cell">33</div><div class="grid-num-cell">34</div><div class="grid-num-cell">35</div><div class="grid-num-cell">36</div><div class="grid-num-cell">37</div><div class="grid-num-cell">38</div>
+                        </div>
+
+                    </div>
+                    <!-- ═══════════ END CHART ═══════════ -->
+
+                    <!-- Chart controls + Legend -->
+                    <div class="chart-bottom-bar">
                         <div class="perio-legend">
                             <div class="legend-col">
-                                <span>- - no bleeding</span>
-                                <span>•- Pinpoint/multiple pinpoint</span>
+                                <span>- No bleeding</span>
+                                <span>&bull; Pinpoint/multiple pinpoint</span>
                             </div>
                             <div class="legend-col">
-                                <span>|- Thin Linear</span>
-                                <span>||- Thick Linear</span>
+                                <span>| Thin Linear</span>
+                                <span>|| Thick Linear</span>
                             </div>
                             <div class="legend-col">
-                                <span>o-Pooling</span>
+                                <span>o Pooling</span>
                             </div>
                         </div>
-
                     </div>
 
                     <!-- Occlular Examination -->
                     <div class="occlular-section">
                         <h3 class="occlular-title"><em>Occlular Examination</em></h3>
-
                         <div class="occlular-grid">
                             <div class="occlular-header">
                                 <div class="occ-label-col"></div>
                                 <div class="occ-col-header">Buccal</div>
                                 <div class="occ-col-header">Lingual</div>
                             </div>
-
-                            <div class="occlular-row">
-                                <div class="occ-tag">Color</div>
-                                <textarea placeholder="Value"></textarea>
-                                <textarea placeholder="Value"></textarea>
-                            </div>
-                            <div class="occlular-row">
-                                <div class="occ-tag">Texture</div>
-                                <textarea placeholder="Value"></textarea>
-                                <textarea placeholder="Value"></textarea>
-                            </div>
-                            <div class="occlular-row">
-                                <div class="occ-tag">Adaptation</div>
-                                <textarea placeholder="Value"></textarea>
-                                <textarea placeholder="Value"></textarea>
-                            </div>
-                            <div class="occlular-row">
-                                <div class="occ-tag">Consistency</div>
-                                <textarea placeholder="Value"></textarea>
-                                <textarea placeholder="Value"></textarea>
-                            </div>
-                            <div class="occlular-row">
-                                <div class="occ-tag">Form</div>
-                                <textarea placeholder="Value"></textarea>
-                                <textarea placeholder="Value"></textarea>
-                            </div>
+                            <div class="occlular-row"><div class="occ-tag">Color</div><textarea placeholder="Value"></textarea><textarea placeholder="Value"></textarea></div>
+                            <div class="occlular-row"><div class="occ-tag">Texture</div><textarea placeholder="Value"></textarea><textarea placeholder="Value"></textarea></div>
+                            <div class="occlular-row"><div class="occ-tag">Adaptation</div><textarea placeholder="Value"></textarea><textarea placeholder="Value"></textarea></div>
+                            <div class="occlular-row"><div class="occ-tag">Consistency</div><textarea placeholder="Value"></textarea><textarea placeholder="Value"></textarea></div>
+                            <div class="occlular-row"><div class="occ-tag">Form</div><textarea placeholder="Value"></textarea><textarea placeholder="Value"></textarea></div>
                         </div>
                     </div>
 
-                    <!-- Diagnosis -->
                     <div class="form-group">
                         <label>Diagnosis</label>
                         <textarea placeholder="Value" rows="3"></textarea>
                     </div>
 
-                    <!-- Treatment Plan -->
                     <div class="form-group">
                         <label>Treatment Plan</label>
                         <textarea placeholder="Value" rows="3"></textarea>
                     </div>
 
-                    <!-- Next Button -->
                     <div class="form-actions">
                         <button type="button" class="btn-next">Next</button>
                     </div>
@@ -295,13 +277,101 @@
 <script>
 document.querySelectorAll('.select-input').forEach(function(sel) {
     sel.addEventListener('change', function() {
-        if (this.value) {
-            this.classList.add('selected');
-        } else {
-            this.classList.remove('selected');
-        }
+        if (this.value) this.classList.add('selected');
+        else this.classList.remove('selected');
     });
 });
+
+/* ── Extra annotation rows ── */
+function makeExtraRow() {
+    const row = document.createElement('div');
+    row.className = 'extra-perio-row';
+    const lbl = document.createElement('div');
+    lbl.className = 'grid-label';
+    row.appendChild(lbl);
+    for (let i = 0; i < 16; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'grid-input-cell';
+        for (let j = 0; j < 3; j++) {
+            const inp = document.createElement('input');
+            inp.type = 'text'; inp.maxLength = 1;
+            cell.appendChild(inp);
+        }
+        row.appendChild(cell);
+    }
+    return row;
+}
+
+/* Upper: rows added between tooth numbers and the empty row (append = below tooth nums) */
+function addUpperRow()    { document.getElementById('upperExtraRows').appendChild(makeExtraRow()); }
+function removeUpperRow() {
+    const c = document.getElementById('upperExtraRows');
+    if (c.lastElementChild) c.removeChild(c.lastElementChild);
+}
+
+/* Lower: rows added between empty row and tooth numbers (append = above tooth nums) */
+function addLowerRow()    { document.getElementById('lowerExtraRows').appendChild(makeExtraRow()); }
+function removeLowerRow() {
+    const c = document.getElementById('lowerExtraRows');
+    if (c.lastElementChild) c.removeChild(c.lastElementChild);
+}
+
+/* ── Canvas symbol picker ── */
+(function() {
+    const canvas = document.getElementById('perioCanvas');
+    const ctx    = canvas.getContext('2d');
+    const picker = document.getElementById('symbolPicker');
+    let annotations = [];
+    let pendingX, pendingY;
+
+    function resize() {
+        canvas.width  = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        redraw();
+    }
+
+    function redraw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.textAlign    = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle    = '#c0392b';
+        annotations.forEach(function(a) {
+            const fontSize = Math.max(15, canvas.width * 0.032);
+            ctx.font = 'bold ' + fontSize + 'px Poppins, sans-serif';
+            ctx.fillText(a.sym, a.x * canvas.width, a.y * canvas.height);
+        });
+    }
+
+    canvas.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const r = canvas.getBoundingClientRect();
+        pendingX = (e.clientX - r.left) / r.width;
+        pendingY = (e.clientY - r.top)  / r.height;
+        picker.style.left    = (e.clientX - r.left + 8) + 'px';
+        picker.style.top     = (e.clientY - r.top  + 8) + 'px';
+        picker.style.display = 'flex';
+    });
+
+    picker.querySelectorAll('.sym-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const sym = btn.dataset.sym;
+            if (sym) {
+                annotations.push({ x: pendingX, y: pendingY, sym: sym });
+            } else {
+                annotations = annotations.filter(function(a) {
+                    return Math.abs(a.x - pendingX) > 0.025 || Math.abs(a.y - pendingY) > 0.04;
+                });
+            }
+            picker.style.display = 'none';
+            redraw();
+        });
+    });
+
+    document.addEventListener('click', function() { picker.style.display = 'none'; });
+    window.addEventListener('resize', resize);
+    resize();
+})();
 
 document.querySelector('.menu-icon').onclick = function() {
     document.querySelector('.sidebar').classList.toggle('expanded');
@@ -313,8 +383,8 @@ document.querySelector('.user-profile').onclick = function(e) {
 };
 
 document.addEventListener('click', function() {
-    const dropdown = document.querySelector('.user-dropdown');
-    if (dropdown.classList.contains('show')) dropdown.classList.remove('show');
+    const d = document.querySelector('.user-dropdown');
+    if (d.classList.contains('show')) d.classList.remove('show');
 });
 
 document.querySelector('.user-dropdown').addEventListener('click', function(e) {

@@ -7,11 +7,7 @@
 
 body { height: 100vh; overflow: hidden; }
 
-.perio-page {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-}
+.perio-page { display: flex; flex-direction: column; height: 100vh; }
 
 .background {
     position: fixed;
@@ -145,13 +141,8 @@ body { height: 100vh; overflow: hidden; }
     width: 100%;
 }
 
-/* TOP ROW: Learning Outcome + Clinician/Date */
-.top-row {
-    display: flex;
-    gap: 20px;
-    align-items: stretch;
-    margin-top: 10px;
-}
+/* TOP ROW */
+.top-row { display: flex; gap: 20px; align-items: stretch; margin-top: 10px; }
 
 .learning-outcome-box {
     background: #2d4a6b;
@@ -163,17 +154,8 @@ body { height: 100vh; overflow: hidden; }
     flex-direction: column;
     gap: 8px;
 }
-
-.lo-title {
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.lo-text {
-    font-size: 12px;
-    line-height: 1.6;
-    font-weight: 300;
-}
+.lo-title { font-size: 14px; font-weight: 600; }
+.lo-text  { font-size: 12px; line-height: 1.6; font-weight: 300; }
 
 .clinician-date-group {
     flex: 1;
@@ -183,19 +165,9 @@ body { height: 100vh; overflow: hidden; }
     justify-content: center;
 }
 
-
 /* FORM GROUP */
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.form-group label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #222;
-}
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label { font-size: 13px; font-weight: 600; color: #222; }
 
 .form-group input,
 .form-group select,
@@ -208,11 +180,9 @@ body { height: 100vh; overflow: hidden; }
     outline: none;
     transition: border-color 0.2s;
 }
-
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus { border-color: #324966; }
-
 .form-group textarea { resize: vertical; min-height: 60px; }
 
 /* SPLIT INPUT */
@@ -224,6 +194,7 @@ body { height: 100vh; overflow: hidden; }
 /* FORM ROW */
 .form-row { display: flex; gap: 12px; align-items: flex-end; }
 .form-row .form-group { flex: 1; min-width: 0; }
+.form-row .form-group.col-tiny  { flex: 0 0 160px; }
 .form-row .form-group.col-small { flex: 0 0 120px; }
 .form-row .form-group.col-large { flex: 1; }
 
@@ -232,137 +203,180 @@ body { height: 100vh; overflow: hidden; }
 .select-input.selected { color: #333; }
 .select-input option { color: #333; }
 
-/* PERIODONTAL CHART */
-.perio-chart-wrapper {
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    padding: 12px;
-    overflow-x: auto;
-}
+/* ─── PERIODONTAL CHART — separated grid rows + cropped image ─── */
 
-.arch-section {
+.perio-interactive-chart {
     display: flex;
     flex-direction: column;
-    gap: 0;
-    margin-bottom: 8px;
+    width: 100%;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    overflow: hidden;
 }
 
-/* TOOTH NUMBERS */
-.tooth-numbers {
+/*
+  Grid columns: ~1/17 label (same width as one tooth column, matches image proportions)
+                + 16 equal tooth columns
+*/
+.perio-grid-row,
+.extra-perio-row {
     display: grid;
-    grid-template-columns: 20px repeat(16, 1fr);
-    font-size: 11px;
-    font-weight: 600;
-    text-align: center;
-    color: #333;
-    padding: 2px 0;
-    min-width: 500px;
+    grid-template-columns: 5.9% repeat(16, 1fr);
+    height: 30px;
+    border-bottom: 1px solid #bbb;
 }
 
-.tooth-numbers span {
+.tooth-num-row { height: 38px; background: #f6f6f6; }
+
+.grid-label {
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #111;
+    background: #ececec;
+    border-right: 1px solid #bbb;
 }
 
-/* PERIO MEASUREMENT GRID */
-.perio-grid {
+.grid-label.empty-row-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 2px;
+    padding: 2px;
+}
+
+.btn-pm {
+    background: #2d4a6b;
+    color: white;
+    border: none;
+    border-radius: 2px;
+    flex: 1;
     width: 100%;
-    border-collapse: collapse;
-    min-width: 500px;
-}
-
-.perio-grid td {
-    border: 1px solid #ccc;
+    font-size: 9px;
+    line-height: 1;
+    cursor: pointer;
     padding: 0;
-    width: calc(100% / 17);
+    font-family: 'Poppins', sans-serif;
+}
+.btn-pm:hover { background: #1e3352; }
+
+.grid-num-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #333;
+    border-left: 1px solid #ddd;
 }
 
-.perio-grid td.grid-label {
-    width: 20px;
-    background: #f5f5f5;
-    border: none;
+.grid-input-cell {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    border-left: 1px solid #ddd;
 }
 
-.perio-grid input[type="text"] {
-    width: 100%;
-    height: 22px;
+.grid-input-cell input[type="text"] {
+    width: 28%;
     border: none;
-    outline: none;
+    background: transparent;
     text-align: center;
     font-size: 11px;
     font-family: 'Poppins', sans-serif;
-    padding: 0 2px;
+    padding: 0;
+    outline: none;
 }
+.grid-input-cell input[type="text"]:focus { background: rgba(45,74,107,0.08); border-radius: 2px; }
 
-/* TOOTH DIAGRAM PLACEHOLDER */
-.tooth-diagram-placeholder {
-    width: 100%;
-    min-width: 500px;
-    background: #fafafa;
-    border: 1px dashed #ccc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 120px;
+.extra-perio-row .grid-label { background: #ececec; }
+.extra-perio-row .grid-input-cell { background: white; }
+
+/* Teeth image: crop out the pre-drawn box rows, show only the teeth drawing */
+.teeth-canvas-wrapper {
     position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid #bbb;
 }
 
-.arch-img {
+.perio-chart-img-cropped {
     width: 100%;
     display: block;
+    /* Shift image up to hide the pre-drawn upper box rows (~24% of image height),
+       and clip the pre-drawn lower box rows from the bottom (~24%). */
+    margin-top: -19%;
+    margin-bottom: -19%;
 }
 
-.arch-img-missing {
-    display: none;
-    color: #aaa;
-    font-size: 13px;
-    font-style: italic;
-    align-items: center;
-    justify-content: center;
-    height: 120px;
+#perioCanvas {
+    position: absolute;
+    top: 0; left: 0;
     width: 100%;
+    height: 100%;
+    cursor: crosshair;
+    z-index: 2;
 }
 
-/* PERIO LEGEND */
+/* Symbol picker popup */
+.symbol-picker {
+    position: absolute;
+    display: none;
+    flex-direction: row;
+    gap: 4px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 6px 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    z-index: 200;
+    pointer-events: all;
+}
+
+.sym-btn {
+    background: #f4f4f4;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    transition: background 0.15s;
+}
+.sym-btn:hover { background: #2d4a6b; color: white; border-color: #2d4a6b; }
+.sym-clear { background: #fff0f0; border-color: #f5c6c6; color: #c0392b; }
+.sym-clear:hover { background: #c0392b; color: white; border-color: #c0392b; }
+
+/* Chart bottom bar */
+.chart-bottom-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+
 .perio-legend {
     display: flex;
     gap: 20px;
     border: 1px solid #ccc;
     border-radius: 4px;
     padding: 8px 14px;
-    margin-top: 8px;
     background: #fafafa;
     font-size: 12px;
     color: #333;
     flex-wrap: wrap;
+    flex: 1;
 }
-
-.legend-col {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
+.legend-col { display: flex; flex-direction: column; gap: 4px; }
 
 /* OCCLULAR EXAMINATION */
-.occlular-section {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 4px;
-}
-
-.occlular-title {
-    font-size: 15px;
-    font-weight: 600;
-    color: #333;
-}
-
-.occlular-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
+.occlular-section { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+.occlular-title { font-size: 15px; font-weight: 600; color: #333; }
+.occlular-grid { display: flex; flex-direction: column; gap: 8px; }
 
 .occlular-header {
     display: grid;
@@ -370,13 +384,7 @@ body { height: 100vh; overflow: hidden; }
     gap: 8px;
     text-align: center;
 }
-
-.occ-col-header {
-    font-size: 13px;
-    font-weight: 600;
-    color: #333;
-    text-align: center;
-}
+.occ-col-header { font-size: 13px; font-weight: 600; color: #333; text-align: center; }
 
 .occlular-row {
     display: grid;
@@ -409,15 +417,10 @@ body { height: 100vh; overflow: hidden; }
     min-height: 55px;
     transition: border-color 0.2s;
 }
-
 .occlular-row textarea:focus { border-color: #324966; }
 
 /* FORM ACTIONS */
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    padding-top: 4px;
-}
+.form-actions { display: flex; justify-content: flex-end; padding-top: 4px; }
 
 .btn-next {
     background: #061F40;
@@ -430,5 +433,4 @@ body { height: 100vh; overflow: hidden; }
     font-weight: 500;
     transition: background-color 0.3s ease;
 }
-
 .btn-next:hover { background: #2c5282; }
