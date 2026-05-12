@@ -206,10 +206,10 @@ body { height: 100vh; overflow: hidden; }
 
 .grid-label.empty-row-controls {
     display: flex;
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: center;
     justify-content: center;
-    gap: 2px;
+    gap: 3px;
     padding: 2px;
 }
 
@@ -219,11 +219,10 @@ body { height: 100vh; overflow: hidden; }
     border: none;
     border-radius: 2px;
     flex: 1;
-    width: 100%;
-    font-size: 9px;
+    font-size: 10px;
     line-height: 1;
     cursor: pointer;
-    padding: 0;
+    padding: 2px 0;
     font-family: 'Poppins', sans-serif;
 }
 .btn-pm:hover { background: #1e3352; }
@@ -294,8 +293,6 @@ body { height: 100vh; overflow: hidden; }
 .perio-chart-img-cropped {
     width: 100%;
     display: block;
-    margin-top: -19%;
-    margin-bottom: -19%;
 }
 
 #perioCanvas {

@@ -29,6 +29,9 @@ public class LoginController {
     @GetMapping("/periodonticsb-clinician")
     public String periodonticsbClinician() { return "periodonticsb-clinician"; }
 
+    @GetMapping("/periodonticsc-clinician")
+    public String periodonticscClinician() { return "periodonticsc-clinician"; }
+
     @GetMapping("/admin-dashboard")
     public String adminDashboard() { return "dashboard-clinician"; } // placeholder
 }

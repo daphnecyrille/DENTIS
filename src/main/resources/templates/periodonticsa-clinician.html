@@ -347,9 +347,14 @@ function removeLowerRow() {
         const r = canvas.getBoundingClientRect();
         pendingX = (e.clientX - r.left) / r.width;
         pendingY = (e.clientY - r.top)  / r.height;
-        picker.style.left    = (e.clientX - r.left + 8) + 'px';
-        picker.style.top     = (e.clientY - r.top  + 8) + 'px';
+        picker.style.left    = (e.clientX + 8) + 'px';
+        picker.style.top     = (e.clientY + 8) + 'px';
         picker.style.display = 'flex';
+        requestAnimationFrame(function() {
+            const pr = picker.getBoundingClientRect();
+            if (pr.right  > window.innerWidth)  picker.style.left = (window.innerWidth  - pr.width  - 8) + 'px';
+            if (pr.bottom > window.innerHeight) picker.style.top  = (window.innerHeight - pr.height - 8) + 'px';
+        });
     });
 
     picker.querySelectorAll('.sym-btn').forEach(function(btn) {

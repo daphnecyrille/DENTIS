@@ -141,34 +141,9 @@ body { height: 100vh; overflow: hidden; }
     width: 100%;
 }
 
-/* TOP ROW */
-.top-row { display: flex; gap: 20px; align-items: stretch; margin-top: 10px; }
-
-.learning-outcome-box {
-    background: #2d4a6b;
-    color: white;
-    border-radius: 10px;
-    padding: 16px 18px;
-    flex: 0 0 42%;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-.lo-title { font-size: 14px; font-weight: 600; }
-.lo-text  { font-size: 12px; line-height: 1.6; font-weight: 300; }
-
-.clinician-date-group {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    justify-content: center;
-}
-
 /* FORM GROUP */
 .form-group { display: flex; flex-direction: column; gap: 5px; }
 .form-group label { font-size: 13px; font-weight: 600; color: #222; }
-
 .form-group input,
 .form-group select,
 .form-group textarea {
@@ -183,7 +158,10 @@ body { height: 100vh; overflow: hidden; }
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus { border-color: #324966; }
-.form-group textarea { resize: vertical; min-height: 60px; }
+
+/* FORM ROW */
+.form-row { display: flex; gap: 12px; align-items: flex-end; }
+.form-row .form-group { flex: 1; min-width: 0; }
 
 /* SPLIT INPUT */
 .split-input { display: flex; gap: 8px; }
@@ -191,122 +169,165 @@ body { height: 100vh; overflow: hidden; }
 .split-input input.input-wide { flex: 3; }
 .split-input input.input-narrow { flex: 0 0 50px; }
 
-/* FORM ROW */
-.form-row { display: flex; gap: 12px; align-items: flex-end; }
-.form-row .form-group { flex: 1; min-width: 0; }
-.form-row .form-group.col-tiny  { flex: 0 0 160px; }
-.form-row .form-group.col-small { flex: 0 0 120px; }
-.form-row .form-group.col-large { flex: 1; }
+/* ═══════════ DUAL-PANEL PERIODONTAL CHART ═══════════ */
 
-/* SELECT */
-.select-input { cursor: pointer; background: white; color: #aaa; }
-.select-input.selected { color: #333; }
-.select-input option { color: #333; }
-
-/* ─── PERIODONTAL CHART — separated grid rows + cropped image ─── */
-
-.perio-interactive-chart {
+.perio-chart-c2 {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: stretch;
     width: 100%;
     border: 1px solid #bbb;
     border-radius: 6px;
     overflow: hidden;
 }
 
-/*
-  Grid columns: ~1/17 label (same width as one tooth column, matches image proportions)
-                + 16 equal tooth columns
-*/
-.perio-grid-row,
-.extra-perio-row {
-    display: grid;
-    grid-template-columns: 5.9% repeat(16, 1fr);
-    height: 30px;
-    border-bottom: 1px solid #bbb;
+/* Each panel */
+.c-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
 }
 
-.tooth-num-row { height: 38px; background: #f6f6f6; }
-
-.grid-label {
+/* Center label column */
+.c-labels {
+    width: 48px;
+    flex-shrink: 0;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: 700;
-    color: #111;
+    flex-direction: column;
     background: #ececec;
+    border-left: 1px solid #bbb;
     border-right: 1px solid #bbb;
 }
 
-.grid-label.empty-row-controls {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    padding: 2px;
+.cl-spacer {
+    height: 38px;
+    border-bottom: 1px solid #bbb;
+    flex-shrink: 0;
 }
 
-.btn-pm {
-    background: #2d4a6b;
-    color: white;
-    border: none;
-    border-radius: 2px;
+.cl-row {
+    height: 26px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: #111;
+    border-bottom: 1px solid #bbb;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.cl-row.cej { height: 30px; }
+
+.cl-img-spacer {
     flex: 1;
-    font-size: 10px;
-    line-height: 1;
-    cursor: pointer;
-    padding: 2px 0;
-    font-family: 'Poppins', sans-serif;
+    border-bottom: 1px solid #bbb;
+    min-height: 0;
 }
-.btn-pm:hover { background: #1e3352; }
 
-.grid-num-cell {
+/* Tooth number rows */
+.c-tooth-row {
+    display: grid;
+    height: 38px;
+    background: #f6f6f6;
+    border-bottom: 1px solid #bbb;
+    flex-shrink: 0;
+}
+
+/* Input rows */
+.c-grid-row {
+    display: grid;
+    height: 26px;
+    border-bottom: 1px solid #bbb;
+    flex-shrink: 0;
+}
+
+.c-grid-row.cej { height: 30px; }
+
+/* Left panel (upper arch 18-28): columns match actual tooth widths */
+.c-panel.left .c-tooth-row,
+.c-panel.left .c-grid-row {
+    grid-template-columns: 77fr 72fr 83fr 57fr 56fr 58fr 48fr 84fr 85fr 50fr 56fr 58fr 56fr 82fr 76fr 75fr;
+}
+
+/* Right panel (lower arch 48-38): columns match actual tooth widths */
+.c-panel.right .c-tooth-row,
+.c-panel.right .c-grid-row {
+    grid-template-columns: 98fr 82fr 86fr 56fr 54fr 54fr 46fr 58fr 62fr 47fr 50fr 55fr 56fr 87fr 79fr 102fr;
+}
+
+.c-tooth-num {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 2px;
     font-size: 10px;
     font-weight: 700;
     color: #333;
-    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+.c-tooth-row .c-tooth-num:last-child { border-right: none; }
+
+.col-x-btn-c {
+    background: white;
+    border: 1.5px solid #c0392b;
+    border-radius: 2px;
+    font-size: 8px;
+    font-weight: 700;
+    color: #c0392b;
+    cursor: pointer;
+    padding: 1px 5px;
+    line-height: 1.3;
+    font-family: 'Poppins', sans-serif;
+    width: auto;
+}
+.col-x-btn-c:hover { background: #c0392b; color: white; }
+
+.c-cell input.x-marked {
+    color: #c0392b;
+    font-weight: 700;
 }
 
-.grid-input-cell {
+.c-cell {
     display: flex;
     align-items: center;
     justify-content: space-evenly;
-    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
 }
+.c-grid-row .c-cell:last-child { border-right: none; }
 
-.grid-input-cell input[type="text"] {
+.c-cell input[type="text"] {
     width: 28%;
     border: none;
     background: transparent;
     text-align: center;
-    font-size: 11px;
+    font-size: 10px;
     font-family: 'Poppins', sans-serif;
     padding: 0;
     outline: none;
 }
-.grid-input-cell input[type="text"]:focus { background: rgba(45,74,107,0.08); border-radius: 2px; }
 
-.extra-perio-row .grid-label { background: #ececec; }
-.extra-perio-row .grid-input-cell { background: white; }
 
-/* Teeth image: crop out the pre-drawn box rows, show only the teeth drawing */
-.teeth-canvas-wrapper {
+.c-cell input[type="text"]:focus { background: rgba(45,74,107,0.08); border-radius: 2px; }
+
+/* Teeth image wrappers */
+.c-teeth-wrapper {
     position: relative;
     overflow: hidden;
     border-bottom: 1px solid #bbb;
+    flex-shrink: 0;
 }
 
-.perio-chart-img-cropped {
+.c-chart-img {
     width: 100%;
     display: block;
 }
 
-#perioCanvas {
+.c-canvas {
     position: absolute;
     top: 0; left: 0;
     width: 100%;
@@ -315,7 +336,7 @@ body { height: 100vh; overflow: hidden; }
     z-index: 2;
 }
 
-/* Symbol picker popup */
+/* Symbol picker */
 .symbol-picker {
     position: fixed;
     display: none;
@@ -346,79 +367,83 @@ body { height: 100vh; overflow: hidden; }
 .sym-clear { background: #fff0f0; border-color: #f5c6c6; color: #c0392b; }
 .sym-clear:hover { background: #c0392b; color: white; border-color: #c0392b; }
 
-/* Chart bottom bar */
-.chart-bottom-bar {
+/* BOTTOM SECTION */
+.chart-bottom-row {
     display: flex;
+    gap: 30px;
     align-items: center;
-    gap: 12px;
     flex-wrap: wrap;
-}
-
-
-.perio-legend {
-    display: flex;
-    gap: 20px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 8px 14px;
-    background: #fafafa;
-    font-size: 12px;
-    color: #333;
-    flex-wrap: wrap;
-    flex: 1;
-}
-.legend-col { display: flex; flex-direction: column; gap: 4px; }
-
-/* OCCLULAR EXAMINATION */
-.occlular-section { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
-.occlular-title { font-size: 15px; font-weight: 600; color: #333; }
-.occlular-grid { display: flex; flex-direction: column; gap: 8px; }
-
-.occlular-header {
-    display: grid;
-    grid-template-columns: 110px 1fr 1fr;
-    gap: 8px;
-    text-align: center;
-}
-.occ-col-header { font-size: 13px; font-weight: 600; color: #333; text-align: center; }
-
-.occlular-row {
-    display: grid;
-    grid-template-columns: 110px 1fr 1fr;
-    gap: 8px;
-    align-items: start;
-}
-
-.occ-tag {
-    background: #2d4a6b;
-    color: white;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-    text-align: center;
-    white-space: nowrap;
-    align-self: start;
     margin-top: 2px;
 }
 
-.occlular-row textarea {
-    padding: 7px 10px;
+.clinician-box {
+    border: 2px solid #444;
+    border-radius: 4px;
+    padding: 8px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 230px;
+}
+
+.clinician-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.clinician-inline label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #222;
+    white-space: nowrap;
+}
+
+.clinician-inline input {
+    padding: 4px 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 13px;
     font-family: 'Poppins', sans-serif;
     outline: none;
-    resize: vertical;
-    min-height: 55px;
-    transition: border-color 0.2s;
+    flex: 1;
 }
-.occlular-row textarea:focus { border-color: #324966; }
+.clinician-inline input:focus { border-color: #324966; }
+
+.check-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.check-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #222;
+}
+
+.check-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+}
+
+.check-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #2d4a6b;
+}
 
 /* FORM ACTIONS */
 .form-actions { display: flex; justify-content: flex-end; padding-top: 4px; }
 
-.btn-next {
+.btn-submit {
     background: #061F40;
     color: white;
     padding: 10px 30px;
@@ -429,4 +454,4 @@ body { height: 100vh; overflow: hidden; }
     font-weight: 500;
     transition: background-color 0.3s ease;
 }
-.btn-next:hover { background: #2c5282; }
+.btn-submit:hover { background: #2c5282; }
