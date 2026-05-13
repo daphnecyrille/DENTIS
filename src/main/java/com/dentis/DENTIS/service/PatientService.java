@@ -8,6 +8,8 @@ import com.dentis.DENTIS.model.User;
 import com.dentis.DENTIS.repository.PatientRepository;
 import com.dentis.DENTIS.repository.UserRepository;
 import com.dentis.DENTIS.service.OralSurgeryChartService;
+import com.dentis.DENTIS.service.EndodonticsChartService;
+import com.dentis.DENTIS.service.PeriodonticChartService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,13 +24,19 @@ public class PatientService {
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
     private final OralSurgeryChartService oralSurgeryChartService;
+    private final EndodonticsChartService endodonticsChartService;
+    private final PeriodonticChartService periodonticChartService;
 
     public PatientService(PatientRepository patientRepository,
                           UserRepository userRepository,
-                          OralSurgeryChartService oralSurgeryChartService) {
+                          OralSurgeryChartService oralSurgeryChartService,
+                          EndodonticsChartService endodonticsChartService,
+                          PeriodonticChartService periodonticChartService) {
         this.patientRepository = patientRepository;
         this.userRepository = userRepository;
         this.oralSurgeryChartService = oralSurgeryChartService;
+        this.endodonticsChartService = endodonticsChartService;
+        this.periodonticChartService = periodonticChartService;
     }
 
     public List<User> getFacultyBySection(String section) {
@@ -55,12 +63,24 @@ public class PatientService {
         User clinician = userRepository.findById(clinicianId).orElseThrow();
         patient.setAssignedClinician(clinician);
         patientRepository.save(patient);
-        // auto-create OSF1 and OSF2 if not already assigned
-        if (oralSurgeryChartService.findByPatientAndType(patient, OralSurgeryChartType.OSF1).isEmpty()) {
-            oralSurgeryChartService.createForPatient(patient, clinician, faculty, OralSurgeryChartType.OSF1);
-        }
-        if (oralSurgeryChartService.findByPatientAndType(patient, OralSurgeryChartType.OSF2).isEmpty()) {
-            oralSurgeryChartService.createForPatient(patient, clinician, faculty, OralSurgeryChartType.OSF2);
+
+        String code = patient.getServiceCode() != null ? patient.getServiceCode().toUpperCase() : "";
+
+        if ("OS".equals(code)) {
+            if (oralSurgeryChartService.findByPatientAndType(patient, OralSurgeryChartType.OSF1).isEmpty()) {
+                oralSurgeryChartService.createForPatient(patient, clinician, faculty, OralSurgeryChartType.OSF1);
+            }
+            if (oralSurgeryChartService.findByPatientAndType(patient, OralSurgeryChartType.OSF2).isEmpty()) {
+                oralSurgeryChartService.createForPatient(patient, clinician, faculty, OralSurgeryChartType.OSF2);
+            }
+        } else if ("ENDO".equals(code)) {
+            if (endodonticsChartService.findByPatient(patient).isEmpty()) {
+                endodonticsChartService.createForPatient(patient, clinician, faculty);
+            }
+        } else if ("PERIO".equals(code)) {
+            if (periodonticChartService.findAllByPatient(patient).isEmpty()) {
+                periodonticChartService.createForPatient(patient, clinician, faculty);
+            }
         }
     }
 

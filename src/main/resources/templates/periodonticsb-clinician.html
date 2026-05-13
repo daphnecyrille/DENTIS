@@ -74,21 +74,29 @@
                 <!-- Banner -->
                 <div class="form-banner">Periodontal Chart</div>
 
+                <form th:action="@{/periodontics-b/{id}(id=${chart.id})}" method="post" th:object="${chart}" id="formB">
+                <script th:inline="javascript">var VIEW_ONLY = /*[[${viewOnly}]]*/ false;</script>
+
                 <div class="form-body">
+                <div th:style="${viewOnly} ? 'pointer-events:none;' : ''">
+
+                    <!-- Hidden JSON inputs for grid and canvas serialization -->
+                    <input type="hidden" id="formBGridJsonInput"   th:field="*{formBGridJson}">
+                    <input type="hidden" id="formBCanvasJsonInput" th:field="*{formBCanvasJson}">
 
                     <!-- Plaque score formula -->
                     <div class="plaque-formula">
                         <label class="formula-label">Total Number of Sites with Plaque/<br>Number of Sites Examined x100 =</label>
-                        <input type="text" placeholder="%" class="formula-input">
+                        <input type="text" placeholder="%" class="formula-input" th:field="*{plaqueScorePercent}">
                     </div>
 
                     <!-- ═══════════ PERIODONTAL CHART ═══════════ -->
                     <div class="perio-interactive-chart">
 
-                        <!-- ── UPPER ARCH: tooth-nums (with X buttons) → [extra rows] → B → L → empty → image -->
+                        <!-- ── UPPER ARCH: tooth-nums → B → L → empty → [extra rows] → image ── -->
                         <div class="perio-grid-row tooth-num-row">
-                            <div class="grid-label empty-row-controls"><button class="btn-pm" onclick="addUpperRow()">+</button><button class="btn-pm" onclick="removeUpperRow()">&#8722;</button></div>
-                            <div class="grid-num-cell"><span class="tooth-num">18</span><button class="col-x-btn" data-col="1" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">17</span><button class="col-x-btn" data-col="2" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">16</span><button class="col-x-btn" data-col="3" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">15</span><button class="col-x-btn" data-col="4" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">14</span><button class="col-x-btn" data-col="5" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">13</span><button class="col-x-btn" data-col="6" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">12</span><button class="col-x-btn" data-col="7" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">11</span><button class="col-x-btn" data-col="8" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">21</span><button class="col-x-btn" data-col="9" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">22</span><button class="col-x-btn" data-col="10" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">23</span><button class="col-x-btn" data-col="11" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">24</span><button class="col-x-btn" data-col="12" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">25</span><button class="col-x-btn" data-col="13" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">26</span><button class="col-x-btn" data-col="14" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">27</span><button class="col-x-btn" data-col="15" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">28</span><button class="col-x-btn" data-col="16" data-arch="upper">X</button></div>
+                            <div class="grid-label empty-row-controls"><button type="button" class="btn-pm" onclick="addUpperRow()">+</button><button type="button" class="btn-pm" onclick="removeUpperRow()">&#8722;</button></div>
+                            <div class="grid-num-cell"><span class="tooth-num">18</span><button type="button" class="col-x-btn" data-col="1" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">17</span><button type="button" class="col-x-btn" data-col="2" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">16</span><button type="button" class="col-x-btn" data-col="3" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">15</span><button type="button" class="col-x-btn" data-col="4" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">14</span><button type="button" class="col-x-btn" data-col="5" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">13</span><button type="button" class="col-x-btn" data-col="6" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">12</span><button type="button" class="col-x-btn" data-col="7" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">11</span><button type="button" class="col-x-btn" data-col="8" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">21</span><button type="button" class="col-x-btn" data-col="9" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">22</span><button type="button" class="col-x-btn" data-col="10" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">23</span><button type="button" class="col-x-btn" data-col="11" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">24</span><button type="button" class="col-x-btn" data-col="12" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">25</span><button type="button" class="col-x-btn" data-col="13" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">26</span><button type="button" class="col-x-btn" data-col="14" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">27</span><button type="button" class="col-x-btn" data-col="15" data-arch="upper">X</button></div><div class="grid-num-cell"><span class="tooth-num">28</span><button type="button" class="col-x-btn" data-col="16" data-arch="upper">X</button></div>
                         </div>
 
                         <!-- Upper B row -->
@@ -111,13 +119,13 @@
 
                         <div id="upperExtraRows"></div>
 
-                        <!-- Teeth image + canvas (click tooth surface → big X at that point) -->
+                        <!-- Teeth image + canvas -->
                         <div class="teeth-canvas-wrapper">
                             <img src="/images/perio-chart.png" alt="Periodontal Chart" class="perio-chart-img-cropped">
                             <canvas id="perioCanvas"></canvas>
                         </div>
 
-                        <!-- ── LOWER ARCH: image → L → B → empty → [extra rows] → tooth-nums -->
+                        <!-- ── LOWER ARCH: image → L → B → empty → [extra rows] → tooth-nums ── -->
 
                         <!-- Lower L row (closest to image) -->
                         <div class="perio-grid-row">
@@ -141,8 +149,8 @@
 
                         <!-- Lower tooth-num-row with X buttons -->
                         <div class="perio-grid-row tooth-num-row">
-                            <div class="grid-label empty-row-controls"><button class="btn-pm" onclick="addLowerRow()">+</button><button class="btn-pm" onclick="removeLowerRow()">&#8722;</button></div>
-                            <div class="grid-num-cell"><span class="tooth-num">48</span><button class="col-x-btn" data-col="1" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">47</span><button class="col-x-btn" data-col="2" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">46</span><button class="col-x-btn" data-col="3" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">45</span><button class="col-x-btn" data-col="4" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">44</span><button class="col-x-btn" data-col="5" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">43</span><button class="col-x-btn" data-col="6" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">42</span><button class="col-x-btn" data-col="7" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">41</span><button class="col-x-btn" data-col="8" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">31</span><button class="col-x-btn" data-col="9" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">32</span><button class="col-x-btn" data-col="10" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">33</span><button class="col-x-btn" data-col="11" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">34</span><button class="col-x-btn" data-col="12" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">35</span><button class="col-x-btn" data-col="13" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">36</span><button class="col-x-btn" data-col="14" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">37</span><button class="col-x-btn" data-col="15" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">38</span><button class="col-x-btn" data-col="16" data-arch="lower">X</button></div>
+                            <div class="grid-label empty-row-controls"><button type="button" class="btn-pm" onclick="addLowerRow()">+</button><button type="button" class="btn-pm" onclick="removeLowerRow()">&#8722;</button></div>
+                            <div class="grid-num-cell"><span class="tooth-num">48</span><button type="button" class="col-x-btn" data-col="1" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">47</span><button type="button" class="col-x-btn" data-col="2" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">46</span><button type="button" class="col-x-btn" data-col="3" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">45</span><button type="button" class="col-x-btn" data-col="4" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">44</span><button type="button" class="col-x-btn" data-col="5" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">43</span><button type="button" class="col-x-btn" data-col="6" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">42</span><button type="button" class="col-x-btn" data-col="7" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">41</span><button type="button" class="col-x-btn" data-col="8" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">31</span><button type="button" class="col-x-btn" data-col="9" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">32</span><button type="button" class="col-x-btn" data-col="10" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">33</span><button type="button" class="col-x-btn" data-col="11" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">34</span><button type="button" class="col-x-btn" data-col="12" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">35</span><button type="button" class="col-x-btn" data-col="13" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">36</span><button type="button" class="col-x-btn" data-col="14" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">37</span><button type="button" class="col-x-btn" data-col="15" data-arch="lower">X</button></div><div class="grid-num-cell"><span class="tooth-num">38</span><button type="button" class="col-x-btn" data-col="16" data-arch="lower">X</button></div>
                         </div>
 
                     </div>
@@ -155,7 +163,7 @@
                             <p><em><strong>Silness &amp; Loe (Scoring<br>and description)</strong></em></p>
                         </div>
                         <div class="plaque-index-right">
-                            <input type="text" placeholder="%" class="plaque-pct-input">
+                            <input type="text" placeholder="%" class="plaque-pct-input" th:field="*{plaqueIndexPercent}">
                             <div class="scoring-list">
                                 <p>0 - No plaque</p>
                                 <p>1 - Thin film of plaque at the gingival margin visible only when scraped with an explorer</p>
@@ -172,42 +180,83 @@
                                 <tr><th>#</th><th>MB</th><th>MidB</th><th>DB</th><th>L</th></tr>
                             </thead>
                             <tbody>
-                                <tr><td class="tooth-num-cell">12</td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td></tr>
-                                <tr><td class="tooth-num-cell">16</td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td></tr>
-                                <tr><td class="tooth-num-cell">24</td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td></tr>
-                                <tr><td class="tooth-num-cell">32</td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td></tr>
-                                <tr><td class="tooth-num-cell">36</td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td></tr>
-                                <tr><td class="tooth-num-cell">44</td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td><td><input type="text" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td></tr>
+                                <tr>
+                                    <td class="tooth-num-cell">12</td>
+                                    <td><input type="text" name="pt12MB"  th:value="*{pt12MB}"  maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                    <td><input type="text" name="pt12MidB" th:value="*{pt12MidB}" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                    <td><input type="text" name="pt12DB"  th:value="*{pt12DB}"  maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                    <td><input type="text" name="pt12L"   th:value="*{pt12L}"   maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                </tr>
+                                <tr>
+                                    <td class="tooth-num-cell">16</td>
+                                    <td><input type="text" name="pt16MB"  th:value="*{pt16MB}"  maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                    <td><input type="text" name="pt16MidB" th:value="*{pt16MidB}" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                    <td><input type="text" name="pt16DB"  th:value="*{pt16DB}"  maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                    <td><input type="text" name="pt16L"   th:value="*{pt16L}"   maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                </tr>
+                                <tr>
+                                    <td class="tooth-num-cell">24</td>
+                                    <td><input type="text" name="pt24MB"  th:value="*{pt24MB}"  maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                    <td><input type="text" name="pt24MidB" th:value="*{pt24MidB}" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                    <td><input type="text" name="pt24DB"  th:value="*{pt24DB}"  maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                    <td><input type="text" name="pt24L"   th:value="*{pt24L}"   maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                </tr>
+                                <tr>
+                                    <td class="tooth-num-cell">32</td>
+                                    <td><input type="text" name="pt32MB"  th:value="*{pt32MB}"  maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                    <td><input type="text" name="pt32MidB" th:value="*{pt32MidB}" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                    <td><input type="text" name="pt32DB"  th:value="*{pt32DB}"  maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                    <td><input type="text" name="pt32L"   th:value="*{pt32L}"   maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                </tr>
+                                <tr>
+                                    <td class="tooth-num-cell">36</td>
+                                    <td><input type="text" name="pt36MB"  th:value="*{pt36MB}"  maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                    <td><input type="text" name="pt36MidB" th:value="*{pt36MidB}" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                    <td><input type="text" name="pt36DB"  th:value="*{pt36DB}"  maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                    <td><input type="text" name="pt36L"   th:value="*{pt36L}"   maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                </tr>
+                                <tr>
+                                    <td class="tooth-num-cell">44</td>
+                                    <td><input type="text" name="pt44MB"  th:value="*{pt44MB}"  maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                    <td><input type="text" name="pt44MidB" th:value="*{pt44MidB}" maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                    <td><input type="text" name="pt44DB"  th:value="*{pt44DB}"  maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                    <td><input type="text" name="pt44L"   th:value="*{pt44L}"   maxlength="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                                </tr>
                             </tbody>
                         </table>
                         <div class="other-findings">
                             <label>Other relevant findings:</label>
-                            <textarea placeholder="Value" rows="7"></textarea>
+                            <textarea rows="7" th:field="*{otherFindings}" placeholder="Value"></textarea>
                         </div>
                     </div>
 
                     <!-- Recall 1 -->
                     <div class="recall-section">
                         <h3 class="recall-title"><em>Recall 1</em></h3>
-                        <div class="form-group"><label>Diagnosis</label><textarea placeholder="Value" rows="3"></textarea></div>
-                        <div class="form-group"><label>Relevant Findings</label><textarea placeholder="Value" rows="3"></textarea></div>
-                        <div class="form-group"><label>Recommendation</label><textarea placeholder="Value" rows="3"></textarea></div>
+                        <div class="form-group"><label>Diagnosis</label><textarea rows="3" th:field="*{recall1Diagnosis}" placeholder="Value"></textarea></div>
+                        <div class="form-group"><label>Relevant Findings</label><textarea rows="3" th:field="*{recall1Findings}" placeholder="Value"></textarea></div>
+                        <div class="form-group"><label>Recommendation</label><textarea rows="3" th:field="*{recall1Recommendation}" placeholder="Value"></textarea></div>
                     </div>
 
                     <!-- Recall 2 -->
                     <div class="recall-section">
                         <h3 class="recall-title"><em>Recall 2</em></h3>
-                        <div class="form-group"><label>Diagnosis</label><textarea placeholder="Value" rows="3"></textarea></div>
-                        <div class="form-group"><label>Relevant Findings</label><textarea placeholder="Value" rows="3"></textarea></div>
-                        <div class="form-group"><label>Recommendation</label><textarea placeholder="Value" rows="3"></textarea></div>
+                        <div class="form-group"><label>Diagnosis</label><textarea rows="3" th:field="*{recall2Diagnosis}" placeholder="Value"></textarea></div>
+                        <div class="form-group"><label>Relevant Findings</label><textarea rows="3" th:field="*{recall2Findings}" placeholder="Value"></textarea></div>
+                        <div class="form-group"><label>Recommendation</label><textarea rows="3" th:field="*{recall2Recommendation}" placeholder="Value"></textarea></div>
                     </div>
 
-                    <!-- Save -->
+                </div><!-- end viewOnly wrapper -->
+
+                    <!-- Navigation -->
                     <div class="form-actions">
-                        <button type="button" class="btn-submit">Save</button>
+                        <a th:if="${viewOnly}" th:href="@{/periodontics-a/{id}/view(id=${chart.id})}" class="btn-back">Back</a>
+                        <a th:if="${!viewOnly}" th:href="@{/periodontics-a/{id}(id=${chart.id})}" class="btn-back">Back</a>
+                        <button th:if="${!viewOnly}" type="submit" class="btn-submit">Save</button>
                     </div>
 
                 </div>
+                </form>
             </div>
         </main>
     </div>
@@ -216,25 +265,25 @@
 <script>
 /* ── Box-spot click: cycles blank → + → - → blank ── */
 document.addEventListener('click', function(e) {
-    const spot = e.target.closest('.box-spot');
+    var spot = e.target.closest('.box-spot');
     if (!spot) return;
-    const cur = spot.dataset.val || '';
-    const states = ['', '+', '-'];
-    const next = states[(states.indexOf(cur) + 1) % states.length];
-    spot.dataset.val = next;
-    spot.textContent = next;
+    var cur    = spot.dataset.val || '';
+    var states = ['', '+', '-'];
+    var next   = states[(states.indexOf(cur) + 1) % states.length];
+    spot.dataset.val  = next;
+    spot.textContent  = next;
 });
 
-/* ── Col X button: toggle all box-spots in that column/arch between X and blank ── */
+/* ── Col X button: toggle all box-spots in that column/arch ── */
 document.addEventListener('click', function(e) {
-    const btn = e.target.closest('.col-x-btn');
+    var btn = e.target.closest('.col-x-btn');
     if (!btn) return;
-    const col  = btn.dataset.col;
-    const arch = btn.dataset.arch;
-    const spots = document.querySelectorAll('.box-spot[data-col="' + col + '"][data-arch="' + arch + '"]');
-    const allX  = Array.from(spots).every(function(s) { return s.dataset.val === 'X'; });
+    var col   = btn.dataset.col;
+    var arch  = btn.dataset.arch;
+    var spots = document.querySelectorAll('.box-spot[data-col="' + col + '"][data-arch="' + arch + '"]');
+    var allX  = Array.from(spots).every(function(s) { return s.dataset.val === 'X'; });
     spots.forEach(function(s) {
-        const v = allX ? '' : 'X';
+        var v = allX ? '' : 'X';
         s.dataset.val = v;
         s.textContent = v;
     });
@@ -242,16 +291,16 @@ document.addEventListener('click', function(e) {
 
 /* ── Extra rows (box-spots) ── */
 function makeExtraRow(arch) {
-    const row = document.createElement('div');
+    var row = document.createElement('div');
     row.className = 'extra-perio-row';
-    const lbl = document.createElement('div');
+    var lbl = document.createElement('div');
     lbl.className = 'grid-label';
     row.appendChild(lbl);
-    for (let i = 1; i <= 16; i++) {
-        const cell = document.createElement('div');
+    for (var i = 1; i <= 16; i++) {
+        var cell = document.createElement('div');
         cell.className = 'grid-input-cell';
-        for (let j = 0; j < 3; j++) {
-            const s = document.createElement('span');
+        for (var j = 0; j < 3; j++) {
+            var s = document.createElement('span');
             s.className = 'box-spot';
             s.dataset.col  = String(i);
             s.dataset.arch = arch;
@@ -262,17 +311,19 @@ function makeExtraRow(arch) {
     return row;
 }
 function addUpperRow()    { document.getElementById('upperExtraRows').appendChild(makeExtraRow('upper')); }
-function removeUpperRow() { const c = document.getElementById('upperExtraRows'); if (c.lastElementChild) c.removeChild(c.lastElementChild); }
+function removeUpperRow() { var c = document.getElementById('upperExtraRows'); if (c.lastElementChild) c.removeChild(c.lastElementChild); }
 function addLowerRow()    { document.getElementById('lowerExtraRows').appendChild(makeExtraRow('lower')); }
-function removeLowerRow() { const c = document.getElementById('lowerExtraRows'); if (c.lastElementChild) c.removeChild(c.lastElementChild); }
+function removeLowerRow() { var c = document.getElementById('lowerExtraRows'); if (c.lastElementChild) c.removeChild(c.lastElementChild); }
 
-/* ── Canvas: click tooth surface → draw big X at that point (toggle off by clicking same spot) ── */
+/* ── Canvas: module-scoped xMarks for serialization ── */
+var xMarks = [];
+var _canvasRedraw = null;
+
 (function() {
-    const canvas = document.getElementById('perioCanvas');
-    const ctx    = canvas.getContext('2d');
-    const LABEL  = 0.059;
-    const COLS   = 16;
-    let xMarks   = [];   // [{x, y}] as fractions 0-1
+    var canvas = document.getElementById('perioCanvas');
+    var ctx    = canvas.getContext('2d');
+    var LABEL  = 0.059;
+    var COLS   = 16;
 
     function colHalfW() { return (1 - LABEL) / COLS / 2; }
 
@@ -286,12 +337,12 @@ function removeLowerRow() { const c = document.getElementById('lowerExtraRows');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.strokeStyle = '#c0392b';
         ctx.lineCap     = 'round';
-        const hw = colHalfW() * canvas.width * 0.9;   // arm half-width
-        const hh = hw * 1.8;                           // arm half-height (taller than wide)
+        var hw = colHalfW() * canvas.width * 0.9;
+        var hh = hw * 1.8;
         ctx.lineWidth = Math.max(2, canvas.width * 0.004);
         xMarks.forEach(function(m) {
-            const cx = m.x * canvas.width;
-            const cy = m.y * canvas.height;
+            var cx = m.x * canvas.width;
+            var cy = m.y * canvas.height;
             ctx.beginPath();
             ctx.moveTo(cx - hw, cy - hh);
             ctx.lineTo(cx + hw, cy + hh);
@@ -301,13 +352,15 @@ function removeLowerRow() { const c = document.getElementById('lowerExtraRows');
         });
     }
 
+    _canvasRedraw = redraw;
+
     canvas.addEventListener('click', function(e) {
-        const r = canvas.getBoundingClientRect();
-        const x = (e.clientX - r.left) / r.width;
-        const y = (e.clientY - r.top)  / r.height;
-        const hw = colHalfW();
-        const hh = hw * 1.8;
-        const idx = xMarks.findIndex(function(m) {
+        var r  = canvas.getBoundingClientRect();
+        var x  = (e.clientX - r.left) / r.width;
+        var y  = (e.clientY - r.top)  / r.height;
+        var hw = colHalfW();
+        var hh = hw * 1.8;
+        var idx = xMarks.findIndex(function(m) {
             return Math.abs(m.x - x) < hw && Math.abs(m.y - y) < hh;
         });
         if (idx >= 0) {
@@ -322,6 +375,98 @@ function removeLowerRow() { const c = document.getElementById('lowerExtraRows');
     resize();
 })();
 
+/* ── Form submit: serialize grid + canvas to hidden inputs ── */
+document.getElementById('formB').addEventListener('submit', function() {
+    /* Fixed grid rows */
+    var rows = [];
+    document.querySelectorAll('.perio-grid-row:not(.tooth-num-row)').forEach(function(row) {
+        var cells = [];
+        row.querySelectorAll('.grid-input-cell').forEach(function(cell) {
+            var vals = [];
+            cell.querySelectorAll('.box-spot').forEach(function(s) { vals.push(s.dataset.val || ''); });
+            cells.push(vals);
+        });
+        rows.push(cells);
+    });
+    /* Upper extra rows */
+    var upperExtra = [];
+    document.querySelectorAll('#upperExtraRows .extra-perio-row').forEach(function(row) {
+        var cells = [];
+        row.querySelectorAll('.grid-input-cell').forEach(function(cell) {
+            var vals = [];
+            cell.querySelectorAll('.box-spot').forEach(function(s) { vals.push(s.dataset.val || ''); });
+            cells.push(vals);
+        });
+        upperExtra.push(cells);
+    });
+    /* Lower extra rows */
+    var lowerExtra = [];
+    document.querySelectorAll('#lowerExtraRows .extra-perio-row').forEach(function(row) {
+        var cells = [];
+        row.querySelectorAll('.grid-input-cell').forEach(function(cell) {
+            var vals = [];
+            cell.querySelectorAll('.box-spot').forEach(function(s) { vals.push(s.dataset.val || ''); });
+            cells.push(vals);
+        });
+        lowerExtra.push(cells);
+    });
+    document.getElementById('formBGridJsonInput').value   = JSON.stringify({ rows: rows, upperExtra: upperExtra, lowerExtra: lowerExtra });
+    document.getElementById('formBCanvasJsonInput').value = JSON.stringify(xMarks);
+});
+
+/* ── Load-time deserialization ── */
+(function() {
+    /* Grid */
+    var gridVal = document.getElementById('formBGridJsonInput').value;
+    if (gridVal) {
+        try {
+            var data     = JSON.parse(gridVal);
+            var fixedRows = document.querySelectorAll('.perio-grid-row:not(.tooth-num-row)');
+            (data.rows || []).forEach(function(cells, ri) {
+                if (ri >= fixedRows.length) return;
+                var allSpots = fixedRows[ri].querySelectorAll('.box-spot');
+                var si = 0;
+                cells.forEach(function(cellVals) {
+                    cellVals.forEach(function(v) {
+                        if (si < allSpots.length) { allSpots[si].dataset.val = v; allSpots[si].textContent = v; si++; }
+                    });
+                });
+            });
+            (data.upperExtra || []).forEach(function(cells) {
+                var row = makeExtraRow('upper');
+                document.getElementById('upperExtraRows').appendChild(row);
+                var spots = row.querySelectorAll('.box-spot');
+                var si = 0;
+                cells.forEach(function(cellVals) {
+                    cellVals.forEach(function(v) {
+                        if (si < spots.length) { spots[si].dataset.val = v; spots[si].textContent = v; si++; }
+                    });
+                });
+            });
+            (data.lowerExtra || []).forEach(function(cells) {
+                var row = makeExtraRow('lower');
+                document.getElementById('lowerExtraRows').appendChild(row);
+                var spots = row.querySelectorAll('.box-spot');
+                var si = 0;
+                cells.forEach(function(cellVals) {
+                    cellVals.forEach(function(v) {
+                        if (si < spots.length) { spots[si].dataset.val = v; spots[si].textContent = v; si++; }
+                    });
+                });
+            });
+        } catch(e) {}
+    }
+    /* Canvas */
+    var canvasVal = document.getElementById('formBCanvasJsonInput').value;
+    if (canvasVal) {
+        try {
+            xMarks = JSON.parse(canvasVal);
+            if (_canvasRedraw) _canvasRedraw();
+        } catch(e) {}
+    }
+})();
+
+/* ── UI handlers ── */
 document.querySelector('.menu-icon').onclick = function() {
     document.querySelector('.sidebar').classList.toggle('expanded');
 };
@@ -330,7 +475,7 @@ document.querySelector('.user-profile').onclick = function(e) {
     document.querySelector('.user-dropdown').classList.toggle('show');
 };
 document.addEventListener('click', function() {
-    const d = document.querySelector('.user-dropdown');
+    var d = document.querySelector('.user-dropdown');
     if (d.classList.contains('show')) d.classList.remove('show');
 });
 document.querySelector('.user-dropdown').addEventListener('click', function(e) { e.stopPropagation(); });

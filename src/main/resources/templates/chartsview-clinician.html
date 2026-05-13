@@ -196,6 +196,68 @@
                                 </td>
                                 <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
                             </tr>
+                            <tr th:each="ec : ${endoCharts}">
+                                <td th:text="${#strings.replace(ec.chartNo, 'ENDO-', 'ENDO1-')}"></td>
+                                <td>Endodontics - Patient Workup</td>
+                                <td th:class="'status ' + ${ec.status.cssClass}"
+                                    th:text="${ec.status.displayName}"></td>
+                                <td th:text="${ec.createdAt.toLocalDate()}"></td>
+                                <td><a th:href="@{/endodontics-clinician/{id}/view(id=${ec.id})}" class="btn-action btn-view">View</a></td>
+                                <td><a th:href="@{/endodontics-clinician/{id}(id=${ec.id})}" class="btn-action btn-edit">Edit</a></td>
+                                <td>
+                                    <form th:action="@{/endodontics-clinician/{id}/submit(id=${ec.id})}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn-action btn-submit">Submit</button>
+                                    </form>
+                                </td>
+                                <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
+                            </tr>
+                            <tr th:each="ec : ${endoCharts}">
+                                <td th:text="${#strings.replace(#strings.replace(ec.chartNo, 'ENDO1-', 'ENDO2-'), 'ENDO-', 'ENDO2-')}"></td>
+                                <td>Endodontics - Endodontic Evaluation &amp; Treatment Planning</td>
+                                <td th:class="'status ' + ${ec.form2Status.cssClass}"
+                                    th:text="${ec.form2Status.displayName}"></td>
+                                <td th:text="${ec.createdAt.toLocalDate()}"></td>
+                                <td><a th:href="@{/endodontics2-clinician/{id}/view(id=${ec.id})}" class="btn-action btn-view">View</a></td>
+                                <td><a th:href="@{/endodontics2-clinician/{id}(id=${ec.id})}" class="btn-action btn-edit">Edit</a></td>
+                                <td>
+                                    <form th:action="@{/endodontics2-clinician/{id}/submit(id=${ec.id})}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn-action btn-submit">Submit</button>
+                                    </form>
+                                </td>
+                                <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
+                            </tr>
+                            <!-- Periodontics PF1 (Forms A+B) -->
+                            <tr th:each="pc : ${perioCharts}">
+                                <td th:text="${pc.chartNo}"></td>
+                                <td>Periodontics - Periodontal Chart</td>
+                                <td th:class="'status ' + ${pc.status.cssClass}"
+                                    th:text="${pc.status.displayName}"></td>
+                                <td th:text="${pc.createdAt.toLocalDate()}"></td>
+                                <td><a th:href="@{/periodontics-a/{id}/view(id=${pc.id})}" class="btn-action btn-view">View</a></td>
+                                <td><a th:href="@{/periodontics-a/{id}(id=${pc.id})}" class="btn-action btn-edit">Edit</a></td>
+                                <td>
+                                    <form th:action="@{/periodontics-ab/{id}/submit(id=${pc.id})}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn-action btn-submit">Submit</button>
+                                    </form>
+                                </td>
+                                <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
+                            </tr>
+                            <!-- Periodontics PF2 (Form C) -->
+                            <tr th:each="pc : ${perioCharts}">
+                                <td th:text="${#strings.replace(pc.chartNo, 'PF1-', 'PF2-')}"></td>
+                                <td>Periodontics - PPD/CAL/BOP Chart</td>
+                                <td th:class="'status ' + ${pc.formCStatus.cssClass}"
+                                    th:text="${pc.formCStatus.displayName}"></td>
+                                <td th:text="${pc.createdAt.toLocalDate()}"></td>
+                                <td><a th:href="@{/periodontics-c/{id}(id=${pc.id})}" class="btn-action btn-view">View</a></td>
+                                <td><a th:href="@{/periodontics-c/{id}(id=${pc.id})}" class="btn-action btn-edit">Edit</a></td>
+                                <td>
+                                    <form th:action="@{/periodontics-c/{id}/submit(id=${pc.id})}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn-action btn-submit">Submit</button>
+                                    </form>
+                                </td>
+                                <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

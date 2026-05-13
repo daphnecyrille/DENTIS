@@ -114,9 +114,10 @@ body { height: 100vh; overflow: hidden; }
     margin-bottom: 27px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     padding-top: 30px;
     position: relative;
+    width: 100%;
 }
 
 /* BANNER */
@@ -191,8 +192,10 @@ body { height: 100vh; overflow: hidden; }
 
 /* SELECT */
 .select-input { cursor: pointer; background: white; color: #aaa; }
+input[readonly].select-input, input[readonly] { color: #333; }
 .select-input.selected { color: #333; }
 .select-input option { color: #333; }
+.select-input:disabled { color: #333; background: #f5f5f5; cursor: default; opacity: 1; }
 
 /* EVALUATION TABLE */
 .eval-table-wrapper { overflow-x: auto; }

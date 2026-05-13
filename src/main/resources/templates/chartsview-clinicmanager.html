@@ -167,13 +167,31 @@
                                 <td th:text="${patient.registrationDate}"></td>
                                 <td><a th:href="@{/admitting-view-clinicmanager/{id}(id=${patient.id})}" class="btn-action btn-view">View Chart</a></td>
                                 <td>
-                                    <form th:action="@{/chartsview-clinicmanager/{id}/assign-faculty(id=${patient.id})}" method="post" style="display:flex; gap:6px; align-items:center; justify-content:center;">
+                                    <!-- Already assigned: show name with reassign link -->
+                                    <div th:if="${patient.assignedFaculty != null}" style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                                        <span style="font-size:13px; font-weight:600; color:#2d6a2d;">&#10003; <span th:text="${patient.assignedFaculty.fullName}"></span></span>
+                                        <a href="#" onclick="this.closest('td').querySelector('.reassign-form').style.display='flex'; this.style.display='none'; return false;"
+                                           style="font-size:11px; color:#888; text-decoration:underline; cursor:pointer;">Reassign</a>
+                                        <form class="reassign-form" th:action="@{/chartsview-clinicmanager/{id}/assign-faculty(id=${patient.id})}" method="post"
+                                              style="display:none; gap:6px; align-items:center; margin-top:2px;">
+                                            <select name="facultyId" style="font-size:12px; padding:3px 6px; border:1px solid #ccc; border-radius:4px;">
+                                                <option value="">Select Faculty</option>
+                                                <option th:each="f : ${facultyOptions}"
+                                                        th:value="${f.id}"
+                                                        th:text="${f.fullName}"
+                                                        th:selected="${patient.assignedFaculty.id == f.id}">
+                                                </option>
+                                            </select>
+                                            <button type="submit" style="background:#324966;color:white;border:none;padding:4px 8px;border-radius:4px;font-size:11px;cursor:pointer;font-family:'Poppins',sans-serif;">Confirm</button>
+                                        </form>
+                                    </div>
+                                    <!-- Not yet assigned: show assign form -->
+                                    <form th:if="${patient.assignedFaculty == null}" th:action="@{/chartsview-clinicmanager/{id}/assign-faculty(id=${patient.id})}" method="post" style="display:flex; gap:6px; align-items:center; justify-content:center;">
                                         <select name="facultyId" style="font-size:13px; padding:4px 8px; border:1px solid #ccc; border-radius:4px;">
                                             <option value="">Select Faculty</option>
                                             <option th:each="f : ${facultyOptions}"
                                                     th:value="${f.id}"
-                                                    th:text="${f.fullName}"
-                                                    th:selected="${patient.assignedFaculty != null and patient.assignedFaculty.id == f.id}">
+                                                    th:text="${f.fullName}">
                                             </option>
                                         </select>
                                         <button type="submit" style="background:#324966;color:white;border:none;padding:5px 10px;border-radius:4px;font-size:12px;cursor:pointer;font-family:'Poppins',sans-serif;">Assign</button>

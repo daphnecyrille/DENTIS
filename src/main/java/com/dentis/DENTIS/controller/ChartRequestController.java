@@ -5,8 +5,10 @@ import com.dentis.DENTIS.model.Patient;
 import com.dentis.DENTIS.model.User;
 import com.dentis.DENTIS.repository.UserRepository;
 import com.dentis.DENTIS.service.ChartRequestService;
+import com.dentis.DENTIS.service.EndodonticsChartService;
 import com.dentis.DENTIS.service.OralSurgeryChartService;
 import com.dentis.DENTIS.service.PatientService;
+import com.dentis.DENTIS.service.PeriodonticChartService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
@@ -21,15 +23,21 @@ public class ChartRequestController {
     private final ChartRequestService chartRequestService;
     private final PatientService patientService;
     private final OralSurgeryChartService oralSurgeryChartService;
+    private final EndodonticsChartService endodonticsChartService;
+    private final PeriodonticChartService periodonticChartService;
     private final UserRepository userRepository;
 
     public ChartRequestController(ChartRequestService chartRequestService,
                                   PatientService patientService,
                                   OralSurgeryChartService oralSurgeryChartService,
+                                  EndodonticsChartService endodonticsChartService,
+                                  PeriodonticChartService periodonticChartService,
                                   UserRepository userRepository) {
         this.chartRequestService = chartRequestService;
         this.patientService = patientService;
         this.oralSurgeryChartService = oralSurgeryChartService;
+        this.endodonticsChartService = endodonticsChartService;
+        this.periodonticChartService = periodonticChartService;
         this.userRepository = userRepository;
     }
 
@@ -48,8 +56,26 @@ public class ChartRequestController {
         model.addAttribute("osCharts", clinician != null
                 ? oralSurgeryChartService.findByClinicianOrderByCreatedAtDesc(clinician).stream().limit(3).toList()
                 : List.of());
+        model.addAttribute("endoCharts", clinician != null
+                ? endodonticsChartService.findByClinicianOrderByCreatedAtDesc(clinician).stream().limit(3).toList()
+                : List.of());
+        model.addAttribute("perioCharts", clinician != null
+                ? periodonticChartService.findByClinicianOrderByCreatedAtDesc(clinician).stream().limit(3).toList()
+                : List.of());
         model.addAttribute("actionNeededCharts", clinician != null
                 ? oralSurgeryChartService.findActionNeededByClinician(clinician)
+                : List.of());
+        model.addAttribute("endoActionNeededCharts", clinician != null
+                ? endodonticsChartService.findActionNeededByClinician(clinician)
+                : List.of());
+        model.addAttribute("endoForm2ActionNeededCharts", clinician != null
+                ? endodonticsChartService.findForm2ActionNeededByClinician(clinician)
+                : List.of());
+        model.addAttribute("perioActionNeededCharts", clinician != null
+                ? periodonticChartService.findFormABActionNeededByClinician(clinician)
+                : List.of());
+        model.addAttribute("periocActionNeededCharts", clinician != null
+                ? periodonticChartService.findFormCActionNeededByClinician(clinician)
                 : List.of());
         model.addAttribute("requests", clinician != null
                 ? chartRequestService.getClinicianRequests(clinician).stream().limit(3).toList()
@@ -108,6 +134,12 @@ public class ChartRequestController {
         model.addAttribute("osCharts", clinician != null
                 ? oralSurgeryChartService.findByClinicianOrderByCreatedAtDesc(clinician)
                 : List.of());
+        model.addAttribute("endoCharts", clinician != null
+                ? endodonticsChartService.findByClinicianOrderByCreatedAtDesc(clinician)
+                : List.of());
+        model.addAttribute("perioCharts", clinician != null
+                ? periodonticChartService.findByClinicianOrderByCreatedAtDesc(clinician)
+                : List.of());
         return "patientlist-clinician";
     }
 
@@ -127,6 +159,8 @@ public class ChartRequestController {
                 ? chartRequestService.getApprovedRequestsForClinicianAndPatient(clinician, id)
                 : List.of());
         model.addAttribute("osCharts", oralSurgeryChartService.findAllByPatient(patient));
+        model.addAttribute("endoCharts", endodonticsChartService.findAllByPatient(patient));
+        model.addAttribute("perioCharts", periodonticChartService.findAllByPatient(patient));
         return "chartsview-clinician";
     }
 }

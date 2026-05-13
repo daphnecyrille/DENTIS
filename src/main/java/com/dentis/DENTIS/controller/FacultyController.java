@@ -4,8 +4,10 @@ import com.dentis.DENTIS.model.OralSurgeryChart;
 import com.dentis.DENTIS.model.Patient;
 import com.dentis.DENTIS.model.User;
 import com.dentis.DENTIS.repository.UserRepository;
+import com.dentis.DENTIS.service.EndodonticsChartService;
 import com.dentis.DENTIS.service.OralSurgeryChartService;
 import com.dentis.DENTIS.service.PatientService;
+import com.dentis.DENTIS.service.PeriodonticChartService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
@@ -19,13 +21,19 @@ public class FacultyController {
 
     private final PatientService patientService;
     private final OralSurgeryChartService oralSurgeryChartService;
+    private final EndodonticsChartService endodonticsChartService;
+    private final PeriodonticChartService periodonticChartService;
     private final UserRepository userRepository;
 
     public FacultyController(PatientService patientService,
                              OralSurgeryChartService oralSurgeryChartService,
+                             EndodonticsChartService endodonticsChartService,
+                             PeriodonticChartService periodonticChartService,
                              UserRepository userRepository) {
         this.patientService = patientService;
         this.oralSurgeryChartService = oralSurgeryChartService;
+        this.endodonticsChartService = endodonticsChartService;
+        this.periodonticChartService = periodonticChartService;
         this.userRepository = userRepository;
     }
 
@@ -41,11 +49,33 @@ public class FacultyController {
     public String dashboard(Model model, Authentication authentication) {
         User faculty = getCurrentUser(authentication);
         model.addAttribute("currentUser", faculty);
-        model.addAttribute("osCharts", faculty != null
+
+        String section = faculty != null && faculty.getSection() != null
+                ? faculty.getSection().toUpperCase() : "";
+
+        model.addAttribute("osCharts", "OS".equals(section) && faculty != null
                 ? oralSurgeryChartService.findByFacultyOrderByCreatedAtDesc(faculty).stream().limit(3).toList()
                 : List.of());
-        model.addAttribute("awaitingApprovalCharts", faculty != null
+        model.addAttribute("endoCharts", "ENDO".equals(section) && faculty != null
+                ? endodonticsChartService.findByFacultyOrderByCreatedAtDesc(faculty).stream().limit(3).toList()
+                : List.of());
+        model.addAttribute("perioCharts", "PERIO".equals(section) && faculty != null
+                ? periodonticChartService.findByFacultyOrderByCreatedAtDesc(faculty).stream().limit(3).toList()
+                : List.of());
+        model.addAttribute("awaitingApprovalCharts", "OS".equals(section) && faculty != null
                 ? oralSurgeryChartService.findAwaitingApprovalByFaculty(faculty)
+                : List.of());
+        model.addAttribute("awaitingApprovalEndoCharts", "ENDO".equals(section) && faculty != null
+                ? endodonticsChartService.findAwaitingApprovalByFaculty(faculty)
+                : List.of());
+        model.addAttribute("awaitingApprovalEndo2Charts", "ENDO".equals(section) && faculty != null
+                ? endodonticsChartService.findAwaitingApproval2ByFaculty(faculty)
+                : List.of());
+        model.addAttribute("awaitingApprovalPerioCharts", "PERIO".equals(section) && faculty != null
+                ? periodonticChartService.findFormABAwaitingApprovalByFaculty(faculty)
+                : List.of());
+        model.addAttribute("awaitingApprovalPerio2Charts", "PERIO".equals(section) && faculty != null
+                ? periodonticChartService.findFormCAwaitingApprovalByFaculty(faculty)
                 : List.of());
         model.addAttribute("unassignedPatients", faculty != null
                 ? patientService.getUnassignedPatientsForFaculty(faculty).stream().limit(3).toList()
@@ -58,8 +88,18 @@ public class FacultyController {
     public String patientList(Model model, Authentication authentication) {
         User faculty = getCurrentUser(authentication);
         model.addAttribute("currentUser", faculty);
-        model.addAttribute("osCharts", faculty != null
+
+        String section = faculty != null && faculty.getSection() != null
+                ? faculty.getSection().toUpperCase() : "";
+
+        model.addAttribute("osCharts", "OS".equals(section) && faculty != null
                 ? oralSurgeryChartService.findByFacultyOrderByCreatedAtDesc(faculty)
+                : List.of());
+        model.addAttribute("endoCharts", "ENDO".equals(section) && faculty != null
+                ? endodonticsChartService.findByFacultyOrderByCreatedAtDesc(faculty)
+                : List.of());
+        model.addAttribute("perioCharts", "PERIO".equals(section) && faculty != null
+                ? periodonticChartService.findByFacultyOrderByCreatedAtDesc(faculty)
                 : List.of());
         return "patientlist-faculty";
     }
@@ -77,10 +117,23 @@ public class FacultyController {
 
     @GetMapping("/chartsview-faculty/{id}")
     public String chartsView(@PathVariable Long id, Model model, Authentication authentication) {
+        User faculty = getCurrentUser(authentication);
         Patient patient = patientService.getPatientById(id);
-        model.addAttribute("currentUser", getCurrentUser(authentication));
+
+        String section = faculty != null && faculty.getSection() != null
+                ? faculty.getSection().toUpperCase() : "";
+
+        model.addAttribute("currentUser", faculty);
         model.addAttribute("patient", patient);
-        model.addAttribute("osCharts", oralSurgeryChartService.findAllByPatient(patient));
+        model.addAttribute("osCharts", "OS".equals(section)
+                ? oralSurgeryChartService.findAllByPatient(patient)
+                : List.of());
+        model.addAttribute("endoCharts", "ENDO".equals(section)
+                ? endodonticsChartService.findAllByPatient(patient)
+                : List.of());
+        model.addAttribute("perioCharts", "PERIO".equals(section)
+                ? periodonticChartService.findAllByPatient(patient)
+                : List.of());
         return "chartsview-faculty";
     }
 
@@ -89,12 +142,6 @@ public class FacultyController {
         model.addAttribute("currentUser", getCurrentUser(authentication));
         model.addAttribute("patient", patientService.getPatientById(id));
         return "admitting-view-faculty";
-    }
-
-    @GetMapping("/endodontics2-faculty")
-    public String endodontics2Faculty(Model model, Authentication authentication) {
-        model.addAttribute("currentUser", getCurrentUser(authentication));
-        return "endodontics2-faculty";
     }
 
     @PostMapping("/oralsurgery-faculty/{id}/approve")

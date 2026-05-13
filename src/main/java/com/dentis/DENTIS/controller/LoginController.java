@@ -20,9 +20,6 @@ public class LoginController {
         return "login";
     }
 
-    @GetMapping("/endodontics-clinician")
-    public String endodonticsClinician() { return "endodontics-clinician"; }
-
     @GetMapping("/periodonticsa-clinician")
     public String periodonticsaClinician() { return "periodonticsa-clinician"; }
 

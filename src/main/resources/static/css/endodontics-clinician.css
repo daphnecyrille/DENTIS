@@ -115,9 +115,10 @@ body { height: 100vh; overflow: hidden; }
     margin-bottom: 27px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     padding-top: 30px;
     position: relative;
+    width: 100%;
 }
 
 /* BANNER */
@@ -193,8 +194,10 @@ body { height: 100vh; overflow: hidden; }
 
 /* SELECT */
 .select-input { cursor: pointer; background: white; color: #aaa; }
+input[readonly].select-input, input[readonly] { color: #333; }
 .select-input.selected { color: #333; }
 .select-input option { color: #333; }
+.select-input:disabled { color: #333; background: #f5f5f5; cursor: default; opacity: 1; }
 
 /* PAIN SYMPTOMS SECTION */
 .symptom-section {
@@ -248,6 +251,7 @@ body { height: 100vh; overflow: hidden; }
 }
 .pain-select.selected { color: #333; }
 .pain-select option { color: #333; }
+.pain-select:disabled { color: #333; background: #f5f5f5; cursor: default; opacity: 1; }
 
 /* INTENSITY ROW */
 .intensity-row {
@@ -272,7 +276,10 @@ body { height: 100vh; overflow: hidden; }
     font-family: 'Poppins', sans-serif;
     outline: none;
     min-width: 100px;
+    color: #aaa;
 }
+.intensity-select.selected { color: #333; }
+.intensity-select:disabled { color: #333; background: #f5f5f5; cursor: default; opacity: 1; }
 
 /* CHECKBOX */
 .checkbox-label {
@@ -350,6 +357,7 @@ body { height: 100vh; overflow: hidden; }
 }
 .exam-select.selected { color: #333; }
 .exam-select option { color: #333; }
+.exam-select:disabled { color: #333; background: #f5f5f5; cursor: default; opacity: 1; }
 
 .others-text {
     padding: 7px 10px;

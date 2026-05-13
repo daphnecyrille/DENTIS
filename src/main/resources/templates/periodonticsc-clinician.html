@@ -68,61 +68,72 @@
             <div class="form-card">
                 <div class="form-banner">Periodontal Chart 2</div>
 
+                <form th:action="@{/periodontics-c/{id}(id=${chart.id})}" method="post" th:object="${chart}" id="formC">
+
                 <div class="form-body">
 
-                    <!-- Patient info -->
+                    <!-- Hidden JSON inputs for grid and canvas serialization -->
+                    <input type="hidden" id="formCLeftGridJsonInput"   th:field="*{formCLeftGridJson}">
+                    <input type="hidden" id="formCRightGridJsonInput"  th:field="*{formCRightGridJson}">
+                    <input type="hidden" id="formCLeftCanvasJsonInput"  th:field="*{formCLeftCanvasJson}">
+                    <input type="hidden" id="formCRightCanvasJsonInput" th:field="*{formCRightCanvasJson}">
+
+                    <!-- Patient info (read-only) -->
                     <div class="form-row">
                         <div class="form-group" style="flex: 3;">
                             <label>Patient's Name</label>
                             <div class="split-input">
-                                <input type="text" placeholder="Surname">
-                                <input type="text" placeholder="First Name" class="input-wide">
-                                <input type="text" placeholder="M.I." class="input-narrow">
+                                <input type="text" readonly th:value="${chart.patient != null ? chart.patient.surname : ''}">
+                                <input type="text" readonly class="input-wide" th:value="${chart.patient != null ? chart.patient.firstName : ''}">
+                                <input type="text" readonly class="input-narrow" th:value="${chart.patient != null ? chart.patient.middleInitial : ''}">
                             </div>
                         </div>
                         <div class="form-group">
                             <label>Chart Number</label>
-                            <input type="text" placeholder="Chart No.">
+                            <input type="text" readonly th:value="${#strings.replace(chart.chartNo, 'PF1-', 'PF2-')}">
                         </div>
                     </div>
+
+                    <!-- Wrapper: pointer-events disabled in view-only mode -->
+                    <div th:style="${viewOnly} ? 'pointer-events:none;' : ''">
 
                     <!-- ═══════════ DUAL-PANEL PERIODONTAL CHART ═══════════ -->
                     <div class="perio-chart-c2">
 
                         <!-- ══ LEFT PANEL — Upper arch (18–28) ══ -->
-                        <div class="c-panel left">
+                        <div class="c-panel left" id="leftPanel">
 
                             <!-- Top tooth numbers -->
                             <div class="c-tooth-row">
                                 <div class="c-tooth-num">18</div><div class="c-tooth-num">17</div><div class="c-tooth-num">16</div><div class="c-tooth-num">15</div><div class="c-tooth-num">14</div><div class="c-tooth-num">13</div><div class="c-tooth-num">12</div><div class="c-tooth-num">11</div><div class="c-tooth-num">21</div><div class="c-tooth-num">22</div><div class="c-tooth-num">23</div><div class="c-tooth-num">24</div><div class="c-tooth-num">25</div><div class="c-tooth-num">26</div><div class="c-tooth-num">27</div><div class="c-tooth-num">28</div>
                             </div>
 
-                            <!-- PI (1 per tooth) -->
+                            <!-- PI (above) -->
                             <div class="c-grid-row">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
-                            <!-- BOP (3 per tooth) -->
+                            <!-- BOP (above) -->
                             <div class="c-grid-row">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
-                            <!-- Mob (1 per tooth) -->
+                            <!-- Mob (above) -->
                             <div class="c-grid-row">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
-                            <!-- CAL (3 per tooth) -->
+                            <!-- CAL (above) -->
                             <div class="c-grid-row">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
-                            <!-- PPD (3 per tooth) -->
+                            <!-- PPD (above) -->
                             <div class="c-grid-row">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
-                            <!-- CEJ-GM (3 per tooth) -->
+                            <!-- CEJ-GM (above) -->
                             <div class="c-grid-row cej">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
@@ -132,39 +143,39 @@
                                 <img src="/images/perio-grid-upper.png" alt="Upper Arch" class="c-chart-img">
                                 <canvas id="canvasLeft" class="c-canvas"></canvas>
                                 <div class="symbol-picker" id="pickerLeft">
-                                    <button class="sym-btn" data-sym="circle" title="Circle">○</button>
-                                    <button class="sym-btn" data-sym="half"   title="Half shaded">◐</button>
-                                    <button class="sym-btn" data-sym="full"   title="Full shaded">●</button>
-                                    <button class="sym-btn sym-clear" data-sym="" title="Remove">&#10005;</button>
+                                    <button type="button" class="sym-btn" data-sym="circle" title="Circle">&#9675;</button>
+                                    <button type="button" class="sym-btn" data-sym="half"   title="Half shaded">&#9680;</button>
+                                    <button type="button" class="sym-btn" data-sym="full"   title="Full shaded">&#9679;</button>
+                                    <button type="button" class="sym-btn sym-clear" data-sym="" title="Remove">&#10005;</button>
                                 </div>
                             </div>
 
-                            <!-- CEJ-GM below (3 per tooth) -->
+                            <!-- CEJ-GM (below) -->
                             <div class="c-grid-row cej">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
-                            <!-- PPD below (3 per tooth) -->
+                            <!-- PPD (below) -->
                             <div class="c-grid-row">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
-                            <!-- CAL below (3 per tooth) -->
+                            <!-- CAL (below) -->
                             <div class="c-grid-row">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
-                            <!-- Sup below (1 per tooth) -->
+                            <!-- Sup (below) -->
                             <div class="c-grid-row">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
-                            <!-- BOP below (3 per tooth) -->
+                            <!-- BOP (below) -->
                             <div class="c-grid-row">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
-                            <!-- PI below (1 per tooth) -->
+                            <!-- PI (below) -->
                             <div class="c-grid-row">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
@@ -197,39 +208,39 @@
                         </div>
 
                         <!-- ══ RIGHT PANEL — Lower arch (48–38) ══ -->
-                        <div class="c-panel right">
+                        <div class="c-panel right" id="rightPanel">
 
                             <!-- Top tooth numbers -->
                             <div class="c-tooth-row">
                                 <div class="c-tooth-num">48</div><div class="c-tooth-num">47</div><div class="c-tooth-num">46</div><div class="c-tooth-num">45</div><div class="c-tooth-num">44</div><div class="c-tooth-num">43</div><div class="c-tooth-num">42</div><div class="c-tooth-num">41</div><div class="c-tooth-num">31</div><div class="c-tooth-num">32</div><div class="c-tooth-num">33</div><div class="c-tooth-num">34</div><div class="c-tooth-num">35</div><div class="c-tooth-num">36</div><div class="c-tooth-num">37</div><div class="c-tooth-num">38</div>
                             </div>
 
-                            <!-- PI (1 per tooth) -->
+                            <!-- PI (above) -->
                             <div class="c-grid-row">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
-                            <!-- BOP (3 per tooth) -->
+                            <!-- BOP (above) -->
                             <div class="c-grid-row">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
-                            <!-- Mob (1 per tooth) -->
+                            <!-- Mob (above) -->
                             <div class="c-grid-row">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
-                            <!-- CAL (3 per tooth) -->
+                            <!-- CAL (above) -->
                             <div class="c-grid-row">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
-                            <!-- PPD (3 per tooth) -->
+                            <!-- PPD (above) -->
                             <div class="c-grid-row">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
-                            <!-- CEJ-GM (3 per tooth) -->
+                            <!-- CEJ-GM (above) -->
                             <div class="c-grid-row cej">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
@@ -239,39 +250,39 @@
                                 <img src="/images/perio-grid-lower.png" alt="Lower Arch" class="c-chart-img">
                                 <canvas id="canvasRight" class="c-canvas"></canvas>
                                 <div class="symbol-picker" id="pickerRight">
-                                    <button class="sym-btn" data-sym="circle" title="Circle">○</button>
-                                    <button class="sym-btn" data-sym="half"   title="Half shaded">◐</button>
-                                    <button class="sym-btn" data-sym="full"   title="Full shaded">●</button>
-                                    <button class="sym-btn sym-clear" data-sym="" title="Remove">&#10005;</button>
+                                    <button type="button" class="sym-btn" data-sym="circle" title="Circle">&#9675;</button>
+                                    <button type="button" class="sym-btn" data-sym="half"   title="Half shaded">&#9680;</button>
+                                    <button type="button" class="sym-btn" data-sym="full"   title="Full shaded">&#9679;</button>
+                                    <button type="button" class="sym-btn sym-clear" data-sym="" title="Remove">&#10005;</button>
                                 </div>
                             </div>
 
-                            <!-- CEJ-GM below (3 per tooth) -->
+                            <!-- CEJ-GM (below) -->
                             <div class="c-grid-row cej">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
-                            <!-- PPD below (3 per tooth) -->
+                            <!-- PPD (below) -->
                             <div class="c-grid-row">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
-                            <!-- CAL below (3 per tooth) -->
+                            <!-- CAL (below) -->
                             <div class="c-grid-row">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
-                            <!-- Sup below (1 per tooth) -->
+                            <!-- Sup (below) -->
                             <div class="c-grid-row">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
-                            <!-- BOP below (3 per tooth) -->
+                            <!-- BOP (below) -->
                             <div class="c-grid-row">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
-                            <!-- PI below (1 per tooth) -->
+                            <!-- PI (below) -->
                             <div class="c-grid-row">
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
@@ -292,41 +303,51 @@
                         <div class="clinician-box">
                             <div class="clinician-inline">
                                 <label>Clinician's Name:</label>
-                                <input type="text" placeholder="">
+                                <input type="text" readonly th:value="${currentUser != null ? currentUser.firstName + ' ' + currentUser.lastName : ''}">
                             </div>
                             <div class="clinician-inline">
                                 <label>Date:</label>
-                                <input type="date">
+                                <input type="date" th:field="*{formCDate}">
                             </div>
                         </div>
                         <div class="check-section">
                             <span class="check-label">Check if:</span>
-                            <label class="check-option"><input type="checkbox"> Initial Examination</label>
-                            <label class="check-option"><input type="checkbox"> Reevaluation</label>
-                            <label class="check-option"><input type="checkbox"> Maintenance Visit</label>
+                            <label class="check-option"><input type="checkbox" th:field="*{isInitialExamination}"> Initial Examination</label>
+                            <label class="check-option"><input type="checkbox" th:field="*{isReevaluation}"> Reevaluation</label>
+                            <label class="check-option"><input type="checkbox" th:field="*{isMaintenanceVisit}"> Maintenance Visit</label>
                         </div>
                     </div>
 
-                    <div class="form-actions">
-                        <button type="button" class="btn-submit">Submit</button>
+                    </div><!-- end pointer-events wrapper -->
+
+                    <div class="form-actions" th:if="${!viewOnly}">
+                        <button type="submit" class="btn-submit">Save</button>
                     </div>
 
                 </div>
+                </form>
             </div>
         </main>
     </div>
 </div>
 
+<script th:inline="javascript">
+var VIEW_ONLY = /*[[${viewOnly}]]*/ false;
+</script>
+
 <script>
-/* Circle symbol picker — shared logic for both panels */
+/* ── Module-level marks storage and redraw references ── */
+var panelMarks  = { canvasLeft: [], canvasRight: [] };
+var panelRedraw = {};
+
+/* ── Canvas: symbol picker logic (shared for both panels) ── */
 function initCanvas(canvasId, pickerId) {
     var canvas = document.getElementById(canvasId);
     var picker = document.getElementById(pickerId);
     var ctx    = canvas.getContext('2d');
-    var marks  = [];
     var pendingX, pendingY;
 
-    function r() { return canvas.width / 16 * 0.26; }
+    function r()  { return canvas.width / 16 * 0.26; }
     function lw() { return Math.max(1.2, canvas.width * 0.002); }
 
     function drawMark(cx, cy, sym) {
@@ -336,25 +357,26 @@ function initCanvas(canvasId, pickerId) {
         ctx.lineWidth   = lw();
         if (sym === 'circle') {
             ctx.lineWidth = lw() * 2.5;
-            ctx.beginPath();
-            ctx.arc(cx, cy, rad, 0, Math.PI * 2);
-            ctx.stroke();
+            ctx.beginPath(); ctx.arc(cx, cy, rad, 0, Math.PI * 2); ctx.stroke();
         } else if (sym === 'half') {
-            ctx.beginPath();
-            ctx.arc(cx, cy, rad, 0, Math.PI * 2);
-            ctx.stroke();
+            ctx.beginPath(); ctx.arc(cx, cy, rad, 0, Math.PI * 2); ctx.stroke();
             ctx.beginPath();
             ctx.moveTo(cx, cy - rad);
             ctx.arc(cx, cy, rad, -Math.PI / 2, Math.PI / 2, true);
-            ctx.closePath();
-            ctx.fill();
+            ctx.closePath(); ctx.fill();
         } else if (sym === 'full') {
-            ctx.beginPath();
-            ctx.arc(cx, cy, rad, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
+            ctx.beginPath(); ctx.arc(cx, cy, rad, 0, Math.PI * 2);
+            ctx.fill(); ctx.stroke();
         }
     }
+
+    function redraw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        panelMarks[canvasId].forEach(function(m) {
+            drawMark(m.x * canvas.width, m.y * canvas.height, m.sym);
+        });
+    }
+    panelRedraw[canvasId] = redraw;
 
     function resize() {
         canvas.width  = canvas.offsetWidth;
@@ -362,23 +384,17 @@ function initCanvas(canvasId, pickerId) {
         redraw();
     }
 
-    function redraw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        marks.forEach(function(m) {
-            drawMark(m.x * canvas.width, m.y * canvas.height, m.sym);
-        });
-    }
-
     canvas.addEventListener('click', function(e) {
+        if (VIEW_ONLY) return;
         e.stopPropagation();
         var rect = canvas.getBoundingClientRect();
         pendingX = (e.clientX - rect.left) / rect.width;
         pendingY = (e.clientY - rect.top)  / rect.height;
         var rFrac = r() / canvas.width;
         var hit = -1;
-        for (var i = 0; i < marks.length; i++) {
-            if (Math.abs(marks[i].x - pendingX) < rFrac * 1.5 &&
-                Math.abs(marks[i].y - pendingY) < rFrac * 1.5) {
+        for (var i = 0; i < panelMarks[canvasId].length; i++) {
+            if (Math.abs(panelMarks[canvasId][i].x - pendingX) < rFrac * 1.5 &&
+                Math.abs(panelMarks[canvasId][i].y - pendingY) < rFrac * 1.5) {
                 hit = i; break;
             }
         }
@@ -399,9 +415,9 @@ function initCanvas(canvasId, pickerId) {
             var sym = btn.dataset.sym;
             var hit = parseInt(picker.dataset.hit);
             if (!sym) {
-                if (hit >= 0) marks.splice(hit, 1);
+                if (hit >= 0) panelMarks[canvasId].splice(hit, 1);
             } else {
-                marks.push({ x: pendingX, y: pendingY, sym: sym });
+                panelMarks[canvasId].push({ x: pendingX, y: pendingY, sym: sym });
             }
             picker.style.display = 'none';
             redraw();
@@ -415,13 +431,13 @@ function initCanvas(canvasId, pickerId) {
 initCanvas('canvasLeft',  'pickerLeft');
 initCanvas('canvasRight', 'pickerRight');
 
-/* Close pickers on outside click */
+/* ── Close pickers on outside click ── */
 document.addEventListener('click', function() {
     document.getElementById('pickerLeft').style.display  = 'none';
     document.getElementById('pickerRight').style.display = 'none';
 });
 
-/* ── Column X buttons: top row → above-image rows only, bottom row → below-image rows only ── */
+/* ── Column X buttons ── */
 document.querySelectorAll('.c-tooth-row').forEach(function(row) {
     var panel        = row.closest('.c-panel');
     var teethWrapper = panel.querySelector('.c-teeth-wrapper');
@@ -430,7 +446,8 @@ document.querySelectorAll('.c-tooth-row').forEach(function(row) {
 
     cells.forEach(function(cell, colIdx) {
         var btn = document.createElement('button');
-        btn.className   = 'col-x-btn-c';
+        btn.type      = 'button';
+        btn.className = 'col-x-btn-c';
         btn.textContent = 'X';
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -452,19 +469,92 @@ document.querySelectorAll('.c-tooth-row').forEach(function(row) {
     });
 });
 
-/* Keep x-marked in sync when inputs are manually edited */
+/* ── Keep x-marked CSS in sync ── */
 document.querySelectorAll('.c-cell input').forEach(function(inp) {
     inp.addEventListener('input', function() {
         this.classList.toggle('x-marked', this.value === 'X' || this.value === 'x');
     });
 });
 
-/* Sidebar toggle */
+/* ── Grid serialization helpers ── */
+function serializePanel(panelId) {
+    var rows = [];
+    document.querySelectorAll('#' + panelId + ' .c-grid-row').forEach(function(row) {
+        var cells = [];
+        row.querySelectorAll('.c-cell').forEach(function(cell) {
+            var vals = [];
+            cell.querySelectorAll('input').forEach(function(inp) { vals.push(inp.value); });
+            cells.push(vals);
+        });
+        rows.push(cells);
+    });
+    return rows;
+}
+
+function deserializePanel(panelId, data) {
+    var rows = document.querySelectorAll('#' + panelId + ' .c-grid-row');
+    (data || []).forEach(function(cells, ri) {
+        if (ri >= rows.length) return;
+        var inputs = rows[ri].querySelectorAll('.c-cell input');
+        var ii = 0;
+        cells.forEach(function(vals) {
+            vals.forEach(function(v) {
+                if (ii < inputs.length) {
+                    inputs[ii].value = v;
+                    inputs[ii].classList.toggle('x-marked', v === 'X' || v === 'x');
+                    ii++;
+                }
+            });
+        });
+    });
+}
+
+/* ── Form submit: serialize grids + canvases ── */
+var formEl = document.getElementById('formC');
+if (formEl) {
+    formEl.addEventListener('submit', function() {
+        document.getElementById('formCLeftGridJsonInput').value   = JSON.stringify(serializePanel('leftPanel'));
+        document.getElementById('formCRightGridJsonInput').value  = JSON.stringify(serializePanel('rightPanel'));
+        document.getElementById('formCLeftCanvasJsonInput').value  = JSON.stringify(panelMarks.canvasLeft);
+        document.getElementById('formCRightCanvasJsonInput').value = JSON.stringify(panelMarks.canvasRight);
+    });
+}
+
+/* ── Load-time deserialization ── */
+(function() {
+    /* Left grid */
+    var lgVal = document.getElementById('formCLeftGridJsonInput').value;
+    if (lgVal) { try { deserializePanel('leftPanel',  JSON.parse(lgVal)); } catch(e) {} }
+
+    /* Right grid */
+    var rgVal = document.getElementById('formCRightGridJsonInput').value;
+    if (rgVal) { try { deserializePanel('rightPanel', JSON.parse(rgVal)); } catch(e) {} }
+
+    /* Left canvas */
+    var lcVal = document.getElementById('formCLeftCanvasJsonInput').value;
+    if (lcVal) {
+        try {
+            panelMarks.canvasLeft = JSON.parse(lcVal);
+            if (panelRedraw.canvasLeft) panelRedraw.canvasLeft();
+        } catch(e) {}
+    }
+
+    /* Right canvas */
+    var rcVal = document.getElementById('formCRightCanvasJsonInput').value;
+    if (rcVal) {
+        try {
+            panelMarks.canvasRight = JSON.parse(rcVal);
+            if (panelRedraw.canvasRight) panelRedraw.canvasRight();
+        } catch(e) {}
+    }
+})();
+
+/* ── Sidebar toggle ── */
 document.querySelector('.menu-icon').onclick = function() {
     document.querySelector('.sidebar').classList.toggle('expanded');
 };
 
-/* User dropdown */
+/* ── User dropdown ── */
 document.querySelector('.user-profile').onclick = function(e) {
     e.stopPropagation();
     document.querySelector('.user-dropdown').classList.toggle('show');

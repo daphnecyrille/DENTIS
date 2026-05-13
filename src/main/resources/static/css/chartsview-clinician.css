@@ -144,6 +144,7 @@ body {
     overflow-y: auto;
     margin-left: 70px;
     transition: margin-left 0.3s ease;
+    height: calc(100vh - 77px);
 }
 
 /* SIDEBAR */
