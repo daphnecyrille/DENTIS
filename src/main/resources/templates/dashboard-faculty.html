@@ -125,7 +125,21 @@
                                 <td th:text="${pc.clinician != null ? pc.clinician.fullName : '—'}"></td>
                                 <td><a th:href="@{/chartsview-faculty/{id}(id=${pc.patient.id})}" class="btn-view">Review</a></td>
                             </tr>
-                            <tr th:if="${#lists.isEmpty(awaitingApprovalCharts) and #lists.isEmpty(awaitingApprovalEndoCharts) and #lists.isEmpty(awaitingApprovalEndo2Charts) and #lists.isEmpty(awaitingApprovalPerioCharts) and #lists.isEmpty(awaitingApprovalPerio2Charts)}">
+                            <tr th:each="oc : ${awaitingApprovalOperative10Charts}">
+                                <td th:text="${oc.chartNo}"></td>
+                                <td>Operative Dentistry - Assessment Form</td>
+                                <td th:text="${oc.patient.surname + ', ' + oc.patient.firstName + (oc.patient.middleInitial != null ? ' ' + oc.patient.middleInitial + '.' : '')}"></td>
+                                <td th:text="${oc.clinician != null ? oc.clinician.fullName : '—'}"></td>
+                                <td><a th:href="@{/chartsview-faculty/{id}(id=${oc.patient.id})}" class="btn-view">Review</a></td>
+                            </tr>
+                            <tr th:each="oc : ${awaitingApprovalOperative6Charts}">
+                                <td th:text="${#strings.replace(oc.chartNo, 'RESTO10-', 'RESTO6-')}"></td>
+                                <td>Operative Dentistry - Caries Risk Assessment</td>
+                                <td th:text="${oc.patient.surname + ', ' + oc.patient.firstName + (oc.patient.middleInitial != null ? ' ' + oc.patient.middleInitial + '.' : '')}"></td>
+                                <td th:text="${oc.clinician != null ? oc.clinician.fullName : '—'}"></td>
+                                <td><a th:href="@{/chartsview-faculty/{id}(id=${oc.patient.id})}" class="btn-view">Review</a></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(awaitingApprovalCharts) and #lists.isEmpty(awaitingApprovalEndoCharts) and #lists.isEmpty(awaitingApprovalEndo2Charts) and #lists.isEmpty(awaitingApprovalPerioCharts) and #lists.isEmpty(awaitingApprovalPerio2Charts) and #lists.isEmpty(awaitingApprovalOperative10Charts) and #lists.isEmpty(awaitingApprovalOperative6Charts)}">
                                 <td colspan="5" style="text-align:center; color:#888;">No charts awaiting approval.</td>
                             </tr>
                         </tbody>
@@ -199,7 +213,27 @@
                                 <td th:text="${pc.clinician != null ? pc.clinician.fullName : '—'}"></td>
                                 <td><a th:href="@{/chartsview-faculty/{id}(id=${pc.patient.id})}" class="btn-view">View Chart</a></td>
                             </tr>
-                            <tr th:if="${#lists.isEmpty(osCharts) and #lists.isEmpty(endoCharts) and #lists.isEmpty(perioCharts)}">
+                            <!-- RESTO10 (Assessment Form) -->
+                            <tr th:each="oc : ${operativeCharts}">
+                                <td th:text="${oc.chartNo}"></td>
+                                <td>Operative Dentistry - Assessment Form</td>
+                                <td th:text="${oc.patient.surname + ', ' + oc.patient.firstName + (oc.patient.middleInitial != null ? ' ' + oc.patient.middleInitial + '.' : '')}"></td>
+                                <td th:text="${oc.patient.contactNumber}"></td>
+                                <td th:text="${oc.patient.email}"></td>
+                                <td th:text="${oc.clinician != null ? oc.clinician.fullName : '—'}"></td>
+                                <td><a th:href="@{/chartsview-faculty/{id}(id=${oc.patient.id})}" class="btn-view">View Chart</a></td>
+                            </tr>
+                            <!-- RESTO6 (Caries Risk Assessment) -->
+                            <tr th:each="oc : ${operativeCharts}">
+                                <td th:text="${#strings.replace(oc.chartNo, 'RESTO10-', 'RESTO6-')}"></td>
+                                <td>Operative Dentistry - Caries Risk Assessment</td>
+                                <td th:text="${oc.patient.surname + ', ' + oc.patient.firstName + (oc.patient.middleInitial != null ? ' ' + oc.patient.middleInitial + '.' : '')}"></td>
+                                <td th:text="${oc.patient.contactNumber}"></td>
+                                <td th:text="${oc.patient.email}"></td>
+                                <td th:text="${oc.clinician != null ? oc.clinician.fullName : '—'}"></td>
+                                <td><a th:href="@{/chartsview-faculty/{id}(id=${oc.patient.id})}" class="btn-view">View Chart</a></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(osCharts) and #lists.isEmpty(endoCharts) and #lists.isEmpty(perioCharts) and #lists.isEmpty(operativeCharts)}">
                                 <td colspan="7" style="text-align:center; color:#888;">No assigned patients yet.</td>
                             </tr>
                         </tbody>

@@ -6,6 +6,7 @@ import com.dentis.DENTIS.model.User;
 import com.dentis.DENTIS.repository.UserRepository;
 import com.dentis.DENTIS.service.ChartRequestService;
 import com.dentis.DENTIS.service.EndodonticsChartService;
+import com.dentis.DENTIS.service.OperativeChartService;
 import com.dentis.DENTIS.service.OralSurgeryChartService;
 import com.dentis.DENTIS.service.PatientService;
 import com.dentis.DENTIS.service.PeriodonticChartService;
@@ -24,10 +25,12 @@ public class ChartRequestController {
     private final PatientService patientService;
     private final OralSurgeryChartService oralSurgeryChartService;
     private final EndodonticsChartService endodonticsChartService;
+    private final OperativeChartService operativeChartService;
     private final PeriodonticChartService periodonticChartService;
     private final UserRepository userRepository;
 
     public ChartRequestController(ChartRequestService chartRequestService,
+                                   OperativeChartService operativeChartService,
                                   PatientService patientService,
                                   OralSurgeryChartService oralSurgeryChartService,
                                   EndodonticsChartService endodonticsChartService,
@@ -37,6 +40,7 @@ public class ChartRequestController {
         this.patientService = patientService;
         this.oralSurgeryChartService = oralSurgeryChartService;
         this.endodonticsChartService = endodonticsChartService;
+        this.operativeChartService = operativeChartService;
         this.periodonticChartService = periodonticChartService;
         this.userRepository = userRepository;
     }
@@ -61,6 +65,24 @@ public class ChartRequestController {
                 : List.of());
         model.addAttribute("perioCharts", clinician != null
                 ? periodonticChartService.findByClinicianOrderByCreatedAtDesc(clinician).stream().limit(3).toList()
+                : List.of());
+        if (clinician != null) {
+            for (Patient p : patientService.getPatientsForClinician(clinician)) {
+                if ("Resto".equalsIgnoreCase(p.getServiceCode())
+                        && operativeChartService.findAllByPatient(p).isEmpty()
+                        && p.getAssignedFaculty() != null) {
+                    operativeChartService.createForPatient(p, clinician, p.getAssignedFaculty());
+                }
+            }
+        }
+        model.addAttribute("operativeCharts", clinician != null
+                ? operativeChartService.findByClinicianOrderByCreatedAtDesc(clinician).stream().limit(3).toList()
+                : List.of());
+        model.addAttribute("operativeActionNeededCharts", clinician != null
+                ? operativeChartService.findForm1ActionNeededByClinician(clinician)
+                : List.of());
+        model.addAttribute("operative6ActionNeededCharts", clinician != null
+                ? operativeChartService.findForm2ActionNeededByClinician(clinician)
                 : List.of());
         model.addAttribute("actionNeededCharts", clinician != null
                 ? oralSurgeryChartService.findActionNeededByClinician(clinician)
@@ -140,6 +162,18 @@ public class ChartRequestController {
         model.addAttribute("perioCharts", clinician != null
                 ? periodonticChartService.findByClinicianOrderByCreatedAtDesc(clinician)
                 : List.of());
+        if (clinician != null) {
+            for (Patient p : patientService.getPatientsForClinician(clinician)) {
+                if ("Resto".equalsIgnoreCase(p.getServiceCode())
+                        && operativeChartService.findAllByPatient(p).isEmpty()
+                        && p.getAssignedFaculty() != null) {
+                    operativeChartService.createForPatient(p, clinician, p.getAssignedFaculty());
+                }
+            }
+        }
+        model.addAttribute("operativeCharts", clinician != null
+                ? operativeChartService.findByClinicianOrderByCreatedAtDesc(clinician)
+                : List.of());
         return "patientlist-clinician";
     }
 
@@ -161,6 +195,13 @@ public class ChartRequestController {
         model.addAttribute("osCharts", oralSurgeryChartService.findAllByPatient(patient));
         model.addAttribute("endoCharts", endodonticsChartService.findAllByPatient(patient));
         model.addAttribute("perioCharts", periodonticChartService.findAllByPatient(patient));
+        if ("Resto".equalsIgnoreCase(patient.getServiceCode())
+                && operativeChartService.findAllByPatient(patient).isEmpty()
+                && patient.getAssignedClinician() != null
+                && patient.getAssignedFaculty() != null) {
+            operativeChartService.createForPatient(patient, patient.getAssignedClinician(), patient.getAssignedFaculty());
+        }
+        model.addAttribute("operativeCharts", operativeChartService.findAllByPatient(patient));
         return "chartsview-clinician";
     }
 }

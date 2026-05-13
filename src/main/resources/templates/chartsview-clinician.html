@@ -249,10 +249,42 @@
                                 <td th:class="'status ' + ${pc.formCStatus.cssClass}"
                                     th:text="${pc.formCStatus.displayName}"></td>
                                 <td th:text="${pc.createdAt.toLocalDate()}"></td>
-                                <td><a th:href="@{/periodontics-c/{id}(id=${pc.id})}" class="btn-action btn-view">View</a></td>
+                                <td><a th:href="@{/periodontics-c/{id}/view(id=${pc.id})}" class="btn-action btn-view">View</a></td>
                                 <td><a th:href="@{/periodontics-c/{id}(id=${pc.id})}" class="btn-action btn-edit">Edit</a></td>
                                 <td>
                                     <form th:action="@{/periodontics-c/{id}/submit(id=${pc.id})}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn-action btn-submit">Submit</button>
+                                    </form>
+                                </td>
+                                <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
+                            </tr>
+                            <!-- RESTO10 Page 1 (operativeb - Assessment Form) -->
+                            <tr th:each="oc : ${operativeCharts}">
+                                <td th:text="${oc.chartNo}"></td>
+                                <td>Operative Dentistry - Assessment Form</td>
+                                <td th:class="'status ' + ${oc.status.cssClass}"
+                                    th:text="${oc.status.displayName}"></td>
+                                <td th:text="${oc.createdAt.toLocalDate()}"></td>
+                                <td><a th:href="@{/operative-b/{id}/view(id=${oc.id})}" class="btn-action btn-view">View</a></td>
+                                <td><a th:href="@{/operative-b/{id}(id=${oc.id})}" class="btn-action btn-edit">Edit</a></td>
+                                <td>
+                                    <form th:action="@{/operative-c/{id}/submit(id=${oc.id})}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn-action btn-submit">Submit</button>
+                                    </form>
+                                </td>
+                                <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
+                            </tr>
+                            <!-- RESTO6 (operativea - Caries Risk Assessment) -->
+                            <tr th:each="oc : ${operativeCharts}">
+                                <td th:text="${#strings.replace(oc.chartNo, 'RESTO10-', 'RESTO6-')}"></td>
+                                <td>Operative Dentistry - Caries Risk Assessment</td>
+                                <td th:class="'status ' + ${oc.form2Status.cssClass}"
+                                    th:text="${oc.form2Status.displayName}"></td>
+                                <td th:text="${oc.createdAt.toLocalDate()}"></td>
+                                <td><a th:href="@{/operative-a/{id}/view(id=${oc.id})}" class="btn-action btn-view">View</a></td>
+                                <td><a th:href="@{/operative-a/{id}(id=${oc.id})}" class="btn-action btn-edit">Edit</a></td>
+                                <td>
+                                    <form th:action="@{/operative-a/{id}/submit(id=${oc.id})}" method="post" style="display:inline;">
                                         <button type="submit" class="btn-action btn-submit">Submit</button>
                                     </form>
                                 </td>

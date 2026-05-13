@@ -471,8 +471,17 @@ body { height: 100vh; overflow: hidden; }
 .form-actions {
     display: flex;
     justify-content: flex-end;
+    gap: 10px;
     padding-top: 4px;
 }
+
+.btn-back {
+    background: white; color: #061F40; padding: 10px 30px;
+    border-radius: 6px; border: 2px solid #061F40; cursor: pointer;
+    font-size: 15px; font-weight: 500; text-decoration: none;
+    display: inline-block; transition: all 0.3s ease;
+}
+.btn-back:hover { background: #f0f4ff; }
 
 .btn-submit {
     background: #061F40;
@@ -487,3 +496,19 @@ body { height: 100vh; overflow: hidden; }
 }
 
 .btn-submit:hover { background: #2c5282; }
+
+.btn-next {
+    background: #061F40;
+    color: white;
+    padding: 10px 30px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
+
+.btn-next:hover { background: #2c5282; }

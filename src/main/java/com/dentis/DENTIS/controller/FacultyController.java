@@ -5,6 +5,7 @@ import com.dentis.DENTIS.model.Patient;
 import com.dentis.DENTIS.model.User;
 import com.dentis.DENTIS.repository.UserRepository;
 import com.dentis.DENTIS.service.EndodonticsChartService;
+import com.dentis.DENTIS.service.OperativeChartService;
 import com.dentis.DENTIS.service.OralSurgeryChartService;
 import com.dentis.DENTIS.service.PatientService;
 import com.dentis.DENTIS.service.PeriodonticChartService;
@@ -22,17 +23,20 @@ public class FacultyController {
     private final PatientService patientService;
     private final OralSurgeryChartService oralSurgeryChartService;
     private final EndodonticsChartService endodonticsChartService;
+    private final OperativeChartService operativeChartService;
     private final PeriodonticChartService periodonticChartService;
     private final UserRepository userRepository;
 
     public FacultyController(PatientService patientService,
                              OralSurgeryChartService oralSurgeryChartService,
                              EndodonticsChartService endodonticsChartService,
+                             OperativeChartService operativeChartService,
                              PeriodonticChartService periodonticChartService,
                              UserRepository userRepository) {
         this.patientService = patientService;
         this.oralSurgeryChartService = oralSurgeryChartService;
         this.endodonticsChartService = endodonticsChartService;
+        this.operativeChartService = operativeChartService;
         this.periodonticChartService = periodonticChartService;
         this.userRepository = userRepository;
     }
@@ -62,6 +66,9 @@ public class FacultyController {
         model.addAttribute("perioCharts", "PERIO".equals(section) && faculty != null
                 ? periodonticChartService.findByFacultyOrderByCreatedAtDesc(faculty).stream().limit(3).toList()
                 : List.of());
+        model.addAttribute("operativeCharts", "RESTO".equals(section) && faculty != null
+                ? operativeChartService.findByFacultyOrderByCreatedAtDesc(faculty).stream().limit(3).toList()
+                : List.of());
         model.addAttribute("awaitingApprovalCharts", "OS".equals(section) && faculty != null
                 ? oralSurgeryChartService.findAwaitingApprovalByFaculty(faculty)
                 : List.of());
@@ -76,6 +83,12 @@ public class FacultyController {
                 : List.of());
         model.addAttribute("awaitingApprovalPerio2Charts", "PERIO".equals(section) && faculty != null
                 ? periodonticChartService.findFormCAwaitingApprovalByFaculty(faculty)
+                : List.of());
+        model.addAttribute("awaitingApprovalOperative10Charts", "RESTO".equals(section) && faculty != null
+                ? operativeChartService.findForm1AwaitingApprovalByFaculty(faculty)
+                : List.of());
+        model.addAttribute("awaitingApprovalOperative6Charts", "RESTO".equals(section) && faculty != null
+                ? operativeChartService.findForm2AwaitingApprovalByFaculty(faculty)
                 : List.of());
         model.addAttribute("unassignedPatients", faculty != null
                 ? patientService.getUnassignedPatientsForFaculty(faculty).stream().limit(3).toList()
@@ -100,6 +113,9 @@ public class FacultyController {
                 : List.of());
         model.addAttribute("perioCharts", "PERIO".equals(section) && faculty != null
                 ? periodonticChartService.findByFacultyOrderByCreatedAtDesc(faculty)
+                : List.of());
+        model.addAttribute("operativeCharts", "RESTO".equals(section) && faculty != null
+                ? operativeChartService.findByFacultyOrderByCreatedAtDesc(faculty)
                 : List.of());
         return "patientlist-faculty";
     }
@@ -133,6 +149,9 @@ public class FacultyController {
                 : List.of());
         model.addAttribute("perioCharts", "PERIO".equals(section)
                 ? periodonticChartService.findAllByPatient(patient)
+                : List.of());
+        model.addAttribute("operativeCharts", "RESTO".equals(section)
+                ? operativeChartService.findAllByPatient(patient)
                 : List.of());
         return "chartsview-faculty";
     }

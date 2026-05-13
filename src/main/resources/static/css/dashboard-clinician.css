@@ -6,8 +6,7 @@
 }
 
 body {
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
 }
 
 .background {
@@ -29,6 +28,9 @@ body {
 
 /* HEADER */
 .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
     background: black;
     color: white;
     padding: 12px 20px;

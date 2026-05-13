@@ -292,6 +292,52 @@
                                     <span th:if="${pc.formCStatus.name() != 'SUBMITTED'}">—</span>
                                 </td>
                             </tr>
+                            <!-- RESTO10 (operativeb/c - Assessment Form) -->
+                            <tr th:each="oc : ${operativeCharts}">
+                                <td th:text="${oc.chartNo}"></td>
+                                <td>Operative Dentistry - Assessment Form</td>
+                                <td th:class="'status ' + ${oc.status.cssClass}"
+                                    th:text="${oc.status.displayName}"></td>
+                                <td th:text="${oc.createdAt.toLocalDate()}"></td>
+                                <td>
+                                    <a th:href="@{/operative-view-faculty/{id}(id=${oc.id})}" class="btn-action btn-view">View</a>
+                                </td>
+                                <td th:text="${oc.clinician != null ? oc.clinician.fullName : '—'}"></td>
+                                <td>
+                                    <span th:if="${oc.status.name() == 'SUBMITTED'}" style="display:flex; gap:6px;">
+                                        <form th:action="@{/operative-faculty/{id}/approve(id=${oc.id})}" method="post" style="display:inline;">
+                                            <button type="submit" class="btn-action btn-accept">Approve</button>
+                                        </form>
+                                        <form th:action="@{/operative-faculty/{id}/revise(id=${oc.id})}" method="post" style="display:inline;">
+                                            <button type="submit" class="btn-action btn-deny">Revise</button>
+                                        </form>
+                                    </span>
+                                    <span th:if="${oc.status.name() != 'SUBMITTED'}">—</span>
+                                </td>
+                            </tr>
+                            <!-- RESTO6 (operativea - Caries Risk Assessment) -->
+                            <tr th:each="oc : ${operativeCharts}">
+                                <td th:text="${#strings.replace(oc.chartNo, 'RESTO10-', 'RESTO6-')}"></td>
+                                <td>Operative Dentistry - Caries Risk Assessment</td>
+                                <td th:class="'status ' + ${oc.form2Status.cssClass}"
+                                    th:text="${oc.form2Status.displayName}"></td>
+                                <td th:text="${oc.createdAt.toLocalDate()}"></td>
+                                <td>
+                                    <a th:href="@{/operative2-view-faculty/{id}(id=${oc.id})}" class="btn-action btn-view">View</a>
+                                </td>
+                                <td th:text="${oc.clinician != null ? oc.clinician.fullName : '—'}"></td>
+                                <td>
+                                    <span th:if="${oc.form2Status.name() == 'SUBMITTED'}" style="display:flex; gap:6px;">
+                                        <form th:action="@{/operative2-faculty/{id}/approve(id=${oc.id})}" method="post" style="display:inline;">
+                                            <button type="submit" class="btn-action btn-accept">Approve</button>
+                                        </form>
+                                        <form th:action="@{/operative2-faculty/{id}/revise(id=${oc.id})}" method="post" style="display:inline;">
+                                            <button type="submit" class="btn-action btn-deny">Revise</button>
+                                        </form>
+                                    </span>
+                                    <span th:if="${oc.form2Status.name() != 'SUBMITTED'}">—</span>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

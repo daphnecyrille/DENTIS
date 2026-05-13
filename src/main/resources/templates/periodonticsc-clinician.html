@@ -303,7 +303,7 @@
                         <div class="clinician-box">
                             <div class="clinician-inline">
                                 <label>Clinician's Name:</label>
-                                <input type="text" readonly th:value="${currentUser != null ? currentUser.firstName + ' ' + currentUser.lastName : ''}">
+                                <input type="text" readonly th:value="${chart.clinician != null ? chart.clinician.firstName + ' ' + chart.clinician.lastName : (currentUser != null ? currentUser.firstName + ' ' + currentUser.lastName : '')}">
                             </div>
                             <div class="clinician-inline">
                                 <label>Date:</label>

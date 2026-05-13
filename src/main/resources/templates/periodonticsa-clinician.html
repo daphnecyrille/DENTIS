@@ -386,13 +386,16 @@ var annotations = [];
 
     document.addEventListener('click', function() { picker.style.display = 'none'; });
     window.addEventListener('resize', resize);
-    resize();
 
-    // Restore canvas from saved JSON
-    var canvasJson = document.getElementById('formACanvasJsonInput').value;
-    if (canvasJson) {
-        try { annotations = JSON.parse(canvasJson); redraw(); } catch(e) {}
-    }
+    // Restore canvas from saved JSON — deferred to window.load so the image
+    // is fully loaded and the canvas wrapper has its correct dimensions.
+    window.addEventListener('load', function() {
+        var canvasJson = document.getElementById('formACanvasJsonInput').value;
+        if (canvasJson) {
+            try { annotations = JSON.parse(canvasJson); } catch(e) {}
+        }
+        resize();
+    });
 })();
 
 /* ── Restore grid from saved JSON on page load ── */

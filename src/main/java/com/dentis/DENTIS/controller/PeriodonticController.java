@@ -96,6 +96,15 @@ public class PeriodonticController {
         return "periodonticsc-clinician";
     }
 
+    @GetMapping("/periodontics-c/{id}/view")
+    public String formCView(@PathVariable Long id, Model model, Authentication authentication) {
+        PeriodonticChart chart = periodonticChartService.getById(id);
+        model.addAttribute("currentUser", getCurrentUser(authentication));
+        model.addAttribute("chart", chart);
+        model.addAttribute("viewOnly", true);
+        return "periodonticsc-clinician";
+    }
+
     @PostMapping("/periodontics-c/{id}")
     public String saveFormC(@PathVariable Long id,
                             @ModelAttribute("chart") PeriodonticChart updated) {

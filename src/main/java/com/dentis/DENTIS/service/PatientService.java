@@ -25,17 +25,20 @@ public class PatientService {
     private final UserRepository userRepository;
     private final OralSurgeryChartService oralSurgeryChartService;
     private final EndodonticsChartService endodonticsChartService;
+    private final OperativeChartService operativeChartService;
     private final PeriodonticChartService periodonticChartService;
 
     public PatientService(PatientRepository patientRepository,
                           UserRepository userRepository,
                           OralSurgeryChartService oralSurgeryChartService,
                           EndodonticsChartService endodonticsChartService,
+                          OperativeChartService operativeChartService,
                           PeriodonticChartService periodonticChartService) {
         this.patientRepository = patientRepository;
         this.userRepository = userRepository;
         this.oralSurgeryChartService = oralSurgeryChartService;
         this.endodonticsChartService = endodonticsChartService;
+        this.operativeChartService = operativeChartService;
         this.periodonticChartService = periodonticChartService;
     }
 
@@ -80,6 +83,10 @@ public class PatientService {
         } else if ("PERIO".equals(code)) {
             if (periodonticChartService.findAllByPatient(patient).isEmpty()) {
                 periodonticChartService.createForPatient(patient, clinician, faculty);
+            }
+        } else if ("RESTO".equalsIgnoreCase(code)) {
+            if (operativeChartService.findAllByPatient(patient).isEmpty()) {
+                operativeChartService.createForPatient(patient, clinician, faculty);
             }
         }
     }

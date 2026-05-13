@@ -24,7 +24,7 @@ public class PatientController {
 
     @GetMapping("/dashboard-clinicmanager")
     public String dashboard(Model model) {
-        model.addAttribute("patients", patientService.getAllPatients().stream().limit(3).toList());
+        model.addAttribute("patients", patientService.getAllPatients());
         model.addAttribute("requests", chartRequestService.getPendingRequests().stream().limit(3).toList());
         return "dashboard-clinicmanager";
     }

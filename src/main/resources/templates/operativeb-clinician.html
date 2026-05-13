@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Operative Dentistry - DentIS</title>
+    <link rel="stylesheet" href="/css/operativeb-clinician.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div class="background"></div>
+<div class="operative-page">
+
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.firstName + ' ' + currentUser.lastName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
+                <div class="dropdown-icon">&#9660;</div>
+                <div class="user-dropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="/clinician-dashboard" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/chartrequest-clinician" class="nav-link">
+                            <img src="/images/request-icon.png" alt="Chart" class="nav-icon2">
+                            <span>Chart Request</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/patientlist-clinician" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h2 class="page-title">Operative Dentistry</h2>
+
+            <form th:action="@{/operative-b/{id}(id=${chart.id})}" th:object="${chart}" method="post" id="operativeBForm">
+            <div class="form-card">
+                <div class="form-banner">Assessment Form for Carious Lesions</div>
+
+                <div class="form-body">
+                <div th:style="${viewOnly} ? 'pointer-events:none;' : ''">
+
+                    <!-- Patient Name -->
+                    <div class="form-group">
+                        <label>Name of Patient</label>
+                        <div class="split-input">
+                            <input type="text" th:value="${chart.patient?.surname}" placeholder="Surname" readonly>
+                            <input type="text" class="input-wide" th:value="${chart.patient?.firstName}" placeholder="First Name" readonly>
+                            <input type="text" class="input-narrow" th:value="${chart.patient?.middleInitial}" placeholder="M.I." readonly>
+                        </div>
+                    </div>
+
+                    <!-- Age, Sex, Chart No. -->
+                    <div class="form-row">
+                        <div class="form-group col-small">
+                            <label>Age</label>
+                            <input type="text" th:value="${chart.patient?.age}" readonly>
+                        </div>
+                        <div class="form-group col-small">
+                            <label>Sex</label>
+                            <input type="text" th:value="${chart.patient?.sex}" readonly>
+                        </div>
+                        <div class="form-group col-medium">
+                            <label>Chart No.</label>
+                            <input type="text" th:value="${chart.chartNo}" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Clinician, Dent Course, Date -->
+                    <div class="form-row">
+                        <div class="form-group col-large">
+                            <label>Name of Clinician</label>
+                            <input type="text" th:value="${chart.clinician != null ? chart.clinician.firstName + ' ' + chart.clinician.lastName : ''}" readonly>
+                        </div>
+                        <div class="form-group col-medium">
+                            <label>Course</label>
+                            <div class="dent-course-row" style="margin-top:6px;">
+                                <label class="check-item"><input type="checkbox" th:field="*{dent171}"> Dent 171</label>
+                                <label class="check-item"><input type="checkbox" th:field="*{dent172}"> Dent 172</label>
+                            </div>
+                        </div>
+                        <div class="form-group col-small">
+                            <label>Date Accomplished</label>
+                            <input type="date" class="date-picker" th:field="*{visitDate}" th:readonly="${viewOnly}">
+                        </div>
+                    </div>
+
+                    <!-- Chief Complaint -->
+                    <div class="form-group">
+                        <label>Chief Complaint</label>
+                        <textarea rows="2" th:field="*{chiefComplaint}" th:readonly="${viewOnly}"></textarea>
+                    </div>
+
+                    <!-- History of Present Illness -->
+                    <div class="form-group">
+                        <label>History of Present Illness</label>
+                        <textarea rows="2" th:field="*{historyOfPresentIllness}" th:readonly="${viewOnly}"></textarea>
+                    </div>
+
+                    <!-- Medical History -->
+                    <div class="form-group">
+                        <label>Medical History</label>
+                        <textarea rows="2" th:field="*{medicalHistory}" th:readonly="${viewOnly}"></textarea>
+                    </div>
+
+                    <!-- Dental History -->
+                    <div class="form-group">
+                        <label>Dental History</label>
+                        <textarea rows="2" th:field="*{dentalHistory}" th:readonly="${viewOnly}"></textarea>
+                    </div>
+
+                    <!-- PAIN SYMPTOMS SECTION -->
+                    <div class="section-header">
+                        Pain Symptoms &nbsp;&nbsp; TOOTH #:
+                        <input type="text" th:field="*{painToothNumber}" th:readonly="${viewOnly}" placeholder="___">
+                    </div>
+
+                    <!-- Onset -->
+                    <div class="pain-onset-row">
+                        <span class="pain-onset-label">Onset:</span>
+                        <label class="check-item"><input type="checkbox" th:field="*{painOnsetProvoked}"> Provoked</label>
+                        <label class="check-item"><input type="checkbox" th:field="*{painOnsetSpontaneous}"> Spontaneous</label>
+                    </div>
+
+                    <!-- Pain Grid -->
+                    <div class="pain-grid">
+
+                        <!-- Column 1: Affected by -->
+                        <div class="pain-col">
+                            <div class="col-header">Affected by:</div>
+                            <div class="check-with-sub">
+                                <label class="check-item"><input type="checkbox" th:field="*{painAffectedByCold}"> Cold</label>
+                                <label class="inline-check"><input type="checkbox" th:field="*{painColdIncreased}"> Increased</label>
+                                <label class="inline-check"><input type="checkbox" th:field="*{painColdDecreased}"> Decreased</label>
+                            </div>
+                            <div class="check-with-sub">
+                                <label class="check-item"><input type="checkbox" th:field="*{painAffectedByHeat}"> Heat</label>
+                                <label class="inline-check"><input type="checkbox" th:field="*{painHeatIncreased}"> Increased</label>
+                                <label class="inline-check"><input type="checkbox" th:field="*{painHeatDecreased}"> Decreased</label>
+                            </div>
+                            <label class="check-item"><input type="checkbox" th:field="*{painAffectedByFoodImpaction}"> Food Impaction</label>
+                            <label class="check-item"><input type="checkbox" th:field="*{painAffectedByChewingBiting}"> Chewing / Biting</label>
+                            <label class="check-item"><input type="checkbox" th:field="*{painAffectedByPalpation}"> Palpation</label>
+                            <label class="check-item"><input type="checkbox" th:field="*{painAffectedByBodyPosition}"> Patient's Body / Head Position</label>
+                            <div class="others-inline">
+                                <label class="check-item" style="flex-shrink:0;"><input type="checkbox" th:field="*{painAffectedByOthers}"> Others:</label>
+                                <input type="text" class="others-text-sm" th:field="*{painAffectedByOthersSpec}" th:readonly="${viewOnly}" placeholder="specify">
+                            </div>
+                        </div>
+
+                        <!-- Column 2: Duration (top) + Frequency (bottom) -->
+                        <div class="pain-col-split">
+                            <div class="pain-col-half">
+                                <div class="col-header">Duration:</div>
+                                <label class="check-item"><input type="checkbox" th:field="*{painDurationSeconds}"> Seconds</label>
+                                <label class="check-item"><input type="checkbox" th:field="*{painDurationMinutes}"> Minutes</label>
+                                <label class="check-item"><input type="checkbox" th:field="*{painDurationHours}"> Hours</label>
+                            </div>
+                            <div class="pain-col-half">
+                                <div class="col-header">Frequency:</div>
+                                <label class="check-item"><input type="checkbox" th:field="*{painFrequencyConstant}"> Constant</label>
+                                <label class="check-item"><input type="checkbox" th:field="*{painFrequencyMomentary}"> Momentary</label>
+                                <label class="check-item"><input type="checkbox" th:field="*{painFrequencyIntermittent}"> Intermittent</label>
+                            </div>
+                        </div>
+
+                        <!-- Column 3: Quality (top) + Location (bottom) -->
+                        <div class="pain-col-split">
+                            <div class="pain-col-half">
+                                <div class="col-header">Quality:</div>
+                                <label class="check-item"><input type="checkbox" th:field="*{painQualitySharp}"> Sharp</label>
+                                <label class="check-item"><input type="checkbox" th:field="*{painQualityDull}"> Dull</label>
+                                <label class="check-item"><input type="checkbox" th:field="*{painQualityThrobbing}"> Throbbing</label>
+                            </div>
+                            <div class="pain-col-half">
+                                <div class="col-header">Location:</div>
+                                <label class="check-item"><input type="checkbox" th:field="*{painLocationLocalized}"> Localized</label>
+                                <label class="check-item"><input type="checkbox" th:field="*{painLocationDiffused}"> Diffused</label>
+                                <div class="others-inline">
+                                    <label class="check-item" style="flex-shrink:0;"><input type="checkbox" th:field="*{painLocationReferred}"> Referred;</label>
+                                </div>
+                                <div style="padding-left:4px; font-size:11px; color:#555;">radiating to:</div>
+                                <input type="text" th:field="*{painLocationReferredTo}" th:readonly="${viewOnly}"
+                                       style="border:none;border-bottom:1px solid #aaa;font-size:11px;font-family:'Poppins',sans-serif;outline:none;width:100%;padding:1px 3px;background:transparent;">
+                            </div>
+                        </div>
+
+                        <!-- Column 4: Level of Intensity -->
+                        <div class="pain-col">
+                            <div class="col-header">Level of Intensity:</div>
+                            <div class="intensity-text">Scale of 1 (discomfort) to 10 (severe/excruciating):</div>
+                            <input type="number" min="1" max="10" class="intensity-input-sm"
+                                   th:field="*{painIntensity}" th:readonly="${viewOnly}" placeholder="1–10">
+                        </div>
+                    </div>
+
+                    <!-- RADIOGRAPHIC EXAMINATION -->
+                    <div class="section-header">Radiographic Examination</div>
+                    <div class="exam-section">
+                        <div class="exam-section-body">
+                            <div class="exam-row">
+                                <span class="exam-row-label">Extent of Caries:</span>
+                                <div class="exam-row-checks">
+                                    <label class="check-item"><input type="checkbox" th:field="*{radioExtentUpToPulp}"> up to pulp</label>
+                                    <label class="check-item"><input type="checkbox" th:field="*{radioExtent1mm}"> 1mm from pulp</label>
+                                    <label class="check-item"><input type="checkbox" th:field="*{radioExtent2mm}"> 2mm from pulp</label>
+                                    <label class="check-item"><input type="checkbox" th:field="*{radioExtent3mmOrMore}"> 3mm or more from pulp</label>
+                                </div>
+                            </div>
+                            <div class="exam-row">
+                                <span class="exam-row-label">Level of cervical floor relative to crest of alveolar bone:</span>
+                                <div class="exam-row-checks">
+                                    <label class="check-item"><input type="checkbox" th:field="*{radioCervicalFloorSupra}"> Supra</label>
+                                    <label class="check-item"><input type="checkbox" th:field="*{radioCervicalFloorEqui}"> Equi</label>
+                                    <label class="check-item"><input type="checkbox" th:field="*{radioCervicalFloorSub}"> Sub</label>
+                                </div>
+                            </div>
+                            <div class="exam-row">
+                                <span class="exam-row-label">Quality of existing restoration: Evidence of recurrent caries</span>
+                                <div class="exam-row-checks">
+                                    <label class="check-item"><input type="checkbox" th:field="*{radioRecurrentCariesPresent}"> Present</label>
+                                    <label class="check-item"><input type="checkbox" th:field="*{radioRecurrentCariesAbsent}"> Absent</label>
+                                </div>
+                            </div>
+                            <div class="exam-row">
+                                <span class="exam-row-label">Periapical radiographic picture:</span>
+                                <div class="exam-row-checks">
+                                    <label class="check-item"><input type="checkbox" th:field="*{radioPeriapicalNormal}"> Normal</label>
+                                    <label class="check-item"><input type="checkbox" th:field="*{radioPeriapicalPDLThickened}"> PDL Thickened</label>
+                                    <label class="check-item"><input type="checkbox" th:field="*{radioPeriapicalWithRadiolucency}"> With radiolucency</label>
+                                    <label class="check-item"><input type="checkbox" th:field="*{radioPeriapicalWithRadiopacity}"> With radiopacity</label>
+                                </div>
+                            </div>
+                            <div class="exam-row">
+                                <span class="exam-row-label">Evidence of Bone Loss:</span>
+                                <div class="exam-row-checks">
+                                    <label class="check-item"><input type="checkbox" th:field="*{radioBoneLossNone}"> None</label>
+                                    <label class="check-item"><input type="checkbox" th:field="*{radioBoneLossHorizontal}"> Horizontal</label>
+                                    <label class="check-item"><input type="checkbox" th:field="*{radioBoneLossVertical}"> Vertical</label>
+                                </div>
+                            </div>
+                            <div class="exam-row">
+                                <span class="exam-row-label">Evidence of Fracture Line:</span>
+                                <div class="exam-row-checks">
+                                    <label class="check-item"><input type="checkbox" th:field="*{radioFractureLinePresent}"> Present</label>
+                                    <label class="check-item"><input type="checkbox" th:field="*{radioFractureLineAbsent}"> Absent</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SOFT TISSUE EXAMINATION -->
+                    <div class="section-header">Soft Tissue Examination</div>
+                    <div class="exam-section">
+                        <div class="exam-section-body">
+                            <div class="exam-row">
+                                <div class="exam-row-checks" style="grid-column:1/-1;flex-wrap:wrap;gap:14px;">
+                                    <label class="check-item"><input type="checkbox" th:field="*{softTissueNormal}"> Normal</label>
+                                    <label class="check-item"><input type="checkbox" th:field="*{softTissueSinusTract}"> Sinus tract</label>
+                                    <label class="check-item"><input type="checkbox" th:field="*{softTissueInflamed}"> Inflamed</label>
+                                    <label class="check-item"><input type="checkbox" th:field="*{softTissueWithSwelling}"> With swelling:</label>
+                                    <label class="check-item"><input type="checkbox" th:field="*{softTissueSwellingIntraoral}"> Intraoral</label>
+                                    <label class="check-item"><input type="checkbox" th:field="*{softTissueSwellingExtraoral}"> Extraoral</label>
+                                </div>
+                            </div>
+                            <div class="exam-row">
+                                <span class="exam-row-label-sm">PPD:</span>
+                                <div class="exam-row-checks">
+                                    <label class="check-item"><input type="checkbox" th:field="*{softTissuePPDNormal}"> Normal</label>
+                                    <label class="check-item"><input type="checkbox" th:field="*{softTissuePPDWithPocket}"> With periodontal pocket/s, location and measurements</label>
+                                </div>
+                            </div>
+                            <div class="exam-row">
+                                <span class="exam-row-label-sm">Mobility:</span>
+                                <div class="exam-row-checks">
+                                    <label class="check-item"><input type="checkbox" th:field="*{softTissueMobility0}"> 0</label>
+                                    <label class="check-item"><input type="checkbox" th:field="*{softTissueMobilityFirst}"> First degree</label>
+                                    <label class="check-item"><input type="checkbox" th:field="*{softTissueMobilitySecond}"> Second degree</label>
+                                    <label class="check-item"><input type="checkbox" th:field="*{softTissueMobilityThird}"> Third degree</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions" th:unless="${viewOnly}">
+                    <button type="submit" class="btn-next">Next</button>
+                </div>
+                <div class="form-actions" th:if="${viewOnly}">
+                    <a th:href="@{/operative-c/{id}/view(id=${chart.id})}" class="btn-next">Next</a>
+                </div>
+
+                </div>
+            </div>
+            </form>
+        </main>
+    </div>
+</div>
+
+<script>
+document.querySelector('.menu-icon').onclick = function() {
+    document.querySelector('.sidebar').classList.toggle('expanded');
+};
+
+document.querySelector('.user-profile').onclick = function(e) {
+    e.stopPropagation();
+    document.querySelector('.user-dropdown').classList.toggle('show');
+};
+
+document.addEventListener('click', function() {
+    const d = document.querySelector('.user-dropdown');
+    if (d.classList.contains('show')) d.classList.remove('show');
+});
+
+document.querySelector('.user-dropdown').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+</script>
+
+</body>
+</html>

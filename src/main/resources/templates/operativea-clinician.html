@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Operative Dentistry - DentIS</title>
+    <link rel="stylesheet" href="/css/operativea-clinician.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div class="background"></div>
+<div class="operative-page">
+
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.firstName + ' ' + currentUser.lastName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
+                <div class="dropdown-icon">&#9660;</div>
+                <div class="user-dropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="/clinician-dashboard" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/chartrequest-clinician" class="nav-link">
+                            <img src="/images/request-icon.png" alt="Chart" class="nav-icon2">
+                            <span>Chart Request</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/patientlist-clinician" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h2 class="page-title">Operative Dentistry</h2>
+
+            <form th:action="@{/operative-a/{id}(id=${chart.id})}" th:object="${chart}" method="post">
+            <div class="form-card">
+                <div class="form-banner">Caries Risk Assessment Form</div>
+
+                <div class="form-body">
+                <div th:style="${viewOnly} ? 'pointer-events:none;' : ''">
+
+                    <!-- Patient Name + Chart Number -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Patient's Name</label>
+                            <input type="text"
+                                   th:value="${chart.patient != null ? chart.patient.surname + ', ' + chart.patient.firstName : ''}"
+                                   readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Chart Number</label>
+                            <input type="text" th:value="${#strings.replace(chart.chartNo, 'RESTO10-', 'RESTO6-')}" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Clinician + Date -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Clinician's Name</label>
+                            <input type="text"
+                                   th:value="${chart.clinician != null ? chart.clinician.firstName + ' ' + chart.clinician.lastName : ''}"
+                                   readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" class="date-picker" th:field="*{craDate}" th:readonly="${viewOnly}">
+                        </div>
+                    </div>
+
+                    <!-- STEP 1: Current Caries Experience Assessment -->
+                    <div class="step-header">
+                        <div class="step-num">STEP 1: Current Caries Experience Assessment:</div>
+                        <div class="step-desc">Determine from the patient's ICDAS CHART.</div>
+                    </div>
+                    <div class="icdas-table-wrapper">
+                        <table class="icdas-table">
+                            <thead>
+                                <tr>
+                                    <th class="row-label-h"></th>
+                                    <th colspan="4" style="background:#2d4a6b;font-size:13px;">ICDAS Code</th>
+                                </tr>
+                                <tr class="icdas-code-row">
+                                    <th class="row-label-h"></th>
+                                    <th>Sound<br><span style="font-size:14px;font-weight:700;">0</span></th>
+                                    <th>Early Stage Decay<br><span style="font-size:14px;font-weight:700;">A</span></th>
+                                    <th>Established Decay<br><span style="font-size:14px;font-weight:700;">B</span></th>
+                                    <th>Severe Decay<br><span style="font-size:14px;font-weight:700;">C</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Number of Teeth with ICDAS Score</td>
+                                    <td><input type="text" th:field="*{icdas0TeethCount}" th:readonly="${viewOnly}"></td>
+                                    <td><input type="text" th:field="*{icdasATeethCount}" th:readonly="${viewOnly}"></td>
+                                    <td><input type="text" th:field="*{icdasBTeethCount}" th:readonly="${viewOnly}"></td>
+                                    <td><input type="text" th:field="*{icdasCTeethCount}" th:readonly="${viewOnly}"></td>
+                                </tr>
+                                <tr>
+                                    <td>ICDAS Highest code observed <em style="font-size:10px;color:#888;">(Please tick only one)</em></td>
+                                    <td><label class="check-item" style="justify-content:center;"><input type="checkbox" th:field="*{icdasHighest0}" class="icdas-highest"></label></td>
+                                    <td><label class="check-item" style="justify-content:center;"><input type="checkbox" th:field="*{icdasHighestA}" class="icdas-highest"></label></td>
+                                    <td><label class="check-item" style="justify-content:center;"><input type="checkbox" th:field="*{icdasHighestB}" class="icdas-highest"></label></td>
+                                    <td><label class="check-item" style="justify-content:center;"><input type="checkbox" th:field="*{icdasHighestC}" class="icdas-highest"></label></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- STEP 2: Risk Factor Assessment -->
+                    <div class="step-header">
+                        <div class="step-num">STEP 2: Risk Factor Assessment:</div>
+                        <div class="step-desc">Tick the risk factors applicable to the patient.</div>
+                    </div>
+                    <div class="risk-factors-grid">
+                        <label class="check-item"><input type="checkbox" th:field="*{rfVisiblePlaque}" class="rf-checkbox" data-rf="1"> Visible Plaque</label>
+                        <label class="check-item"><input type="checkbox" th:field="*{rfMedicallyCompromised}" class="rf-checkbox" data-rf="1"> Medically compromised</label>
+                        <label class="check-item"><input type="checkbox" th:field="*{rfNoFluorideExposure}" class="rf-checkbox" data-rf="1"> No Fluoride Exposure</label>
+                        <label class="check-item"><input type="checkbox" th:field="*{rfMotherSiblingCaries}" class="rf-checkbox" data-rf="1"> Mother/sibling caries experience history</label>
+                        <label class="check-item"><input type="checkbox" th:field="*{rfCrowdingDeepPits}" class="rf-checkbox" data-rf="1"> Crowding/Deep pits and fissures</label>
+                        <label class="check-item"><input type="checkbox" th:field="*{rfDryMouth}" class="rf-checkbox" data-rf="1"> Dry Mouth</label>
+                        <label class="check-item"><input type="checkbox" th:field="*{rfDentalAppliances}" class="rf-checkbox" data-rf="1"> Any dental appliances (Fixed orthodontic, faulty fixed prostheses, fixed lingual retainers)</label>
+                        <label class="check-item"><input type="checkbox" th:field="*{rfMultipleRestorations}" class="rf-checkbox" data-rf="1"> Multiple restorations/extracted teeth due to caries</label>
+                        <label class="check-item"><input type="checkbox" th:field="*{rfSugarySnacks}" class="rf-checkbox" data-rf="1"> Sugary/snacks intake between meals</label>
+                        <label class="check-item"><input type="checkbox" th:field="*{rfOverhangingRestorations}" class="rf-checkbox" data-rf="1"> Overhanging restorations</label>
+                    </div>
+
+                    <!-- STEP 3: Caries Risk Matrix -->
+                    <div class="step-header">
+                        <div class="step-num">STEP 3: Caries Risk Matrix:</div>
+                        <div class="step-desc">Fill in column 1 based on the Risk Factor Assessment (Step 2). Based on the ICDAS highest code observed (Step 1) and number of risk factors, encircle which category (low, moderate or high) the patient falls under.</div>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <table class="risk-matrix-table">
+                            <thead>
+                                <tr>
+                                    <th class="row-label-h" style="min-width:120px;">Number of<br>Risk Factors</th>
+                                    <th>No active caries lesions<br>(ICDAS 0)</th>
+                                    <th>Initial-stage active caries lesions<br>(ICDAS A)</th>
+                                    <th>Moderate or extensive caries lesions<br>(ICDAS B &amp; C)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <label class="check-cell"><input type="checkbox" th:field="*{riskFactors0}" data-risk-row="0"> 0</label>
+                                    </td>
+                                    <td class="cell-low">Low</td>
+                                    <td class="cell-moderate">Moderate</td>
+                                    <td class="cell-moderate">Moderate</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <label class="check-cell"><input type="checkbox" th:field="*{riskFactors1or2}" data-risk-row="1or2"> 1 or 2</label>
+                                    </td>
+                                    <td class="cell-low">Low</td>
+                                    <td class="cell-moderate">Moderate</td>
+                                    <td class="cell-high">High</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <label class="check-cell"><input type="checkbox" th:field="*{riskFactors3orMore}" data-risk-row="3orMore"> 3 or more</label>
+                                    </td>
+                                    <td class="cell-moderate">Moderate</td>
+                                    <td class="cell-high">High</td>
+                                    <td class="cell-high">High</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- STEP 4: Caries Management Recommendation -->
+                    <div class="step-header">
+                        <div class="step-num">STEP 4: Caries Management Recommendation:</div>
+                        <div class="step-desc">From the Caries Risk Matrix (Step 3), determine which preventive measures the patient need. Tick the appropriate box/es.</div>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <table class="mgmt-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:160px;"></th>
+                                    <th>Risk Levels</th>
+                                    <th></th>
+                                    <th style="width:80px;">Treatment</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <label class="check-item"><input type="checkbox" th:field="*{prevPrimary}">
+                                            &nbsp; Primary<br>&nbsp; Prevention</label>
+                                    </td>
+                                    <td><span class="risk-levels">Low, Moderate, High</span></td>
+                                    <td>
+                                        <ul>
+                                            <li>Brush 2x with fluoride toothpaste, no rinsing</li>
+                                            <li>Patient Education</li>
+                                        </ul>
+                                    </td>
+                                    <td rowspan="2" style="text-align:center;vertical-align:middle;"><div class="treatment-tag">NOC</div></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <label class="check-item"><input type="checkbox" th:field="*{prevSecondary}">
+                                            &nbsp; Secondary<br>&nbsp; Prevention</label>
+                                    </td>
+                                    <td><span class="risk-levels">Moderate, High</span></td>
+                                    <td>
+                                        <ul>
+                                            <li>Fluoride Varnish</li>
+                                            <li>Sealant Application</li>
+                                            <li>Diet Counseling</li>
+                                            <li>Chew sugar free gum</li>
+                                            <li>Prescribed home fluoride gel</li>
+                                            <li>Prescribed home fluoride mouthwash</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <label class="check-item"><input type="checkbox" th:field="*{prevTertiary}">
+                                            &nbsp; Tertiary<br>&nbsp; Prevention</label>
+                                    </td>
+                                    <td><span class="risk-levels">High</span></td>
+                                    <td>
+                                        <ul>
+                                            <li>Minimally Invasive Treatment</li>
+                                            <li>Restoration</li>
+                                        </ul>
+                                    </td>
+                                    <td><div class="treatment-tag">TPOC</div></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- RECALL VISITS -->
+                    <div class="step-header">
+                        <div class="step-num">RECALL VISITS:</div>
+                        <div class="step-desc">Tick the appropriate recall visit for the patient.</div>
+                    </div>
+                    <div class="recall-row">
+                        <div class="recall-item">
+                            <label class="check-item" style="gap:8px;">
+                                <input type="checkbox" th:field="*{recallLowRisk}" class="recall-cb">
+                                <span>
+                                    <span class="recall-label">Low Risk</span>
+                                    <span class="recall-period">6–12 months</span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="recall-item">
+                            <label class="check-item" style="gap:8px;">
+                                <input type="checkbox" th:field="*{recallModerateRisk}" class="recall-cb">
+                                <span>
+                                    <span class="recall-label">Moderate Risk</span>
+                                    <span class="recall-period">6 months</span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="recall-item">
+                            <label class="check-item" style="gap:8px;">
+                                <input type="checkbox" th:field="*{recallHighRisk}" class="recall-cb">
+                                <span>
+                                    <span class="recall-label">High Risk</span>
+                                    <span class="recall-period">3 months</span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <p style="font-size:11px;color:#666;font-style:italic;">*At recall visit, review CRA of patient. &nbsp; &nbsp; *Adapted from Colgate Caries Risk Assessment</p>
+
+                    <!-- Faculty Name -->
+                    <div class="faculty-row">
+                        <div class="form-group">
+                            <label>Faculty Name</label>
+                            <input type="text" th:value="${chart.faculty != null ? chart.faculty.firstName + ' ' + chart.faculty.lastName : ''}" readonly>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions" th:unless="${viewOnly}">
+                    <button type="submit" class="btn-save">Save</button>
+                </div>
+
+                </div>
+            </div>
+            </form>
+        </main>
+    </div>
+</div>
+
+<script>
+document.querySelector('.menu-icon').onclick = function() {
+    document.querySelector('.sidebar').classList.toggle('expanded');
+};
+
+document.querySelector('.user-profile').onclick = function(e) {
+    e.stopPropagation();
+    document.querySelector('.user-dropdown').classList.toggle('show');
+};
+
+document.addEventListener('click', function() {
+    const d = document.querySelector('.user-dropdown');
+    if (d.classList.contains('show')) d.classList.remove('show');
+});
+
+document.querySelector('.user-dropdown').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+
+/* Checkbox visual state */
+document.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+    cb.addEventListener('change', function() {
+        if (this.checked) {
+            this.style.background = '#8B0000';
+            this.style.borderColor = '#8B0000';
+        } else {
+            this.style.background = 'white';
+            this.style.borderColor = '#555';
+        }
+    });
+    if (cb.checked) {
+        cb.style.background = '#8B0000';
+        cb.style.borderColor = '#8B0000';
+    }
+});
+
+/* Step 3: auto-select risk row based on step 2 tick count */
+function updateRiskMatrix() {
+    var count = document.querySelectorAll('[data-rf]:checked').length;
+    var cb0    = document.querySelector('[data-risk-row="0"]');
+    var cb1or2 = document.querySelector('[data-risk-row="1or2"]');
+    var cb3up  = document.querySelector('[data-risk-row="3orMore"]');
+    if (!cb0 || !cb1or2 || !cb3up) return;
+    [cb0, cb1or2, cb3up].forEach(function(cb) {
+        cb.checked = false;
+        cb.style.background = 'white';
+        cb.style.borderColor = '#555';
+    });
+    var target = count === 0 ? cb0 : (count <= 2 ? cb1or2 : cb3up);
+    target.checked = true;
+    target.style.background = '#8B0000';
+    target.style.borderColor = '#8B0000';
+}
+document.querySelectorAll('[data-rf]').forEach(function(cb) {
+    cb.addEventListener('change', updateRiskMatrix);
+});
+updateRiskMatrix();
+
+/* Single-select for ICDAS highest code (Step 1) */
+document.querySelectorAll('.icdas-highest').forEach(function(cb) {
+    cb.addEventListener('change', function() {
+        if (this.checked) {
+            document.querySelectorAll('.icdas-highest').forEach(function(other) {
+                if (other !== cb) {
+                    other.checked = false;
+                    other.style.background = 'white';
+                    other.style.borderColor = '#555';
+                }
+            });
+        }
+    });
+});
+
+/* Single-select for Recall Visits */
+document.querySelectorAll('.recall-cb').forEach(function(cb) {
+    cb.addEventListener('change', function() {
+        if (this.checked) {
+            document.querySelectorAll('.recall-cb').forEach(function(other) {
+                if (other !== cb) {
+                    other.checked = false;
+                    other.style.background = 'white';
+                    other.style.borderColor = '#555';
+                }
+            });
+        }
+    });
+});
+
+updateRiskMatrix();
+</script>
+
+</body>
+</html>

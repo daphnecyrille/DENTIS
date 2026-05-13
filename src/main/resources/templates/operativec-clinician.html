@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Operative Dentistry - DentIS</title>
+    <link rel="stylesheet" href="/css/operativec-clinician.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div class="background"></div>
+<div class="operative-page">
+
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.firstName + ' ' + currentUser.lastName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
+                <div class="dropdown-icon">&#9660;</div>
+                <div class="user-dropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="/clinician-dashboard" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/chartrequest-clinician" class="nav-link">
+                            <img src="/images/request-icon.png" alt="Chart" class="nav-icon2">
+                            <span>Chart Request</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/patientlist-clinician" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h2 class="page-title">Operative Dentistry</h2>
+
+            <form th:action="@{/operative-c/{id}(id=${chart.id})}" th:object="${chart}" method="post">
+            <div class="form-card">
+                <div class="form-banner">Assessment Form for Carious Lesions</div>
+
+                <div class="form-body">
+                <div th:style="${viewOnly} ? 'pointer-events:none;' : ''">
+
+                    <!-- DIAGNOSTIC TESTS -->
+                    <div class="section-header">Diagnostic Tests</div>
+                    <div class="diag-table-wrapper">
+                        <table class="diag-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-label"></th>
+                                    <th>Tooth Involved</th>
+                                    <th>Adjacent</th>
+                                    <th>Contralateral</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Tooth number</td>
+                                    <td><input type="text" th:field="*{diagInvolvedToothNumber}" th:readonly="${viewOnly}"></td>
+                                    <td><input type="text" th:field="*{diagAdjacentToothNumber}" th:readonly="${viewOnly}"></td>
+                                    <td><input type="text" th:field="*{diagContralateralToothNumber}" th:readonly="${viewOnly}"></td>
+                                </tr>
+                                <tr>
+                                    <td>Pocket Depth / CAL</td>
+                                    <td><input type="text" th:field="*{diagInvolvedPocketDepth}" th:readonly="${viewOnly}"></td>
+                                    <td><input type="text" th:field="*{diagAdjacentPocketDepth}" th:readonly="${viewOnly}"></td>
+                                    <td><input type="text" th:field="*{diagContralateralPocketDepth}" th:readonly="${viewOnly}"></td>
+                                </tr>
+                                <tr>
+                                    <td>Mobility grade</td>
+                                    <td><input type="text" th:field="*{diagInvolvedMobility}" th:readonly="${viewOnly}"></td>
+                                    <td><input type="text" th:field="*{diagAdjacentMobility}" th:readonly="${viewOnly}"></td>
+                                    <td><input type="text" th:field="*{diagContralateralMobility}" th:readonly="${viewOnly}"></td>
+                                </tr>
+                                <tr>
+                                    <td>Percussion (+++, + or -)</td>
+                                    <td><input type="text" th:field="*{diagInvolvedPercussion}" th:readonly="${viewOnly}"></td>
+                                    <td><input type="text" th:field="*{diagAdjacentPercussion}" th:readonly="${viewOnly}"></td>
+                                    <td><input type="text" th:field="*{diagContralateralPercussion}" th:readonly="${viewOnly}"></td>
+                                </tr>
+                                <tr>
+                                    <td>Palpation (+++, + or -)</td>
+                                    <td><input type="text" th:field="*{diagInvolvedPalpation}" th:readonly="${viewOnly}"></td>
+                                    <td><input type="text" th:field="*{diagAdjacentPalpation}" th:readonly="${viewOnly}"></td>
+                                    <td><input type="text" th:field="*{diagContralateralPalpation}" th:readonly="${viewOnly}"></td>
+                                </tr>
+                                <tr>
+                                    <td>Cold (pain duration; immediate or delayed)</td>
+                                    <td><input type="text" th:field="*{diagInvolvedCold}" th:readonly="${viewOnly}"></td>
+                                    <td><input type="text" th:field="*{diagAdjacentCold}" th:readonly="${viewOnly}"></td>
+                                    <td><input type="text" th:field="*{diagContralateralCold}" th:readonly="${viewOnly}"></td>
+                                </tr>
+                                <tr>
+                                    <td>Heat (pain duration; immediate or delayed)</td>
+                                    <td><input type="text" th:field="*{diagInvolvedHeat}" th:readonly="${viewOnly}"></td>
+                                    <td><input type="text" th:field="*{diagAdjacentHeat}" th:readonly="${viewOnly}"></td>
+                                    <td><input type="text" th:field="*{diagContralateralHeat}" th:readonly="${viewOnly}"></td>
+                                </tr>
+                                <tr>
+                                    <td>EPT values</td>
+                                    <td><input type="text" th:field="*{diagInvolvedEPT}" th:readonly="${viewOnly}"></td>
+                                    <td><input type="text" th:field="*{diagAdjacentEPT}" th:readonly="${viewOnly}"></td>
+                                    <td><input type="text" th:field="*{diagContralateralEPT}" th:readonly="${viewOnly}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- GUIDE TO DIAGNOSING PULP STATUS (reference — read-only) -->
+                    <div class="section-header">Guide to Diagnosing Pulp Status</div>
+                    <div class="guide-table-wrapper">
+                        <table class="guide-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-label-h">Subjective Symptoms and<br>Diagnostic Tests</th>
+                                    <th>Reversible Pulpitis</th>
+                                    <th>Irreversible Pulpitis</th>
+                                    <th>Necrosis</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Pain</td>
+                                    <td>Provoked</td>
+                                    <td>Spontaneous or asymptomatic</td>
+                                    <td>None unless with periapical lesion</td>
+                                </tr>
+                                <tr>
+                                    <td>Pain that lingers</td>
+                                    <td>No</td>
+                                    <td>Yes or No</td>
+                                    <td>None unless with periapical lesion</td>
+                                </tr>
+                                <tr>
+                                    <td>Sinus tract</td>
+                                    <td>Absent</td>
+                                    <td>Absent</td>
+                                    <td>May be present</td>
+                                </tr>
+                                <tr>
+                                    <td>Percussion</td>
+                                    <td>Negative<br>No pain or discomfort</td>
+                                    <td>Negative unless with periapical lesion</td>
+                                    <td>+/–<br>Negative or positive</td>
+                                </tr>
+                                <tr>
+                                    <td>Palpation</td>
+                                    <td>Negative<br>No pain or discomfort</td>
+                                    <td>Negative unless with periapical lesion</td>
+                                    <td>+/–<br>Negative or positive</td>
+                                </tr>
+                                <tr>
+                                    <td>EPT</td>
+                                    <td>Responds</td>
+                                    <td>Responds</td>
+                                    <td>No response</td>
+                                </tr>
+                                <tr>
+                                    <td>Radiographic picture</td>
+                                    <td>No radiographic periapical changes<br><br>Caries lesion not close to pulp</td>
+                                    <td>No radiographic periapical changes<br>Periapical changes may or may not be present<br><br>Caries lesion close to pulp</td>
+                                    <td>With Radiographic periapical changes<br>Periapical changes may or may not be present<br><br>Caries lesion up to pulp</td>
+                                </tr>
+                                <tr>
+                                    <td>Tooth Level Findings</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Pulp exposure</td>
+                                    <td>None / Iatrogenic<br><br>Subsequent bleeding easily controlled (within 5 minutes)</td>
+                                    <td>Exposure due to caries<br><br>Subsequent bleeding is difficult to control</td>
+                                    <td>Exposure due to caries<br><br>No bleeding even if with pulp exposure</td>
+                                </tr>
+                                <tr>
+                                    <td>Patient's response to caries excavation</td>
+                                    <td>Pain</td>
+                                    <td>Pain</td>
+                                    <td>None</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- FACTORS FOR DIRECT PULP CAPPING (reference — read-only) -->
+                    <div class="factors-box">
+                        <div class="factors-title">Factors favoring success of Direct Pulp Capping</div>
+                        <div class="factors-ref">(Sturdevant Art and Science of Operative Dentistry, 6th ed, p 464)</div>
+                        <ol>
+                            <li>The exposure is small (&lt;0.5 mm in diameter).</li>
+                            <li>The tooth has been asymptomatic, showing no signs of pulpitis.</li>
+                            <li>Any hemorrhage from the exposure site is easily controlled.</li>
+                            <li>The invasion of the pulp chamber was relatively atraumatic with little physical irritation to the pulp tissue.</li>
+                            <li>A clean, uncontaminated operating field is maintained (i.e., by using a rubber dam).</li>
+                        </ol>
+                    </div>
+
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions" th:unless="${viewOnly}">
+                    <a th:href="@{/operative-b/{id}(id=${chart.id})}" class="btn-back">Back</a>
+                    <button type="submit" name="action" value="save" class="btn-save">Save</button>
+                </div>
+                <div class="form-actions" th:if="${viewOnly}">
+                    <a th:href="@{/operative-b/{id}/view(id=${chart.id})}" class="btn-back">Back</a>
+                </div>
+
+                </div>
+            </div>
+            </form>
+        </main>
+    </div>
+</div>
+
+<script>
+document.querySelector('.menu-icon').onclick = function() {
+    document.querySelector('.sidebar').classList.toggle('expanded');
+};
+
+document.querySelector('.user-profile').onclick = function(e) {
+    e.stopPropagation();
+    document.querySelector('.user-dropdown').classList.toggle('show');
+};
+
+document.addEventListener('click', function() {
+    const d = document.querySelector('.user-dropdown');
+    if (d.classList.contains('show')) d.classList.remove('show');
+});
+
+document.querySelector('.user-dropdown').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+</script>
+
+</body>
+</html>

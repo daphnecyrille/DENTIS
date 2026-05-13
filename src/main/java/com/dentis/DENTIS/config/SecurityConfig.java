@@ -38,7 +38,9 @@ public class SecurityConfig {
                     "/faculty-dashboard", "/faculty-assign", "/faculty-patientlist",
                     "/chartsview-faculty/**", "/faculty-dashboard/**", "/admitting-view-faculty/**",
                     "/oralsurgery-view-faculty/**", "/oralsurgery2-view-faculty/**",
-                    "/endodontics-view-faculty/**", "/endodontics2-view-faculty/**"
+                    "/endodontics-view-faculty/**", "/endodontics2-view-faculty/**",
+                    "/operative-view-faculty/**", "/operative2-view-faculty/**",
+                    "/operative-faculty/**", "/operative2-faculty/**"
                 ).hasRole("FACULTY")
                 .requestMatchers(
                     "/dashboard-clinicmanager", "/patientlist-clinicmanager", "/requestlist-clinicmanager",
