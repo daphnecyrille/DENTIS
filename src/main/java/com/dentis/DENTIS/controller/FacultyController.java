@@ -4,11 +4,15 @@ import com.dentis.DENTIS.model.OralSurgeryChart;
 import com.dentis.DENTIS.model.Patient;
 import com.dentis.DENTIS.model.User;
 import com.dentis.DENTIS.repository.UserRepository;
+import com.dentis.DENTIS.service.ClinicianFacultyAssignmentService;
 import com.dentis.DENTIS.service.EndodonticsChartService;
 import com.dentis.DENTIS.service.OperativeChartService;
 import com.dentis.DENTIS.service.OralSurgeryChartService;
 import com.dentis.DENTIS.service.PatientService;
 import com.dentis.DENTIS.service.PeriodonticChartService;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
@@ -26,19 +30,22 @@ public class FacultyController {
     private final OperativeChartService operativeChartService;
     private final PeriodonticChartService periodonticChartService;
     private final UserRepository userRepository;
+    private final ClinicianFacultyAssignmentService assignmentService;
 
     public FacultyController(PatientService patientService,
                              OralSurgeryChartService oralSurgeryChartService,
                              EndodonticsChartService endodonticsChartService,
                              OperativeChartService operativeChartService,
                              PeriodonticChartService periodonticChartService,
-                             UserRepository userRepository) {
+                             UserRepository userRepository,
+                             ClinicianFacultyAssignmentService assignmentService) {
         this.patientService = patientService;
         this.oralSurgeryChartService = oralSurgeryChartService;
         this.endodonticsChartService = endodonticsChartService;
         this.operativeChartService = operativeChartService;
         this.periodonticChartService = periodonticChartService;
         this.userRepository = userRepository;
+        this.assignmentService = assignmentService;
     }
 
     private User getCurrentUser(Authentication authentication) {
@@ -58,16 +65,16 @@ public class FacultyController {
                 ? faculty.getSection().toUpperCase() : "";
 
         model.addAttribute("osCharts", "OS".equals(section) && faculty != null
-                ? oralSurgeryChartService.findByFacultyOrderByCreatedAtDesc(faculty).stream().limit(3).toList()
+                ? oralSurgeryChartService.findByFacultyOrderByCreatedAtDesc(faculty).stream().limit(5).toList()
                 : List.of());
         model.addAttribute("endoCharts", "ENDO".equals(section) && faculty != null
-                ? endodonticsChartService.findByFacultyOrderByCreatedAtDesc(faculty).stream().limit(3).toList()
+                ? endodonticsChartService.findByFacultyOrderByCreatedAtDesc(faculty).stream().limit(5).toList()
                 : List.of());
         model.addAttribute("perioCharts", "PERIO".equals(section) && faculty != null
-                ? periodonticChartService.findByFacultyOrderByCreatedAtDesc(faculty).stream().limit(3).toList()
+                ? periodonticChartService.findByFacultyOrderByCreatedAtDesc(faculty).stream().limit(5).toList()
                 : List.of());
         model.addAttribute("operativeCharts", "RESTO".equals(section) && faculty != null
-                ? operativeChartService.findByFacultyOrderByCreatedAtDesc(faculty).stream().limit(3).toList()
+                ? operativeChartService.findByFacultyOrderByCreatedAtDesc(faculty).stream().limit(5).toList()
                 : List.of());
         model.addAttribute("awaitingApprovalCharts", "OS".equals(section) && faculty != null
                 ? oralSurgeryChartService.findAwaitingApprovalByFaculty(faculty)
@@ -91,7 +98,7 @@ public class FacultyController {
                 ? operativeChartService.findForm2AwaitingApprovalByFaculty(faculty)
                 : List.of());
         model.addAttribute("unassignedPatients", faculty != null
-                ? patientService.getUnassignedPatientsForFaculty(faculty).stream().limit(3).toList()
+                ? patientService.getUnassignedPatientsForFaculty(faculty).stream().limit(5).toList()
                 : List.of());
         model.addAttribute("clinicians", patientService.getAllClinicians());
         return "dashboard-faculty";
@@ -118,6 +125,25 @@ public class FacultyController {
                 ? operativeChartService.findByFacultyOrderByCreatedAtDesc(faculty)
                 : List.of());
         return "patientlist-faculty";
+    }
+
+    @GetMapping("/faculty-advisees")
+    public String advisees(Model model, Authentication authentication) {
+        User faculty = getCurrentUser(authentication);
+        model.addAttribute("currentUser", faculty);
+        String section = faculty != null && faculty.getSection() != null
+                ? faculty.getSection() : "";
+        List<User> advisees = faculty != null
+                ? assignmentService.getAdviseesForFaculty(faculty, section)
+                : List.of();
+        Map<Long, List<Patient>> patientsMap = new LinkedHashMap<>();
+        for (User advisee : advisees) {
+            patientsMap.put(advisee.getId(), patientService.getPatientsForClinician(advisee));
+        }
+        model.addAttribute("advisees", advisees);
+        model.addAttribute("patientsMap", patientsMap);
+        model.addAttribute("section", section);
+        return "faculty-advisees";
     }
 
     @GetMapping("/faculty-assign")

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Assign Advisers - Clinic Manager</title>
+    <link rel="stylesheet" href="/css/assign-clinicmanager.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="background"></div>
+<div class="clinicmanager-assign">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
+                <div class="dropdown-icon">▼</div>
+                <div class="user-dropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="/dashboard-clinicmanager" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/requestlist-clinicmanager" class="nav-link">
+                            <img src="/images/request-icon.png" alt="Request List" class="nav-icon">
+                            <span>Request List</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/patientlist-clinicmanager" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient List" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="/assign-clinicmanager" class="nav-link">
+                            <img src="/images/chart-icon.png" alt="Assign Advisers" class="nav-icon">
+                            <span>Assign Advisers</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <section class="section">
+                <div class="section-header">
+                    <h2>Assign Faculty Advisers to Clinicians</h2>
+                </div>
+                <div class="table-container">
+
+                    <!-- Hidden forms — one per clinician, associated via HTML5 form attribute -->
+                    <div style="display:none">
+                        <form th:each="row : ${assignmentRows}"
+                              th:id="'form-' + ${row.clinician.id}"
+                              th:action="@{/assign-clinicmanager/{id}(id=${row.clinician.id})}"
+                              method="post">
+                        </form>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="text-align:left;">Clinician</th>
+                                <th>OS Adviser</th>
+                                <th>ENDO Adviser</th>
+                                <th>PERIO Adviser</th>
+                                <th>RESTO Adviser</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="row : ${assignmentRows}">
+                                <td>
+                                    <a th:href="@{/clinician-profile/{id}(id=${row.clinician.id})}"
+                                       class="clinician-profile-link"
+                                       th:text="${row.clinician.fullName}"></a>
+                                </td>
+
+                                <!-- OS -->
+                                <td>
+                                    <select name="osFacultyId" class="assign-select"
+                                            th:attr="form='form-' + ${row.clinician.id}">
+                                        <option value="">— None —</option>
+                                        <option th:each="f : ${osFaculty}"
+                                                th:value="${f.id}"
+                                                th:text="${f.fullName}"
+                                                th:selected="${row.osFaculty != null and row.osFaculty.id == f.id}">
+                                        </option>
+                                    </select>
+                                </td>
+
+                                <!-- ENDO -->
+                                <td>
+                                    <select name="endoFacultyId" class="assign-select"
+                                            th:attr="form='form-' + ${row.clinician.id}">
+                                        <option value="">— None —</option>
+                                        <option th:each="f : ${endoFaculty}"
+                                                th:value="${f.id}"
+                                                th:text="${f.fullName}"
+                                                th:selected="${row.endoFaculty != null and row.endoFaculty.id == f.id}">
+                                        </option>
+                                    </select>
+                                </td>
+
+                                <!-- PERIO -->
+                                <td>
+                                    <select name="perioFacultyId" class="assign-select"
+                                            th:attr="form='form-' + ${row.clinician.id}">
+                                        <option value="">— None —</option>
+                                        <option th:each="f : ${perioFaculty}"
+                                                th:value="${f.id}"
+                                                th:text="${f.fullName}"
+                                                th:selected="${row.perioFaculty != null and row.perioFaculty.id == f.id}">
+                                        </option>
+                                    </select>
+                                </td>
+
+                                <!-- RESTO -->
+                                <td>
+                                    <select name="restoFacultyId" class="assign-select"
+                                            th:attr="form='form-' + ${row.clinician.id}">
+                                        <option value="">— None —</option>
+                                        <option th:each="f : ${restoFaculty}"
+                                                th:value="${f.id}"
+                                                th:text="${f.fullName}"
+                                                th:selected="${row.restoFaculty != null and row.restoFaculty.id == f.id}">
+                                        </option>
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <button type="submit" class="btn-save-row"
+                                            th:attr="form='form-' + ${row.clinician.id}">Save</button>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(assignmentRows)}">
+                                <td colspan="6" class="empty-state">No active clinicians found.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script>
+document.querySelector('.menu-icon').onclick = function() {
+    document.querySelector('.sidebar').classList.toggle('expanded');
+};
+
+document.querySelector('.user-profile').onclick = function(e) {
+    e.stopPropagation();
+    document.querySelector('.user-dropdown').classList.toggle('show');
+};
+
+document.addEventListener('click', function() {
+    const dropdown = document.querySelector('.user-dropdown');
+    if (dropdown && dropdown.classList.contains('show')) dropdown.classList.remove('show');
+});
+
+document.querySelector('.user-dropdown').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+</script>
+
+</body>
+</html>

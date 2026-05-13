@@ -28,7 +28,7 @@
                         <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
                     </svg>
                 </div>
-                <span class="username" th:text="${currentUser != null ? currentUser.firstName + ' ' + currentUser.lastName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
+                <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
                 <div class="dropdown-icon">▼</div>
                 <div class="user-dropdown">
                     <a href="/logout" class="dropdown-item">Logout</a>
@@ -61,12 +61,41 @@
                             <span>Patient List</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="/assign-clinicmanager" class="nav-link">
+                            <img src="/images/chart-icon.png" alt="Assign Advisers" class="nav-icon">
+                            <span>Assign Advisers</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
+
+            <!-- Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" th:text="${statTotalPatients}">0</div>
+                    <div class="stat-label">Total Patients</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" th:text="${statPendingRequests}">0</div>
+                    <div class="stat-label">Pending Requests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" th:text="${statClinicians}">0</div>
+                    <div class="stat-label">Active Clinicians</div>
+                </div>
+                <div class="stat-card stat-section">
+                    <div class="stat-label" style="margin-bottom:8px; font-weight:600;">Patients by Section</div>
+                    <div class="stat-section-row"><span>OS</span><span th:text="${statOS}">0</span></div>
+                    <div class="stat-section-row"><span>ENDO</span><span th:text="${statENDO}">0</span></div>
+                    <div class="stat-section-row"><span>PERIO</span><span th:text="${statPERIO}">0</span></div>
+                    <div class="stat-section-row"><span>RESTO</span><span th:text="${statRESTO}">0</span></div>
+                </div>
+            </div>
 
             <!-- Patient List -->
             <section class="section">
@@ -91,7 +120,18 @@
                                 <td th:text="${patient.surname + ', ' + patient.firstName + (patient.middleInitial != null ? ' ' + patient.middleInitial + '.' : '')}"></td>
                                 <td th:text="${patient.contactNumber}"></td>
                                 <td th:text="${patient.email}"></td>
-                                <td th:text="${patient.assignedClinician != null ? patient.assignedClinician.fullName : '—'}"></td>
+                                <td>
+                                    <span th:if="${patient.assignedClinician != null}"
+                                          class="clinician-link"
+                                          th:data-name="${patient.assignedClinician.fullName}"
+                                          th:data-email="${patient.assignedClinician.email}"
+                                          th:data-student="${patient.assignedClinician.studentNumber}"
+                                          th:data-year="${patient.assignedClinician.yearLevel}"
+                                          th:text="${patient.assignedClinician.fullName}"
+                                          onclick="showClinicianModal(this)">
+                                    </span>
+                                    <span th:if="${patient.assignedClinician == null}">—</span>
+                                </td>
                                 <td><a th:href="@{/chartsview-clinicmanager/{id}(id=${patient.id})}" class="btn-view">View Chart</a></td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(patients)}">

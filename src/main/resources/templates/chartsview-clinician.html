@@ -163,7 +163,7 @@
                                 <td class="status submitted">Submitted</td>
                                 <td th:text="${patient.createdAt != null ? patient.createdAt.toLocalDate() : '—'}"></td>
                                 <td><a th:href="@{/admitting-view-clinician/{id}(id=${patient.id})}" class="btn-action btn-view">View</a></td>
-                                <td>—</td>
+                                <td><a th:href="@{/admitting-edit-clinician/{id}(id=${patient.id})}" class="btn-action btn-edit">Edit</a></td>
                                 <td>—</td>
                                 <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
                             </tr>

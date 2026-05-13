@@ -10,6 +10,7 @@ import java.util.Optional;
 
 public interface PatientRepository extends JpaRepository<Patient, Long> {
     long countByRegistrationDate(LocalDate date);
+    long countByServiceCodeIgnoreCase(String serviceCode);
     List<Patient> findAllByOrderByCreatedAtDesc();
     Optional<Patient> findByChartNo(String chartNo);
     List<Patient> findByAssignedFacultyOrderByCreatedAtDesc(User faculty);

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Advisees - Faculty</title>
+    <link rel="stylesheet" href="/css/faculty-advisees.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="background"></div>
+<div class="faculty-advisees">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
+                <div class="dropdown-icon">▼</div>
+                <div class="user-dropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="/faculty-dashboard" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/faculty-assign" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17 21V19C17 17.9 16.1 17 15 17H9C7.9 17 7 17.9 7 19V21" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+                                <circle cx="12" cy="11" r="3" stroke="#333" stroke-width="2"/>
+                                <path d="M19 8L21 10L19 12" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M21 10H16" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span>Assign Patients</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/faculty-patientlist" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient List" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="/faculty-advisees" class="nav-link">
+                            <img src="/images/chart-icon.png" alt="My Advisees" class="nav-icon">
+                            <span>My Advisees</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <div class="page-header">
+                <h2 class="page-title">My Advisees
+                    <span class="section-badge" th:text="${section}"></span>
+                </h2>
+            </div>
+
+            <!-- No advisees state -->
+            <div class="empty-state" th:if="${#lists.isEmpty(advisees)}">
+                <p>No clinicians are currently assigned to you for the <strong th:text="${section}"></strong> section.</p>
+            </div>
+
+            <!-- Advisee list + detail -->
+            <div class="advisees-layout" th:if="${!#lists.isEmpty(advisees)}">
+
+                <!-- Left: scrollable advisee list -->
+                <aside class="advisee-list">
+                    <div class="advisee-list-header">Advisees <span class="count-badge" th:text="${#lists.size(advisees)}"></span></div>
+                    <div th:each="advisee, iterStat : ${advisees}"
+                         th:id="'list-item-' + ${advisee.id}"
+                         th:class="${iterStat.first} ? 'advisee-list-item active' : 'advisee-list-item'"
+                         th:onclick="'selectAdvisee(' + ${advisee.id} + ', this)'">
+                        <span class="advisee-name" th:text="${advisee.fullName}"></span>
+                        <span class="advisee-meta" th:text="${advisee.studentNumber != null ? advisee.studentNumber : ''}"></span>
+                        <span class="patient-count-badge" th:text="${#lists.size(patientsMap.get(advisee.id))} + ' patients'"></span>
+                    </div>
+                </aside>
+
+                <!-- Right: detail panel -->
+                <div class="advisee-detail">
+                    <div th:each="advisee, iterStat : ${advisees}"
+                         th:id="'panel-' + ${advisee.id}"
+                         th:class="${iterStat.first} ? 'detail-panel active' : 'detail-panel'">
+
+                        <div class="detail-header">
+                            <h3 th:text="${advisee.fullName}"></h3>
+                        </div>
+
+                        <!-- Advisee info strip -->
+                        <div class="advisee-info">
+                            <div class="info-item">
+                                <span class="info-label">Student No.</span>
+                                <span class="info-value" th:text="${advisee.studentNumber != null ? advisee.studentNumber : '—'}"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Year Level</span>
+                                <span class="info-value" th:text="${advisee.yearLevel != null ? advisee.yearLevel : '—'}"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Email</span>
+                                <span class="info-value" th:text="${advisee.email}"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Total Patients</span>
+                                <span class="info-value" th:text="${#lists.size(patientsMap.get(advisee.id))}"></span>
+                            </div>
+                        </div>
+
+                        <!-- Patient table -->
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Chart No.</th>
+                                        <th>Patient Name</th>
+                                        <th>Contact Number</th>
+                                        <th>Email</th>
+                                        <th>Section</th>
+                                        <th>View</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="p : ${patientsMap.get(advisee.id)}">
+                                        <td th:text="${p.chartNo}"></td>
+                                        <td th:text="${p.surname + ', ' + p.firstName + (p.middleInitial != null ? ' ' + p.middleInitial + '.' : '')}"></td>
+                                        <td th:text="${p.contactNumber}"></td>
+                                        <td th:text="${p.email}"></td>
+                                        <td th:text="${p.serviceCode}"></td>
+                                        <td><a th:href="@{/chartsview-faculty/{id}(id=${p.id})}" class="btn-view">View Chart</a></td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(patientsMap.get(advisee.id))}">
+                                        <td colspan="6" class="empty-row">No patients assigned to this clinician yet.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script>
+document.querySelector('.menu-icon').onclick = function() {
+    document.querySelector('.sidebar').classList.toggle('expanded');
+};
+document.querySelector('.user-profile').onclick = function(e) {
+    e.stopPropagation();
+    document.querySelector('.user-dropdown').classList.toggle('show');
+};
+document.addEventListener('click', function() {
+    const d = document.querySelector('.user-dropdown');
+    if (d && d.classList.contains('show')) d.classList.remove('show');
+});
+document.querySelector('.user-dropdown').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+
+function selectAdvisee(id, item) {
+    document.querySelectorAll('.detail-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.advisee-list-item').forEach(i => i.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    item.classList.add('active');
+}
+</script>
+</body>
+</html>

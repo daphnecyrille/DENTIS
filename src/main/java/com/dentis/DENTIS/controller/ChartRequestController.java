@@ -58,13 +58,13 @@ public class ChartRequestController {
         User clinician = getCurrentUser(authentication);
         model.addAttribute("currentUser", clinician);
         model.addAttribute("osCharts", clinician != null
-                ? oralSurgeryChartService.findByClinicianOrderByCreatedAtDesc(clinician).stream().limit(3).toList()
+                ? oralSurgeryChartService.findByClinicianOrderByCreatedAtDesc(clinician).stream().limit(5).toList()
                 : List.of());
         model.addAttribute("endoCharts", clinician != null
-                ? endodonticsChartService.findByClinicianOrderByCreatedAtDesc(clinician).stream().limit(3).toList()
+                ? endodonticsChartService.findByClinicianOrderByCreatedAtDesc(clinician).stream().limit(5).toList()
                 : List.of());
         model.addAttribute("perioCharts", clinician != null
-                ? periodonticChartService.findByClinicianOrderByCreatedAtDesc(clinician).stream().limit(3).toList()
+                ? periodonticChartService.findByClinicianOrderByCreatedAtDesc(clinician).stream().limit(5).toList()
                 : List.of());
         if (clinician != null) {
             for (Patient p : patientService.getPatientsForClinician(clinician)) {
@@ -76,7 +76,7 @@ public class ChartRequestController {
             }
         }
         model.addAttribute("operativeCharts", clinician != null
-                ? operativeChartService.findByClinicianOrderByCreatedAtDesc(clinician).stream().limit(3).toList()
+                ? operativeChartService.findByClinicianOrderByCreatedAtDesc(clinician).stream().limit(5).toList()
                 : List.of());
         model.addAttribute("operativeActionNeededCharts", clinician != null
                 ? operativeChartService.findForm1ActionNeededByClinician(clinician)
@@ -100,7 +100,7 @@ public class ChartRequestController {
                 ? periodonticChartService.findFormCActionNeededByClinician(clinician)
                 : List.of());
         model.addAttribute("requests", clinician != null
-                ? chartRequestService.getClinicianRequests(clinician).stream().limit(3).toList()
+                ? chartRequestService.getClinicianRequests(clinician).stream().limit(5).toList()
                 : List.of());
         return "dashboard-clinician";
     }

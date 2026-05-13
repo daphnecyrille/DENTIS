@@ -118,8 +118,24 @@ public class PatientService {
         return patientRepository.findAllByOrderByCreatedAtDesc();
     }
 
+    public long countAll() {
+        return patientRepository.count();
+    }
+
+    public long countBySection(String section) {
+        return patientRepository.countByServiceCodeIgnoreCase(section);
+    }
+
     public Patient getPatientById(Long id) {
         return patientRepository.findById(id).orElseThrow();
+    }
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElseThrow();
+    }
+
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
     }
 
     public Patient update(Long id, Patient updated) {

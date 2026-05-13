@@ -35,7 +35,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/css/**", "/images/**", "/js/**", "/login", "/oauth2/**").permitAll()
                 .requestMatchers(
-                    "/faculty-dashboard", "/faculty-assign", "/faculty-patientlist",
+                    "/faculty-dashboard", "/faculty-assign", "/faculty-patientlist", "/faculty-advisees",
                     "/chartsview-faculty/**", "/faculty-dashboard/**", "/admitting-view-faculty/**",
                     "/oralsurgery-view-faculty/**", "/oralsurgery2-view-faculty/**",
                     "/endodontics-view-faculty/**", "/endodontics2-view-faculty/**",

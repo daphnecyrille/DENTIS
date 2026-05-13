@@ -1,0 +1,220 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    min-height: 100vh;
+}
+
+.background {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background:
+        linear-gradient(rgba(217,217,217,0.9), rgba(217,217,217,0.9)),
+        url('/images/DentFacade.png') center/cover no-repeat;
+    z-index: -1;
+}
+
+.clinicmanager-assign {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* HEADER */
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: black;
+    color: white;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo { display: flex; align-items: center; gap: 15px; }
+.menu-icon { font-size: 22px; cursor: pointer; color: white; }
+.logo h1 { font-size: 35px; }
+.upm-logo { height: 45px; width: auto; }
+.header-right { display: flex; align-items: center; }
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    cursor: pointer;
+    position: relative;
+}
+
+.user-icon { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; }
+.username { font-size: 13px; }
+.dropdown-icon { font-size: 10px; margin-left: 2px; opacity: 0.8; }
+
+.user-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    min-width: 120px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    margin-top: 8px;
+}
+
+.user-dropdown.show { opacity: 1; visibility: visible; transform: translateY(0); }
+
+.dropdown-item {
+    display: block;
+    padding: 10px 16px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.dropdown-item:hover { background-color: #f5f5f5; }
+.dropdown-item:first-child { border-radius: 6px 6px 0 0; }
+.dropdown-item:last-child { border-radius: 0 0 6px 6px; }
+
+/* LAYOUT */
+.main-container { display: flex; }
+
+.main-content {
+    flex: 1;
+    padding: 20px 40px;
+    margin-left: 70px;
+    transition: margin-left 0.3s ease;
+}
+
+/* SIDEBAR */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 77px;
+    width: 70px;
+    height: calc(100vh - 77px);
+    background: #FFFFFF;
+    display: flex;
+    justify-content: center;
+    padding-top: 20px;
+    border-right: 1px solid #ccc;
+    transition: width 0.3s ease;
+    z-index: 100;
+}
+
+.sidebar.expanded { width: 220px; }
+.nav-menu ul { list-style: none; width: 100%; }
+.nav-item { margin: 10px 0; }
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    text-decoration: none;
+    color: #333;
+}
+
+.nav-icon { width: 30px; height: 30px; flex-shrink: 0; object-fit: contain; }
+.nav-link span { display: none; }
+
+.sidebar.expanded .nav-link { justify-content: flex-start; gap: 12px; padding: 10px 15px; }
+.sidebar.expanded .nav-link span { display: inline; font-size: 13px; }
+.nav-item.active { background: #f0f0f0; border-radius: 6px; }
+.nav-link:hover { background: #f5f5f5; border-radius: 6px; }
+
+/* SECTION */
+.section {
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.section-header {
+    background: #324966;
+    color: white;
+    padding: 12px 20px;
+    font-weight: 500;
+}
+
+/* TABLE */
+.table-container { padding: 10px 15px; overflow-x: auto; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead { background: #f1f1f1; }
+
+th {
+    text-align: center;
+    padding: 10px;
+    border-right: 1px solid #e9ecef;
+    border-bottom: 1px solid #e9ecef;
+    white-space: nowrap;
+}
+
+th:last-child { border-right: none; }
+
+td {
+    padding: 8px 10px;
+    border-right: 1px solid #e9ecef;
+    border-bottom: 1px solid #e9ecef;
+    text-align: center;
+    vertical-align: middle;
+}
+
+td:first-child { text-align: left; font-weight: 500; }
+td:last-child { border-right: none; }
+
+/* DROPDOWNS */
+.assign-select {
+    width: 100%;
+    min-width: 140px;
+    padding: 5px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: 'Poppins', sans-serif;
+    background: white;
+    color: #333;
+    cursor: pointer;
+}
+
+.assign-select:focus { outline: none; border-color: #324966; }
+
+/* SAVE BUTTON */
+.btn-save-row {
+    background: #061F40;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn-save-row:hover { background: #2c5282; }
+
+/* EMPTY STATE */
+.empty-state { text-align: center; color: #888; padding: 20px; }
+
+.clinician-profile-link {
+    color: #324966;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-weight: 500;
+}
