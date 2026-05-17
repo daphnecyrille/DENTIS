@@ -129,6 +129,9 @@ public class OralSurgeryChart {
     private String otherDiagnosticAids;
     private String checkedBy;
 
+    @Column(columnDefinition = "TEXT")
+    private String revisionReason;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 }

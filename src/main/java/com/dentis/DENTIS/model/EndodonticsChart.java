@@ -170,6 +170,12 @@ public class EndodonticsChart {
 
     private String epaLevel;
 
+    @Column(columnDefinition = "TEXT")
+    private String revisionReason;
+
+    @Column(columnDefinition = "TEXT")
+    private String form2RevisionReason;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 }

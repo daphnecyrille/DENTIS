@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Prosthodontics - DentIS</title>
+    <link rel="stylesheet" href="/css/prosthodontics-clinician.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div class="background"></div>
+<div class="operative-page">
+
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
+                <div class="dropdown-icon">&#9660;</div>
+                <div class="user-dropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
+                    <li class="nav-item"><a href="/dashboard-clinicmanager" class="nav-link"><img src="/images/home-icon.png" alt="Home" class="nav-icon"><span>Home</span></a></li>
+                    <li class="nav-item"><a href="/requestlist-clinicmanager" class="nav-link"><img src="/images/request-icon.png" alt="Request List" class="nav-icon"><span>Request List</span></a></li>
+                    <li class="nav-item active"><a href="/patientlist-clinicmanager" class="nav-link"><img src="/images/patient-icon.png" alt="Patient List" class="nav-icon"><span>Patient List</span></a></li>
+                    <li class="nav-item"><a href="/assign-clinicmanager" class="nav-link"><img src="/images/chart-icon.png" alt="Assign Advisers" class="nav-icon"><span>Assign Advisers</span></a></li>
+                </ul>
+                <ul th:unless="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
+                    <li class="nav-item"><a href="/faculty-dashboard" class="nav-link"><img src="/images/home-icon.png" alt="Home" class="nav-icon"><span>Home</span></a></li>
+                    <li class="nav-item"><a href="/faculty-assign" class="nav-link"><img src="/images/chart-icon.png" alt="Assign" class="nav-icon"><span>Assign Patients</span></a></li>
+                    <li class="nav-item active"><a href="/faculty-patientlist" class="nav-link"><img src="/images/patient-icon.png" alt="Patient List" class="nav-icon"><span>Patient List</span></a></li>
+                    <li class="nav-item"><a href="/faculty-advisees" class="nav-link"><img src="/images/chart-icon.png" alt="My Advisees" class="nav-icon"><span>My Advisees</span></a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h2 class="page-title">Prosthodontics</h2>
+
+            <!-- Grade saved confirmation -->
+            <div th:if="${param.graded}" style="background:#d4edda; border-left:5px solid #28a745; padding:12px 20px; margin:0 0 20px 0; border-radius:6px; font-size:13px; color:#155724;">
+                Grade saved successfully.
+            </div>
+
+            <div class="form-card">
+                <div class="form-banner">Evaluation of Clinical Competencies in Prosthodontics</div>
+                <div class="form-body">
+
+                    <!-- Case Info -->
+                    <div class="case-type-box">
+                        <div style="display:flex; gap:32px; flex-wrap:wrap; margin-bottom:14px;">
+                            <div>
+                                <strong style="font-size:13px;">Case Type:</strong>
+                                <span style="font-size:14px; font-weight:600; color:#7a4e2d; margin-left:8px;" th:text="${chart.caseType}">CD</span>
+                            </div>
+                            <div><strong style="font-size:13px;">Case:</strong> <span th:text="${chart.caseNumber}">—</span></div>
+                            <div><strong style="font-size:13px;">Status:</strong>
+                                <span th:text="${chart.status.displayName}"
+                                      th:classappend="${chart.status.name() == 'APPROVED' ? 'status approved' : (chart.status.name() == 'SUBMITTED' ? 'status submitted' : (chart.status.name() == 'REVISE' ? 'status denied' : 'status pending'))}"
+                                      style="margin-left:6px; padding:2px 10px; border-radius:12px; font-size:12px;">—</span>
+                            </div>
+                        </div>
+                        <div th:if="${chart.caseType == 'RPD'}">
+                            <div class="rpd-options">
+                                <label><input type="checkbox" th:checked="${chart.rpdMxWithFramework}" disabled> Mx w/ Framework</label>
+                                <label><input type="checkbox" th:checked="${chart.rpdMxWithout}" disabled> Mx w/o Framework</label>
+                                <label><input type="checkbox" th:checked="${chart.rpdMdWithFramework}" disabled> Md w/ Framework</label>
+                                <label><input type="checkbox" th:checked="${chart.rpdMdWithout}" disabled> Md w/o Framework</label>
+                            </div>
+                        </div>
+                        <div class="cover-grid" style="margin-top:14px;">
+                            <div><label style="font-size:12px; font-weight:500;">Started</label><div th:text="${chart.startedDate}">—</div></div>
+                            <div><label style="font-size:12px; font-weight:500;">Finished</label><div th:text="${chart.finishedDate}">—</div></div>
+                            <div>
+                                <label style="font-size:12px; font-weight:500;">Grade</label>
+                                <input type="text" name="grade" form="gradeForm" th:value="${chart.grade}" placeholder="—"
+                                       style="width:70px; padding:4px 8px; border:1px solid #ccc; border-radius:4px; font-size:12px; font-family:'Poppins',sans-serif; pointer-events:auto;">
+                            </div>
+                            <div><label style="font-size:12px; font-weight:500;">Cleared by</label><div th:text="${chart.clearedBy}">—</div></div>
+                            <div><label style="font-size:12px; font-weight:500;">Cleared Date</label><div th:text="${chart.clearedDate}">—</div></div>
+                        </div>
+                    </div>
+
+                    <!-- Procedure Table (view-only) -->
+                    <div class="section-header">Procedure Records</div>
+                    <div style="overflow-x:auto;">
+                    <table class="upload-table">
+                        <thead>
+                            <tr><th>Procedure</th><th>Date</th><th>Document / Photo</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Patient Consent</td><td>—</td><td>
+                                <a th:if="${chart.patientConsentFilePath != null}" th:href="${chart.patientConsentFilePath}" target="_blank">View file</a>
+                                <span th:unless="${chart.patientConsentFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
+                            </td></tr>
+                            <tr><td>Patient Workup</td><td th:text="${chart.patientWorkupDate}">—</td><td>
+                                <a th:if="${chart.patientWorkupFilePath != null}" th:href="${chart.patientWorkupFilePath}" target="_blank">View file</a>
+                                <span th:unless="${chart.patientWorkupFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
+                            </td></tr>
+                            <tr><td>Primary Impression and Diagnostic Cast</td><td th:text="${chart.primaryImpressionDate}">—</td><td>
+                                <a th:if="${chart.primaryImpressionFilePath != null}" th:href="${chart.primaryImpressionFilePath}" target="_blank">View file</a>
+                                <span th:unless="${chart.primaryImpressionFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
+                            </td></tr>
+                            <tr><td>Individual Tray <span th:if="${chart.individualTrayNotApplicable}" style="font-size:11px; color:#888;">(N/A)</span></td><td th:text="${chart.individualTrayDate}">—</td><td>
+                                <a th:if="${chart.individualTrayFilePath != null}" th:href="${chart.individualTrayFilePath}" target="_blank">View file</a>
+                                <span th:unless="${chart.individualTrayFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
+                            </td></tr>
+                            <tr><td>Mouth Preparations <span th:if="${chart.mouthPreparationsNotApplicable}" style="font-size:11px; color:#888;">(N/A)</span></td><td th:text="${chart.mouthPreparationsDate}">—</td><td>
+                                <span th:if="${chart.mouthPreparationsList != null}" th:text="${chart.mouthPreparationsList}" style="font-size:12px; white-space:pre-wrap;"></span>
+                            </td></tr>
+                            <tr><td>Final Impression and Master Cast</td><td th:text="${chart.finalImpressionDate}">—</td><td>
+                                <a th:if="${chart.finalImpressionFilePath != null}" th:href="${chart.finalImpressionFilePath}" target="_blank">View file</a>
+                                <span th:unless="${chart.finalImpressionFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
+                            </td></tr>
+                            <tr><td>Inspection of Wax Pattern from Laboratory <span th:if="${chart.waxPatternLabNotApplicable}" style="font-size:11px; color:#888;">(N/A)</span></td><td th:text="${chart.waxPatternLabDate}">—</td><td>
+                                <a th:if="${chart.waxPatternLabFilePath != null}" th:href="${chart.waxPatternLabFilePath}" target="_blank">View file</a>
+                                <span th:unless="${chart.waxPatternLabFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
+                            </td></tr>
+                            <tr><td>Wax Pattern on Diagnostic Cast <span th:if="${chart.waxPatternDiagNotApplicable}" style="font-size:11px; color:#888;">(N/A)</span></td><td th:text="${chart.waxPatternDiagDate}">—</td><td>
+                                <a th:if="${chart.waxPatternDiagFilePath != null}" th:href="${chart.waxPatternDiagFilePath}" target="_blank">View file</a>
+                                <span th:unless="${chart.waxPatternDiagFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
+                            </td></tr>
+                            <tr><td>Inspection and Fitting of Metal Framework <span th:if="${chart.metalFrameworkNotApplicable}" style="font-size:11px; color:#888;">(N/A)</span></td><td th:text="${chart.metalFrameworkDate}">—</td><td>
+                                <a th:if="${chart.metalFrameworkFilePath != null}" th:href="${chart.metalFrameworkFilePath}" target="_blank">View file</a>
+                                <span th:unless="${chart.metalFrameworkFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
+                            </td></tr>
+                            <tr><td>Trial Denture Base <span th:if="${chart.trialDentureBaseNotApplicable}" style="font-size:11px; color:#888;">(N/A)</span></td><td th:text="${chart.trialDentureBaseDate}">—</td><td>
+                                <a th:if="${chart.trialDentureBaseFilePath != null}" th:href="${chart.trialDentureBaseFilePath}" target="_blank">View file</a>
+                                <span th:unless="${chart.trialDentureBaseFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
+                            </td></tr>
+                            <tr><td>Development of Maxillary and Mandibular OCR</td><td th:text="${chart.ocrDate}">—</td><td>
+                                <a th:if="${chart.ocrFilePath != null}" th:href="${chart.ocrFilePath}" target="_blank">View file</a>
+                                <span th:unless="${chart.ocrFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
+                            </td></tr>
+                            <tr><td>Positional Relations</td><td th:text="${chart.positionalRelationsDate}">—</td><td>
+                                <a th:if="${chart.positionalRelationsFilePath != null}" th:href="${chart.positionalRelationsFilePath}" target="_blank">View file</a>
+                                <span th:unless="${chart.positionalRelationsFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
+                            </td></tr>
+                            <tr><td>Mounting</td><td th:text="${chart.mountingDate}">—</td><td>
+                                <a th:if="${chart.mountingFilePath != null}" th:href="${chart.mountingFilePath}" target="_blank">View file</a>
+                                <span th:unless="${chart.mountingFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
+                            </td></tr>
+                            <tr><td>Anterior Setup <span th:if="${chart.anteriorSetupNotApplicable}" style="font-size:11px; color:#888;">(N/A)</span></td><td th:text="${chart.anteriorSetupDate}">—</td><td>
+                                <div style="font-size:12px;">Mould: <span th:text="${chart.anteriorSetupMould}">—</span> &nbsp; Shade: <span th:text="${chart.anteriorSetupShade}">—</span></div>
+                                <a th:if="${chart.anteriorSetupFilePath != null}" th:href="${chart.anteriorSetupFilePath}" target="_blank">View file</a>
+                                <span th:unless="${chart.anteriorSetupFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
+                            </td></tr>
+                            <tr><td>Anterior Try-in <span th:if="${chart.anteriorTryInNotApplicable}" style="font-size:11px; color:#888;">(N/A)</span></td><td th:text="${chart.anteriorTryInDate}">—</td><td>
+                                <a th:if="${chart.anteriorTryInFilePath != null}" th:href="${chart.anteriorTryInFilePath}" target="_blank">View file</a>
+                                <span th:unless="${chart.anteriorTryInFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
+                                <div th:if="${chart.anteriorTryInSignaturePath != null}" style="margin-top:4px;"><a th:href="${chart.anteriorTryInSignaturePath}" target="_blank" style="font-size:12px;">View patient signature</a></div>
+                            </td></tr>
+                            <tr><td>Protrusive Records Taking <span th:if="${chart.protrusiveRecordsNotApplicable}" style="font-size:11px; color:#888;">(N/A)</span></td><td th:text="${chart.protrusiveRecordsDate}">—</td><td>
+                                <div style="font-size:12px;">HCA — Right: <span th:text="${chart.hcaRight}">—</span> &nbsp; Left: <span th:text="${chart.hcaLeft}">—</span></div>
+                                <div style="font-size:12px;">LCA — Right: <span th:text="${chart.lcaRight}">—</span> &nbsp; Left: <span th:text="${chart.lcaLeft}">—</span></div>
+                            </td></tr>
+                            <tr><td>Posterior Setup</td><td th:text="${chart.posteriorSetupDate}">—</td><td>
+                                <div style="font-size:12px;">Mould: <span th:text="${chart.posteriorSetupMould}">—</span> &nbsp; Shade: <span th:text="${chart.posteriorSetupShade}">—</span></div>
+                                <a th:if="${chart.posteriorSetupFilePath != null}" th:href="${chart.posteriorSetupFilePath}" target="_blank">View file</a>
+                                <span th:unless="${chart.posteriorSetupFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
+                            </td></tr>
+                            <tr><td>Posterior Try-in</td><td th:text="${chart.posteriorTryInDate}">—</td><td>
+                                <a th:if="${chart.posteriorTryInFilePath != null}" th:href="${chart.posteriorTryInFilePath}" target="_blank">View file</a>
+                                <span th:unless="${chart.posteriorTryInFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
+                                <div th:if="${chart.posteriorTryInSignaturePath != null}" style="margin-top:4px;"><a th:href="${chart.posteriorTryInSignaturePath}" target="_blank" style="font-size:12px;">View patient signature</a></div>
+                            </td></tr>
+                            <tr><td>Wax-up and Festooning</td><td th:text="${chart.waxUpDate}">—</td><td>
+                                <a th:if="${chart.waxUpFilePath != null}" th:href="${chart.waxUpFilePath}" target="_blank">View file</a>
+                                <span th:unless="${chart.waxUpFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
+                            </td></tr>
+                            <tr><td>Processing</td><td th:text="${chart.processingDate}">—</td><td>
+                                <a th:if="${chart.processingFilePath != null}" th:href="${chart.processingFilePath}" target="_blank">View file</a>
+                                <span th:unless="${chart.processingFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
+                            </td></tr>
+                            <tr><td>CEF, Trimming and Polishing</td><td th:text="${chart.cefDate}">—</td><td>
+                                <a th:if="${chart.cefFilePath != null}" th:href="${chart.cefFilePath}" target="_blank">View file</a>
+                                <span th:unless="${chart.cefFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
+                            </td></tr>
+                            <tr><td>Installation</td><td th:text="${chart.installationDate}">—</td><td>
+                                <a th:if="${chart.installationFilePath != null}" th:href="${chart.installationFilePath}" target="_blank">View file</a>
+                                <span th:unless="${chart.installationFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
+                                <div th:if="${chart.installationSignaturePath != null}" style="margin-top:4px;"><a th:href="${chart.installationSignaturePath}" target="_blank" style="font-size:12px;">View patient signature</a></div>
+                            </td></tr>
+                            <tr><td>Post-installation Recall</td><td th:text="${chart.postInstallationDate}">—</td><td>
+                                <a th:if="${chart.postInstallationFilePath != null}" th:href="${chart.postInstallationFilePath}" target="_blank">View file</a>
+                                <span th:unless="${chart.postInstallationFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
+                                <div th:if="${chart.postInstallationSignaturePath != null}" style="margin-top:4px;"><a th:href="${chart.postInstallationSignaturePath}" target="_blank" style="font-size:12px;">View patient signature</a></div>
+                            </td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+
+                    <!-- Remarks -->
+                    <div style="margin-top:20px;" th:if="${chart.remarks != null and !#strings.isEmpty(chart.remarks)}">
+                        <strong style="font-size:13px; color:#5a3e28;">Remarks:</strong>
+                        <p style="font-size:13px; margin:6px 0 0 0;" th:text="${chart.remarks}"></p>
+                    </div>
+
+                </div>
+
+                <!-- Faculty Actions -->
+                <div class="form-actions" style="pointer-events:auto; width:100%; padding:0 45px 20px 45px; box-sizing:border-box;">
+                    <form id="gradeForm" th:action="@{/prosthodontics-faculty/{id}/grade(id=${chart.id})}" method="post" style="display:none;"></form>
+                    <button type="submit" form="gradeForm" class="btn-save">Save Grade</button>
+
+                    <form th:if="${chart.status.name() == 'SUBMITTED'}"
+                          th:action="@{/prosthodontics-faculty/{id}/approve(id=${chart.id})}" method="post" style="display:inline;">
+                        <button type="submit" class="btn-save" style="background:#4a7c59;">Approve</button>
+                    </form>
+
+                    <button th:if="${chart.status.name() == 'SUBMITTED'}"
+                            type="button" class="btn-save"
+                            th:data-action="@{/prosthodontics-faculty/{id}/revise(id=${chart.id})}"
+                            onclick="openReviseModal(this)"
+                            style="background:#c0392b;">Revise</button>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Revise Modal -->
+<div id="reviseModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:2000; align-items:center; justify-content:center;">
+    <div style="background:white; border-radius:10px; padding:28px 32px; width:420px; max-width:90vw; box-shadow:0 8px 32px rgba(0,0,0,0.18);">
+        <h3 style="margin:0 0 8px 0; font-size:16px; color:#2d2d2d;">Request Revision</h3>
+        <p style="margin:0 0 16px 0; font-size:13px; color:#555;">Please provide a reason so the clinician knows what to correct.</p>
+        <form id="reviseForm" method="post">
+            <textarea id="revisionReasonInput" name="revisionReason" rows="4"
+                      style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; font-size:13px; font-family:'Poppins',sans-serif; resize:vertical; box-sizing:border-box;"
+                      placeholder="Enter revision reason..."></textarea>
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
+                <button type="button" onclick="closeReviseModal()"
+                        style="padding:8px 20px; border:1px solid #ccc; border-radius:6px; background:white; cursor:pointer; font-size:13px;">Cancel</button>
+                <button type="submit" id="reviseSubmitBtn"
+                        style="padding:8px 20px; background:#c0392b; color:white; border:none; border-radius:6px; cursor:pointer; font-size:13px;">Confirm Revision</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.querySelector('.menu-icon').onclick = function() {
+    document.querySelector('.sidebar').classList.toggle('expanded');
+};
+document.querySelector('.user-profile').onclick = function(e) {
+    e.stopPropagation();
+    document.querySelector('.user-dropdown').classList.toggle('show');
+};
+document.addEventListener('click', function() {
+    const d = document.querySelector('.user-dropdown');
+    if (d && d.classList.contains('show')) d.classList.remove('show');
+});
+document.querySelector('.user-dropdown').addEventListener('click', function(e) { e.stopPropagation(); });
+
+function openReviseModal(btn) {
+    document.getElementById('reviseForm').action = btn.getAttribute('data-action');
+    document.getElementById('revisionReasonInput').value = '';
+    const modal = document.getElementById('reviseModal');
+    modal.style.display = 'flex';
+}
+function closeReviseModal() {
+    document.getElementById('reviseModal').style.display = 'none';
+}
+document.getElementById('reviseModal').addEventListener('click', function(e) {
+    if (e.target === this) closeReviseModal();
+});
+document.getElementById('reviseForm').addEventListener('submit', function(e) {
+    if (!document.getElementById('revisionReasonInput').value.trim()) {
+        e.preventDefault();
+        alert('Please enter a revision reason.');
+    }
+});
+</script>
+
+</body>
+</html>

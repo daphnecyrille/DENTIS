@@ -41,7 +41,33 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <nav class="nav-menu">
-                <ul>
+                <ul th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
+                    <li class="nav-item">
+                        <a href="/dashboard-clinicmanager" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/requestlist-clinicmanager" class="nav-link">
+                            <img src="/images/request-icon.png" alt="Request List" class="nav-icon">
+                            <span>Request List</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="/patientlist-clinicmanager" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient List" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/assign-clinicmanager" class="nav-link">
+                            <img src="/images/chart-icon.png" alt="Assign Advisers" class="nav-icon">
+                            <span>Assign Advisers</span>
+                        </a>
+                    </li>
+                </ul>
+                <ul th:unless="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
                     <li class="nav-item">
                         <a href="/clinician-dashboard" class="nav-link">
                             <img src="/images/home-icon.png" alt="Home" class="nav-icon">
@@ -68,6 +94,11 @@
         <main class="main-content">
 
             <h2 class="page-title">Clinical Periodontics</h2>
+            <div th:if="${chart.status != null and chart.status.name() == 'REVISE' and chart.revisionReason != null and !#strings.isEmpty(chart.revisionReason)}"
+                 style="background:#fff3cd; border-left:5px solid #e6a817; padding:14px 24px; margin:0 0 28px 0; font-family:'Poppins',sans-serif; border-radius:6px;">
+                <strong style="font-size:13px; color:#856404; display:block; margin-bottom:4px;">Revision Required</strong>
+                <p style="margin:0; font-size:13px; color:#533f03;" th:text="${chart.revisionReason}"></p>
+            </div>
 
             <div class="form-card">
 
@@ -250,8 +281,10 @@
 
                     <!-- Navigation -->
                     <div class="form-actions">
-                        <a th:if="${viewOnly}" th:href="@{/periodontics-a/{id}/view(id=${chart.id})}" class="btn-back">Back</a>
-                        <a th:if="${!viewOnly}" th:href="@{/periodontics-a/{id}(id=${chart.id})}" class="btn-back">Back</a>
+                        <a th:if="${viewOnly and currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}"
+                           th:href="@{/chartsview-clinicmanager/{id}(id=${chart.patient.id})}" class="btn-next">Back to Charts View</a>
+                        <a th:if="${viewOnly}" th:href="@{/periodontics-a/{id}/view(id=${chart.id})}" class="btn-next">Back</a>
+                        <a th:if="${!viewOnly}" th:href="@{/periodontics-a/{id}(id=${chart.id})}" class="btn-next">Back</a>
                         <button th:if="${!viewOnly}" type="submit" class="btn-submit">Save</button>
                     </div>
 

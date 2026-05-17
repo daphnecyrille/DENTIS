@@ -39,7 +39,8 @@ public class ClinicianFacultyAssignmentService {
                 getFacultyForSection(clinician, "OS"),
                 getFacultyForSection(clinician, "ENDO"),
                 getFacultyForSection(clinician, "PERIO"),
-                getFacultyForSection(clinician, "RESTO")
+                getFacultyForSection(clinician, "RESTO"),
+                getFacultyForSection(clinician, "PROSTHO")
         );
     }
 
@@ -50,7 +51,8 @@ public class ClinicianFacultyAssignmentService {
                 getFacultyForSection(clinician, "OS"),
                 getFacultyForSection(clinician, "ENDO"),
                 getFacultyForSection(clinician, "PERIO"),
-                getFacultyForSection(clinician, "RESTO")
+                getFacultyForSection(clinician, "RESTO"),
+                getFacultyForSection(clinician, "PROSTHO")
         )).toList();
     }
 
@@ -61,12 +63,13 @@ public class ClinicianFacultyAssignmentService {
     }
 
     public void saveAssignment(Long clinicianId, Long osFacultyId, Long endoFacultyId,
-                                Long perioFacultyId, Long restoFacultyId) {
+                                Long perioFacultyId, Long restoFacultyId, Long prosthoFacultyId) {
         User clinician = userRepository.findById(clinicianId).orElseThrow();
         upsert(clinician, "OS", osFacultyId);
         upsert(clinician, "ENDO", endoFacultyId);
         upsert(clinician, "PERIO", perioFacultyId);
         upsert(clinician, "RESTO", restoFacultyId);
+        upsert(clinician, "PROSTHO", prosthoFacultyId);
     }
 
     private void upsert(User clinician, String section, Long facultyId) {

@@ -206,4 +206,10 @@ public class OperativeChart {
     private Boolean recallLowRisk;
     private Boolean recallModerateRisk;
     private Boolean recallHighRisk;
+
+    @Column(columnDefinition = "TEXT")
+    private String revisionReason;
+
+    @Column(columnDefinition = "TEXT")
+    private String form2RevisionReason;
 }

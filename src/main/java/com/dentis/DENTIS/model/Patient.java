@@ -86,6 +86,11 @@ public class Patient {
     @JoinColumn(name = "assigned_clinician_id")
     private User assignedClinician;
 
+    /** Non-null only for recall visits — points to the original patient record. */
+    @ManyToOne
+    @JoinColumn(name = "original_patient_id")
+    private Patient originalPatient;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 }

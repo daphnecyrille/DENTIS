@@ -10,6 +10,7 @@ import com.dentis.DENTIS.service.OperativeChartService;
 import com.dentis.DENTIS.service.OralSurgeryChartService;
 import com.dentis.DENTIS.service.PatientService;
 import com.dentis.DENTIS.service.PeriodonticChartService;
+import com.dentis.DENTIS.service.ProsthodonticsChartService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
@@ -28,6 +29,7 @@ public class ChartRequestController {
     private final OperativeChartService operativeChartService;
     private final PeriodonticChartService periodonticChartService;
     private final UserRepository userRepository;
+    private final ProsthodonticsChartService prosthodonticsChartService;
 
     public ChartRequestController(ChartRequestService chartRequestService,
                                    OperativeChartService operativeChartService,
@@ -35,7 +37,8 @@ public class ChartRequestController {
                                   OralSurgeryChartService oralSurgeryChartService,
                                   EndodonticsChartService endodonticsChartService,
                                   PeriodonticChartService periodonticChartService,
-                                  UserRepository userRepository) {
+                                  UserRepository userRepository,
+                                  ProsthodonticsChartService prosthodonticsChartService) {
         this.chartRequestService = chartRequestService;
         this.patientService = patientService;
         this.oralSurgeryChartService = oralSurgeryChartService;
@@ -43,6 +46,7 @@ public class ChartRequestController {
         this.operativeChartService = operativeChartService;
         this.periodonticChartService = periodonticChartService;
         this.userRepository = userRepository;
+        this.prosthodonticsChartService = prosthodonticsChartService;
     }
 
     private User getCurrentUser(Authentication authentication) {
@@ -99,8 +103,17 @@ public class ChartRequestController {
         model.addAttribute("periocActionNeededCharts", clinician != null
                 ? periodonticChartService.findFormCActionNeededByClinician(clinician)
                 : List.of());
+        model.addAttribute("prosthoCharts", clinician != null
+                ? prosthodonticsChartService.findByClinicianOrderByCreatedAtDesc(clinician).stream().limit(5).toList()
+                : List.of());
+        model.addAttribute("prosthoActionNeededCharts", clinician != null
+                ? prosthodonticsChartService.findActionNeededByClinician(clinician)
+                : List.of());
         model.addAttribute("requests", clinician != null
                 ? chartRequestService.getClinicianRequests(clinician).stream().limit(5).toList()
+                : List.of());
+        model.addAttribute("recentPatients", clinician != null
+                ? patientService.getPatientsForClinician(clinician).stream().limit(5).toList()
                 : List.of());
         return "dashboard-clinician";
     }
@@ -117,6 +130,7 @@ public class ChartRequestController {
     public String showForm(Model model, Authentication authentication) {
         User clinician = getCurrentUser(authentication);
         model.addAttribute("chartRequest", new ChartRequest());
+        model.addAttribute("currentUser", clinician);
         model.addAttribute("requests", clinician != null
                 ? chartRequestService.getClinicianRequests(clinician)
                 : List.of());
@@ -174,6 +188,9 @@ public class ChartRequestController {
         model.addAttribute("operativeCharts", clinician != null
                 ? operativeChartService.findByClinicianOrderByCreatedAtDesc(clinician)
                 : List.of());
+        model.addAttribute("prosthoCharts", clinician != null
+                ? prosthodonticsChartService.findByClinicianOrderByCreatedAtDesc(clinician)
+                : List.of());
         return "patientlist-clinician";
     }
 
@@ -202,6 +219,13 @@ public class ChartRequestController {
             operativeChartService.createForPatient(patient, patient.getAssignedClinician(), patient.getAssignedFaculty());
         }
         model.addAttribute("operativeCharts", operativeChartService.findAllByPatient(patient));
+        if (("CD".equalsIgnoreCase(patient.getServiceCode()) || "RPD".equalsIgnoreCase(patient.getServiceCode()))
+                && prosthodonticsChartService.findAllByPatient(patient).isEmpty()
+                && patient.getAssignedClinician() != null
+                && patient.getAssignedFaculty() != null) {
+            prosthodonticsChartService.createForPatient(patient, patient.getAssignedClinician(), patient.getAssignedFaculty());
+        }
+        model.addAttribute("prosthoCharts", prosthodonticsChartService.findAllByPatient(patient));
         return "chartsview-clinician";
     }
 }

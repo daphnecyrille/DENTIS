@@ -28,7 +28,8 @@ public class OralSurgeryChartService {
         chart.setClinician(clinician);
         chart.setFaculty(faculty);
         chart.setChartType(chartType);
-        chart.setChartNo(generateChartNo(chartType));
+        String suffix = chartType == OralSurgeryChartType.OSF2 ? "OS2" : "OS1";
+        chart.setChartNo(patient.getChartNo() + "-" + suffix);
         chart.setChiefComplaint(patient.getChiefComplaint());
         return repo.save(chart);
     }
@@ -145,9 +146,10 @@ public class OralSurgeryChartService {
         return repo.save(chart);
     }
 
-    public OralSurgeryChart revise(Long id) {
+    public OralSurgeryChart revise(Long id, String reason) {
         OralSurgeryChart chart = repo.findById(id).orElseThrow();
         chart.setStatus(OralSurgeryChartStatus.REVISE);
+        chart.setRevisionReason(reason);
         return repo.save(chart);
     }
 }

@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Prosthodontics - DentIS</title>
+    <link rel="stylesheet" href="/css/prosthodontics-clinician.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div class="background"></div>
+<div class="operative-page">
+
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
+                <div class="dropdown-icon">&#9660;</div>
+                <div class="user-dropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="/clinician-dashboard" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/chartrequest-clinician" class="nav-link">
+                            <img src="/images/request-icon.png" alt="Chart" class="nav-icon2">
+                            <span>Chart Request</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/patientlist-clinician" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h2 class="page-title">Prosthodontics Dentistry</h2>
+
+            <div th:if="${chart.status != null and chart.status.name() == 'REVISE' and chart.revisionReason != null and !#strings.isEmpty(chart.revisionReason)}"
+                 style="background:#fff3cd; border-left:5px solid #e6a817; padding:14px 24px; margin:0 0 28px 0; font-family:'Poppins',sans-serif; border-radius:6px;">
+                <strong style="font-size:13px; color:#856404; display:block; margin-bottom:4px;">Revision Required</strong>
+                <p style="margin:0; font-size:13px; color:#533f03;" th:text="${chart.revisionReason}"></p>
+            </div>
+
+            <div th:if="${uploadError}" style="background:#fdecea;color:#c0392b;padding:10px 18px;border-radius:6px;margin-bottom:12px;font-size:13px;"
+                 th:text="${uploadError}"></div>
+
+            <form th:action="@{/prosthodontics-clinician/{id}(id=${chart.id})}"
+                  th:object="${chart}" method="post" enctype="multipart/form-data">
+            <div class="form-card">
+                <div class="form-banner">Evaluation of Clinical Competencies in Prosthodontics</div>
+
+                <div class="form-body">
+                <div th:style="${viewOnly} ? 'pointer-events:none;' : ''">
+
+                    <!-- Case Type & Cover Info -->
+                    <div class="case-type-box">
+                        <div style="display:flex; gap:32px; flex-wrap:wrap; margin-bottom:14px;">
+                            <div>
+                                <strong style="font-size:13px;">Case Type:</strong>
+                                <span style="font-size:14px; font-weight:600; color:#7a4e2d; margin-left:8px;"
+                                      th:text="${chart.caseType}">CD</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <label style="font-size:13px;">Case:</label>
+                                <select th:field="*{caseNumber}" style="padding:4px 8px; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+                                    <option value="">—</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- RPD sub-options (only shown for RPD) -->
+                        <div th:if="${chart.caseType == 'RPD'}">
+                            <strong style="font-size:13px; display:block; margin-bottom:6px;">RPD Options:</strong>
+                            <div class="rpd-options">
+                                <label><input type="checkbox" th:field="*{rpdMxWithFramework}"> Mx w/ Framework</label>
+                                <label><input type="checkbox" th:field="*{rpdMxWithout}"> Mx w/o Framework</label>
+                                <label><input type="checkbox" th:field="*{rpdMdWithFramework}"> Md w/ Framework</label>
+                                <label><input type="checkbox" th:field="*{rpdMdWithout}"> Md w/o Framework</label>
+                            </div>
+                        </div>
+
+                        <div class="cover-grid" style="margin-top:14px;">
+                            <div>
+                                <label style="font-size:12px; font-weight:500;">Started</label>
+                                <input type="date" th:field="*{startedDate}" class="date-picker" th:readonly="${viewOnly}">
+                            </div>
+                            <div>
+                                <label style="font-size:12px; font-weight:500;">Finished</label>
+                                <input type="date" th:field="*{finishedDate}" class="date-picker" th:readonly="${viewOnly}">
+                            </div>
+                            <div>
+                                <label style="font-size:12px; font-weight:500;">Grade</label>
+                                <input type="text" th:field="*{grade}" class="text-input-small" readonly style="background:#f5f5f5;">
+                            </div>
+                            <div>
+                                <label style="font-size:12px; font-weight:500;">Cleared by (SGN)</label>
+                                <input type="text" th:field="*{clearedBy}" class="text-input-small" th:readonly="${viewOnly}">
+                            </div>
+                            <div>
+                                <label style="font-size:12px; font-weight:500;">Cleared Date</label>
+                                <input type="date" th:field="*{clearedDate}" class="date-picker" th:readonly="${viewOnly}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Procedure Record Table -->
+                    <div class="section-header">Procedure Records</div>
+                    <div style="overflow-x:auto;">
+                    <table class="upload-table">
+                        <thead>
+                            <tr>
+                                <th>Procedure</th>
+                                <th>Date</th>
+                                <th>Document / Photo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <!-- 1. Patient Consent -->
+                            <tr>
+                                <td>Patient Consent</td>
+                                <td>—</td>
+                                <td>
+                                    <div th:if="${chart.patientConsentFilePath != null}">
+                                        <div class="file-preview">
+                                            <a th:href="${chart.patientConsentFilePath}" target="_blank"><img th:src="${chart.patientConsentFilePath}" alt="Preview" class="img-preview"></a>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="patientConsentFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                </td>
+                            </tr>
+
+                            <!-- 2. Patient Workup -->
+                            <tr>
+                                <td>Patient Workup</td>
+                                <td><input type="date" th:field="*{patientWorkupDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <div th:if="${chart.patientWorkupFilePath != null}">
+                                        <div class="file-preview">
+                                            <a th:href="${chart.patientWorkupFilePath}" target="_blank">
+                                                <img th:src="${chart.patientWorkupFilePath}" alt="Preview" class="img-preview">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="patientWorkupFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                </td>
+                            </tr>
+
+                            <!-- 3. Primary Impression and Diagnostic Cast -->
+                            <tr>
+                                <td>Primary Impression and Diagnostic Cast</td>
+                                <td><input type="date" th:field="*{primaryImpressionDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <div th:if="${chart.primaryImpressionFilePath != null}">
+                                        <div class="file-preview">
+                                            <a th:href="${chart.primaryImpressionFilePath}" target="_blank"><img th:src="${chart.primaryImpressionFilePath}" alt="Preview" class="img-preview"></a>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="primaryImpressionFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                </td>
+                            </tr>
+
+                            <!-- 4. Individual Tray -->
+                            <tr>
+                                <td>
+                                    Individual Tray
+                                    <div class="na-label"><input type="checkbox" th:field="*{individualTrayNotApplicable}"> Not Applicable</div>
+                                </td>
+                                <td><input type="date" th:field="*{individualTrayDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <div th:if="${chart.individualTrayFilePath != null}">
+                                        <div class="file-preview">
+                                            <a th:href="${chart.individualTrayFilePath}" target="_blank"><img th:src="${chart.individualTrayFilePath}" alt="Preview" class="img-preview"></a>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="individualTrayFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                </td>
+                            </tr>
+
+                            <!-- 5. Mouth Preparations -->
+                            <tr>
+                                <td>
+                                    Mouth Preparations
+                                    <div class="na-label"><input type="checkbox" th:field="*{mouthPreparationsNotApplicable}"> Not Applicable</div>
+                                </td>
+                                <td><input type="date" th:field="*{mouthPreparationsDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <label style="font-size:12px;">List of Mouth Preparations done:</label>
+                                    <textarea th:field="*{mouthPreparationsList}" class="text-input-small" rows="3"
+                                              style="resize:vertical;" th:readonly="${viewOnly}"></textarea>
+                                </td>
+                            </tr>
+
+                            <!-- 6. Final Impression and Master Cast -->
+                            <tr>
+                                <td>Final Impression and Master Cast</td>
+                                <td><input type="date" th:field="*{finalImpressionDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <div th:if="${chart.finalImpressionFilePath != null}">
+                                        <div class="file-preview">
+                                            <a th:href="${chart.finalImpressionFilePath}" target="_blank"><img th:src="${chart.finalImpressionFilePath}" alt="Preview" class="img-preview"></a>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="finalImpressionFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                </td>
+                            </tr>
+
+                            <!-- 7. Inspection of Wax Pattern from Laboratory -->
+                            <tr>
+                                <td>
+                                    Inspection of Wax Pattern from the Laboratory
+                                    <div class="na-label"><input type="checkbox" th:field="*{waxPatternLabNotApplicable}"> Not Applicable</div>
+                                </td>
+                                <td><input type="date" th:field="*{waxPatternLabDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <div th:if="${chart.waxPatternLabFilePath != null}">
+                                        <div class="file-preview">
+                                            <a th:href="${chart.waxPatternLabFilePath}" target="_blank"><img th:src="${chart.waxPatternLabFilePath}" alt="Preview" class="img-preview"></a>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="waxPatternLabFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                </td>
+                            </tr>
+
+                            <!-- 8. Wax Pattern on Diagnostic Cast -->
+                            <tr>
+                                <td>
+                                    Wax Pattern on Diagnostic Cast
+                                    <div class="na-label"><input type="checkbox" th:field="*{waxPatternDiagNotApplicable}"> Not Applicable</div>
+                                </td>
+                                <td><input type="date" th:field="*{waxPatternDiagDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <div th:if="${chart.waxPatternDiagFilePath != null}">
+                                        <div class="file-preview">
+                                            <a th:href="${chart.waxPatternDiagFilePath}" target="_blank"><img th:src="${chart.waxPatternDiagFilePath}" alt="Preview" class="img-preview"></a>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="waxPatternDiagFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                </td>
+                            </tr>
+
+                            <!-- 9. Inspection and Fitting of Metal Framework -->
+                            <tr>
+                                <td>
+                                    Inspection and Fitting of Metal Framework
+                                    <div class="na-label"><input type="checkbox" th:field="*{metalFrameworkNotApplicable}"> Not Applicable</div>
+                                </td>
+                                <td><input type="date" th:field="*{metalFrameworkDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <div th:if="${chart.metalFrameworkFilePath != null}">
+                                        <div class="file-preview">
+                                            <a th:href="${chart.metalFrameworkFilePath}" target="_blank"><img th:src="${chart.metalFrameworkFilePath}" alt="Preview" class="img-preview"></a>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="metalFrameworkFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                </td>
+                            </tr>
+
+                            <!-- 10. Trial Denture Base -->
+                            <tr>
+                                <td>
+                                    Trial Denture Base
+                                    <div class="na-label"><input type="checkbox" th:field="*{trialDentureBaseNotApplicable}"> Not Applicable</div>
+                                </td>
+                                <td><input type="date" th:field="*{trialDentureBaseDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <div th:if="${chart.trialDentureBaseFilePath != null}">
+                                        <div class="file-preview">
+                                            <a th:href="${chart.trialDentureBaseFilePath}" target="_blank"><img th:src="${chart.trialDentureBaseFilePath}" alt="Preview" class="img-preview"></a>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="trialDentureBaseFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                </td>
+                            </tr>
+
+                            <!-- 11. Development of Maxillary and Mandibular OCR -->
+                            <tr>
+                                <td>Development of Maxillary and Mandibular OCR</td>
+                                <td><input type="date" th:field="*{ocrDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <div th:if="${chart.ocrFilePath != null}">
+                                        <div class="file-preview">
+                                            <a th:href="${chart.ocrFilePath}" target="_blank"><img th:src="${chart.ocrFilePath}" alt="Preview" class="img-preview"></a>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="ocrFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                </td>
+                            </tr>
+
+                            <!-- 12. Positional Relations -->
+                            <tr>
+                                <td>Positional Relations</td>
+                                <td><input type="date" th:field="*{positionalRelationsDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <div th:if="${chart.positionalRelationsFilePath != null}">
+                                        <div class="file-preview">
+                                            <a th:href="${chart.positionalRelationsFilePath}" target="_blank"><img th:src="${chart.positionalRelationsFilePath}" alt="Preview" class="img-preview"></a>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="positionalRelationsFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                </td>
+                            </tr>
+
+                            <!-- 13. Mounting -->
+                            <tr>
+                                <td>Mounting</td>
+                                <td><input type="date" th:field="*{mountingDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <div th:if="${chart.mountingFilePath != null}">
+                                        <div class="file-preview">
+                                            <a th:href="${chart.mountingFilePath}" target="_blank"><img th:src="${chart.mountingFilePath}" alt="Preview" class="img-preview"></a>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="mountingFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                </td>
+                            </tr>
+
+                            <!-- 14. Anterior Setup -->
+                            <tr>
+                                <td>
+                                    Anterior Setup
+                                    <div class="na-label"><input type="checkbox" th:field="*{anteriorSetupNotApplicable}"> Not Applicable</div>
+                                </td>
+                                <td><input type="date" th:field="*{anteriorSetupDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <div class="row-group" style="margin-bottom:8px;">
+                                        <div>
+                                            <label>Mould:</label>
+                                            <input type="text" th:field="*{anteriorSetupMould}" class="text-input-small" style="width:100px;" th:readonly="${viewOnly}">
+                                        </div>
+                                        <div>
+                                            <label>Shade:</label>
+                                            <input type="text" th:field="*{anteriorSetupShade}" class="text-input-small" style="width:100px;" th:readonly="${viewOnly}">
+                                        </div>
+                                    </div>
+                                    <div th:if="${chart.anteriorSetupFilePath != null}">
+                                        <div class="file-preview">
+                                            <a th:href="${chart.anteriorSetupFilePath}" target="_blank"><img th:src="${chart.anteriorSetupFilePath}" alt="Preview" class="img-preview"></a>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="anteriorSetupFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                </td>
+                            </tr>
+
+                            <!-- 15. Anterior Try-in -->
+                            <tr>
+                                <td>
+                                    Anterior Try-in
+                                    <div class="na-label"><input type="checkbox" th:field="*{anteriorTryInNotApplicable}"> Not Applicable</div>
+                                </td>
+                                <td><input type="date" th:field="*{anteriorTryInDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <div th:if="${chart.anteriorTryInFilePath != null}">
+                                        <div class="file-preview">
+                                            <a th:href="${chart.anteriorTryInFilePath}" target="_blank"><img th:src="${chart.anteriorTryInFilePath}" alt="Preview" class="img-preview"></a>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="anteriorTryInFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                    <div style="margin-top:8px;">
+                                        <label style="font-size:12px;">Patient Signature:</label>
+                                        <div th:if="${chart.anteriorTryInSignaturePath != null}">
+                                            <a th:href="${chart.anteriorTryInSignaturePath}" target="_blank"><img th:src="${chart.anteriorTryInSignaturePath}" alt="Signature" class="img-preview"></a>
+                                        </div>
+                                        <input type="file" name="anteriorTryInSignatureFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- 16. Protrusive Records Taking -->
+                            <tr>
+                                <td>
+                                    Protrusive Records Taking
+                                    <div class="na-label"><input type="checkbox" th:field="*{protrusiveRecordsNotApplicable}"> Not Applicable</div>
+                                </td>
+                                <td><input type="date" th:field="*{protrusiveRecordsDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <div style="font-size:12px; margin-bottom:6px;"><strong>Horizontal Condylar Guidance Angle:</strong></div>
+                                    <div class="row-group" style="margin-bottom:8px;">
+                                        <div><label>Right:</label> <input type="text" th:field="*{hcaRight}" class="text-input-small" style="width:80px;" th:readonly="${viewOnly}"></div>
+                                        <div><label>Left:</label> <input type="text" th:field="*{hcaLeft}" class="text-input-small" style="width:80px;" th:readonly="${viewOnly}"></div>
+                                    </div>
+                                    <div style="font-size:12px; margin-bottom:6px;"><strong>Lateral Condylar Guidance Angle:</strong></div>
+                                    <div class="row-group">
+                                        <div><label>Right:</label> <input type="text" th:field="*{lcaRight}" class="text-input-small" style="width:80px;" th:readonly="${viewOnly}"></div>
+                                        <div><label>Left:</label> <input type="text" th:field="*{lcaLeft}" class="text-input-small" style="width:80px;" th:readonly="${viewOnly}"></div>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- 17. Posterior Setup -->
+                            <tr>
+                                <td>Posterior Setup</td>
+                                <td><input type="date" th:field="*{posteriorSetupDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <div class="row-group" style="margin-bottom:8px;">
+                                        <div>
+                                            <label>Mould:</label>
+                                            <input type="text" th:field="*{posteriorSetupMould}" class="text-input-small" style="width:100px;" th:readonly="${viewOnly}">
+                                        </div>
+                                        <div>
+                                            <label>Shade:</label>
+                                            <input type="text" th:field="*{posteriorSetupShade}" class="text-input-small" style="width:100px;" th:readonly="${viewOnly}">
+                                        </div>
+                                    </div>
+                                    <div th:if="${chart.posteriorSetupFilePath != null}">
+                                        <div class="file-preview">
+                                            <a th:href="${chart.posteriorSetupFilePath}" target="_blank"><img th:src="${chart.posteriorSetupFilePath}" alt="Preview" class="img-preview"></a>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="posteriorSetupFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                </td>
+                            </tr>
+
+                            <!-- 18. Posterior Try-in -->
+                            <tr>
+                                <td>Posterior Try-in</td>
+                                <td><input type="date" th:field="*{posteriorTryInDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <div th:if="${chart.posteriorTryInFilePath != null}">
+                                        <div class="file-preview">
+                                            <a th:href="${chart.posteriorTryInFilePath}" target="_blank"><img th:src="${chart.posteriorTryInFilePath}" alt="Preview" class="img-preview"></a>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="posteriorTryInFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                    <div style="margin-top:8px;">
+                                        <label style="font-size:12px;">Patient Signature:</label>
+                                        <div th:if="${chart.posteriorTryInSignaturePath != null}">
+                                            <a th:href="${chart.posteriorTryInSignaturePath}" target="_blank"><img th:src="${chart.posteriorTryInSignaturePath}" alt="Signature" class="img-preview"></a>
+                                        </div>
+                                        <input type="file" name="posteriorTryInSignatureFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- 19. Wax-up and Festooning -->
+                            <tr>
+                                <td>Wax-up and Festooning</td>
+                                <td><input type="date" th:field="*{waxUpDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <div th:if="${chart.waxUpFilePath != null}">
+                                        <div class="file-preview">
+                                            <a th:href="${chart.waxUpFilePath}" target="_blank"><img th:src="${chart.waxUpFilePath}" alt="Preview" class="img-preview"></a>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="waxUpFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                </td>
+                            </tr>
+
+                            <!-- 20. Processing -->
+                            <tr>
+                                <td>Processing</td>
+                                <td><input type="date" th:field="*{processingDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <div th:if="${chart.processingFilePath != null}">
+                                        <div class="file-preview">
+                                            <a th:href="${chart.processingFilePath}" target="_blank"><img th:src="${chart.processingFilePath}" alt="Preview" class="img-preview"></a>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="processingFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                </td>
+                            </tr>
+
+                            <!-- 21. CEF, Trimming and Polishing -->
+                            <tr>
+                                <td>CEF, Trimming and Polishing</td>
+                                <td><input type="date" th:field="*{cefDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <div th:if="${chart.cefFilePath != null}">
+                                        <div class="file-preview">
+                                            <a th:href="${chart.cefFilePath}" target="_blank"><img th:src="${chart.cefFilePath}" alt="Preview" class="img-preview"></a>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="cefFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                </td>
+                            </tr>
+
+                            <!-- 22. Installation -->
+                            <tr>
+                                <td>Installation</td>
+                                <td><input type="date" th:field="*{installationDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <div th:if="${chart.installationFilePath != null}">
+                                        <div class="file-preview">
+                                            <a th:href="${chart.installationFilePath}" target="_blank"><img th:src="${chart.installationFilePath}" alt="Preview" class="img-preview"></a>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="installationFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                    <div style="margin-top:8px;">
+                                        <label style="font-size:12px;">Patient Signature:</label>
+                                        <div th:if="${chart.installationSignaturePath != null}">
+                                            <a th:href="${chart.installationSignaturePath}" target="_blank"><img th:src="${chart.installationSignaturePath}" alt="Signature" class="img-preview"></a>
+                                        </div>
+                                        <input type="file" name="installationSignatureFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- 23. Post-installation Recall -->
+                            <tr>
+                                <td>Post-installation Recall</td>
+                                <td><input type="date" th:field="*{postInstallationDate}" class="date-picker" th:readonly="${viewOnly}"></td>
+                                <td>
+                                    <div th:if="${chart.postInstallationFilePath != null}">
+                                        <div class="file-preview">
+                                            <a th:href="${chart.postInstallationFilePath}" target="_blank"><img th:src="${chart.postInstallationFilePath}" alt="Preview" class="img-preview"></a>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="postInstallationFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                    <div style="margin-top:8px;">
+                                        <label style="font-size:12px;">Patient Signature:</label>
+                                        <div th:if="${chart.postInstallationSignaturePath != null}">
+                                            <a th:href="${chart.postInstallationSignaturePath}" target="_blank"><img th:src="${chart.postInstallationSignaturePath}" alt="Signature" class="img-preview"></a>
+                                        </div>
+                                        <input type="file" name="postInstallationSignatureFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
+                                    </div>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                    </div>
+
+                    <!-- Remarks -->
+                    <div style="margin-top:20px;">
+                        <label style="font-size:13px; font-weight:600; color:#5a3e28;">Remarks:</label>
+                        <textarea th:field="*{remarks}" class="text-input-small" rows="4"
+                                  style="margin-top:6px; resize:vertical;" th:readonly="${viewOnly}"></textarea>
+                    </div>
+
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions" th:if="${!viewOnly}">
+                    <button type="submit" name="action" value="save" class="btn-next">Save</button>
+                </div>
+
+                </div>
+            </div>
+            </form>
+        </main>
+    </div>
+</div>
+
+<script>
+document.querySelector('.menu-icon').onclick = function() {
+    document.querySelector('.sidebar').classList.toggle('expanded');
+};
+
+document.querySelector('.user-profile').onclick = function(e) {
+    e.stopPropagation();
+    document.querySelector('.user-dropdown').classList.toggle('show');
+};
+
+document.addEventListener('click', function() {
+    const d = document.querySelector('.user-dropdown');
+    if (d && d.classList.contains('show')) d.classList.remove('show');
+});
+
+document.querySelector('.user-dropdown').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+
+const rpdBoxes = document.querySelectorAll('.rpd-options input[type="checkbox"]');
+rpdBoxes.forEach(function(cb) {
+    cb.addEventListener('change', function() {
+        if (this.checked) {
+            rpdBoxes.forEach(function(other) { if (other !== cb) other.checked = false; });
+        }
+    });
+});
+
+// Disable file inputs that have no file chosen before submitting
+// so empty file parts are not sent as multipart parts.
+document.querySelector('form').addEventListener('submit', function() {
+    document.querySelectorAll('input[type="file"]').forEach(function(input) {
+        if (!input.files || input.files.length === 0) {
+            input.disabled = true;
+        }
+    });
+});
+
+// Replace broken <img> previews (e.g. PDFs) with a plain "View file" link.
+document.querySelectorAll('.img-preview').forEach(function(img) {
+    img.addEventListener('error', function() {
+        const a = document.createElement('a');
+        a.href = this.src;
+        a.target = '_blank';
+        a.textContent = '📄 View file';
+        a.style.cssText = 'font-size:12px;color:#3b5ea6;text-decoration:underline;';
+        this.parentNode.replaceChild(a, this);
+    });
+});
+</script>
+
+</body>
+</html>

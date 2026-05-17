@@ -1,6 +1,7 @@
 package com.dentis.DENTIS.controller;
 
 import com.dentis.DENTIS.model.OralSurgeryChart;
+import com.dentis.DENTIS.model.OralSurgeryChartStatus;
 import com.dentis.DENTIS.model.User;
 import com.dentis.DENTIS.repository.UserRepository;
 import com.dentis.DENTIS.service.OralSurgeryChartService;
@@ -44,7 +45,7 @@ public class OralSurgeryController {
         }
         model.addAttribute("currentUser", getCurrentUser(authentication));
         model.addAttribute("chart", chart);
-        model.addAttribute("viewOnly", false);
+        model.addAttribute("viewOnly", chart.getStatus() == OralSurgeryChartStatus.APPROVED);
         return "oralsurgery-clinician";
     }
 
@@ -77,7 +78,7 @@ public class OralSurgeryController {
         }
         model.addAttribute("currentUser", getCurrentUser(authentication));
         model.addAttribute("chart", chart);
-        model.addAttribute("viewOnly", false);
+        model.addAttribute("viewOnly", chart.getStatus() == OralSurgeryChartStatus.APPROVED);
         return "oralsurgery2-clinician";
     }
 

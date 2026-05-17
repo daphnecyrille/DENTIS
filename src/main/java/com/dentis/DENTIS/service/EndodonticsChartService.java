@@ -26,7 +26,7 @@ public class EndodonticsChartService {
         chart.setPatient(patient);
         chart.setClinician(clinician);
         chart.setFaculty(faculty);
-        chart.setChartNo(generateChartNo());
+        chart.setChartNo(patient.getChartNo() + "-ENDO1");
         chart.setChiefComplaint(patient.getChiefComplaint());
         return repo.save(chart);
     }
@@ -173,9 +173,10 @@ public class EndodonticsChartService {
         return repo.save(chart);
     }
 
-    public EndodonticsChart revise(Long id) {
+    public EndodonticsChart revise(Long id, String reason) {
         EndodonticsChart chart = repo.findById(id).orElseThrow();
         chart.setStatus(EndodonticsChartStatus.REVISE);
+        chart.setRevisionReason(reason);
         return repo.save(chart);
     }
 
@@ -185,9 +186,10 @@ public class EndodonticsChartService {
         return repo.save(chart);
     }
 
-    public EndodonticsChart reviseForm2(Long id) {
+    public EndodonticsChart reviseForm2(Long id, String reason) {
         EndodonticsChart chart = repo.findById(id).orElseThrow();
         chart.setForm2Status(EndodonticsChartStatus.REVISE);
+        chart.setForm2RevisionReason(reason);
         return repo.save(chart);
     }
 }

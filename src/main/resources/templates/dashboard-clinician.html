@@ -94,14 +94,14 @@
                                 <td><a th:href="@{/chartsview-clinician/{id}(id=${osc.patient.id})}" class="btn-view-chart">Go to Chart</a></td>
                             </tr>
                             <tr th:each="ec : ${endoActionNeededCharts}">
-                                <td th:text="${#strings.replace(ec.chartNo, 'ENDO-', 'ENDO1-')}"></td>
+                                <td th:text="${ec.chartNo}"></td>
                                 <td>Endodontics - Patient Workup</td>
                                 <td th:text="${ec.patient.surname + ', ' + ec.patient.firstName + (ec.patient.middleInitial != null ? ' ' + ec.patient.middleInitial + '.' : '')}"></td>
                                 <td th:class="'status ' + ${ec.status.cssClass}" th:text="${ec.status.displayName}"></td>
                                 <td><a th:href="@{/chartsview-clinician/{id}(id=${ec.patient.id})}" class="btn-view-chart">Go to Chart</a></td>
                             </tr>
                             <tr th:each="ec : ${endoForm2ActionNeededCharts}">
-                                <td th:text="${#strings.replace(#strings.replace(ec.chartNo, 'ENDO1-', 'ENDO2-'), 'ENDO-', 'ENDO2-')}"></td>
+                                <td th:text="${#strings.replace(ec.chartNo, '-ENDO1', '-ENDO2')}"></td>
                                 <td>Endodontics - Endodontic Evaluation &amp; Treatment Planning</td>
                                 <td th:text="${ec.patient.surname + ', ' + ec.patient.firstName + (ec.patient.middleInitial != null ? ' ' + ec.patient.middleInitial + '.' : '')}"></td>
                                 <td th:class="'status ' + ${ec.form2Status.cssClass}" th:text="${ec.form2Status.displayName}"></td>
@@ -115,7 +115,7 @@
                                 <td><a th:href="@{/chartsview-clinician/{id}(id=${pc.patient.id})}" class="btn-view-chart">Go to Chart</a></td>
                             </tr>
                             <tr th:each="pc : ${periocActionNeededCharts}">
-                                <td th:text="${#strings.replace(pc.chartNo, 'PF1-', 'PF2-')}"></td>
+                                <td th:text="${#strings.replace(pc.chartNo, '-PF1', '-PF2')}"></td>
                                 <td>Periodontics - PPD/CAL/BOP Chart</td>
                                 <td th:text="${pc.patient.surname + ', ' + pc.patient.firstName + (pc.patient.middleInitial != null ? ' ' + pc.patient.middleInitial + '.' : '')}"></td>
                                 <td th:class="'status ' + ${pc.formCStatus.cssClass}" th:text="${pc.formCStatus.displayName}"></td>
@@ -129,13 +129,20 @@
                                 <td><a th:href="@{/chartsview-clinician/{id}(id=${oc.patient.id})}" class="btn-view-chart">Go to Chart</a></td>
                             </tr>
                             <tr th:each="oc : ${operative6ActionNeededCharts}">
-                                <td th:text="${#strings.replace(oc.chartNo, 'RESTO10-', 'RESTO6-')}"></td>
+                                <td th:text="${#strings.replace(oc.chartNo, '-RESTO10', '-RESTO6')}"></td>
                                 <td>Operative Dentistry - Caries Risk Assessment</td>
                                 <td th:text="${oc.patient.surname + ', ' + oc.patient.firstName + (oc.patient.middleInitial != null ? ' ' + oc.patient.middleInitial + '.' : '')}"></td>
                                 <td th:class="'status ' + ${oc.form2Status.cssClass}" th:text="${oc.form2Status.displayName}"></td>
                                 <td><a th:href="@{/chartsview-clinician/{id}(id=${oc.patient.id})}" class="btn-view-chart">Go to Chart</a></td>
                             </tr>
-                            <tr th:if="${#lists.isEmpty(actionNeededCharts) and #lists.isEmpty(endoActionNeededCharts) and #lists.isEmpty(endoForm2ActionNeededCharts) and #lists.isEmpty(perioActionNeededCharts) and #lists.isEmpty(periocActionNeededCharts) and #lists.isEmpty(operativeActionNeededCharts) and #lists.isEmpty(operative6ActionNeededCharts)}">
+                            <tr th:each="pc : ${prosthoActionNeededCharts}">
+                                <td th:text="${pc.chartNo}"></td>
+                                <td th:text="'Prosthodontics (' + ${pc.caseType} + ')'"></td>
+                                <td th:text="${pc.patient.surname + ', ' + pc.patient.firstName + (pc.patient.middleInitial != null ? ' ' + pc.patient.middleInitial + '.' : '')}"></td>
+                                <td th:class="'status ' + ${pc.status.name().toLowerCase()}" th:text="${pc.status.displayName}"></td>
+                                <td><a th:href="@{/chartsview-clinician/{id}(id=${pc.patient.id})}" class="btn-view-chart">Go to Chart</a></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(actionNeededCharts) and #lists.isEmpty(endoActionNeededCharts) and #lists.isEmpty(endoForm2ActionNeededCharts) and #lists.isEmpty(perioActionNeededCharts) and #lists.isEmpty(periocActionNeededCharts) and #lists.isEmpty(operativeActionNeededCharts) and #lists.isEmpty(operative6ActionNeededCharts) and #lists.isEmpty(prosthoActionNeededCharts)}">
                                 <td colspan="5" style="text-align:center; color:#888;">All charts have been submitted.</td>
                             </tr>
                         </tbody>
@@ -147,96 +154,33 @@
             <section class="section">
                 <div class="section-header">
                     <h2>Patient List</h2>
+                    <a href="/patientlist-clinician" style="font-size:12px; color:#666; text-decoration:none;">View all →</a>
                 </div>
                 <div class="table-container">
                     <table class="patient-table">
                         <thead>
                             <tr>
                                 <th>Chart Number</th>
-                                <th>Chart Type</th>
                                 <th>Patient Name</th>
                                 <th>Contact Number</th>
                                 <th>Email</th>
+                                <th>Service</th>
                                 <th>View</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="osc : ${osCharts}">
-                                <td th:text="${osc.chartNo}"></td>
-                                <td th:text="${osc.chartType != null ? osc.chartType.displayName : '—'}"></td>
-                                <td th:text="${osc.patient.surname + ', ' + osc.patient.firstName + (osc.patient.middleInitial != null ? ' ' + osc.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${osc.patient.contactNumber}"></td>
-                                <td th:text="${osc.patient.email}"></td>
+                            <tr th:each="p : ${recentPatients}">
+                                <td th:text="${p.chartNo}"></td>
+                                <td th:text="${p.surname + ', ' + p.firstName + (p.middleInitial != null ? ' ' + p.middleInitial + '.' : '')}"></td>
+                                <td th:text="${p.contactNumber}"></td>
+                                <td th:text="${p.email}"></td>
+                                <td th:text="${p.serviceCode != null ? p.serviceCode : '—'}"></td>
                                 <td>
-                                    <a th:href="@{/chartsview-clinician/{id}(id=${osc.patient.id})}" class="btn-view-chart">View</a>
+                                    <a th:href="@{/chartsview-clinician/{id}(id=${p.id})}" class="btn-view-chart">View</a>
                                 </td>
                             </tr>
-                            <tr th:each="ec : ${endoCharts}">
-                                <td th:text="${#strings.replace(ec.chartNo, 'ENDO-', 'ENDO1-')}"></td>
-                                <td>Endodontics - Patient Workup</td>
-                                <td th:text="${ec.patient.surname + ', ' + ec.patient.firstName + (ec.patient.middleInitial != null ? ' ' + ec.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${ec.patient.contactNumber}"></td>
-                                <td th:text="${ec.patient.email}"></td>
-                                <td>
-                                    <a th:href="@{/chartsview-clinician/{id}(id=${ec.patient.id})}" class="btn-view-chart">View</a>
-                                </td>
-                            </tr>
-                            <tr th:each="ec : ${endoCharts}">
-                                <td th:text="${#strings.replace(#strings.replace(ec.chartNo, 'ENDO1-', 'ENDO2-'), 'ENDO-', 'ENDO2-')}"></td>
-                                <td>Endodontics - Endodontic Evaluation &amp; Treatment Planning</td>
-                                <td th:text="${ec.patient.surname + ', ' + ec.patient.firstName + (ec.patient.middleInitial != null ? ' ' + ec.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${ec.patient.contactNumber}"></td>
-                                <td th:text="${ec.patient.email}"></td>
-                                <td>
-                                    <a th:href="@{/chartsview-clinician/{id}(id=${ec.patient.id})}" class="btn-view-chart">View</a>
-                                </td>
-                            </tr>
-                            <!-- Periodontics PF1 (Forms A+B) -->
-                            <tr th:each="pc : ${perioCharts}">
-                                <td th:text="${pc.chartNo}"></td>
-                                <td>Periodontics - Periodontal Chart</td>
-                                <td th:text="${pc.patient.surname + ', ' + pc.patient.firstName + (pc.patient.middleInitial != null ? ' ' + pc.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${pc.patient.contactNumber}"></td>
-                                <td th:text="${pc.patient.email}"></td>
-                                <td>
-                                    <a th:href="@{/chartsview-clinician/{id}(id=${pc.patient.id})}" class="btn-view-chart">View</a>
-                                </td>
-                            </tr>
-                            <!-- Periodontics PF2 (Form C) -->
-                            <tr th:each="pc : ${perioCharts}">
-                                <td th:text="${#strings.replace(pc.chartNo, 'PF1-', 'PF2-')}"></td>
-                                <td>Periodontics - PPD/CAL/BOP Chart</td>
-                                <td th:text="${pc.patient.surname + ', ' + pc.patient.firstName + (pc.patient.middleInitial != null ? ' ' + pc.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${pc.patient.contactNumber}"></td>
-                                <td th:text="${pc.patient.email}"></td>
-                                <td>
-                                    <a th:href="@{/chartsview-clinician/{id}(id=${pc.patient.id})}" class="btn-view-chart">View</a>
-                                </td>
-                            </tr>
-                            <!-- RESTO10 (Assessment Form) -->
-                            <tr th:each="oc : ${operativeCharts}">
-                                <td th:text="${oc.chartNo}"></td>
-                                <td>Operative Dentistry - Assessment Form</td>
-                                <td th:text="${oc.patient.surname + ', ' + oc.patient.firstName + (oc.patient.middleInitial != null ? ' ' + oc.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${oc.patient.contactNumber}"></td>
-                                <td th:text="${oc.patient.email}"></td>
-                                <td>
-                                    <a th:href="@{/chartsview-clinician/{id}(id=${oc.patient.id})}" class="btn-view-chart">View</a>
-                                </td>
-                            </tr>
-                            <!-- RESTO6 (Caries Risk Assessment) -->
-                            <tr th:each="oc : ${operativeCharts}">
-                                <td th:text="${#strings.replace(oc.chartNo, 'RESTO10-', 'RESTO6-')}"></td>
-                                <td>Operative Dentistry - Caries Risk Assessment</td>
-                                <td th:text="${oc.patient.surname + ', ' + oc.patient.firstName + (oc.patient.middleInitial != null ? ' ' + oc.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${oc.patient.contactNumber}"></td>
-                                <td th:text="${oc.patient.email}"></td>
-                                <td>
-                                    <a th:href="@{/chartsview-clinician/{id}(id=${oc.patient.id})}" class="btn-view-chart">View</a>
-                                </td>
-                            </tr>
-                            <tr th:if="${#lists.isEmpty(osCharts) and #lists.isEmpty(endoCharts) and #lists.isEmpty(perioCharts) and #lists.isEmpty(operativeCharts)}">
-                                <td colspan="6" style="text-align:center; color:#888;">No charts assigned yet.</td>
+                            <tr th:if="${#lists.isEmpty(recentPatients)}">
+                                <td colspan="6" style="text-align:center; color:#888;">No patients assigned yet.</td>
                             </tr>
                         </tbody>
                     </table>

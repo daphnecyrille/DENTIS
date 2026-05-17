@@ -25,7 +25,7 @@ public class OperativeChartService {
         chart.setPatient(patient);
         chart.setClinician(clinician);
         chart.setFaculty(faculty);
-        chart.setChartNo(generateChartNo());
+        chart.setChartNo(patient.getChartNo() + "-RESTO10");
         chart.setChiefComplaint(patient.getChiefComplaint());
         return repo.save(chart);
     }
@@ -239,9 +239,10 @@ public class OperativeChartService {
         return repo.save(c);
     }
 
-    public OperativeChart reviseForm1(Long id) {
+    public OperativeChart reviseForm1(Long id, String reason) {
         OperativeChart c = repo.findById(id).orElseThrow();
         c.setStatus(OperativeChartStatus.REVISE);
+        c.setRevisionReason(reason);
         return repo.save(c);
     }
 
@@ -259,9 +260,10 @@ public class OperativeChartService {
         return repo.save(c);
     }
 
-    public OperativeChart reviseForm2(Long id) {
+    public OperativeChart reviseForm2(Long id, String reason) {
         OperativeChart c = repo.findById(id).orElseThrow();
         c.setForm2Status(OperativeChartStatus.REVISE);
+        c.setForm2RevisionReason(reason);
         return repo.save(c);
     }
 }

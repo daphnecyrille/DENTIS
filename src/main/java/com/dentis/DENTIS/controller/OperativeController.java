@@ -1,6 +1,7 @@
 package com.dentis.DENTIS.controller;
 
 import com.dentis.DENTIS.model.OperativeChart;
+import com.dentis.DENTIS.model.OperativeChartStatus;
 import com.dentis.DENTIS.model.User;
 import com.dentis.DENTIS.repository.UserRepository;
 import com.dentis.DENTIS.service.OperativeChartService;
@@ -63,7 +64,7 @@ public class OperativeController {
         OperativeChart chart = operativeChartService.getById(id);
         model.addAttribute("currentUser", getCurrentUser(authentication));
         model.addAttribute("chart", chart);
-        model.addAttribute("viewOnly", false);
+        model.addAttribute("viewOnly", chart.getForm2Status() == OperativeChartStatus.APPROVED);
         return "operativea-clinician";
     }
 
@@ -96,7 +97,7 @@ public class OperativeController {
         OperativeChart chart = operativeChartService.getById(id);
         model.addAttribute("currentUser", getCurrentUser(authentication));
         model.addAttribute("chart", chart);
-        model.addAttribute("viewOnly", false);
+        model.addAttribute("viewOnly", chart.getStatus() == OperativeChartStatus.APPROVED);
         return "operativeb-clinician";
     }
 
@@ -123,7 +124,7 @@ public class OperativeController {
         OperativeChart chart = operativeChartService.getById(id);
         model.addAttribute("currentUser", getCurrentUser(authentication));
         model.addAttribute("chart", chart);
-        model.addAttribute("viewOnly", false);
+        model.addAttribute("viewOnly", chart.getStatus() == OperativeChartStatus.APPROVED);
         return "operativec-clinician";
     }
 
@@ -180,6 +181,28 @@ public class OperativeController {
         return "operativea-clinician";
     }
 
+    // ── Clinic Manager: View Form 10 (RESTO10) ──────────────────────────────
+
+    @GetMapping("/operative-view/{id}")
+    public String viewResto10ClinicManager(@PathVariable Long id, Model model, Authentication authentication) {
+        OperativeChart chart = operativeChartService.getById(id);
+        model.addAttribute("currentUser", getCurrentUser(authentication));
+        model.addAttribute("chart", chart);
+        model.addAttribute("viewOnly", true);
+        return "operativeb-clinician";
+    }
+
+    // ── Clinic Manager: View Form 6 (RESTO6) ────────────────────────────────
+
+    @GetMapping("/operative2-view/{id}")
+    public String viewResto6ClinicManager(@PathVariable Long id, Model model, Authentication authentication) {
+        OperativeChart chart = operativeChartService.getById(id);
+        model.addAttribute("currentUser", getCurrentUser(authentication));
+        model.addAttribute("chart", chart);
+        model.addAttribute("viewOnly", true);
+        return "operativea-clinician";
+    }
+
     // ── Faculty: Approve / Revise Form 10 ───────────────────────────────────
 
     @PostMapping("/operative-faculty/{id}/approve")
@@ -189,8 +212,8 @@ public class OperativeController {
     }
 
     @PostMapping("/operative-faculty/{id}/revise")
-    public String reviseForm1(@PathVariable Long id) {
-        OperativeChart chart = operativeChartService.reviseForm1(id);
+    public String reviseForm1(@PathVariable Long id, @RequestParam String revisionReason) {
+        OperativeChart chart = operativeChartService.reviseForm1(id, revisionReason);
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 
@@ -203,8 +226,8 @@ public class OperativeController {
     }
 
     @PostMapping("/operative2-faculty/{id}/revise")
-    public String reviseForm2(@PathVariable Long id) {
-        OperativeChart chart = operativeChartService.reviseForm2(id);
+    public String reviseForm2(@PathVariable Long id, @RequestParam String revisionReason) {
+        OperativeChart chart = operativeChartService.reviseForm2(id, revisionReason);
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 }

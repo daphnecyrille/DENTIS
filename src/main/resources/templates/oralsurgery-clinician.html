@@ -68,6 +68,11 @@
 
 
             <h2 class="page-title">Clinical Oral Surgery</h2>
+            <div th:if="${chart.status != null and chart.status.name() == 'REVISE' and chart.revisionReason != null and !#strings.isEmpty(chart.revisionReason)}"
+                 style="background:#fff3cd; border-left:5px solid #e6a817; padding:14px 24px; margin:0 0 28px 0; font-family:'Poppins',sans-serif; border-radius:6px;">
+                <strong style="font-size:13px; color:#856404; display:block; margin-bottom:4px;">Revision Required</strong>
+                <p style="margin:0; font-size:13px; color:#533f03;" th:text="${chart.revisionReason}"></p>
+            </div>
 
             <div class="form-card">
                 <div class="form-banner">Patient Workup Form</div>

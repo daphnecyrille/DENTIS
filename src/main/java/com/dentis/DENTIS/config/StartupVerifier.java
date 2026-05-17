@@ -1,7 +1,9 @@
 package com.dentis.DENTIS.config;
 
+import jakarta.servlet.MultipartConfigElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -18,11 +20,23 @@ public class StartupVerifier implements ApplicationRunner {
     @Value("${spring.security.oauth2.client.registration.google.client-secret:NOT_SET}")
     private String clientSecret;
 
+    @Autowired(required = false)
+    private MultipartConfigElement multipartConfigElement;
+
     @Override
     public void run(ApplicationArguments args) {
         log.info("=== OAuth2 Config Check ===");
         log.info("Client ID   : {}", clientId.isBlank() ? "EMPTY (not loaded!)" : "SET — " + clientId.substring(0, 12) + "...");
         log.info("Client Secret: {}", clientSecret.isBlank() ? "EMPTY (not loaded!)" : "SET — starts with: " + clientSecret.substring(0, 8) + "...");
         log.info("===========================");
+        log.info("=== Multipart Config ===");
+        if (multipartConfigElement == null) {
+            log.warn("MultipartConfigElement bean is NULL — multipart not configured!");
+        } else {
+            log.info("maxFileSize    : {}", multipartConfigElement.getMaxFileSize());
+            log.info("maxRequestSize : {}", multipartConfigElement.getMaxRequestSize());
+            log.info("fileSizeThresh : {}", multipartConfigElement.getFileSizeThreshold());
+        }
+        log.info("========================");
     }
 }

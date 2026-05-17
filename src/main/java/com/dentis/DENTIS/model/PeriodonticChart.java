@@ -141,4 +141,10 @@ public class PeriodonticChart {
     private Boolean isInitialExamination;
     private Boolean isReevaluation;
     private Boolean isMaintenanceVisit;
+
+    @Column(columnDefinition = "TEXT")
+    private String revisionReason;
+
+    @Column(columnDefinition = "TEXT")
+    private String formCRevisionReason;
 }

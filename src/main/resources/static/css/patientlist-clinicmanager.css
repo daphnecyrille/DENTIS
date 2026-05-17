@@ -254,3 +254,90 @@ td:last-child { border-right: none; }
 }
 
 .btn-view:hover { background: #2c5282; }
+
+/* ── Section Tabs ── */
+.tab-bar {
+    display: flex;
+    gap: 4px;
+    padding: 12px 16px 0;
+    border-bottom: 1px solid #e0e0e0;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    padding: 7px 16px;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    background: #f5f5f5;
+    color: #666;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.tab-btn.active {
+    background: #324966;
+    color: white;
+    border-color: #324966;
+}
+
+.tab-btn:hover:not(.active) { background: #e8edf2; }
+
+.tab-count {
+    font-size: 11px;
+    opacity: 0.8;
+    margin-left: 2px;
+}
+
+/* Clinician modal */
+.clinician-link {
+    cursor: pointer;
+    color: #324966;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+}
+.modal-box {
+    background: white;
+    border-radius: 10px;
+    padding: 28px 32px;
+    min-width: 320px;
+    position: relative;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+.modal-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #555;
+}
+.modal-box h3 {
+    font-size: 16px;
+    margin-bottom: 16px;
+    color: #324966;
+}
+.modal-details { display: flex; flex-direction: column; gap: 10px; }
+.modal-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 6px;
+}
+.modal-label { color: #888; font-weight: 500; }

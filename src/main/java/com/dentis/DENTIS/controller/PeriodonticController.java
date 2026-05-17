@@ -1,6 +1,7 @@
 package com.dentis.DENTIS.controller;
 
 import com.dentis.DENTIS.model.PeriodonticChart;
+import com.dentis.DENTIS.model.PeriodonticChartStatus;
 import com.dentis.DENTIS.model.User;
 import com.dentis.DENTIS.repository.UserRepository;
 import com.dentis.DENTIS.service.PeriodonticChartService;
@@ -37,7 +38,7 @@ public class PeriodonticController {
         PeriodonticChart chart = periodonticChartService.getById(id);
         model.addAttribute("currentUser", getCurrentUser(authentication));
         model.addAttribute("chart", chart);
-        model.addAttribute("viewOnly", false);
+        model.addAttribute("viewOnly", chart.getStatus() == PeriodonticChartStatus.APPROVED);
         return "periodonticsa-clinician";
     }
 
@@ -65,7 +66,7 @@ public class PeriodonticController {
         PeriodonticChart chart = periodonticChartService.getById(id);
         model.addAttribute("currentUser", getCurrentUser(authentication));
         model.addAttribute("chart", chart);
-        model.addAttribute("viewOnly", false);
+        model.addAttribute("viewOnly", chart.getStatus() == PeriodonticChartStatus.APPROVED);
         return "periodonticsb-clinician";
     }
 
@@ -92,7 +93,7 @@ public class PeriodonticController {
         PeriodonticChart chart = periodonticChartService.getById(id);
         model.addAttribute("currentUser", getCurrentUser(authentication));
         model.addAttribute("chart", chart);
-        model.addAttribute("viewOnly", false);
+        model.addAttribute("viewOnly", chart.getFormCStatus() == PeriodonticChartStatus.APPROVED);
         return "periodonticsc-clinician";
     }
 
@@ -139,6 +140,28 @@ public class PeriodonticController {
         return "periodonticsc-clinician";
     }
 
+    // ── Clinic Manager: View-only (Forms A+B / PF1) ─────────────────────────
+
+    @GetMapping("/periodontics-ab-view/{id}")
+    public String viewPF1ClinicManager(@PathVariable Long id, Model model, Authentication authentication) {
+        PeriodonticChart chart = periodonticChartService.getById(id);
+        model.addAttribute("currentUser", getCurrentUser(authentication));
+        model.addAttribute("chart", chart);
+        model.addAttribute("viewOnly", true);
+        return "periodonticsa-clinician";
+    }
+
+    // ── Clinic Manager: View-only (Form C / PF2) ────────────────────────────
+
+    @GetMapping("/periodontics-c-view/{id}")
+    public String viewPF2ClinicManager(@PathVariable Long id, Model model, Authentication authentication) {
+        PeriodonticChart chart = periodonticChartService.getById(id);
+        model.addAttribute("currentUser", getCurrentUser(authentication));
+        model.addAttribute("chart", chart);
+        model.addAttribute("viewOnly", true);
+        return "periodonticsc-clinician";
+    }
+
     // ── Faculty: Approve / Revise PF1 (Form A/B) ────────────────────────────
 
     @PostMapping("/periodontics-faculty/{id}/approve")
@@ -148,8 +171,8 @@ public class PeriodonticController {
     }
 
     @PostMapping("/periodontics-faculty/{id}/revise")
-    public String reviseFormAB(@PathVariable Long id) {
-        PeriodonticChart chart = periodonticChartService.reviseFormAB(id);
+    public String reviseFormAB(@PathVariable Long id, @RequestParam String revisionReason) {
+        PeriodonticChart chart = periodonticChartService.reviseFormAB(id, revisionReason);
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 
@@ -162,8 +185,8 @@ public class PeriodonticController {
     }
 
     @PostMapping("/periodontics2-faculty/{id}/revise")
-    public String reviseFormC(@PathVariable Long id) {
-        PeriodonticChart chart = periodonticChartService.reviseFormC(id);
+    public String reviseFormC(@PathVariable Long id, @RequestParam String revisionReason) {
+        PeriodonticChart chart = periodonticChartService.reviseFormC(id, revisionReason);
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 }

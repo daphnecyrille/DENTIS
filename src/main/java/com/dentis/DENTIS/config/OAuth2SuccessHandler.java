@@ -30,7 +30,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String email = oAuth2User.getAttribute("email");
 
         User user = userRepository.findByEmail(email).orElseThrow();
-        String redirectUrl = resolveRedirectUrl(user.getRole());
+
+        boolean profileIncomplete = user.getFirstName() == null || user.getFirstName().isBlank();
+        String redirectUrl = profileIncomplete ? "/complete-profile" : resolveRedirectUrl(user.getRole());
 
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
@@ -40,7 +42,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             case CLINICIAN -> "/clinician-dashboard";
             case FACULTY -> "/faculty-dashboard";
             case CLINIC_MANAGER -> "/dashboard-clinicmanager";
-            case ADMIN -> "/clinician-dashboard";
+            case ADMIN -> "/dashboard-sysadmin";
         };
     }
 }

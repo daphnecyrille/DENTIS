@@ -2,6 +2,7 @@ package com.dentis.DENTIS.service;
 
 import com.dentis.DENTIS.model.*;
 import com.dentis.DENTIS.repository.PeriodonticChartRepository;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,9 +16,12 @@ import java.util.List;
 public class PeriodonticChartService {
 
     private final PeriodonticChartRepository repo;
+    private final PerioEvaluationService perioEvaluationService;
 
-    public PeriodonticChartService(PeriodonticChartRepository repo) {
+    public PeriodonticChartService(PeriodonticChartRepository repo,
+                                   @Lazy PerioEvaluationService perioEvaluationService) {
         this.repo = repo;
+        this.perioEvaluationService = perioEvaluationService;
     }
 
     public PeriodonticChart createForPatient(Patient patient, User clinician, User faculty) {
@@ -25,9 +29,11 @@ public class PeriodonticChartService {
         chart.setPatient(patient);
         chart.setClinician(clinician);
         chart.setFaculty(faculty);
-        chart.setChartNo(generateChartNo());
+        chart.setChartNo(patient.getChartNo() + "-PF1");
         chart.setChiefComplaint(patient.getChiefComplaint());
-        return repo.save(chart);
+        PeriodonticChart saved = repo.save(chart);
+        perioEvaluationService.initForChart(saved);
+        return saved;
     }
 
     private String generateChartNo() {
@@ -176,9 +182,10 @@ public class PeriodonticChartService {
         return repo.save(chart);
     }
 
-    public PeriodonticChart reviseFormAB(Long id) {
+    public PeriodonticChart reviseFormAB(Long id, String reason) {
         PeriodonticChart chart = repo.findById(id).orElseThrow();
         chart.setStatus(PeriodonticChartStatus.REVISE);
+        chart.setRevisionReason(reason);
         return repo.save(chart);
     }
 
@@ -196,9 +203,10 @@ public class PeriodonticChartService {
         return repo.save(chart);
     }
 
-    public PeriodonticChart reviseFormC(Long id) {
+    public PeriodonticChart reviseFormC(Long id, String reason) {
         PeriodonticChart chart = repo.findById(id).orElseThrow();
         chart.setFormCStatus(PeriodonticChartStatus.REVISE);
+        chart.setFormCRevisionReason(reason);
         return repo.save(chart);
     }
 }

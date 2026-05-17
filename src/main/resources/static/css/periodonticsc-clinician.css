@@ -64,7 +64,7 @@ body { height: 100vh; overflow: hidden; }
 
 .main-content {
     flex: 1;
-    padding: 20px 83px 0 83px;
+    padding: 20px 24px 0 24px;
     overflow-y: auto;
     margin-left: 70px;
     transition: margin-left 0.3s ease;
@@ -134,7 +134,7 @@ body { height: 100vh; overflow: hidden; }
 
 /* FORM BODY */
 .form-body {
-    padding: 10px 45px 30px 45px;
+    padding: 10px 20px 30px 20px;
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -201,13 +201,13 @@ body { height: 100vh; overflow: hidden; }
 }
 
 .cl-spacer {
-    height: 38px;
+    height: 44px;
     border-bottom: 1px solid #bbb;
     flex-shrink: 0;
 }
 
 .cl-row {
-    height: 26px;
+    height: 36px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -220,7 +220,7 @@ body { height: 100vh; overflow: hidden; }
     line-height: 1.2;
 }
 
-.cl-row.cej { height: 30px; }
+.cl-row.cej { height: 40px; }
 
 .cl-img-spacer {
     flex: 1;
@@ -231,7 +231,7 @@ body { height: 100vh; overflow: hidden; }
 /* Tooth number rows */
 .c-tooth-row {
     display: grid;
-    height: 38px;
+    height: 44px;
     background: #f6f6f6;
     border-bottom: 1px solid #bbb;
     flex-shrink: 0;
@@ -240,23 +240,23 @@ body { height: 100vh; overflow: hidden; }
 /* Input rows */
 .c-grid-row {
     display: grid;
-    height: 26px;
+    height: 36px;
     border-bottom: 1px solid #bbb;
     flex-shrink: 0;
 }
 
-.c-grid-row.cej { height: 30px; }
+.c-grid-row.cej { height: 40px; }
 
-/* Left panel (upper arch 18-28): columns match actual tooth widths */
+/* Left panel (upper arch 18-28): proportions derived from anatomical tooth widths */
 .c-panel.left .c-tooth-row,
 .c-panel.left .c-grid-row {
-    grid-template-columns: 77fr 72fr 83fr 57fr 56fr 58fr 48fr 84fr 85fr 50fr 56fr 58fr 56fr 82fr 76fr 75fr;
+    grid-template-columns: 56fr 59fr 69fr 46fr 46fr 53fr 43fr 56fr 56fr 43fr 53fr 46fr 46fr 69fr 59fr 56fr;
 }
 
-/* Right panel (lower arch 48-38): columns match actual tooth widths */
+/* Right panel (lower arch 48-38): proportions measured from perio-grid-lower.png */
 .c-panel.right .c-tooth-row,
 .c-panel.right .c-grid-row {
-    grid-template-columns: 98fr 82fr 86fr 56fr 54fr 54fr 46fr 58fr 62fr 47fr 50fr 55fr 56fr 87fr 79fr 102fr;
+    grid-template-columns: 76fr 66fr 75fr 47fr 44fr 44fr 38fr 35fr 35fr 38fr 44fr 43fr 48fr 74fr 68fr 77fr;
 }
 
 .c-tooth-num {
@@ -305,7 +305,7 @@ body { height: 100vh; overflow: hidden; }
     border: none;
     background: transparent;
     text-align: center;
-    font-size: 10px;
+    font-size: 13px;
     font-family: 'Poppins', sans-serif;
     padding: 0;
     outline: none;
@@ -313,6 +313,13 @@ body { height: 100vh; overflow: hidden; }
 
 
 .c-cell input[type="text"]:focus { background: rgba(45,74,107,0.08); border-radius: 2px; }
+
+.c-cell.pi-cell .pi-input {
+    width: 28%;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+}
 
 /* Teeth image wrappers */
 .c-teeth-wrapper {
@@ -441,7 +448,21 @@ body { height: 100vh; overflow: hidden; }
 }
 
 /* FORM ACTIONS */
-.form-actions { display: flex; justify-content: flex-end; padding-top: 4px; }
+.form-actions { display: flex; justify-content: flex-end; gap: 12px; padding-top: 4px; }
+
+.btn-next {
+    background: #061F40;
+    color: white;
+    padding: 10px 30px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+.btn-next:hover { background: #2c5282; }
 
 .btn-submit {
     background: #061F40;

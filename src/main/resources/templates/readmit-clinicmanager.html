@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Readmit Patient - DentIS</title>
+    <link rel="stylesheet" href="/css/admitting-clinicmanager.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div class="background"></div>
+<div class="admitting-form">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
+                <div class="dropdown-icon">▼</div>
+                <div class="user-dropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="/dashboard-clinicmanager" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/requestlist-clinicmanager" class="nav-link">
+                            <img src="/images/request-icon.png" alt="Request List" class="nav-icon">
+                            <span>Request List</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="/patientlist-clinicmanager" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient List" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/assign-clinicmanager" class="nav-link">
+                            <img src="/images/chart-icon.png" alt="Assign Advisers" class="nav-icon">
+                            <span>Assign Advisers</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <h2 class="page-title">Recall Visit — Admitting Section Form</h2>
+
+            <!-- Form Card -->
+            <div class="form-card">
+                <form class="admitting-form-content"
+                      th:action="@{/readmit-clinicmanager/{id}(id=${patient.id})}"
+                      th:object="${patient}" method="post">
+
+                    <!-- Personal Information Sub-header -->
+                    <div class="sub-header">Personal Information</div>
+
+                    <!-- Registration Date -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Registration Date</label>
+                            <input type="date" class="date-picker" name="registrationDate" th:value="${today}">
+                        </div>
+                    </div>
+
+                    <!-- Patient Name -->
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label>Patient Name</label>
+                            <div class="split-input">
+                                <input type="text" placeholder="Surname" th:field="*{surname}">
+                                <input type="text" placeholder="First Name" class="input-wide" th:field="*{firstName}">
+                                <input type="text" placeholder="M.I." class="input-narrow" th:field="*{middleInitial}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Age, Birthdate, Sex -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Age</label>
+                            <input type="number" placeholder="Age" th:field="*{age}">
+                        </div>
+                        <div class="form-group">
+                            <label>Birthdate</label>
+                            <input type="date" class="date-picker" th:field="*{birthdate}">
+                        </div>
+                        <div class="form-group">
+                            <label>Sex</label>
+                            <select class="select-input" th:field="*{sex}">
+                                <option value="">Enter Sex</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label>Address</label>
+                            <input type="text" placeholder="Enter Address" th:field="*{address}">
+                        </div>
+                    </div>
+
+                    <!-- Contact Number, Email, Civil Status -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Contact Number</label>
+                            <input type="tel" placeholder="Enter Contact Number" th:field="*{contactNumber}">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" placeholder="Enter Email Address" th:field="*{email}">
+                        </div>
+                        <div class="form-group">
+                            <label>Civil Status</label>
+                            <select class="select-input" th:field="*{civilStatus}">
+                                <option value="">Civil Status</option>
+                                <option value="Single">Single</option>
+                                <option value="Married">Married</option>
+                                <option value="Widowed">Widowed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Occupation, Educational Attainment -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Occupation</label>
+                            <input type="text" placeholder="Occupation" th:field="*{occupation}">
+                        </div>
+                        <div class="form-group">
+                            <label>Educational Attainment</label>
+                            <input type="text" placeholder="Educational Attainment" th:field="*{educationalAttainment}">
+                        </div>
+                    </div>
+
+                    <!-- In case of emergency -->
+                    <h3 class="section-title">In case of emergency</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Contact Person</label>
+                            <input type="text" placeholder="Surname, First Name M.I." th:field="*{emergencyContactName}">
+                        </div>
+                        <div class="form-group">
+                            <label>Relationship</label>
+                            <input type="text" placeholder="Relationship" th:field="*{emergencyContactRelation}">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group form-group-small">
+                            <label>Contact Number</label>
+                            <input type="tel" placeholder="Emergency Contact Number" th:field="*{emergencyContactNumber}">
+                        </div>
+                    </div>
+
+                    <!-- Chief Complaint -->
+                    <h3 class="section-title">Chief Complaint</h3>
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <textarea placeholder="Description" rows="3" th:field="*{chiefComplaint}"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- History of Present Illness -->
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label>History of Present Illness</label>
+                            <textarea placeholder="Enter History of Present Illness" rows="3" th:field="*{historyOfPresentIllness}"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Service Code -->
+                    <div class="form-row">
+                        <div class="form-group form-group-small">
+                            <label>Service Code</label>
+                            <select class="select-input" th:field="*{serviceCode}">
+                                <option value="">Select Service Code</option>
+                                <option value="Resto">Resto</option>
+                                <option value="FPD">FPD</option>
+                                <option value="PEDO">PEDO</option>
+                                <option value="CD">CD</option>
+                                <option value="RPD">RPD</option>
+                                <option value="ENDO">ENDO</option>
+                                <option value="PERIO">PERIO</option>
+                                <option value="OS">OS</option>
+                                <option value="Ortho">Ortho</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Proposed Treatment Plan -->
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label>Proposed Treatment Plan</label>
+                            <textarea placeholder="Enter Proposed Treatment Plan" rows="3" th:field="*{proposedTreatmentPlan}"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="form-actions">
+                        <a th:href="@{/chartsview-clinicmanager/{id}(id=${patient.id})}" class="btn-cancel">Cancel</a>
+                        <button type="submit" class="btn-submit">Confirm Readmission</button>
+                    </div>
+
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+document.querySelector('.menu-icon').onclick = function() {
+    document.querySelector('.sidebar').classList.toggle('expanded');
+};
+document.querySelector('.user-profile').onclick = function(e) {
+    e.stopPropagation();
+    document.querySelector('.user-dropdown').classList.toggle('show');
+};
+document.addEventListener('click', function() {
+    const dropdown = document.querySelector('.user-dropdown');
+    if (dropdown && dropdown.classList.contains('show')) dropdown.classList.remove('show');
+});
+document.querySelector('.user-dropdown').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+</script>
+
+</body>
+</html>

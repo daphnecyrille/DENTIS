@@ -212,6 +212,7 @@ body { height: 100vh; overflow: hidden; }
     border: 1px solid #bbb;
     border-radius: 6px;
     overflow: hidden;
+    margin-top: 16px;
 }
 
 /*
@@ -416,7 +417,7 @@ body { height: 100vh; overflow: hidden; }
 .occlular-row textarea:focus { border-color: #324966; }
 
 /* FORM ACTIONS */
-.form-actions { display: flex; justify-content: flex-end; padding-top: 4px; }
+.form-actions { display: flex; justify-content: flex-end; gap: 12px; padding-top: 4px; }
 
 .btn-next {
     background: #061F40;

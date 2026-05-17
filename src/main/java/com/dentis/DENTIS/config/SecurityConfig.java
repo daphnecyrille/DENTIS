@@ -33,26 +33,37 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/css/**", "/images/**", "/js/**", "/login", "/oauth2/**").permitAll()
+                .requestMatchers("/css/**", "/images/**", "/js/**", "/uploads/**", "/login", "/oauth2/**").permitAll()
                 .requestMatchers(
                     "/faculty-dashboard", "/faculty-assign", "/faculty-patientlist", "/faculty-advisees",
                     "/chartsview-faculty/**", "/faculty-dashboard/**", "/admitting-view-faculty/**",
-                    "/oralsurgery-view-faculty/**", "/oralsurgery2-view-faculty/**",
-                    "/endodontics-view-faculty/**", "/endodontics2-view-faculty/**",
                     "/operative-view-faculty/**", "/operative2-view-faculty/**",
                     "/operative-faculty/**", "/operative2-faculty/**"
                 ).hasRole("FACULTY")
                 .requestMatchers(
+                    "/oralsurgery-view-faculty/**", "/oralsurgery2-view-faculty/**",
+                    "/endodontics-view-faculty/**", "/endodontics2-view-faculty/**",
+                    "/periodontics-ab-view/**", "/periodontics-c-view/**",
+                    "/operative-view/**", "/operative2-view/**",
+                    "/prosthodontics-view/**",
                     "/dashboard-clinicmanager", "/patientlist-clinicmanager", "/requestlist-clinicmanager",
                     "/chartsview-clinicmanager/**", "/admitting-clinicmanager/**",
-                    "/admitting-view-clinicmanager/**"
-                ).hasRole("CLINIC_MANAGER")
+                    "/admitting-view-clinicmanager/**",
+                    "/assign-clinicmanager/**", "/readmit-clinicmanager/**",
+                    "/clinician-profile/**"
+                ).hasAnyRole("CLINIC_MANAGER", "FACULTY")
+                .requestMatchers(
+                    "/dashboard-sysadmin",
+                    "/create-user-sysadmin", "/edit-user-sysadmin", "/toggle-status-sysadmin",
+                    "/usermanagement-sysadmin"
+                ).hasRole("ADMIN")
                 .requestMatchers(
                     "/clinician-dashboard", "/chartsview-clinician/**", "/chartrequest-clinician",
                     "/patientlist-clinician", "/admitting-edit-clinician/**",
                     "/admitting-view-clinician/**", "/oralsurgery-clinician/**", "/oralsurgery2-clinician/**",
                     "/endodontics-clinician/**", "/endodontics2-clinician/**", "/periodonticsa-clinician/**", "/periodonticsb-clinician/**"
                 ).hasRole("CLINICIAN")
+                .requestMatchers("/complete-profile").authenticated()
                 .anyRequest().authenticated()
             )
             .oauth2Login(oauth2 -> oauth2
@@ -88,6 +99,8 @@ public class SecurityConfig {
                     redirect = "/dashboard-clinicmanager";
                 } else if (auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLINICIAN"))) {
                     redirect = "/clinician-dashboard";
+                } else if (auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+                    redirect = "/dashboard-sysadmin";
                 }
             }
             response.sendRedirect(redirect);

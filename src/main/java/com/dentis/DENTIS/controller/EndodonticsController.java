@@ -1,6 +1,7 @@
 package com.dentis.DENTIS.controller;
 
 import com.dentis.DENTIS.model.EndodonticsChart;
+import com.dentis.DENTIS.model.EndodonticsChartStatus;
 import com.dentis.DENTIS.model.User;
 import com.dentis.DENTIS.repository.UserRepository;
 import com.dentis.DENTIS.service.EndodonticsChartService;
@@ -40,7 +41,7 @@ public class EndodonticsController {
         }
         model.addAttribute("currentUser", getCurrentUser(authentication));
         model.addAttribute("chart", chart);
-        model.addAttribute("viewOnly", false);
+        model.addAttribute("viewOnly", chart.getStatus() == EndodonticsChartStatus.APPROVED);
         return "endodontics-clinician";
     }
 
@@ -91,7 +92,7 @@ public class EndodonticsController {
         EndodonticsChart chart = endodonticsChartService.getById(id);
         model.addAttribute("currentUser", getCurrentUser(authentication));
         model.addAttribute("chart", chart);
-        model.addAttribute("viewOnly", false);
+        model.addAttribute("viewOnly", chart.getForm2Status() == EndodonticsChartStatus.APPROVED);
         return "endodontics2-clinician";
     }
 
@@ -124,8 +125,8 @@ public class EndodonticsController {
     }
 
     @PostMapping("/endodontics-faculty/{id}/revise")
-    public String reviseChart(@PathVariable Long id) {
-        EndodonticsChart chart = endodonticsChartService.revise(id);
+    public String reviseChart(@PathVariable Long id, @RequestParam String revisionReason) {
+        EndodonticsChart chart = endodonticsChartService.revise(id, revisionReason);
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 
@@ -136,8 +137,8 @@ public class EndodonticsController {
     }
 
     @PostMapping("/endodontics2-faculty/{id}/revise")
-    public String reviseForm2(@PathVariable Long id) {
-        EndodonticsChart chart = endodonticsChartService.reviseForm2(id);
+    public String reviseForm2(@PathVariable Long id, @RequestParam String revisionReason) {
+        EndodonticsChart chart = endodonticsChartService.reviseForm2(id, revisionReason);
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 }

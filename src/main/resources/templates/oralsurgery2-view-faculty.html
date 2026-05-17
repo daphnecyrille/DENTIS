@@ -40,7 +40,33 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <nav class="nav-menu">
-                <ul>
+                <ul th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
+                    <li class="nav-item">
+                        <a href="/dashboard-clinicmanager" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/requestlist-clinicmanager" class="nav-link">
+                            <img src="/images/request-icon.png" alt="Request List" class="nav-icon">
+                            <span>Request List</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="/patientlist-clinicmanager" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient List" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/assign-clinicmanager" class="nav-link">
+                            <img src="/images/chart-icon.png" alt="Assign Advisers" class="nav-icon">
+                            <span>Assign Advisers</span>
+                        </a>
+                    </li>
+                </ul>
+                <ul th:unless="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
                     <li class="nav-item">
                         <a href="/faculty-dashboard" class="nav-link">
                             <img src="/images/home-icon.png" alt="Home" class="nav-icon">
@@ -62,6 +88,12 @@
                         <a href="/faculty-patientlist" class="nav-link">
                             <img src="/images/patient-icon.png" alt="Patient List" class="nav-icon">
                             <span>Patient List</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/faculty-advisees" class="nav-link">
+                            <img src="/images/chart-icon.png" alt="My Advisees" class="nav-icon">
+                            <span>My Advisees</span>
                         </a>
                     </li>
                 </ul>
@@ -188,6 +220,9 @@
                         <input type="text" th:field="*{checkedBy}" class="input-medium" readonly>
                     </div>
 
+                    <div class="form-actions" th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
+                        <a th:href="@{/chartsview-clinicmanager/{id}(id=${chart.patient.id})}" class="btn-next">Back to Charts View</a>
+                    </div>
                 </div>
                 </form>
             </div>

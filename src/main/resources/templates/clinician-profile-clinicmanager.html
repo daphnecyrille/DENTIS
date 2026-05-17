@@ -135,6 +135,11 @@
                             <span class="adviser-name" th:if="${assignmentRow.restoFaculty != null}" th:text="${assignmentRow.restoFaculty.fullName}"></span>
                             <span class="adviser-none" th:if="${assignmentRow.restoFaculty == null}">Not assigned</span>
                         </div>
+                        <div class="adviser-row">
+                            <span class="adviser-section">PROSTHO</span>
+                            <span class="adviser-name" th:if="${assignmentRow.prosthoFaculty != null}" th:text="${assignmentRow.prosthoFaculty.fullName}"></span>
+                            <span class="adviser-none" th:if="${assignmentRow.prosthoFaculty == null}">Not assigned</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -156,6 +161,9 @@
                     </button>
                     <button class="tab-btn" onclick="showTab('resto', this)">
                         RESTO (<span th:text="${#lists.size(restoPatients)}">0</span>)
+                    </button>
+                    <button class="tab-btn" onclick="showTab('prostho', this)">
+                        PROSTHO (<span th:text="${#lists.size(prosthoPatients)}">0</span>)
                     </button>
                 </div>
 
@@ -290,6 +298,35 @@
                                 </tr>
                                 <tr class="empty-row" th:if="${#lists.isEmpty(restoPatients)}">
                                     <td colspan="4">No RESTO patients assigned.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- PROSTHO -->
+                <div id="tab-prostho" class="tab-panel">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Chart No.</th>
+                                    <th>Patient Name</th>
+                                    <th>Service Code</th>
+                                    <th>Faculty</th>
+                                    <th>View</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="p : ${prosthoPatients}">
+                                    <td th:text="${p.chartNo}"></td>
+                                    <td th:text="${p.surname + ', ' + p.firstName + (p.middleInitial != null ? ' ' + p.middleInitial + '.' : '')}"></td>
+                                    <td th:text="${p.serviceCode}"></td>
+                                    <td th:text="${p.assignedFaculty != null ? p.assignedFaculty.fullName : '—'}"></td>
+                                    <td><a th:href="@{/chartsview-clinicmanager/{id}(id=${p.id})}" class="btn-view">View</a></td>
+                                </tr>
+                                <tr class="empty-row" th:if="${#lists.isEmpty(prosthoPatients)}">
+                                    <td colspan="5">No PROSTHO patients assigned.</td>
                                 </tr>
                             </tbody>
                         </table>

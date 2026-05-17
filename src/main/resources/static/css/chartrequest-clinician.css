@@ -276,6 +276,21 @@ body {
     outline: none;
 }
 
+/* SECTION SELECT */
+.section-select {
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+    width: 100%;
+    background: white;
+    color: #333;
+    cursor: pointer;
+    appearance: auto;
+    font-family: 'Poppins', sans-serif;
+}
+
 /* DATE PICKER */
 .date-picker {
     padding: 8px 10px;

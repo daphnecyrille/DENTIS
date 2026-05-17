@@ -15,4 +15,5 @@ public class ClinicianAssignmentRow {
     private User endoFaculty;
     private User perioFaculty;
     private User restoFaculty;
+    private User prosthoFaculty;
 }

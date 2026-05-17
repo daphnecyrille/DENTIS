@@ -10,6 +10,7 @@ import com.dentis.DENTIS.service.OperativeChartService;
 import com.dentis.DENTIS.service.OralSurgeryChartService;
 import com.dentis.DENTIS.service.PatientService;
 import com.dentis.DENTIS.service.PeriodonticChartService;
+import com.dentis.DENTIS.service.ProsthodonticsChartService;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,6 +32,7 @@ public class FacultyController {
     private final PeriodonticChartService periodonticChartService;
     private final UserRepository userRepository;
     private final ClinicianFacultyAssignmentService assignmentService;
+    private final ProsthodonticsChartService prosthodonticsChartService;
 
     public FacultyController(PatientService patientService,
                              OralSurgeryChartService oralSurgeryChartService,
@@ -38,7 +40,8 @@ public class FacultyController {
                              OperativeChartService operativeChartService,
                              PeriodonticChartService periodonticChartService,
                              UserRepository userRepository,
-                             ClinicianFacultyAssignmentService assignmentService) {
+                             ClinicianFacultyAssignmentService assignmentService,
+                             ProsthodonticsChartService prosthodonticsChartService) {
         this.patientService = patientService;
         this.oralSurgeryChartService = oralSurgeryChartService;
         this.endodonticsChartService = endodonticsChartService;
@@ -46,6 +49,7 @@ public class FacultyController {
         this.periodonticChartService = periodonticChartService;
         this.userRepository = userRepository;
         this.assignmentService = assignmentService;
+        this.prosthodonticsChartService = prosthodonticsChartService;
     }
 
     private User getCurrentUser(Authentication authentication) {
@@ -76,6 +80,12 @@ public class FacultyController {
         model.addAttribute("operativeCharts", "RESTO".equals(section) && faculty != null
                 ? operativeChartService.findByFacultyOrderByCreatedAtDesc(faculty).stream().limit(5).toList()
                 : List.of());
+        model.addAttribute("prosthoCharts", "PROSTHO".equals(section) && faculty != null
+                ? prosthodonticsChartService.findByFacultyOrderByCreatedAtDesc(faculty).stream().limit(5).toList()
+                : List.of());
+        model.addAttribute("awaitingApprovalProsthoCharts", "PROSTHO".equals(section) && faculty != null
+                ? prosthodonticsChartService.findAwaitingApprovalByFaculty(faculty)
+                : List.of());
         model.addAttribute("awaitingApprovalCharts", "OS".equals(section) && faculty != null
                 ? oralSurgeryChartService.findAwaitingApprovalByFaculty(faculty)
                 : List.of());
@@ -100,7 +110,11 @@ public class FacultyController {
         model.addAttribute("unassignedPatients", faculty != null
                 ? patientService.getUnassignedPatientsForFaculty(faculty).stream().limit(5).toList()
                 : List.of());
+        model.addAttribute("recentPatients", faculty != null
+                ? patientService.getPatientsForFaculty(faculty).stream().limit(5).toList()
+                : List.of());
         model.addAttribute("clinicians", patientService.getAllClinicians());
+        model.addAttribute("clinicianPatientCounts", patientService.getUniquePatientCountByClinician());
         return "dashboard-faculty";
     }
 
@@ -124,6 +138,10 @@ public class FacultyController {
         model.addAttribute("operativeCharts", "RESTO".equals(section) && faculty != null
                 ? operativeChartService.findByFacultyOrderByCreatedAtDesc(faculty)
                 : List.of());
+        model.addAttribute("prosthoCharts", "PROSTHO".equals(section) && faculty != null
+                ? prosthodonticsChartService.findByFacultyOrderByCreatedAtDesc(faculty)
+                : List.of());
+        model.addAttribute("clinicianPatientCounts", patientService.getUniquePatientCountByClinician());
         return "patientlist-faculty";
     }
 
@@ -179,6 +197,10 @@ public class FacultyController {
         model.addAttribute("operativeCharts", "RESTO".equals(section)
                 ? operativeChartService.findAllByPatient(patient)
                 : List.of());
+        model.addAttribute("prosthoCharts", "PROSTHO".equals(section)
+                ? prosthodonticsChartService.findAllByPatient(patient)
+                : List.of());
+        model.addAttribute("clinicianPatientCounts", patientService.getUniquePatientCountByClinician());
         return "chartsview-faculty";
     }
 
@@ -196,8 +218,8 @@ public class FacultyController {
     }
 
     @PostMapping("/oralsurgery-faculty/{id}/revise")
-    public String reviseChart(@PathVariable Long id) {
-        OralSurgeryChart chart = oralSurgeryChartService.revise(id);
+    public String reviseChart(@PathVariable Long id, @RequestParam String revisionReason) {
+        OralSurgeryChart chart = oralSurgeryChartService.revise(id, revisionReason);
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 

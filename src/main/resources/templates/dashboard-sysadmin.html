@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - System Administrator</title>
+    <link rel="stylesheet" href="/css/dashboard-sysadmin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="background"></div>
+<div class="sysadmin-dashboard">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="menu-icon" id="menuToggle">&#9776;</div>
+            <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+            <h1>DentIS</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-profile" id="userProfileBtn">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (System Admin)' : 'System Admin'}">Admin</span>
+                <div class="dropdown-icon">&#9660;</div>
+                <div class="user-dropdown" id="userDropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item active">
+                        <a href="/dashboard-sysadmin" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 9L12 2l9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                <polyline points="9 22 9 12 15 12 15 22"/>
+                            </svg>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+
+            <div class="page-title">
+                System Administrator Dashboard
+                <span class="subtitle">— Manage accounts and system access</span>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="stat-value" th:text="${statTotalUsers}">0</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="stat-value" th:text="${statActiveUsers}">0</div>
+                        <div class="stat-label">Active Users</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon amber">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="stat-value" th:text="${statClinicians}">0</div>
+                        <div class="stat-label">Clinicians</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon navy">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="3" width="20" height="14" rx="2"/>
+                            <path d="M8 21h8M12 17v4"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="stat-value" th:text="${statFaculty}">0</div>
+                        <div class="stat-label">Faculty</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Management Section -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h2>User Accounts</h2>
+                    <button class="btn-create" onclick="openCreateModal()">
+                        &#43; Create User
+                    </button>
+                </div>
+
+                <!-- Tab Filters -->
+                <div class="tab-filters">
+                    <button class="filter-btn active" onclick="filterTable('all', this)">
+                        All (<span th:text="${statTotalUsers}">0</span>)
+                    </button>
+                    <button class="filter-btn" onclick="filterTable('clinician', this)">
+                        Clinicians (<span th:text="${statClinicians}">0</span>)
+                    </button>
+                    <button class="filter-btn" onclick="filterTable('faculty', this)">
+                        Faculty (<span th:text="${statFaculty}">0</span>)
+                    </button>
+                    <button class="filter-btn" onclick="filterTable('clinic_manager', this)">
+                        Clinic Managers (<span th:text="${statManagers}">0</span>)
+                    </button>
+                </div>
+
+                <!-- Table -->
+                <div class="table-wrapper">
+                    <table id="userTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Section</th>
+                                <th>Year Level</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="user : ${users}"
+                                th:attr="data-role=${user.role.name().toLowerCase()}">
+                                <td th:text="${user.fullName}">—</td>
+                                <td th:text="${user.email}">—</td>
+                                <td>
+                                    <span th:if="${user.role.name() == 'CLINICIAN'}"  class="badge badge-clinician">Clinician</span>
+                                    <span th:if="${user.role.name() == 'FACULTY'}"    class="badge badge-faculty">Faculty</span>
+                                    <span th:if="${user.role.name() == 'CLINIC_MANAGER'}" class="badge badge-manager">Clinic Manager</span>
+                                    <span th:if="${user.role.name() == 'ADMIN'}"       class="badge badge-sysadmin">Admin</span>
+                                </td>
+                                <td th:text="${user.section != null ? user.section : '—'}">—</td>
+                                <td th:text="${user.yearLevel != null ? user.yearLevel : '—'}">—</td>
+                                <td>
+                                    <span th:if="${user.status != null and user.status.name() == 'ACTIVE'}"
+                                          class="status-badge status-active">
+                                        <span class="status-dot"></span>Active
+                                    </span>
+                                    <span th:if="${user.status == null or user.status.name() != 'ACTIVE'}"
+                                          class="status-badge status-inactive">
+                                        <span class="status-dot"></span>Inactive
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="actions-cell">
+                                        <button class="btn-edit"
+                                                th:data-id="${user.id}"
+                                                th:data-firstname="${user.firstName}"
+                                                th:data-lastname="${user.lastName}"
+                                                th:data-email="${user.email}"
+                                                th:data-role="${user.role.name()}"
+                                                th:data-section="${user.section != null ? user.section : ''}"
+                                                th:data-yearlevel="${user.yearLevel != null ? user.yearLevel : ''}"
+                                                th:data-studentnumber="${user.studentNumber != null ? user.studentNumber : ''}"
+                                                onclick="openEditModal(this)">
+                                            Edit
+                                        </button>
+                                        <button th:if="${user.status != null and user.status.name() == 'ACTIVE'}"
+                                                class="btn-deactivate"
+                                                th:data-id="${user.id}"
+                                                th:data-name="${user.fullName}"
+                                                th:data-action="deactivate"
+                                                onclick="openConfirmModal(this)">
+                                            Deactivate
+                                        </button>
+                                        <button th:if="${user.status == null or user.status.name() != 'ACTIVE'}"
+                                                class="btn-activate"
+                                                th:data-id="${user.id}"
+                                                th:data-name="${user.fullName}"
+                                                th:data-action="activate"
+                                                onclick="openConfirmModal(this)">
+                                            Activate
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="empty-row" th:if="${#lists.isEmpty(users)}">
+                                <td colspan="7">No users found.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<!-- ══════════════ CREATE USER MODAL ══════════════ -->
+<div class="modal-overlay" id="createModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Create New User Account</h3>
+            <button class="modal-close" onclick="closeModal('createModal')">&#10005;</button>
+        </div>
+        <form th:action="@{/create-user-sysadmin}" method="post">
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Google Email Address</label>
+                        <input type="email" name="email" placeholder="e.g. user@up.edu.ph" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Role</label>
+                        <select name="role" id="createRoleSelect" onchange="toggleCreateSection()" required>
+                            <option value="">-- Select Role --</option>
+                            <option value="CLINICIAN">Clinician</option>
+                            <option value="FACULTY">Faculty</option>
+                            <option value="CLINIC_MANAGER">Clinic Manager</option>
+                        </select>
+                    </div>
+                    <div id="createFacultyFields" style="display:none; grid-column: 1 / -1;">
+                        <div class="form-grid" style="margin-bottom:0;">
+                            <div class="form-group">
+                                <label>First Name</label>
+                                <input type="text" name="firstName" placeholder="e.g. Juan">
+                            </div>
+                            <div class="form-group">
+                                <label>Last Name</label>
+                                <input type="text" name="lastName" placeholder="e.g. Dela Cruz">
+                            </div>
+                            <div class="form-group full-width">
+                                <label>Section</label>
+                                <select name="section">
+                                    <option value="">-- Select Section --</option>
+                                    <option value="OS">OS</option>
+                                    <option value="ENDO">ENDO</option>
+                                    <option value="PERIO">PERIO</option>
+                                    <option value="Resto">RESTO</option>
+                                    <option value="PROSTHO">PROSTHO</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeModal('createModal')">Cancel</button>
+                <button type="submit" class="btn-submit">Create Account</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ══════════════ EDIT USER MODAL ══════════════ -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Edit User Account</h3>
+            <button class="modal-close" onclick="closeModal('editModal')">&#10005;</button>
+        </div>
+        <form th:action="@{/edit-user-sysadmin}" method="post">
+            <input type="hidden" name="userId" id="editUserId">
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" name="firstName" id="editFirstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" name="lastName" id="editLastName" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Google Email Address</label>
+                        <input type="email" name="email" id="editEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <select name="role" id="editRoleSelect" onchange="toggleRoleFields('edit')">
+                            <option value="CLINICIAN">Clinician</option>
+                            <option value="FACULTY">Faculty</option>
+                            <option value="CLINIC_MANAGER">Clinic Manager</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="editSectionGroup" style="display:none;">
+                        <label>Section</label>
+                        <select name="section" id="editSection">
+                            <option value="">-- Select Section --</option>
+                            <option value="OS">OS</option>
+                            <option value="ENDO">ENDO</option>
+                            <option value="PERIO">PERIO</option>
+                            <option value="Resto">RESTO</option>
+                            <option value="PROSTHO">PROSTHO</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="editYearGroup" style="display:none;">
+                        <label>Year Level</label>
+                        <select name="yearLevel" id="editYearLevel">
+                            <option value="">-- Select Year --</option>
+                            <option value="3rd-Year">3rd Year</option>
+                            <option value="4th-Year">4th Year</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="editStudentNumGroup" style="display:none;">
+                        <label>Student Number</label>
+                        <input type="text" name="studentNumber" id="editStudentNumber">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeModal('editModal')">Cancel</button>
+                <button type="submit" class="btn-submit">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ══════════════ CONFIRM DEACTIVATE/ACTIVATE MODAL ══════════════ -->
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-box" style="max-width:400px;">
+        <div class="modal-header" id="confirmHeader">
+            <h3 id="confirmTitle">Confirm Action</h3>
+            <button class="modal-close" onclick="closeModal('confirmModal')">&#10005;</button>
+        </div>
+        <form th:action="@{/toggle-status-sysadmin}" method="post">
+            <input type="hidden" name="userId" id="confirmUserId">
+            <input type="hidden" name="action" id="confirmAction">
+            <div class="confirm-body">
+                <div class="confirm-icon" id="confirmIcon">&#9888;</div>
+                <p id="confirmMessage">Are you sure?</p>
+            </div>
+            <div class="confirm-footer">
+                <button type="button" class="btn-cancel" onclick="closeModal('confirmModal')">Cancel</button>
+                <button type="submit" class="btn-submit" id="confirmBtn">Confirm</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+/* ── Sidebar toggle ── */
+document.getElementById('menuToggle').addEventListener('click', function() {
+    var sidebar = document.getElementById('sidebar');
+    var main    = document.getElementById('mainContent');
+    sidebar.classList.toggle('expanded');
+    main.classList.toggle('shifted');
+});
+
+/* ── User dropdown ── */
+document.getElementById('userProfileBtn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('userDropdown').classList.toggle('show');
+});
+document.addEventListener('click', function() {
+    document.getElementById('userDropdown').classList.remove('show');
+});
+
+/* ── Modal helpers ── */
+function openCreateModal() {
+    document.getElementById('createModal').classList.add('open');
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+}
+
+function openEditModal(btn) {
+    document.getElementById('editUserId').value        = btn.dataset.id;
+    document.getElementById('editFirstName').value     = btn.dataset.firstname;
+    document.getElementById('editLastName').value      = btn.dataset.lastname;
+    document.getElementById('editEmail').value         = btn.dataset.email;
+    document.getElementById('editRoleSelect').value    = btn.dataset.role;
+    document.getElementById('editSection').value       = btn.dataset.section;
+    document.getElementById('editYearLevel').value     = btn.dataset.yearlevel;
+    document.getElementById('editStudentNumber').value = btn.dataset.studentnumber || '';
+    toggleRoleFields('edit');
+    document.getElementById('editModal').classList.add('open');
+}
+
+function openConfirmModal(btn) {
+    var id     = btn.dataset.id;
+    var name   = btn.dataset.name;
+    var action = btn.dataset.action;
+    document.getElementById('confirmUserId').value = id;
+    document.getElementById('confirmAction').value = action;
+    var isDeactivate = (action === 'deactivate');
+    document.getElementById('confirmTitle').textContent   = isDeactivate ? 'Deactivate Account' : 'Activate Account';
+    document.getElementById('confirmMessage').innerHTML   = 'Are you sure you want to ' + action + ' the account of <strong>' + name + '</strong>?';
+    var icon    = document.getElementById('confirmIcon');
+    var btn     = document.getElementById('confirmBtn');
+    var header  = document.getElementById('confirmHeader');
+    icon.className  = 'confirm-icon ' + (isDeactivate ? 'danger' : 'success');
+    icon.textContent = isDeactivate ? '⚠' : '✓';
+    btn.textContent  = isDeactivate ? 'Deactivate' : 'Activate';
+    btn.style.background = isDeactivate ? '#c0392b' : '#1a7f5a';
+    document.getElementById('confirmModal').classList.add('open');
+}
+
+/* Close modal on overlay click */
+document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) overlay.classList.remove('open');
+    });
+});
+
+/* ── Create modal: show name+section fields only for FACULTY ── */
+function toggleCreateSection() {
+    var role = document.getElementById('createRoleSelect').value;
+    var show = (role === 'FACULTY');
+    document.getElementById('createFacultyFields').style.display = show ? '' : 'none';
+}
+
+/* ── Role-conditional fields ── */
+function toggleRoleFields(prefix) {
+    var role    = document.getElementById(prefix + 'RoleSelect').value;
+    var secGrp  = document.getElementById(prefix + 'SectionGroup');
+    var yearGrp = document.getElementById(prefix + 'YearGroup');
+    var stuGrp  = document.getElementById(prefix + 'StudentNumGroup');
+    secGrp.style.display  = (role === 'FACULTY' || role === 'CLINICIAN') ? '' : 'none';
+    yearGrp.style.display = (role === 'CLINICIAN') ? '' : 'none';
+    stuGrp.style.display  = (role === 'CLINICIAN') ? '' : 'none';
+}
+
+/* ── Tab filter ── */
+function filterTable(role, btn) {
+    document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    var rows = document.querySelectorAll('#userTable tbody tr:not(.empty-row)');
+    rows.forEach(function(row) {
+        row.style.display = (role === 'all' || row.dataset.role === role) ? '' : 'none';
+    });
+}
+</script>
+
+</body>
+</html>

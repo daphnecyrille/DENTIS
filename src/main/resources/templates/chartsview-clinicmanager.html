@@ -61,6 +61,12 @@
                             <span>Patient List</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="/assign-clinicmanager" class="nav-link">
+                            <img src="/images/chart-icon.png" alt="Assign Advisers" class="nav-icon">
+                            <span>Assign Advisers</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
         </aside>
@@ -71,8 +77,9 @@
 
             <!-- Patient Information -->
             <section class="section">
-                <div class="section-header">
+                <div class="section-header" style="display:flex; justify-content:space-between; align-items:center;">
                     <h2>Patient Information</h2>
+                    <a th:href="@{/readmit-clinicmanager/{id}(id=${patient.id})}" class="btn-readmit">Readmit Patient</a>
                 </div>
                 <div class="patient-info-container">
                     <div class="info-grid">
@@ -157,15 +164,59 @@
                                 <th>Date Created</th>
                                 <th>View Chart</th>
                                 <th>Faculty</th>
+                                <th>Assigned Clinician</th>
                             </tr>
                         </thead>
                         <tbody>
+                            <!-- Root (original) visit admitting chart — shown only when viewing a recall patient -->
+                            <tr th:if="${isRecall}">
+                                <td th:text="${rootPatient.chartNo}">—</td>
+                                <td>Admitting Section Chart</td>
+                                <td class="status submitted">Submitted</td>
+                                <td th:text="${rootPatient.registrationDate}"></td>
+                                <td><a th:href="@{/admitting-view-clinicmanager/{id}(id=${rootPatient.id})}" class="btn-action btn-view">View</a></td>
+                                <td th:text="${rootPatient.assignedFaculty != null ? rootPatient.assignedFaculty.fullName : '—'}"></td>
+                                <td>
+                                    <span th:if="${rootPatient.assignedClinician != null}"
+                                          class="clinician-link"
+                                          th:data-name="${rootPatient.assignedClinician.fullName}"
+                                          th:data-email="${rootPatient.assignedClinician.email}"
+                                          th:data-student="${rootPatient.assignedClinician.studentNumber}"
+                                          th:data-year="${rootPatient.assignedClinician.yearLevel}"
+                                          th:data-patient-id="${rootPatient.id}"
+                                          th:text="${rootPatient.assignedClinician.fullName}"
+                                          onclick="showClinicianModal(this)"></span>
+                                    <span th:if="${rootPatient.assignedClinician == null}">—</span>
+                                </td>
+                            </tr>
+                            <!-- Sibling recall admitting charts (other recalls of the same root, excluding current) -->
+                            <tr th:each="sibling : ${siblingRecalls}">
+                                <td th:text="${sibling.chartNo}">—</td>
+                                <td>Admitting Section Chart</td>
+                                <td class="status submitted">Submitted</td>
+                                <td th:text="${sibling.registrationDate}"></td>
+                                <td><a th:href="@{/admitting-view-clinicmanager/{id}(id=${sibling.id})}" class="btn-action btn-view">View</a></td>
+                                <td th:text="${sibling.assignedFaculty != null ? sibling.assignedFaculty.fullName : '—'}"></td>
+                                <td>
+                                    <span th:if="${sibling.assignedClinician != null}"
+                                          class="clinician-link"
+                                          th:data-name="${sibling.assignedClinician.fullName}"
+                                          th:data-email="${sibling.assignedClinician.email}"
+                                          th:data-student="${sibling.assignedClinician.studentNumber}"
+                                          th:data-year="${sibling.assignedClinician.yearLevel}"
+                                          th:data-patient-id="${sibling.originalPatient != null ? sibling.originalPatient.id : sibling.id}"
+                                          th:text="${sibling.assignedClinician.fullName}"
+                                          onclick="showClinicianModal(this)"></span>
+                                    <span th:if="${sibling.assignedClinician == null}">—</span>
+                                </td>
+                            </tr>
+                            <!-- Current visit admitting chart -->
                             <tr>
                                 <td th:text="${patient.chartNo}">—</td>
                                 <td>Admitting Section Chart</td>
                                 <td class="status submitted">Submitted</td>
                                 <td th:text="${patient.registrationDate}"></td>
-                                <td><a th:href="@{/admitting-view-clinicmanager/{id}(id=${patient.id})}" class="btn-action btn-view">View Chart</a></td>
+                                <td><a th:href="@{/admitting-view-clinicmanager/{id}(id=${patient.id})}" class="btn-action btn-view">View</a></td>
                                 <td>
                                     <!-- Already assigned: show name with reassign link -->
                                     <div th:if="${patient.assignedFaculty != null}" style="display:flex; flex-direction:column; align-items:center; gap:4px;">
@@ -197,6 +248,191 @@
                                         <button type="submit" style="background:#324966;color:white;border:none;padding:5px 10px;border-radius:4px;font-size:12px;cursor:pointer;font-family:'Poppins',sans-serif;">Assign</button>
                                     </form>
                                 </td>
+                                <td>
+                                    <span th:if="${patient.assignedClinician != null}"
+                                          class="clinician-link"
+                                          th:data-name="${patient.assignedClinician.fullName}"
+                                          th:data-email="${patient.assignedClinician.email}"
+                                          th:data-student="${patient.assignedClinician.studentNumber}"
+                                          th:data-year="${patient.assignedClinician.yearLevel}"
+                                          th:data-patient-id="${patient.originalPatient != null ? patient.originalPatient.id : patient.id}"
+                                          th:text="${patient.assignedClinician.fullName}"
+                                          onclick="showClinicianModal(this)"></span>
+                                    <span th:if="${patient.assignedClinician == null}">—</span>
+                                </td>
+                            </tr>
+                            <!-- Oral Surgery charts -->
+                            <tr th:each="osc : ${osCharts}">
+                                <td th:text="${osc.chartNo}"></td>
+                                <td th:text="${osc.chartType != null ? osc.chartType.displayName : 'Oral Surgery Chart'}"></td>
+                                <td th:class="'status ' + ${osc.status.cssClass}" th:text="${osc.status.displayName}"></td>
+                                <td th:text="${osc.createdAt.toLocalDate()}"></td>
+                                <td>
+                                    <a th:if="${osc.chartType != null and osc.chartType.name() == 'OSF2'}"
+                                       th:href="@{/oralsurgery2-view-faculty/{id}(id=${osc.id})}" class="btn-action btn-view">View</a>
+                                    <a th:if="${osc.chartType == null or osc.chartType.name() == 'OSF1'}"
+                                       th:href="@{/oralsurgery-view-faculty/{id}(id=${osc.id})}" class="btn-action btn-view">View</a>
+                                </td>
+                                <td th:text="${osc.faculty != null ? osc.faculty.fullName : '—'}"></td>
+                                <td>
+                                    <span th:if="${osc.clinician != null}"
+                                          class="clinician-link"
+                                          th:data-name="${osc.clinician.fullName}"
+                                          th:data-email="${osc.clinician.email}"
+                                          th:data-student="${osc.clinician.studentNumber}"
+                                          th:data-year="${osc.clinician.yearLevel}"
+                                          th:data-patient-id="${patient.originalPatient != null ? patient.originalPatient.id : patient.id}"
+                                          th:text="${osc.clinician.fullName}"
+                                          onclick="showClinicianModal(this)"></span>
+                                    <span th:if="${osc.clinician == null}">—</span>
+                                </td>
+                            </tr>
+                            <!-- Endodontics Form 1 -->
+                            <tr th:each="ec : ${endoCharts}">
+                                <td th:text="${ec.chartNo}"></td>
+                                <td>Endodontics - Patient Workup</td>
+                                <td th:class="'status ' + ${ec.status.cssClass}" th:text="${ec.status.displayName}"></td>
+                                <td th:text="${ec.createdAt.toLocalDate()}"></td>
+                                <td><a th:href="@{/endodontics-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-view">View</a></td>
+                                <td th:text="${ec.faculty != null ? ec.faculty.fullName : '—'}"></td>
+                                <td>
+                                    <span th:if="${ec.clinician != null}"
+                                          class="clinician-link"
+                                          th:data-name="${ec.clinician.fullName}"
+                                          th:data-email="${ec.clinician.email}"
+                                          th:data-student="${ec.clinician.studentNumber}"
+                                          th:data-year="${ec.clinician.yearLevel}"
+                                          th:data-patient-id="${patient.originalPatient != null ? patient.originalPatient.id : patient.id}"
+                                          th:text="${ec.clinician.fullName}"
+                                          onclick="showClinicianModal(this)"></span>
+                                    <span th:if="${ec.clinician == null}">—</span>
+                                </td>
+                            </tr>
+                            <!-- Endodontics Form 2 -->
+                            <tr th:each="ec : ${endoCharts}">
+                                <td th:text="${#strings.replace(ec.chartNo, '-ENDO1', '-ENDO2')}"></td>
+                                <td>Endodontics - Evaluation &amp; Treatment Planning</td>
+                                <td th:class="'status ' + ${ec.form2Status.cssClass}" th:text="${ec.form2Status.displayName}"></td>
+                                <td th:text="${ec.createdAt.toLocalDate()}"></td>
+                                <td><a th:href="@{/endodontics2-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-view">View</a></td>
+                                <td th:text="${ec.faculty != null ? ec.faculty.fullName : '—'}"></td>
+                                <td>
+                                    <span th:if="${ec.clinician != null}"
+                                          class="clinician-link"
+                                          th:data-name="${ec.clinician.fullName}"
+                                          th:data-email="${ec.clinician.email}"
+                                          th:data-student="${ec.clinician.studentNumber}"
+                                          th:data-year="${ec.clinician.yearLevel}"
+                                          th:data-patient-id="${patient.originalPatient != null ? patient.originalPatient.id : patient.id}"
+                                          th:text="${ec.clinician.fullName}"
+                                          onclick="showClinicianModal(this)"></span>
+                                    <span th:if="${ec.clinician == null}">—</span>
+                                </td>
+                            </tr>
+                            <!-- Periodontics PF1 (Forms A+B) -->
+                            <tr th:each="pc : ${perioCharts}">
+                                <td th:text="${pc.chartNo}"></td>
+                                <td>Periodontics - Periodontal Chart</td>
+                                <td th:class="'status ' + ${pc.status.cssClass}" th:text="${pc.status.displayName}"></td>
+                                <td th:text="${pc.createdAt.toLocalDate()}"></td>
+                                <td><a th:href="@{/periodontics-ab-view/{id}(id=${pc.id})}" class="btn-action btn-view">View</a></td>
+                                <td th:text="${pc.faculty != null ? pc.faculty.fullName : '—'}"></td>
+                                <td>
+                                    <span th:if="${pc.clinician != null}"
+                                          class="clinician-link"
+                                          th:data-name="${pc.clinician.fullName}"
+                                          th:data-email="${pc.clinician.email}"
+                                          th:data-student="${pc.clinician.studentNumber}"
+                                          th:data-year="${pc.clinician.yearLevel}"
+                                          th:data-patient-id="${patient.originalPatient != null ? patient.originalPatient.id : patient.id}"
+                                          th:text="${pc.clinician.fullName}"
+                                          onclick="showClinicianModal(this)"></span>
+                                    <span th:if="${pc.clinician == null}">—</span>
+                                </td>
+                            </tr>
+                            <!-- Periodontics PF2 (Form C) -->
+                            <tr th:each="pc : ${perioCharts}">
+                                <td th:text="${#strings.replace(pc.chartNo, '-PF1', '-PF2')}"></td>
+                                <td>Periodontics - PPD/CAL/BOP Chart</td>
+                                <td th:class="'status ' + ${pc.formCStatus.cssClass}" th:text="${pc.formCStatus.displayName}"></td>
+                                <td th:text="${pc.createdAt.toLocalDate()}"></td>
+                                <td><a th:href="@{/periodontics-c-view/{id}(id=${pc.id})}" class="btn-action btn-view">View</a></td>
+                                <td th:text="${pc.faculty != null ? pc.faculty.fullName : '—'}"></td>
+                                <td>
+                                    <span th:if="${pc.clinician != null}"
+                                          class="clinician-link"
+                                          th:data-name="${pc.clinician.fullName}"
+                                          th:data-email="${pc.clinician.email}"
+                                          th:data-student="${pc.clinician.studentNumber}"
+                                          th:data-year="${pc.clinician.yearLevel}"
+                                          th:data-patient-id="${patient.originalPatient != null ? patient.originalPatient.id : patient.id}"
+                                          th:text="${pc.clinician.fullName}"
+                                          onclick="showClinicianModal(this)"></span>
+                                    <span th:if="${pc.clinician == null}">—</span>
+                                </td>
+                            </tr>
+                            <!-- Operative Dentistry - RESTO10 (Assessment Form) -->
+                            <tr th:each="oc : ${operativeCharts}">
+                                <td th:text="${oc.chartNo}"></td>
+                                <td>Operative Dentistry - Assessment Form</td>
+                                <td th:class="'status ' + ${oc.status.cssClass}" th:text="${oc.status.displayName}"></td>
+                                <td th:text="${oc.createdAt.toLocalDate()}"></td>
+                                <td><a th:href="@{/operative-view/{id}(id=${oc.id})}" class="btn-action btn-view">View</a></td>
+                                <td th:text="${oc.faculty != null ? oc.faculty.fullName : '—'}"></td>
+                                <td>
+                                    <span th:if="${oc.clinician != null}"
+                                          class="clinician-link"
+                                          th:data-name="${oc.clinician.fullName}"
+                                          th:data-email="${oc.clinician.email}"
+                                          th:data-student="${oc.clinician.studentNumber}"
+                                          th:data-year="${oc.clinician.yearLevel}"
+                                          th:data-patient-id="${patient.originalPatient != null ? patient.originalPatient.id : patient.id}"
+                                          th:text="${oc.clinician.fullName}"
+                                          onclick="showClinicianModal(this)"></span>
+                                    <span th:if="${oc.clinician == null}">—</span>
+                                </td>
+                            </tr>
+                            <!-- Operative Dentistry - RESTO6 (Caries Risk Assessment) -->
+                            <tr th:each="oc : ${operativeCharts}">
+                                <td th:text="${#strings.replace(oc.chartNo, '-RESTO10', '-RESTO6')}"></td>
+                                <td>Operative Dentistry - Caries Risk Assessment</td>
+                                <td th:class="'status ' + ${oc.form2Status.cssClass}" th:text="${oc.form2Status.displayName}"></td>
+                                <td th:text="${oc.createdAt.toLocalDate()}"></td>
+                                <td><a th:href="@{/operative2-view/{id}(id=${oc.id})}" class="btn-action btn-view">View</a></td>
+                                <td th:text="${oc.faculty != null ? oc.faculty.fullName : '—'}"></td>
+                                <td>
+                                    <span th:if="${oc.clinician != null}"
+                                          class="clinician-link"
+                                          th:data-name="${oc.clinician.fullName}"
+                                          th:data-email="${oc.clinician.email}"
+                                          th:data-student="${oc.clinician.studentNumber}"
+                                          th:data-year="${oc.clinician.yearLevel}"
+                                          th:data-patient-id="${patient.originalPatient != null ? patient.originalPatient.id : patient.id}"
+                                          th:text="${oc.clinician.fullName}"
+                                          onclick="showClinicianModal(this)"></span>
+                                    <span th:if="${oc.clinician == null}">—</span>
+                                </td>
+                            </tr>
+                            <!-- Prosthodontics -->
+                            <tr th:each="pc : ${prosthoCharts}">
+                                <td th:text="${pc.chartNo}"></td>
+                                <td th:text="'Prosthodontics (' + ${pc.caseType} + ')'"></td>
+                                <td th:class="'status ' + ${pc.status.name().toLowerCase()}" th:text="${pc.status.displayName}"></td>
+                                <td th:text="${pc.createdAt.toLocalDate()}"></td>
+                                <td><a th:href="@{/prosthodontics-view/{id}(id=${pc.id})}" class="btn-action btn-view">View</a></td>
+                                <td th:text="${pc.faculty != null ? pc.faculty.fullName : '—'}"></td>
+                                <td>
+                                    <span th:if="${pc.clinician != null}"
+                                          class="clinician-link"
+                                          th:data-name="${pc.clinician.fullName}"
+                                          th:data-email="${pc.clinician.email}"
+                                          th:data-student="${pc.clinician.studentNumber}"
+                                          th:data-year="${pc.clinician.yearLevel}"
+                                          th:data-patient-id="${patient.originalPatient != null ? patient.originalPatient.id : patient.id}"
+                                          th:text="${pc.clinician.fullName}"
+                                          onclick="showClinicianModal(this)"></span>
+                                    <span th:if="${pc.clinician == null}">—</span>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -207,7 +443,40 @@
     </div>
 </div>
 
+<!-- Clinician Info Modal -->
+<div id="clinicianModal" class="modal-overlay" onclick="closeClinicianModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <button class="modal-close" onclick="closeClinicianModal()">✕</button>
+        <h3 id="modal-name"></h3>
+        <div class="modal-details">
+            <div class="modal-row"><span class="modal-label">Email</span><span id="modal-email"></span></div>
+            <div class="modal-row"><span class="modal-label">Student No.</span><span id="modal-student"></span></div>
+            <div class="modal-row"><span class="modal-label">Year Level</span><span id="modal-year"></span></div>
+            <div class="modal-row"><span class="modal-label">Total Patients</span><span id="modal-total"></span></div>
+        </div>
+    </div>
+</div>
+
 <script>
+function showClinicianModal(el) {
+    const name = el.dataset.name || '—';
+    document.getElementById('modal-name').textContent = name;
+    document.getElementById('modal-email').textContent = el.dataset.email || '—';
+    document.getElementById('modal-student').textContent = el.dataset.student || '—';
+    document.getElementById('modal-year').textContent = el.dataset.year || '—';
+    const patientIds = new Set();
+    document.querySelectorAll('.clinician-link').forEach(function(span) {
+        if (span.dataset.name === name && span.dataset.patientId) {
+            patientIds.add(span.dataset.patientId);
+        }
+    });
+    document.getElementById('modal-total').textContent = patientIds.size > 0 ? patientIds.size : '—';
+    document.getElementById('clinicianModal').style.display = 'flex';
+}
+function closeClinicianModal() {
+    document.getElementById('clinicianModal').style.display = 'none';
+}
+
 document.querySelector('.menu-icon').onclick = function() {
     document.querySelector('.sidebar').classList.toggle('expanded');
 };

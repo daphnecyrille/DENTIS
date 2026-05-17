@@ -95,6 +95,7 @@
                                 <th>ENDO Adviser</th>
                                 <th>PERIO Adviser</th>
                                 <th>RESTO Adviser</th>
+                                <th>PROSTHO Adviser</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -158,13 +159,26 @@
                                     </select>
                                 </td>
 
+                                <!-- PROSTHO -->
+                                <td>
+                                    <select name="prosthoFacultyId" class="assign-select"
+                                            th:attr="form='form-' + ${row.clinician.id}">
+                                        <option value="">— None —</option>
+                                        <option th:each="f : ${prosthoFaculty}"
+                                                th:value="${f.id}"
+                                                th:text="${f.fullName}"
+                                                th:selected="${row.prosthoFaculty != null and row.prosthoFaculty.id == f.id}">
+                                        </option>
+                                    </select>
+                                </td>
+
                                 <td>
                                     <button type="submit" class="btn-save-row"
                                             th:attr="form='form-' + ${row.clinician.id}">Save</button>
                                 </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(assignmentRows)}">
-                                <td colspan="6" class="empty-state">No active clinicians found.</td>
+                                <td colspan="7" class="empty-state">No active clinicians found.</td>
                             </tr>
                         </tbody>
                     </table>

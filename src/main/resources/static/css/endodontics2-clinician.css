@@ -268,8 +268,23 @@ input[readonly].select-input, input[readonly] { color: #333; }
 .form-actions {
     display: flex;
     justify-content: flex-end;
+    gap: 12px;
     padding-top: 4px;
 }
+
+.btn-next {
+    background: #061F40;
+    color: white;
+    padding: 10px 30px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+.btn-next:hover { background: #2c5282; }
 
 .btn-save {
     background: #061F40;

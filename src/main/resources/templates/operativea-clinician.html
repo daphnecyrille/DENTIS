@@ -39,7 +39,64 @@
     <div class="main-container">
         <aside class="sidebar">
             <nav class="nav-menu">
-                <ul>
+                <ul th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
+                    <li class="nav-item">
+                        <a href="/dashboard-clinicmanager" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/requestlist-clinicmanager" class="nav-link">
+                            <img src="/images/request-icon.png" alt="Request List" class="nav-icon">
+                            <span>Request List</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="/patientlist-clinicmanager" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient List" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/assign-clinicmanager" class="nav-link">
+                            <img src="/images/chart-icon.png" alt="Assign Advisers" class="nav-icon">
+                            <span>Assign Advisers</span>
+                        </a>
+                    </li>
+                </ul>
+                <ul th:if="${currentUser != null and currentUser.role.name() == 'FACULTY'}">
+                    <li class="nav-item">
+                        <a href="/faculty-dashboard" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/faculty-assign" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17 21V19C17 17.9 16.1 17 15 17H9C7.9 17 7 17.9 7 19V21" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+                                <circle cx="12" cy="11" r="3" stroke="#333" stroke-width="2"/>
+                                <path d="M19 8L21 10L19 12" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M21 10H16" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span>Assign Patients</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="/faculty-patientlist" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient List" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/faculty-advisees" class="nav-link">
+                            <img src="/images/chart-icon.png" alt="My Advisees" class="nav-icon">
+                            <span>My Advisees</span>
+                        </a>
+                    </li>
+                </ul>
+                <ul th:unless="${currentUser != null and (currentUser.role.name() == 'CLINIC_MANAGER' or currentUser.role.name() == 'FACULTY')}">
                     <li class="nav-item">
                         <a href="/clinician-dashboard" class="nav-link">
                             <img src="/images/home-icon.png" alt="Home" class="nav-icon">
@@ -64,6 +121,11 @@
 
         <main class="main-content">
             <h2 class="page-title">Operative Dentistry</h2>
+            <div th:if="${chart.form2Status != null and chart.form2Status.name() == 'REVISE' and chart.form2RevisionReason != null and !#strings.isEmpty(chart.form2RevisionReason)}"
+                 style="background:#fff3cd; border-left:5px solid #e6a817; padding:14px 24px; margin:0 0 28px 0; font-family:'Poppins',sans-serif; border-radius:6px;">
+                <strong style="font-size:13px; color:#856404; display:block; margin-bottom:4px;">Revision Required</strong>
+                <p style="margin:0; font-size:13px; color:#533f03;" th:text="${chart.form2RevisionReason}"></p>
+            </div>
 
             <form th:action="@{/operative-a/{id}(id=${chart.id})}" th:object="${chart}" method="post">
             <div class="form-card">
@@ -82,7 +144,7 @@
                         </div>
                         <div class="form-group">
                             <label>Chart Number</label>
-                            <input type="text" th:value="${#strings.replace(chart.chartNo, 'RESTO10-', 'RESTO6-')}" readonly>
+                            <input type="text" th:value="${#strings.replace(chart.chartNo, '-RESTO10', '-RESTO6')}" readonly>
                         </div>
                     </div>
 
@@ -314,6 +376,9 @@
                 </div>
 
                 <!-- Form Actions -->
+                <div class="form-actions" th:if="${viewOnly and currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
+                    <a th:href="@{/chartsview-clinicmanager/{id}(id=${chart.patient.id})}" class="btn-next">Back to Charts View</a>
+                </div>
                 <div class="form-actions" th:unless="${viewOnly}">
                     <button type="submit" class="btn-save">Save</button>
                 </div>

@@ -81,6 +81,16 @@
                         <a href="/admitting-clinicmanager" class="btn-add">+ Add Patient</a>
                     </div>
                 </div>
+                <!-- Section Tabs -->
+                <div class="tab-bar">
+                    <button class="tab-btn active" data-section="all">All <span class="tab-count" id="count-all"></span></button>
+                    <button class="tab-btn" data-section="os">OS <span class="tab-count" id="count-os"></span></button>
+                    <button class="tab-btn" data-section="endo">ENDO <span class="tab-count" id="count-endo"></span></button>
+                    <button class="tab-btn" data-section="perio">PERIO <span class="tab-count" id="count-perio"></span></button>
+                    <button class="tab-btn" data-section="resto">RESTO <span class="tab-count" id="count-resto"></span></button>
+                    <button class="tab-btn" data-section="prostho">PROSTHO <span class="tab-count" id="count-prostho"></span></button>
+                </div>
+
                 <div class="table-container">
                     <table>
                         <thead>
@@ -94,12 +104,25 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="patient : ${patients}">
+                            <tr th:each="patient : ${patients}"
+                                th:attr="data-section=${patient.serviceCode != null ? patient.serviceCode.toLowerCase() : 'unknown'}">
                                 <td th:text="${patient.chartNo}"></td>
                                 <td th:text="${patient.surname + ', ' + patient.firstName + (patient.middleInitial != null ? ' ' + patient.middleInitial + '.' : '')}"></td>
                                 <td th:text="${patient.contactNumber}"></td>
                                 <td th:text="${patient.email}"></td>
-                                <td th:text="${patient.assignedClinician != null ? patient.assignedClinician.fullName : '—'}"></td>
+                                <td>
+                                    <span th:if="${patient.assignedClinician != null}"
+                                          class="clinician-link"
+                                          th:data-name="${patient.assignedClinician.fullName}"
+                                          th:data-email="${patient.assignedClinician.email}"
+                                          th:data-student="${patient.assignedClinician.studentNumber}"
+                                          th:data-year="${patient.assignedClinician.yearLevel}"
+                                          th:data-clinician-id="${patient.assignedClinician.id}"
+                                          th:data-patient-id="${patient.originalPatient != null ? patient.originalPatient.id : patient.id}"
+                                          th:text="${patient.assignedClinician.fullName}"
+                                          onclick="showClinicianModal(this)"></span>
+                                    <span th:if="${patient.assignedClinician == null}">—</span>
+                                </td>
                                 <td><a th:href="@{/chartsview-clinicmanager/{id}(id=${patient.id})}" class="btn-view">View</a></td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(patients)}">
@@ -113,7 +136,40 @@
     </div>
 </div>
 
+<!-- Clinician Info Modal -->
+<div id="clinicianModal" class="modal-overlay" onclick="closeClinicianModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <button class="modal-close" onclick="closeClinicianModal()">✕</button>
+        <h3 id="modal-name"></h3>
+        <div class="modal-details">
+            <div class="modal-row"><span class="modal-label">Email</span><span id="modal-email"></span></div>
+            <div class="modal-row"><span class="modal-label">Student No.</span><span id="modal-student"></span></div>
+            <div class="modal-row"><span class="modal-label">Year Level</span><span id="modal-year"></span></div>
+            <div class="modal-row"><span class="modal-label">Total Patients</span><span id="modal-total"></span></div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const clinicianPatientCounts = /*[[${clinicianPatientCounts}]]*/ {};
+</script>
+
 <script>
+function showClinicianModal(el) {
+    const name = el.dataset.name || '—';
+    document.getElementById('modal-name').textContent = name;
+    document.getElementById('modal-email').textContent = el.dataset.email || '—';
+    document.getElementById('modal-student').textContent = el.dataset.student || '—';
+    document.getElementById('modal-year').textContent = el.dataset.year || '—';
+    const clinicianId = el.dataset.clinicianId;
+    const total = clinicianId && clinicianPatientCounts[clinicianId] ? clinicianPatientCounts[clinicianId] : '—';
+    document.getElementById('modal-total').textContent = total;
+    document.getElementById('clinicianModal').style.display = 'flex';
+}
+function closeClinicianModal() {
+    document.getElementById('clinicianModal').style.display = 'none';
+}
+
 document.querySelector('.menu-icon').onclick = function() {
     document.querySelector('.sidebar').classList.toggle('expanded');
 };
@@ -132,13 +188,50 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
     e.stopPropagation();
 });
 
-// Search filter
-document.querySelector('.search-input').addEventListener('input', function() {
-    const query = this.value.toLowerCase();
-    document.querySelectorAll('tbody tr').forEach(row => {
-        row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
+/* ── Section tabs ── */
+let activeSection = 'all';
+
+function normSection(code) {
+    if (!code) return 'unknown';
+    const c = code.toLowerCase();
+    return (c === 'cd' || c === 'rpd') ? 'prostho' : c;
+}
+
+function applyFilters() {
+    const query = document.querySelector('.search-input').value.toLowerCase();
+    document.querySelectorAll('tbody tr:not(.empty-row)').forEach(row => {
+        const sec = normSection(row.dataset.section);
+        const matchSection = activeSection === 'all' || sec === activeSection;
+        const matchSearch  = row.textContent.toLowerCase().includes(query);
+        row.style.display  = (matchSection && matchSearch) ? '' : 'none';
+    });
+}
+
+function updateCounts() {
+    const rows = Array.from(document.querySelectorAll('tbody tr:not(.empty-row)'));
+    const totals = { all: rows.length, os: 0, endo: 0, perio: 0, resto: 0, prostho: 0 };
+    rows.forEach(r => {
+        const s = normSection(r.dataset.section);
+        if (totals[s] !== undefined) totals[s]++;
+    });
+    Object.entries(totals).forEach(([k, v]) => {
+        const el = document.getElementById('count-' + k);
+        if (el) el.textContent = '(' + v + ')';
+    });
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        activeSection = this.dataset.section;
+        applyFilters();
     });
 });
+
+document.querySelector('.search-input').addEventListener('input', applyFilters);
+
+updateCounts();
 </script>
 
 </body>
