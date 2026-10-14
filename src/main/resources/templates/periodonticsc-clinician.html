@@ -200,6 +200,10 @@
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
+                            <!-- Extra * rows (upper) + add/remove control -->
+                            <div class="c-star-ctrl-spacer"></div>
+                            <div class="c-star-rows" data-side="upper"></div>
+
                             <!-- Upper arch teeth image -->
                             <div class="c-teeth-wrapper">
                                 <img src="/images/perio-grid-upper.png" alt="Upper Arch" class="c-chart-img">
@@ -208,9 +212,14 @@
                                     <button type="button" class="sym-btn" data-sym="circle" title="Circle">&#9675;</button>
                                     <button type="button" class="sym-btn" data-sym="half"   title="Half shaded">&#9680;</button>
                                     <button type="button" class="sym-btn" data-sym="full"   title="Full shaded">&#9679;</button>
-                                    <button type="button" class="sym-btn sym-clear" data-sym="" title="Remove">&#10005;</button>
+                                    <button type="button" class="sym-btn sym-x" data-sym="x" title="X (missing tooth)">X</button>
+                                    <button type="button" class="sym-btn sym-clear" data-sym="" title="Remove mark">Clear</button>
                                 </div>
                             </div>
+
+                            <!-- Extra * rows (lower) + add/remove control — above the lower CEJ-GM -->
+                            <div class="c-star-rows" data-side="lower"></div>
+                            <div class="c-star-ctrl-spacer"></div>
 
                             <!-- CEJ-GM (below) -->
                             <div class="c-grid-row cej">
@@ -259,7 +268,11 @@
                             <div class="cl-row">CAL</div>
                             <div class="cl-row">PPD</div>
                             <div class="cl-row cej">CEJ<br>-GM</div>
+                            <div class="cl-row cl-star-ctrl"><button type="button" class="btn-star" data-side="upper" data-op="add" title="Add * row">+</button><button type="button" class="btn-star" data-side="upper" data-op="remove" title="Remove last * row">&#8722;</button></div>
+                            <div class="cl-star-rows" data-side="upper"></div>
                             <div class="cl-img-spacer"></div>
+                            <div class="cl-star-rows" data-side="lower"></div>
+                            <div class="cl-row cl-star-ctrl"><button type="button" class="btn-star" data-side="lower" data-op="add" title="Add * row">+</button><button type="button" class="btn-star" data-side="lower" data-op="remove" title="Remove last * row">&#8722;</button></div>
                             <div class="cl-row cej">CEJ<br>-GM</div>
                             <div class="cl-row">PPD</div>
                             <div class="cl-row">CAL</div>
@@ -307,6 +320,10 @@
                                 <div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div><div class="c-cell"><input type="text" maxlength="3"><input type="text" maxlength="3"><input type="text" maxlength="3"></div>
                             </div>
 
+                            <!-- Extra * rows (upper) + add/remove control -->
+                            <div class="c-star-ctrl-spacer"></div>
+                            <div class="c-star-rows" data-side="upper"></div>
+
                             <!-- Lower arch teeth image -->
                             <div class="c-teeth-wrapper">
                                 <img src="/images/perio-grid-lower.png" alt="Lower Arch" class="c-chart-img">
@@ -315,9 +332,14 @@
                                     <button type="button" class="sym-btn" data-sym="circle" title="Circle">&#9675;</button>
                                     <button type="button" class="sym-btn" data-sym="half"   title="Half shaded">&#9680;</button>
                                     <button type="button" class="sym-btn" data-sym="full"   title="Full shaded">&#9679;</button>
-                                    <button type="button" class="sym-btn sym-clear" data-sym="" title="Remove">&#10005;</button>
+                                    <button type="button" class="sym-btn sym-x" data-sym="x" title="X (missing tooth)">X</button>
+                                    <button type="button" class="sym-btn sym-clear" data-sym="" title="Remove mark">Clear</button>
                                 </div>
                             </div>
+
+                            <!-- Extra * rows (lower) + add/remove control — above the lower CEJ-GM -->
+                            <div class="c-star-rows" data-side="lower"></div>
+                            <div class="c-star-ctrl-spacer"></div>
 
                             <!-- CEJ-GM (below) -->
                             <div class="c-grid-row cej">
@@ -359,6 +381,12 @@
 
                     </div>
                     <!-- ═══════════ END CHART ═══════════ -->
+
+                    <!-- Notes -->
+                    <div class="form-group chart-notes">
+                        <label>Notes</label>
+                        <textarea rows="4" th:field="*{formCNotes}" placeholder="Value"></textarea>
+                    </div>
 
                     <!-- Bottom section -->
                     <div class="chart-bottom-row">
@@ -442,6 +470,16 @@ function initCanvas(canvasId, pickerId) {
         } else if (sym === 'full') {
             ctx.beginPath(); ctx.arc(cx, cy, rad, 0, Math.PI * 2);
             ctx.fill(); ctx.stroke();
+        } else if (sym === 'x') {
+            /* Same red X as the PF1 plaque chart: spans the tooth */
+            var hw = canvas.width / 16 / 2 * 0.9;
+            var hh = hw * 1.8;
+            ctx.lineCap   = 'round';
+            ctx.lineWidth = Math.max(2, canvas.width * 0.004);
+            ctx.beginPath();
+            ctx.moveTo(cx - hw, cy - hh); ctx.lineTo(cx + hw, cy + hh);
+            ctx.moveTo(cx + hw, cy - hh); ctx.lineTo(cx - hw, cy + hh);
+            ctx.stroke();
         }
     }
 
@@ -638,70 +676,7 @@ document.querySelectorAll('.ppd-row .c-cell input').forEach(function(inp) {
     inp.addEventListener('input', function() { updatePPDColor(this); });
 });
 
-/* ── CEJ-GM auto-computation: CEJ-GM = CAL − PPD ── */
-function computeCEJValue(calVal, ppdVal) {
-    var isX = calVal.toUpperCase() === 'X' || ppdVal.toUpperCase() === 'X';
-    if (isX) return 'X';
-    var cv = parseInt(calVal, 10);
-    var pv = parseInt(ppdVal, 10);
-    return (!isNaN(cv) && !isNaN(pv)) ? String(cv - pv) : '';
-}
-
-function applyCEJ(cejInp, val) {
-    cejInp.value = val;
-    cejInp.classList.toggle('x-marked', val.toUpperCase() === 'X');
-}
-
-function recomputeAllCEJ() {
-    ['leftPanel', 'rightPanel'].forEach(function(panelId) {
-        var panel   = document.getElementById(panelId);
-        var calRows = panel.querySelectorAll('.cal-row');
-        var ppdRows = panel.querySelectorAll('.ppd-row');
-        var cejRows = panel.querySelectorAll('.c-grid-row.cej');
-        for (var i = 0; i < calRows.length; i++) {
-            var calInps = calRows[i].querySelectorAll('.c-cell input');
-            var ppdInps = ppdRows[i].querySelectorAll('.c-cell input');
-            var cejInps = cejRows[i].querySelectorAll('.c-cell input');
-            for (var j = 0; j < calInps.length; j++) {
-                applyCEJ(cejInps[j], computeCEJValue(calInps[j].value, ppdInps[j].value));
-            }
-        }
-    });
-}
-
-(function setupCEJListeners() {
-    ['leftPanel', 'rightPanel'].forEach(function(panelId) {
-        var panel   = document.getElementById(panelId);
-        var calRows = panel.querySelectorAll('.cal-row');
-        var ppdRows = panel.querySelectorAll('.ppd-row');
-        var cejRows = panel.querySelectorAll('.c-grid-row.cej');
-
-        cejRows.forEach(function(row) {
-            row.querySelectorAll('.c-cell input').forEach(function(inp) {
-                inp.readOnly = true;
-                inp.style.backgroundColor = '#f7f7f7';
-                inp.style.cursor = 'default';
-            });
-        });
-
-        for (var i = 0; i < calRows.length; i++) {
-            (function(calRow, ppdRow, cejRow) {
-                var calInps = calRow.querySelectorAll('.c-cell input');
-                var ppdInps = ppdRow.querySelectorAll('.c-cell input');
-                var cejInps = cejRow.querySelectorAll('.c-cell input');
-                for (var j = 0; j < calInps.length; j++) {
-                    (function(j) {
-                        function compute() {
-                            applyCEJ(cejInps[j], computeCEJValue(calInps[j].value, ppdInps[j].value));
-                        }
-                        calInps[j].addEventListener('input', compute);
-                        ppdInps[j].addEventListener('input', compute);
-                    })(j);
-                }
-            })(calRows[i], ppdRows[i], cejRows[i]);
-        }
-    });
-})();
+/* CEJ-GM is entered manually by the clinician (no auto-computation) */
 
 /* ── Numeric row validation (CAL 0-15, PPD 0-15, CEJ-GM negative allowed max 15) ── */
 function addNumericValidation(selector, allowNegative) {
@@ -729,6 +704,65 @@ function addNumericValidation(selector, allowNegative) {
 addNumericValidation('.cal-row .c-cell input', false);
 addNumericValidation('.ppd-row .c-cell input', false);
 addNumericValidation('.c-grid-row.cej .c-cell input', true);
+
+/* ── Extra "*" rows below CEJ-GM (one box per tooth, click toggles *) ── */
+function makeStarRow() {
+    var row = document.createElement('div');
+    row.className = 'c-star-row';
+    for (var i = 0; i < 16; i++) {
+        var cell = document.createElement('div');
+        cell.className = 'c-cell star-cell';
+        var spot = document.createElement('span');
+        spot.className = 'star-spot';
+        cell.appendChild(spot);
+        row.appendChild(cell);
+    }
+    return row;
+}
+function addStarRow(side) {
+    ['leftPanel', 'rightPanel'].forEach(function(panelId) {
+        document.querySelector('#' + panelId + ' .c-star-rows[data-side="' + side + '"]').appendChild(makeStarRow());
+    });
+    var lbl = document.createElement('div');
+    lbl.className = 'cl-row cl-star-label';
+    lbl.textContent = '*';
+    document.querySelector('.cl-star-rows[data-side="' + side + '"]').appendChild(lbl);
+}
+function removeStarRow(side) {
+    document.querySelectorAll('.c-star-rows[data-side="' + side + '"], .cl-star-rows[data-side="' + side + '"]').forEach(function(c) {
+        if (c.lastElementChild) c.removeChild(c.lastElementChild);
+    });
+}
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.btn-star');
+    if (btn) {
+        if (btn.dataset.op === 'add') addStarRow(btn.dataset.side);
+        else removeStarRow(btn.dataset.side);
+        return;
+    }
+    var cell = e.target.closest('.star-cell');
+    if (cell) {
+        var spot = cell.querySelector('.star-spot');
+        spot.textContent = spot.textContent === '*' ? '' : '*';
+    }
+});
+function serializeStars(panelId, side) {
+    var rows = [];
+    document.querySelectorAll('#' + panelId + ' .c-star-rows[data-side="' + side + '"] .c-star-row').forEach(function(row) {
+        var vals = [];
+        row.querySelectorAll('.star-spot').forEach(function(s) { vals.push(s.textContent); });
+        rows.push(vals);
+    });
+    return rows;
+}
+function loadStars(panelId, side, rows) {
+    var rowEls = document.querySelectorAll('#' + panelId + ' .c-star-rows[data-side="' + side + '"] .c-star-row');
+    (rows || []).forEach(function(vals, ri) {
+        if (ri >= rowEls.length) return;
+        var spots = rowEls[ri].querySelectorAll('.star-spot');
+        vals.forEach(function(v, i) { if (i < spots.length) spots[i].textContent = v; });
+    });
+}
 
 /* ── Grid serialization helpers ── */
 function serializePanel(panelId) {
@@ -767,8 +801,15 @@ function deserializePanel(panelId, data) {
 var formEl = document.getElementById('formC');
 if (formEl) {
     formEl.addEventListener('submit', function() {
-        document.getElementById('formCLeftGridJsonInput').value   = JSON.stringify(serializePanel('leftPanel'));
-        document.getElementById('formCRightGridJsonInput').value  = JSON.stringify(serializePanel('rightPanel'));
+        ['leftPanel', 'rightPanel'].forEach(function(panelId) {
+            var data = {
+                rows:      serializePanel(panelId),
+                starUpper: serializeStars(panelId, 'upper'),
+                starLower: serializeStars(panelId, 'lower')
+            };
+            var inputId = panelId === 'leftPanel' ? 'formCLeftGridJsonInput' : 'formCRightGridJsonInput';
+            document.getElementById(inputId).value = JSON.stringify(data);
+        });
         document.getElementById('formCLeftCanvasJsonInput').value  = JSON.stringify(panelMarks.canvasLeft);
         document.getElementById('formCRightCanvasJsonInput').value = JSON.stringify(panelMarks.canvasRight);
     });
@@ -776,13 +817,23 @@ if (formEl) {
 
 /* ── Load-time deserialization ── */
 (function() {
-    /* Left grid */
-    var lgVal = document.getElementById('formCLeftGridJsonInput').value;
-    if (lgVal) { try { deserializePanel('leftPanel',  JSON.parse(lgVal)); } catch(e) {} }
-
-    /* Right grid */
-    var rgVal = document.getElementById('formCRightGridJsonInput').value;
-    if (rgVal) { try { deserializePanel('rightPanel', JSON.parse(rgVal)); } catch(e) {} }
+    /* Grids — older saves are a plain array of rows; newer ones also hold the extra * rows */
+    var grids = {};
+    [['leftPanel', 'formCLeftGridJsonInput'], ['rightPanel', 'formCRightGridJsonInput']].forEach(function(pair) {
+        var val = document.getElementById(pair[1]).value;
+        var data = null;
+        if (val) { try { data = JSON.parse(val); } catch(e) {} }
+        if (Array.isArray(data)) data = { rows: data };
+        grids[pair[0]] = data || {};
+        deserializePanel(pair[0], grids[pair[0]].rows);
+    });
+    ['upper', 'lower'].forEach(function(side) {
+        var key = side === 'upper' ? 'starUpper' : 'starLower';
+        var count = Math.max((grids.leftPanel[key] || []).length, (grids.rightPanel[key] || []).length);
+        for (var i = 0; i < count; i++) addStarRow(side);
+        loadStars('leftPanel',  side, grids.leftPanel[key]);
+        loadStars('rightPanel', side, grids.rightPanel[key]);
+    });
 
     /* Left canvas */
     var lcVal = document.getElementById('formCLeftCanvasJsonInput').value;
@@ -802,8 +853,7 @@ if (formEl) {
         } catch(e) {}
     }
 
-    /* Apply computed values and colors for loaded data */
-    recomputeAllCEJ();
+    /* Apply PPD colors for loaded data */
     document.querySelectorAll('.ppd-row .c-cell input').forEach(function(inp) { updatePPDColor(inp); });
 })();
 

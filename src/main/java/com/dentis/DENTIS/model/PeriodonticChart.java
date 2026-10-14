@@ -58,6 +58,8 @@ public class PeriodonticChart {
     @Column(columnDefinition = "TEXT")
     private String historyOfChiefComplaint;
 
+    /** E-cigarette use: year started, number of cartridges/day, year stopped (PF1 2026 version). */
+    @Column(columnDefinition = "TEXT") private String ecigaretteUse;
     private String modifyingFactors;
     private String predisposingFactors;
     private String riskFactors;
@@ -97,6 +99,10 @@ public class PeriodonticChart {
     @Column(columnDefinition = "TEXT")
     private String formBCanvasJson;
 
+    /** JSON array of additional recall plaque charts (Silness & Loe table, plaque grid, canvas marks, percentages). */
+    @Column(columnDefinition = "TEXT")
+    private String formBRecallChartsJson;
+
     private String plaqueIndexPercent;
 
     // Plaque table — 6 index teeth × 4 surfaces (MB, MidB, DB, L)
@@ -106,6 +112,11 @@ public class PeriodonticChart {
     private String pt32MB; private String pt32MidB; private String pt32DB; private String pt32L;
     private String pt36MB; private String pt36MidB; private String pt36DB; private String pt36L;
     private String pt44MB; private String pt44MidB; private String pt44DB; private String pt44L;
+
+    // Oral Hygiene Regimen (PF1 2026 version)
+    @Column(columnDefinition = "TEXT") private String brushingFrequency;
+    @Column(columnDefinition = "TEXT") private String interdentalAid;
+    @Column(columnDefinition = "TEXT") private String mouthrinse;
 
     @Column(columnDefinition = "TEXT") private String otherFindings;
 
@@ -141,6 +152,10 @@ public class PeriodonticChart {
     private Boolean isInitialExamination;
     private Boolean isReevaluation;
     private Boolean isMaintenanceVisit;
+
+    /** Free-text notes written below the PF2 chart. */
+    @Column(columnDefinition = "TEXT")
+    private String formCNotes;
 
     @Column(columnDefinition = "TEXT")
     private String revisionReason;

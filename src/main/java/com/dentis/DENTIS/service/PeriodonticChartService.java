@@ -94,6 +94,7 @@ public class PeriodonticChartService {
         chart.setFormADate(updated.getFormADate());
         chart.setChiefComplaint(updated.getChiefComplaint());
         chart.setHistoryOfChiefComplaint(updated.getHistoryOfChiefComplaint());
+        chart.setEcigaretteUse(updated.getEcigaretteUse());
         chart.setModifyingFactors(updated.getModifyingFactors());
         chart.setPredisposingFactors(updated.getPredisposingFactors());
         chart.setRiskFactors(updated.getRiskFactors());
@@ -124,7 +125,8 @@ public class PeriodonticChartService {
         chart.setPlaqueScorePercent(updated.getPlaqueScorePercent());
         chart.setFormBGridJson(updated.getFormBGridJson());
         chart.setFormBCanvasJson(updated.getFormBCanvasJson());
-        chart.setPlaqueIndexPercent(updated.getPlaqueIndexPercent());
+        chart.setFormBRecallChartsJson(updated.getFormBRecallChartsJson());
+        // plaqueIndexPercent is no longer edited separately (same value as plaqueScorePercent); left untouched so old data is kept
         chart.setPt12MB(updated.getPt12MB()); chart.setPt12MidB(updated.getPt12MidB());
         chart.setPt12DB(updated.getPt12DB()); chart.setPt12L(updated.getPt12L());
         chart.setPt16MB(updated.getPt16MB()); chart.setPt16MidB(updated.getPt16MidB());
@@ -137,13 +139,11 @@ public class PeriodonticChartService {
         chart.setPt36DB(updated.getPt36DB()); chart.setPt36L(updated.getPt36L());
         chart.setPt44MB(updated.getPt44MB()); chart.setPt44MidB(updated.getPt44MidB());
         chart.setPt44DB(updated.getPt44DB()); chart.setPt44L(updated.getPt44L());
+        chart.setBrushingFrequency(updated.getBrushingFrequency());
+        chart.setInterdentalAid(updated.getInterdentalAid());
+        chart.setMouthrinse(updated.getMouthrinse());
         chart.setOtherFindings(updated.getOtherFindings());
-        chart.setRecall1Diagnosis(updated.getRecall1Diagnosis());
-        chart.setRecall1Findings(updated.getRecall1Findings());
-        chart.setRecall1Recommendation(updated.getRecall1Recommendation());
-        chart.setRecall2Diagnosis(updated.getRecall2Diagnosis());
-        chart.setRecall2Findings(updated.getRecall2Findings());
-        chart.setRecall2Recommendation(updated.getRecall2Recommendation());
+        // Recall 1/2 moved to PF3 — recall fields are no longer edited on PF1 page 2 (old data is kept)
         if (chart.getStatus() == PeriodonticChartStatus.CREATED) {
             chart.setStatus(PeriodonticChartStatus.IN_PROGRESS);
         }
@@ -162,6 +162,7 @@ public class PeriodonticChartService {
         chart.setIsInitialExamination(updated.getIsInitialExamination());
         chart.setIsReevaluation(updated.getIsReevaluation());
         chart.setIsMaintenanceVisit(updated.getIsMaintenanceVisit());
+        chart.setFormCNotes(updated.getFormCNotes());
         if (chart.getFormCStatus() == PeriodonticChartStatus.CREATED) {
             chart.setFormCStatus(PeriodonticChartStatus.IN_PROGRESS);
         }

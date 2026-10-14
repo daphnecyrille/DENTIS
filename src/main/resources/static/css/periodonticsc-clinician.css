@@ -249,13 +249,15 @@ body { height: 100vh; overflow: hidden; }
 
 /* Left panel (upper arch 18-28): proportions derived from anatomical tooth widths */
 .c-panel.left .c-tooth-row,
-.c-panel.left .c-grid-row {
+.c-panel.left .c-grid-row,
+.c-panel.left .c-star-row {
     grid-template-columns: 56fr 59fr 69fr 46fr 46fr 53fr 43fr 56fr 56fr 43fr 53fr 46fr 46fr 69fr 59fr 56fr;
 }
 
 /* Right panel (lower arch 48-38): proportions measured from perio-grid-lower.png */
 .c-panel.right .c-tooth-row,
-.c-panel.right .c-grid-row {
+.c-panel.right .c-grid-row,
+.c-panel.right .c-star-row {
     grid-template-columns: 76fr 66fr 75fr 47fr 44fr 44fr 38fr 35fr 35fr 38fr 44fr 43fr 48fr 74fr 68fr 77fr;
 }
 
@@ -373,6 +375,8 @@ body { height: 100vh; overflow: hidden; }
 .sym-btn:hover { background: #c0392b; color: white; border-color: #c0392b; }
 .sym-clear { background: #fff0f0; border-color: #f5c6c6; color: #c0392b; }
 .sym-clear:hover { background: #c0392b; color: white; border-color: #c0392b; }
+.sym-clear { font-size: 12px; }
+.sym-x { font-weight: 700; }
 
 /* BOTTOM SECTION */
 .chart-bottom-row {
@@ -476,3 +480,48 @@ body { height: 100vh; overflow: hidden; }
     transition: background-color 0.3s ease;
 }
 .btn-submit:hover { background: #2c5282; }
+
+/* ─── PF2 NOTES ─── */
+.chart-notes { margin: 18px 0 14px; }
+.chart-notes textarea { resize: vertical; min-height: 90px; }
+
+/* ─── EXTRA * ROWS BELOW CEJ-GM ─── */
+.c-star-ctrl-spacer,
+.cl-star-ctrl {
+    height: 24px;
+    flex-shrink: 0;
+    border-bottom: 1px solid #bbb;
+}
+.c-star-ctrl-spacer { background: #fafafa; }
+.cl-star-ctrl { gap: 4px; }
+.btn-star {
+    border: none;
+    border-radius: 3px;
+    background: #2d4a6b;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    cursor: pointer;
+}
+.btn-star:hover { background: #1d3550; }
+.c-star-row {
+    display: grid;
+    height: 30px;
+    border-bottom: 1px solid #bbb;
+    flex-shrink: 0;
+    background: white;
+}
+.c-star-row .c-cell:last-child { border-right: none; }
+.star-cell { cursor: pointer; }
+.star-cell:hover { background: rgba(45,74,107,0.06); }
+.star-spot {
+    font-size: 18px;
+    font-weight: 700;
+    color: #c0392b;
+    line-height: 1;
+}
+.cl-star-label { height: 30px; font-size: 13px; }

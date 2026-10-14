@@ -295,7 +295,7 @@ body { height: 100vh; overflow: hidden; }
     display: block;
 }
 
-#perioCanvas {
+.perio-canvas {
     position: absolute;
     top: 0; left: 0;
     width: 100%;
@@ -512,3 +512,124 @@ body { height: 100vh; overflow: hidden; }
 }
 
 .btn-next:hover { background: #2c5282; }
+
+/* ─── PAGE 2 SECTION SPACING ─── */
+.form-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+/* Silness & Loe scoring box sits directly on top of its 6-tooth table */
+.silness-group {
+    display: flex;
+    flex-direction: column;
+}
+.silness-group .plaque-index-box {
+    border-radius: 10px 10px 0 0;
+}
+.silness-group .plaque-table-row,
+.silness-group .plaque-table {
+    width: 100%;
+}
+
+/* ─── PLAQUE CHART TABS (Initial + Recall charts) ─── */
+.chart-tabs-wrap { display: flex; flex-direction: column; gap: 0; }
+.chart-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 6px;
+    border-bottom: 2px solid #2d4a6b;
+    pointer-events: auto;
+}
+.chart-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border: 1px solid #c8d1dc;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    background: #eef2f6;
+    color: #2d4a6b;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.chart-tab.active { background: #2d4a6b; color: #fff; border-color: #2d4a6b; }
+.chart-tab .tab-remove {
+    border: none;
+    background: transparent;
+    color: inherit;
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 2px;
+    opacity: 0.7;
+}
+.chart-tab .tab-remove:hover { opacity: 1; }
+.chart-tab-add {
+    margin-left: auto;
+    margin-bottom: 6px;
+    padding: 7px 14px;
+    border: 1px dashed #2d4a6b;
+    border-radius: 6px;
+    background: white;
+    color: #2d4a6b;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.chart-tab-add:hover { background: #eef2f6; }
+.chart-panel { display: none; flex-direction: column; gap: 32px; padding-top: 24px; }
+.chart-panel.active { display: flex; }
+
+/* ─── SILNESS & LOE (1964) SCORE BOX ─── */
+.silness-box {
+    flex-direction: column;
+    gap: 14px;
+}
+.silness-title { font-size: 15px; }
+.silness-scores {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    width: 100%;
+}
+.silness-score {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    line-height: 1.4;
+}
+.silness-score img {
+    width: 90px;
+    height: auto;
+    flex-shrink: 0;
+    border-radius: 4px;
+    background: white;
+}
+@media (max-width: 1000px) {
+    .silness-scores { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ─── ORAL HYGIENE REGIMEN ─── */
+.oral-hygiene-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.oral-hygiene-section .section-title {
+    /* matches .occlular-title on PF1 page 1 */
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}

@@ -137,7 +137,7 @@
                 <div class="form-banner">Periodontal Chart</div>
 
                 <div class="form-body">
-                <div th:style="${viewOnly} ? 'pointer-events:none;' : ''">
+                <div class="form-sections" th:style="${viewOnly} ? 'pointer-events:none;' : ''">
 
                     <!-- Learning Outcome + Clinician/Date -->
                     <div class="top-row">
@@ -194,6 +194,11 @@
                     </div>
 
                     <div class="form-group">
+                        <label>E-cigarette Use <span class="label-hint">(year started, number of cartridges/day, year stopped)</span></label>
+                        <input type="text" th:field="*{ecigaretteUse}" placeholder="Value">
+                    </div>
+
+                    <div class="form-group">
                         <label>Modifying Factors</label>
                         <input type="text" th:field="*{modifyingFactors}" placeholder="Value">
                     </div>
@@ -208,6 +213,7 @@
                         <input type="text" th:field="*{riskFactors}" placeholder="Value">
                     </div>
 
+                    <div class="chart-group">
                     <!-- ═══════════ PERIODONTAL CHART ═══════════ -->
                     <div class="perio-interactive-chart" id="perioChart">
 
@@ -297,6 +303,17 @@
                             </div>
                         </div>
                     </div>
+                    </div><!-- end chart-group -->
+
+                    <div class="form-group">
+                        <label>Diagnosis</label>
+                        <textarea th:field="*{diagnosis}" placeholder="Value" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Treatment Plan</label>
+                        <textarea th:field="*{treatmentPlan}" placeholder="Value" rows="10" style="min-height: 220px;"></textarea>
+                    </div>
 
                     <!-- Occlusal Examination -->
                     <div class="occlular-section">
@@ -313,16 +330,6 @@
                             <div class="occlular-row"><div class="occ-tag">Consistency</div><textarea th:field="*{occConsistencyBuccal}" placeholder="Value"></textarea><textarea th:field="*{occConsistencyLingual}" placeholder="Value"></textarea></div>
                             <div class="occlular-row"><div class="occ-tag">Form</div><textarea th:field="*{occFormBuccal}" placeholder="Value"></textarea><textarea th:field="*{occFormLingual}" placeholder="Value"></textarea></div>
                         </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Diagnosis</label>
-                        <textarea th:field="*{diagnosis}" placeholder="Value" rows="3"></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Treatment Plan</label>
-                        <textarea th:field="*{treatmentPlan}" placeholder="Value" rows="3"></textarea>
                     </div>
 
                 </div><!-- end viewOnly wrapper -->
