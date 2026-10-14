@@ -13,6 +13,7 @@ public interface ChartRequestRepository extends JpaRepository<ChartRequest, Long
     List<ChartRequest> findAllByOrderByCreatedAtDesc();
     List<ChartRequest> findByStatusOrderByCreatedAtDesc(ChartRequestStatus status);
     List<ChartRequest> findByClinicianAndStatusInOrderByCreatedAtDesc(User clinician, List<ChartRequestStatus> statuses);
+    List<ChartRequest> findByClinicianAndStatusOrderByCreatedAtDesc(User clinician, ChartRequestStatus status);
 
     @Query("SELECT r FROM ChartRequest r WHERE r.patient.id = :patientId AND r.status = :status AND (r.clinician = :clinician OR r.clinician IS NULL) ORDER BY r.createdAt DESC")
     List<ChartRequest> findApprovedForClinicianAndPatient(@Param("clinician") User clinician, @Param("patientId") Long patientId, @Param("status") ChartRequestStatus status);

@@ -266,6 +266,7 @@
                         <thead>
                             <tr>
                                 <th>Chart No.</th>
+                                <th>Chart Type</th>
                                 <th>Patient Name</th>
                                 <th>Contact Number</th>
                                 <th>Email</th>
@@ -276,6 +277,7 @@
                         <tbody>
                             <tr th:each="pc : ${prosthoCharts}">
                                 <td th:text="${pc.chartNo}"></td>
+                                <td th:text="'Prosthodontics (' + ${pc.caseType} + ')'"></td>
                                 <td th:text="${pc.patient.surname + ', ' + pc.patient.firstName + (pc.patient.middleInitial != null ? ' ' + pc.patient.middleInitial + '.' : '')}"></td>
                                 <td th:text="${pc.patient.contactNumber}"></td>
                                 <td th:text="${pc.patient.email}"></td>
@@ -296,6 +298,7 @@
                             </tr>
                             <tr th:each="osc : ${osCharts}">
                                 <td th:text="${osc.chartNo}"></td>
+                                <td th:text="${osc.chartType != null ? osc.chartType.displayName : '—'}"></td>
                                 <td th:text="${osc.patient.surname + ', ' + osc.patient.firstName + (osc.patient.middleInitial != null ? ' ' + osc.patient.middleInitial + '.' : '')}"></td>
                                 <td th:text="${osc.patient.contactNumber}"></td>
                                 <td th:text="${osc.patient.email}"></td>
@@ -316,6 +319,28 @@
                             </tr>
                             <tr th:each="ec : ${endoCharts}">
                                 <td th:text="${ec.chartNo}"></td>
+                                <td>Endodontics - Patient Workup</td>
+                                <td th:text="${ec.patient.surname + ', ' + ec.patient.firstName + (ec.patient.middleInitial != null ? ' ' + ec.patient.middleInitial + '.' : '')}"></td>
+                                <td th:text="${ec.patient.contactNumber}"></td>
+                                <td th:text="${ec.patient.email}"></td>
+                                <td>
+                                    <span th:if="${ec.clinician != null}"
+                                          class="clinician-link"
+                                          th:data-name="${ec.clinician.fullName}"
+                                          th:data-email="${ec.clinician.email}"
+                                          th:data-student="${ec.clinician.studentNumber}"
+                                          th:data-year="${ec.clinician.yearLevel}"
+                                          th:data-clinician-id="${ec.clinician.id}"
+                                          th:data-patient-id="${ec.patient.originalPatient != null ? ec.patient.originalPatient.id : ec.patient.id}"
+                                          th:text="${ec.clinician.fullName}"
+                                          onclick="showClinicianModal(this)"></span>
+                                    <span th:if="${ec.clinician == null}">—</span>
+                                </td>
+                                <td><a th:href="@{/chartsview-faculty/{id}(id=${ec.patient.id})}" class="btn-view">View Chart</a></td>
+                            </tr>
+                            <tr th:each="ec : ${endoCharts}">
+                                <td th:text="${#strings.replace(ec.chartNo, '-ENDO1', '-ENDO2')}"></td>
+                                <td>Endodontics - Endodontic Evaluation &amp; Treatment Planning</td>
                                 <td th:text="${ec.patient.surname + ', ' + ec.patient.firstName + (ec.patient.middleInitial != null ? ' ' + ec.patient.middleInitial + '.' : '')}"></td>
                                 <td th:text="${ec.patient.contactNumber}"></td>
                                 <td th:text="${ec.patient.email}"></td>
@@ -336,6 +361,28 @@
                             </tr>
                             <tr th:each="pc : ${perioCharts}">
                                 <td th:text="${pc.chartNo}"></td>
+                                <td>Periodontics - Periodontal Chart</td>
+                                <td th:text="${pc.patient.surname + ', ' + pc.patient.firstName + (pc.patient.middleInitial != null ? ' ' + pc.patient.middleInitial + '.' : '')}"></td>
+                                <td th:text="${pc.patient.contactNumber}"></td>
+                                <td th:text="${pc.patient.email}"></td>
+                                <td>
+                                    <span th:if="${pc.clinician != null}"
+                                          class="clinician-link"
+                                          th:data-name="${pc.clinician.fullName}"
+                                          th:data-email="${pc.clinician.email}"
+                                          th:data-student="${pc.clinician.studentNumber}"
+                                          th:data-year="${pc.clinician.yearLevel}"
+                                          th:data-clinician-id="${pc.clinician.id}"
+                                          th:data-patient-id="${pc.patient.originalPatient != null ? pc.patient.originalPatient.id : pc.patient.id}"
+                                          th:text="${pc.clinician.fullName}"
+                                          onclick="showClinicianModal(this)"></span>
+                                    <span th:if="${pc.clinician == null}">—</span>
+                                </td>
+                                <td><a th:href="@{/chartsview-faculty/{id}(id=${pc.patient.id})}" class="btn-view">View Chart</a></td>
+                            </tr>
+                            <tr th:each="pc : ${perioCharts}">
+                                <td th:text="${#strings.replace(pc.chartNo, '-PF1', '-PF2')}"></td>
+                                <td>Periodontics - PPD/CAL/BOP Chart</td>
                                 <td th:text="${pc.patient.surname + ', ' + pc.patient.firstName + (pc.patient.middleInitial != null ? ' ' + pc.patient.middleInitial + '.' : '')}"></td>
                                 <td th:text="${pc.patient.contactNumber}"></td>
                                 <td th:text="${pc.patient.email}"></td>
@@ -356,6 +403,28 @@
                             </tr>
                             <tr th:each="oc : ${operativeCharts}">
                                 <td th:text="${oc.chartNo}"></td>
+                                <td>Operative Dentistry - Assessment Form</td>
+                                <td th:text="${oc.patient.surname + ', ' + oc.patient.firstName + (oc.patient.middleInitial != null ? ' ' + oc.patient.middleInitial + '.' : '')}"></td>
+                                <td th:text="${oc.patient.contactNumber}"></td>
+                                <td th:text="${oc.patient.email}"></td>
+                                <td>
+                                    <span th:if="${oc.clinician != null}"
+                                          class="clinician-link"
+                                          th:data-name="${oc.clinician.fullName}"
+                                          th:data-email="${oc.clinician.email}"
+                                          th:data-student="${oc.clinician.studentNumber}"
+                                          th:data-year="${oc.clinician.yearLevel}"
+                                          th:data-clinician-id="${oc.clinician.id}"
+                                          th:data-patient-id="${oc.patient.originalPatient != null ? oc.patient.originalPatient.id : oc.patient.id}"
+                                          th:text="${oc.clinician.fullName}"
+                                          onclick="showClinicianModal(this)"></span>
+                                    <span th:if="${oc.clinician == null}">—</span>
+                                </td>
+                                <td><a th:href="@{/chartsview-faculty/{id}(id=${oc.patient.id})}" class="btn-view">View Chart</a></td>
+                            </tr>
+                            <tr th:each="oc : ${operativeCharts}">
+                                <td th:text="${#strings.replace(oc.chartNo, '-RESTO10', '-RESTO6')}"></td>
+                                <td>Operative Dentistry - Caries Risk Assessment</td>
                                 <td th:text="${oc.patient.surname + ', ' + oc.patient.firstName + (oc.patient.middleInitial != null ? ' ' + oc.patient.middleInitial + '.' : '')}"></td>
                                 <td th:text="${oc.patient.contactNumber}"></td>
                                 <td th:text="${oc.patient.email}"></td>
@@ -375,7 +444,7 @@
                                 <td><a th:href="@{/chartsview-faculty/{id}(id=${oc.patient.id})}" class="btn-view">View Chart</a></td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(prosthoCharts) and #lists.isEmpty(osCharts) and #lists.isEmpty(endoCharts) and #lists.isEmpty(perioCharts) and #lists.isEmpty(operativeCharts)}">
-                                <td colspan="6" style="text-align:center; color:#888;">No assigned patients yet.</td>
+                                <td colspan="7" style="text-align:center; color:#888;">No assigned patients yet.</td>
                             </tr>
                         </tbody>
                     </table>

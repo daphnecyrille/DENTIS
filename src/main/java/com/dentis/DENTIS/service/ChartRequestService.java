@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,17 +30,29 @@ public class ChartRequestService {
         return userRepository.findByRoleAndStatusOrderByLastNameAsc(Role.CLINICIAN, AccountStatus.ACTIVE);
     }
 
+    public Patient resolvePatient(String chartNo) {
+        if (chartNo == null || chartNo.isBlank()) return null;
+        Optional<Patient> direct = patientRepository.findByChartNo(chartNo);
+        if (direct.isPresent()) return direct.get();
+        String base = chartNo.replaceAll("-(ENDO1|ENDO2|PF1|PF2|RESTO10|RESTO6|OSF1|OSF2|PROSTHO|R\\d+)$", "");
+        if (!base.equals(chartNo)) {
+            return patientRepository.findByChartNo(base).orElse(null);
+        }
+        return null;
+    }
+
     public ChartRequest submit(ChartRequest request, Long clinicianId) {
         if (clinicianId != null) {
             userRepository.findById(clinicianId).ifPresent(request::setClinician);
         }
-        patientRepository.findByChartNo(request.getChartNo()).ifPresent(p -> {
+        Patient p = resolvePatient(request.getChartNo());
+        if (p != null) {
             request.setPatient(p);
             String name = p.getSurname() + ", " + p.getFirstName()
                     + (p.getMiddleInitial() != null && !p.getMiddleInitial().isBlank()
                         ? " " + p.getMiddleInitial() + "." : "");
             request.setPatientName(name);
-        });
+        }
         request.setStatus(ChartRequestStatus.PENDING);
         return chartRequestRepository.save(request);
     }
@@ -58,6 +71,10 @@ public class ChartRequestService {
         ChartRequest r = chartRequestRepository.findById(id).orElseThrow();
         r.setStatus(ChartRequestStatus.DENIED);
         chartRequestRepository.save(r);
+    }
+
+    public ChartRequest getRequestById(Long id) {
+        return chartRequestRepository.findById(id).orElseThrow();
     }
 
     public Patient getPatientById(Long id) {
@@ -84,6 +101,10 @@ public class ChartRequestService {
 
     public List<ChartRequest> getApprovedRequests() {
         return chartRequestRepository.findByStatusOrderByCreatedAtDesc(ChartRequestStatus.APPROVED);
+    }
+
+    public List<ChartRequest> getApprovedRequestsForClinician(User clinician) {
+        return chartRequestRepository.findByClinicianAndStatusOrderByCreatedAtDesc(clinician, ChartRequestStatus.APPROVED);
     }
 
     public List<ChartRequest> getApprovedRequestsForClinicianAndPatient(User clinician, Long patientId) {

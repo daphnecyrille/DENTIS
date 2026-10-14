@@ -61,16 +61,8 @@ public class ChartRequestController {
     public String clinicianDashboard(Model model, Authentication authentication) {
         User clinician = getCurrentUser(authentication);
         model.addAttribute("currentUser", clinician);
-        model.addAttribute("osCharts", clinician != null
-                ? oralSurgeryChartService.findByClinicianOrderByCreatedAtDesc(clinician).stream().limit(5).toList()
-                : List.of());
-        model.addAttribute("endoCharts", clinician != null
-                ? endodonticsChartService.findByClinicianOrderByCreatedAtDesc(clinician).stream().limit(5).toList()
-                : List.of());
-        model.addAttribute("perioCharts", clinician != null
-                ? periodonticChartService.findByClinicianOrderByCreatedAtDesc(clinician).stream().limit(5).toList()
-                : List.of());
         if (clinician != null) {
+            processApprovedRequests(clinician);
             for (Patient p : patientService.getPatientsForClinician(clinician)) {
                 if ("Resto".equalsIgnoreCase(p.getServiceCode())
                         && operativeChartService.findAllByPatient(p).isEmpty()
@@ -118,6 +110,42 @@ public class ChartRequestController {
         return "dashboard-clinician";
     }
 
+    private void processApprovedRequests(User clinician) {
+        for (ChartRequest req : chartRequestService.getApprovedRequestsForClinician(clinician)) {
+            Patient patient = req.getPatient();
+            if (patient == null) {
+                patient = chartRequestService.resolvePatient(req.getChartNo());
+            }
+            if (patient == null) continue;
+            User faculty = patient.getAssignedFaculty();
+            String section = req.getSection() != null ? req.getSection().toUpperCase() : "";
+            switch (section) {
+                case "ENDO" -> {
+                    if (endodonticsChartService.findAllByPatient(patient).isEmpty())
+                        endodonticsChartService.createForPatient(patient, clinician, faculty);
+                }
+                case "OS" -> {
+                    if (oralSurgeryChartService.findAllByPatient(patient).isEmpty())
+                        oralSurgeryChartService.createForPatient(patient, clinician, faculty,
+                                com.dentis.DENTIS.model.OralSurgeryChartType.OSF1);
+                }
+                case "PERIO" -> {
+                    if (periodonticChartService.findAllByPatient(patient).isEmpty())
+                        periodonticChartService.createForPatient(patient, clinician, faculty);
+                }
+                case "RESTO" -> {
+                    if (operativeChartService.findAllByPatient(patient).isEmpty())
+                        operativeChartService.createForPatient(patient, clinician, faculty);
+                }
+                case "CD", "RPD", "FPD" -> {
+                    if (prosthodonticsChartService.findAllByPatient(patient).isEmpty())
+                        prosthodonticsChartService.createForPatient(patient, clinician, faculty);
+                }
+                default -> {}
+            }
+        }
+    }
+
     private List<com.dentis.DENTIS.model.Patient> getUniquePatientsForClinician(User clinician) {
         return oralSurgeryChartService.findByClinicianOrderByCreatedAtDesc(clinician)
                 .stream()
@@ -154,6 +182,37 @@ public class ChartRequestController {
     @PostMapping("/requestlist-clinicmanager/{id}/approve")
     public String approve(@PathVariable Long id) {
         chartRequestService.approve(id);
+        com.dentis.DENTIS.model.ChartRequest req = chartRequestService.getRequestById(id);
+        com.dentis.DENTIS.model.Patient patient = req.getPatient();
+        com.dentis.DENTIS.model.User clinician = req.getClinician();
+        if (patient != null && clinician != null) {
+            com.dentis.DENTIS.model.User faculty = patient.getAssignedFaculty();
+            String section = req.getSection() != null ? req.getSection().toUpperCase() : "";
+            switch (section) {
+                case "ENDO" -> {
+                    if (endodonticsChartService.findAllByPatient(patient).isEmpty())
+                        endodonticsChartService.createForPatient(patient, clinician, faculty);
+                }
+                case "OS" -> {
+                    if (oralSurgeryChartService.findAllByPatient(patient).isEmpty())
+                        oralSurgeryChartService.createForPatient(patient, clinician, faculty,
+                                com.dentis.DENTIS.model.OralSurgeryChartType.OSF1);
+                }
+                case "PERIO" -> {
+                    if (periodonticChartService.findAllByPatient(patient).isEmpty())
+                        periodonticChartService.createForPatient(patient, clinician, faculty);
+                }
+                case "RESTO" -> {
+                    if (operativeChartService.findAllByPatient(patient).isEmpty())
+                        operativeChartService.createForPatient(patient, clinician, faculty);
+                }
+                case "CD", "RPD", "FPD" -> {
+                    if (prosthodonticsChartService.findAllByPatient(patient).isEmpty())
+                        prosthodonticsChartService.createForPatient(patient, clinician, faculty);
+                }
+                default -> {}
+            }
+        }
         return "redirect:/requestlist-clinicmanager";
     }
 
@@ -167,16 +226,8 @@ public class ChartRequestController {
     public String patientList(Model model, Authentication authentication) {
         User clinician = getCurrentUser(authentication);
         model.addAttribute("currentUser", clinician);
-        model.addAttribute("osCharts", clinician != null
-                ? oralSurgeryChartService.findByClinicianOrderByCreatedAtDesc(clinician)
-                : List.of());
-        model.addAttribute("endoCharts", clinician != null
-                ? endodonticsChartService.findByClinicianOrderByCreatedAtDesc(clinician)
-                : List.of());
-        model.addAttribute("perioCharts", clinician != null
-                ? periodonticChartService.findByClinicianOrderByCreatedAtDesc(clinician)
-                : List.of());
         if (clinician != null) {
+            processApprovedRequests(clinician);
             for (Patient p : patientService.getPatientsForClinician(clinician)) {
                 if ("Resto".equalsIgnoreCase(p.getServiceCode())
                         && operativeChartService.findAllByPatient(p).isEmpty()
@@ -185,12 +236,55 @@ public class ChartRequestController {
                 }
             }
         }
-        model.addAttribute("operativeCharts", clinician != null
-                ? operativeChartService.findByClinicianOrderByCreatedAtDesc(clinician)
-                : List.of());
-        model.addAttribute("prosthoCharts", clinician != null
-                ? prosthodonticsChartService.findByClinicianOrderByCreatedAtDesc(clinician)
-                : List.of());
+        java.util.List<com.dentis.DENTIS.model.OralSurgeryChart> osCharts = clinician != null
+                ? new java.util.ArrayList<>(oralSurgeryChartService.findByClinicianOrderByCreatedAtDesc(clinician))
+                : new java.util.ArrayList<>();
+        java.util.List<com.dentis.DENTIS.model.EndodonticsChart> endoCharts = clinician != null
+                ? new java.util.ArrayList<>(endodonticsChartService.findByClinicianOrderByCreatedAtDesc(clinician))
+                : new java.util.ArrayList<>();
+        java.util.List<com.dentis.DENTIS.model.PeriodonticChart> perioCharts = clinician != null
+                ? new java.util.ArrayList<>(periodonticChartService.findByClinicianOrderByCreatedAtDesc(clinician))
+                : new java.util.ArrayList<>();
+        java.util.List<com.dentis.DENTIS.model.OperativeChart> operativeCharts = clinician != null
+                ? new java.util.ArrayList<>(operativeChartService.findByClinicianOrderByCreatedAtDesc(clinician))
+                : new java.util.ArrayList<>();
+        java.util.List<com.dentis.DENTIS.model.ProsthodonticsChart> prosthoCharts = clinician != null
+                ? new java.util.ArrayList<>(prosthodonticsChartService.findByClinicianOrderByCreatedAtDesc(clinician))
+                : new java.util.ArrayList<>();
+
+        if (clinician != null) {
+            for (ChartRequest req : chartRequestService.getApprovedRequestsForClinician(clinician)) {
+                Patient rp = req.getPatient();
+                if (rp == null) rp = chartRequestService.resolvePatient(req.getChartNo());
+                if (rp == null) continue;
+                final Patient reqPatient = rp;
+                String section = req.getSection() != null ? req.getSection().toUpperCase() : "";
+                switch (section) {
+                    case "ENDO" -> endodonticsChartService.findAllByPatient(reqPatient).stream()
+                            .filter(c -> endoCharts.stream().noneMatch(e -> e.getPatient().equals(reqPatient)))
+                            .findFirst().ifPresent(endoCharts::add);
+                    case "OS" -> oralSurgeryChartService.findAllByPatient(reqPatient).stream()
+                            .filter(c -> osCharts.stream().noneMatch(e -> e.getPatient().equals(reqPatient)))
+                            .findFirst().ifPresent(osCharts::add);
+                    case "PERIO" -> periodonticChartService.findAllByPatient(reqPatient).stream()
+                            .filter(c -> perioCharts.stream().noneMatch(e -> e.getPatient().equals(reqPatient)))
+                            .findFirst().ifPresent(perioCharts::add);
+                    case "RESTO" -> operativeChartService.findAllByPatient(reqPatient).stream()
+                            .filter(c -> operativeCharts.stream().noneMatch(e -> e.getPatient().equals(reqPatient)))
+                            .findFirst().ifPresent(operativeCharts::add);
+                    case "CD", "RPD", "FPD" -> prosthodonticsChartService.findAllByPatient(reqPatient).stream()
+                            .filter(c -> prosthoCharts.stream().noneMatch(e -> e.getPatient().equals(reqPatient)))
+                            .findFirst().ifPresent(prosthoCharts::add);
+                    default -> {}
+                }
+            }
+        }
+
+        model.addAttribute("osCharts", osCharts);
+        model.addAttribute("endoCharts", endoCharts);
+        model.addAttribute("perioCharts", perioCharts);
+        model.addAttribute("operativeCharts", operativeCharts);
+        model.addAttribute("prosthoCharts", prosthoCharts);
         return "patientlist-clinician";
     }
 
