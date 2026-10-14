@@ -95,6 +95,9 @@ public class ChartRequestController {
         model.addAttribute("periocActionNeededCharts", clinician != null
                 ? periodonticChartService.findFormCActionNeededByClinician(clinician)
                 : List.of());
+        model.addAttribute("perioPf3ActionNeededCharts", clinician != null
+                ? periodonticChartService.findPf3ActionNeededByClinician(clinician)
+                : List.of());
         model.addAttribute("prosthoCharts", clinician != null
                 ? prosthodonticsChartService.findByClinicianOrderByCreatedAtDesc(clinician).stream().limit(5).toList()
                 : List.of());

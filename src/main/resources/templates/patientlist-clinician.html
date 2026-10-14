@@ -139,6 +139,17 @@
                                     <a th:href="@{/chartsview-clinician/{id}(id=${pc.patient.id})}" class="btn-view-chart">View</a>
                                 </td>
                             </tr>
+                            <!-- Periodontics PF3 (Gingivitis Reevaluation) -->
+                            <tr th:each="pc : ${perioCharts}">
+                                <td th:text="${#strings.replace(pc.chartNo, '-PF1', '-PF3')}"></td>
+                                <td>Periodontics - Gingivitis Reevaluation Chart</td>
+                                <td th:text="${pc.patient.surname + ', ' + pc.patient.firstName + (pc.patient.middleInitial != null ? ' ' + pc.patient.middleInitial + '.' : '')}"></td>
+                                <td th:text="${pc.patient.contactNumber}"></td>
+                                <td th:text="${pc.patient.email}"></td>
+                                <td>
+                                    <a th:href="@{/chartsview-clinician/{id}(id=${pc.patient.id})}" class="btn-view-chart">View</a>
+                                </td>
+                            </tr>
                             <!-- RESTO10 (Assessment Form) -->
                             <tr th:each="oc : ${operativeCharts}">
                                 <td th:text="${oc.chartNo}"></td>

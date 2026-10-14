@@ -77,6 +77,16 @@ public class PeriodonticChartService {
                         PeriodonticChartStatus.REVISE));
     }
 
+    /** Charts where PF3 (Gingivitis Reevaluation) still needs work.
+     *  Filtered in Java because charts made before PF3 existed have no PF3 status in the database. */
+    public List<PeriodonticChart> findPf3ActionNeededByClinician(User clinician) {
+        return repo.findByClinicianOrderByCreatedAtDesc(clinician).stream()
+                .filter(c -> c.getPf3Status() == PeriodonticChartStatus.CREATED
+                          || c.getPf3Status() == PeriodonticChartStatus.IN_PROGRESS
+                          || c.getPf3Status() == PeriodonticChartStatus.REVISE)
+                .toList();
+    }
+
     /** Charts where Form A/B (PF1) is awaiting faculty approval. */
     public List<PeriodonticChart> findFormABAwaitingApprovalByFaculty(User faculty) {
         return repo.findByFacultyAndStatusOrderByCreatedAtDesc(faculty, PeriodonticChartStatus.SUBMITTED);
@@ -85,6 +95,11 @@ public class PeriodonticChartService {
     /** Charts where Form C (PF2) is awaiting faculty approval. */
     public List<PeriodonticChart> findFormCAwaitingApprovalByFaculty(User faculty) {
         return repo.findByFacultyAndFormCStatusOrderByCreatedAtDesc(faculty, PeriodonticChartStatus.SUBMITTED);
+    }
+
+    /** Charts where PF3 (Gingivitis Reevaluation) is awaiting faculty approval. */
+    public List<PeriodonticChart> findPf3AwaitingApprovalByFaculty(User faculty) {
+        return repo.findByFacultyAndPf3StatusOrderByCreatedAtDesc(faculty, PeriodonticChartStatus.SUBMITTED);
     }
 
     // ── Form A ───────────────────────────────────────────────────────────────
@@ -169,6 +184,29 @@ public class PeriodonticChartService {
         return repo.save(chart);
     }
 
+    // ── PF3: Gingivitis Reevaluation Chart ─────────────────────────────────
+
+    public PeriodonticChart savePf3(Long id, PeriodonticChart updated) {
+        PeriodonticChart chart = repo.findById(id).orElseThrow();
+        chart.setPf3GridJson(updated.getPf3GridJson());
+        chart.setPf3PlaqueRecall1(updated.getPf3PlaqueRecall1());
+        chart.setPf3PlaqueRecall2(updated.getPf3PlaqueRecall2());
+        chart.setPf3BopRecall1(updated.getPf3BopRecall1());
+        chart.setPf3BopRecall2(updated.getPf3BopRecall2());
+        chart.setRecall1Date(updated.getRecall1Date());
+        chart.setRecall1Diagnosis(updated.getRecall1Diagnosis());
+        chart.setRecall1Findings(updated.getRecall1Findings());
+        chart.setRecall1Recommendation(updated.getRecall1Recommendation());
+        chart.setRecall2Date(updated.getRecall2Date());
+        chart.setRecall2Diagnosis(updated.getRecall2Diagnosis());
+        chart.setRecall2Findings(updated.getRecall2Findings());
+        chart.setRecall2Recommendation(updated.getRecall2Recommendation());
+        if (chart.getPf3Status() == PeriodonticChartStatus.CREATED) {
+            chart.setPf3Status(PeriodonticChartStatus.IN_PROGRESS);
+        }
+        return repo.save(chart);
+    }
+
     // ── Form A/B (PF1) status transitions ────────────────────────────────────
 
     public PeriodonticChart submitFormAB(Long id) {
@@ -208,6 +246,27 @@ public class PeriodonticChartService {
         PeriodonticChart chart = repo.findById(id).orElseThrow();
         chart.setFormCStatus(PeriodonticChartStatus.REVISE);
         chart.setFormCRevisionReason(reason);
+        return repo.save(chart);
+    }
+
+    // ── PF3 (Gingivitis Reevaluation) status transitions ────────────────────
+
+    public PeriodonticChart submitPf3(Long id) {
+        PeriodonticChart chart = repo.findById(id).orElseThrow();
+        chart.setPf3Status(PeriodonticChartStatus.SUBMITTED);
+        return repo.save(chart);
+    }
+
+    public PeriodonticChart approvePf3(Long id) {
+        PeriodonticChart chart = repo.findById(id).orElseThrow();
+        chart.setPf3Status(PeriodonticChartStatus.APPROVED);
+        return repo.save(chart);
+    }
+
+    public PeriodonticChart revisePf3(Long id, String reason) {
+        PeriodonticChart chart = repo.findById(id).orElseThrow();
+        chart.setPf3Status(PeriodonticChartStatus.REVISE);
+        chart.setPf3RevisionReason(reason);
         return repo.save(chart);
     }
 }

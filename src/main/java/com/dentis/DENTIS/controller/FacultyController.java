@@ -101,6 +101,9 @@ public class FacultyController {
         model.addAttribute("awaitingApprovalPerio2Charts", "PERIO".equals(section) && faculty != null
                 ? periodonticChartService.findFormCAwaitingApprovalByFaculty(faculty)
                 : List.of());
+        model.addAttribute("awaitingApprovalPerio3Charts", "PERIO".equals(section) && faculty != null
+                ? periodonticChartService.findPf3AwaitingApprovalByFaculty(faculty)
+                : List.of());
         model.addAttribute("awaitingApprovalOperative10Charts", "RESTO".equals(section) && faculty != null
                 ? operativeChartService.findForm1AwaitingApprovalByFaculty(faculty)
                 : List.of());

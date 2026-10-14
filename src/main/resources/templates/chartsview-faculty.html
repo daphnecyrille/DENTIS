@@ -370,6 +370,40 @@
                                     <span th:if="${pc.formCStatus.name() != 'SUBMITTED'}">—</span>
                                 </td>
                             </tr>
+                            <tr th:each="pc : ${perioCharts}">
+                                <td th:text="${#strings.replace(pc.chartNo, '-PF1', '-PF3')}"></td>
+                                <td>Periodontics - Gingivitis Reevaluation Chart</td>
+                                <td th:class="'status ' + ${pc.pf3Status.cssClass}"
+                                    th:text="${pc.pf3Status.displayName}"></td>
+                                <td th:text="${pc.createdAt.toLocalDate()}"></td>
+                                <td>
+                                    <a th:href="@{/periodontics-pf3/{id}/view(id=${pc.id})}" class="btn-action btn-view">View</a>
+                                </td>
+                                <td>
+                                    <span th:if="${pc.clinician != null}"
+                                          class="clinician-link"
+                                          th:data-name="${pc.clinician.fullName}"
+                                          th:data-email="${pc.clinician.email}"
+                                          th:data-student="${pc.clinician.studentNumber}"
+                                          th:data-year="${pc.clinician.yearLevel}"
+                                          th:data-clinician-id="${pc.clinician.id}"
+                                          th:data-patient-id="${patient.originalPatient != null ? patient.originalPatient.id : patient.id}"
+                                          th:text="${pc.clinician.fullName}"
+                                          onclick="showClinicianModal(this)"></span>
+                                    <span th:if="${pc.clinician == null}">—</span>
+                                </td>
+                                <td>
+                                    <span th:if="${pc.pf3Status.name() == 'SUBMITTED'}" style="display:flex; gap:6px;">
+                                        <form th:action="@{/periodontics3-faculty/{id}/approve(id=${pc.id})}" method="post" style="display:inline;">
+                                            <button type="submit" class="btn-action btn-accept">Approve</button>
+                                        </form>
+                                        <button type="button" class="btn-action btn-deny"
+                                                th:data-action="@{/periodontics3-faculty/{id}/revise(id=${pc.id})}"
+                                                onclick="openReviseModal(this)">Revise</button>
+                                    </span>
+                                    <span th:if="${pc.pf3Status.name() != 'SUBMITTED'}">—</span>
+                                </td>
+                            </tr>
                             <!-- RESTO10 (operativeb/c - Assessment Form) -->
                             <tr th:each="oc : ${operativeCharts}">
                                 <td th:text="${oc.chartNo}"></td>

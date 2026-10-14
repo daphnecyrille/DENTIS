@@ -134,7 +134,7 @@ body {
 /* LAYOUT */
 .main-container {
     display: flex;
-    height: 100%;
+    height: calc(100vh - 77px); /* fill the space below the 77px header so the last rows can be scrolled into view */
 }
 
 /* MAIN CONTENT */

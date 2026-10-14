@@ -32,4 +32,7 @@ public interface PeriodonticChartRepository extends JpaRepository<PeriodonticCha
             User faculty, PeriodonticChartStatus formCStatus);
 
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+
+    List<PeriodonticChart> findByFacultyAndPf3StatusOrderByCreatedAtDesc(
+            User faculty, PeriodonticChartStatus pf3Status);
 }

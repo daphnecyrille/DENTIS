@@ -276,6 +276,26 @@
                                 </td>
                                 <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
                             </tr>
+                            <!-- Periodontics PF3 (Gingivitis Reevaluation Chart) -->
+                            <tr th:each="pc : ${perioCharts}">
+                                <td th:text="${#strings.replace(pc.chartNo, '-PF1', '-PF3')}"></td>
+                                <td>Periodontics - Gingivitis Reevaluation Chart</td>
+                                <td th:class="'status ' + ${pc.pf3Status.cssClass}"
+                                    th:text="${pc.pf3Status.displayName}"></td>
+                                <td th:text="${pc.createdAt.toLocalDate()}"></td>
+                                <td><a th:href="@{/periodontics-pf3/{id}/view(id=${pc.id})}" class="btn-action btn-view">View</a></td>
+                                <td>
+                                    <a th:if="${pc.pf3Status.name() != 'APPROVED'}" th:href="@{/periodontics-pf3/{id}(id=${pc.id})}" class="btn-action btn-edit">Edit</a>
+                                    <span th:if="${pc.pf3Status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">Approved</span>
+                                </td>
+                                <td>
+                                    <form th:if="${pc.pf3Status.name() != 'APPROVED' and pc.pf3Status.name() != 'SUBMITTED'}" th:action="@{/periodontics-pf3/{id}/submit(id=${pc.id})}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn-action btn-submit">Submit</button>
+                                    </form>
+                                    <span th:if="${pc.pf3Status.name() == 'SUBMITTED' or pc.pf3Status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
+                                </td>
+                                <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
+                            </tr>
                             <!-- RESTO10 Page 1 (operativeb - Assessment Form) -->
                             <tr th:each="oc : ${operativeCharts}">
                                 <td th:text="${oc.chartNo}"></td>

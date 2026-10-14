@@ -1,0 +1,149 @@
+/* PF3 — Gingivitis Reevaluation Chart.
+   Loaded after periodonticsb-clinician.css (header, sidebar, form card, recall sections). */
+
+/* ─── TOP ROW (same look as PF1 page A) ─── */
+.top-row { display: flex; gap: 20px; align-items: stretch; margin-top: 10px; }
+.learning-outcome-box {
+    background: #2d4a6b;
+    color: white;
+    border-radius: 10px;
+    padding: 16px 18px;
+    flex: 0 0 42%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.lo-title { font-size: 14px; font-weight: 600; margin: 0; }
+.lo-text  { font-size: 12px; line-height: 1.6; font-weight: 300; margin: 0; }
+.clinician-date-group { flex: 1; display: flex; flex-direction: column; gap: 10px; justify-content: center; }
+
+.form-group input {
+    padding: 7px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: 'Poppins', sans-serif;
+    outline: none;
+}
+.form-group input:focus { border-color: #324966; }
+.read-only-input { background: #f4f4f4; color: #555; }
+
+.patient-group { display: flex; flex-direction: column; gap: 12px; }
+.split-input { display: flex; gap: 8px; }
+.split-input input { flex: 1; min-width: 0; }
+.split-input input.input-wide { flex: 3; }
+.split-input input.input-narrow { flex: 0 0 50px; }
+.form-row { display: flex; gap: 12px; align-items: flex-end; }
+.form-row .form-group { flex: 1; min-width: 0; }
+.form-row .form-group.col-tiny  { flex: 0 0 160px; }
+.form-row .form-group.col-large { flex: 1; }
+
+/* ─── PLAQUE INDEX / BOP BOXES ─── */
+.pf3-index-row { display: flex; gap: 20px; flex-wrap: wrap; }
+.pf3-index-box {
+    flex: 1;
+    min-width: 260px;
+    border: 1px solid #c8d1dc;
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.pf3-box-title { font-size: 15px; font-weight: 600; color: #333; margin: 0; }
+.pf3-index-line { display: flex; align-items: center; gap: 12px; }
+.pf3-index-line label { flex: 0 0 70px; font-size: 13px; font-weight: 600; color: #222; }
+.pf3-index-line input {
+    flex: 1;
+    padding: 7px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: 'Poppins', sans-serif;
+    outline: none;
+}
+.pf3-index-line input:focus { border-color: #324966; }
+
+/* ─── REEVALUATION CHART ─── */
+.pf3-chart-group { display: flex; flex-direction: column; gap: 8px; }
+.pf3-chart {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #999;
+    border-radius: 6px;
+    overflow: hidden;
+    background: white;
+}
+.pf3-row {
+    display: grid;
+    grid-template-columns: repeat(16, minmax(0, 1fr)) 92px;
+    border-bottom: 1px solid #bbb;
+}
+.pf3-row:last-child { border-bottom: none; }
+
+.pf3-teeth-row { background: #f6f6f6; }
+.pf3-tooth-btn {
+    border: none;
+    border-right: 1px solid #ddd;
+    background: transparent;
+    height: 32px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #222;
+    cursor: pointer;
+}
+.pf3-tooth-btn:hover { background: #eef2f6; }
+.pf3-tooth-btn.is-x { color: #c0392b; }
+
+.pf3-image-row { background: white; }
+.pf3-teeth-img { grid-column: 1 / 17; width: 100%; display: block; }
+
+.pf3-mark-row { height: 28px; }
+.pf3-cell {
+    border-right: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: #2d4a6b;
+    cursor: pointer;
+    user-select: none;
+}
+.pf3-cell:hover { background: rgba(45,74,107,0.08); }
+.pf3-cell.is-x { color: #c0392b; font-size: 13px; }
+.pf3-recall2 .pf3-cell { background: #fafbfc; }
+
+.pf3-label-cell {
+    border-left: 1px solid #999;
+    background: #ececec;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #111;
+}
+
+/* BOP + Plaque rows of one recall, with one R1/R2 box spanning both (like the paper form) */
+.pf3-pair { display: flex; border-bottom: 1px solid #bbb; }
+.pf3-pair-rows { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.pf3-pair-rows .pf3-row { grid-template-columns: repeat(16, minmax(0, 1fr)) 56px; }
+.pf3-pair-rows .pf3-row:last-child { border-bottom: none; }
+.pf3-pair.pf3-divider { border-top: 3px solid #555; }
+.pf3-recall-box {
+    flex: 0 0 36px;
+    border-left: 1px solid #1d3550;
+    background: #2d4a6b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+}
+.pf3-chart > .pf3-pair:last-child { border-bottom: none; }
+.pf3-hint { margin: 0; font-size: 12px; color: #666; }
+
+.recall-date input { max-width: 220px; }

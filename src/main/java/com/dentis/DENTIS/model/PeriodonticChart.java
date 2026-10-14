@@ -162,4 +162,40 @@ public class PeriodonticChart {
 
     @Column(columnDefinition = "TEXT")
     private String formCRevisionReason;
+
+    // ── PF3: Gingivitis Reevaluation Chart ──────────────────────────────────
+    // Recall 1/2 diagnosis, findings and recommendation reuse the recall1*/recall2* fields above.
+
+    /** Status for PF3 (Gingivitis Reevaluation Chart). */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "pf3_status")
+    private PeriodonticChartStatus pf3Status = PeriodonticChartStatus.CREATED;
+
+    @Column(name = "pf3_revision_reason", columnDefinition = "TEXT")
+    private String pf3RevisionReason;
+
+    /** JSON: BOP / Plaque marks (+ / - / X) per tooth for Recall 1 and Recall 2. */
+    @Column(name = "pf3_grid_json", columnDefinition = "TEXT")
+    private String pf3GridJson;
+
+    /** Plaque Index (O'Leary et al., 1972) per recall. */
+    @Column(name = "pf3_plaque_recall1") private String pf3PlaqueRecall1;
+    @Column(name = "pf3_plaque_recall2") private String pf3PlaqueRecall2;
+
+    /** BOP percentage per recall. */
+    @Column(name = "pf3_bop_recall1") private String pf3BopRecall1;
+    @Column(name = "pf3_bop_recall2") private String pf3BopRecall2;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @Column(name = "recall1_date")
+    private LocalDate recall1Date;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @Column(name = "recall2_date")
+    private LocalDate recall2Date;
+
+    /** Charts created before PF3 existed have no PF3 status yet — treat them as not started. */
+    public PeriodonticChartStatus getPf3Status() {
+        return pf3Status != null ? pf3Status : PeriodonticChartStatus.CREATED;
+    }
 }

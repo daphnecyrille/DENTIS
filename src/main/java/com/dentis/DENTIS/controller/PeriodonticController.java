@@ -113,6 +113,33 @@ public class PeriodonticController {
         return "redirect:/chartsview-clinician/" + chart.getPatient().getId();
     }
 
+    // ── Clinician: PF3 (Gingivitis Reevaluation Chart) ──────────────────────
+
+    @GetMapping("/periodontics-pf3/{id}")
+    public String pf3(@PathVariable Long id, Model model, Authentication authentication) {
+        PeriodonticChart chart = periodonticChartService.getById(id);
+        model.addAttribute("currentUser", getCurrentUser(authentication));
+        model.addAttribute("chart", chart);
+        model.addAttribute("viewOnly", chart.getPf3Status() == PeriodonticChartStatus.APPROVED);
+        return "periodonticspf3-clinician";
+    }
+
+    @GetMapping("/periodontics-pf3/{id}/view")
+    public String pf3View(@PathVariable Long id, Model model, Authentication authentication) {
+        PeriodonticChart chart = periodonticChartService.getById(id);
+        model.addAttribute("currentUser", getCurrentUser(authentication));
+        model.addAttribute("chart", chart);
+        model.addAttribute("viewOnly", true);
+        return "periodonticspf3-clinician";
+    }
+
+    @PostMapping("/periodontics-pf3/{id}")
+    public String savePf3(@PathVariable Long id,
+                          @ModelAttribute("chart") PeriodonticChart updated) {
+        PeriodonticChart chart = periodonticChartService.savePf3(id, updated);
+        return "redirect:/chartsview-clinician/" + chart.getPatient().getId();
+    }
+
     // ── Clinician: submit PF1 (Form A/B) ────────────────────────────────────
 
     @PostMapping("/periodontics-ab/{id}/submit")
@@ -187,6 +214,28 @@ public class PeriodonticController {
     @PostMapping("/periodontics2-faculty/{id}/revise")
     public String reviseFormC(@PathVariable Long id, @RequestParam String revisionReason) {
         PeriodonticChart chart = periodonticChartService.reviseFormC(id, revisionReason);
+        return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
+    }
+
+    // ── Clinician: submit PF3 (Gingivitis Reevaluation) ─────────────────────
+
+    @PostMapping("/periodontics-pf3/{id}/submit")
+    public String submitPf3(@PathVariable Long id) {
+        PeriodonticChart chart = periodonticChartService.submitPf3(id);
+        return "redirect:/chartsview-clinician/" + chart.getPatient().getId();
+    }
+
+    // ── Faculty: Approve / Revise PF3 (Gingivitis Reevaluation) ─────────────
+
+    @PostMapping("/periodontics3-faculty/{id}/approve")
+    public String approvePf3(@PathVariable Long id) {
+        PeriodonticChart chart = periodonticChartService.approvePf3(id);
+        return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
+    }
+
+    @PostMapping("/periodontics3-faculty/{id}/revise")
+    public String revisePf3(@PathVariable Long id, @RequestParam String revisionReason) {
+        PeriodonticChart chart = periodonticChartService.revisePf3(id, revisionReason);
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 }

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Clinical Periodontics PF3 - DentIS</title>
+    <link rel="stylesheet" href="/css/periodonticsb-clinician.css">
+    <link rel="stylesheet" href="/css/periodonticspf3-clinician.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div class="background"></div>
+<div class="perio-page">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
+                <div class="dropdown-icon">&#9660;</div>
+                <div class="user-dropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
+                    <li class="nav-item">
+                        <a href="/dashboard-clinicmanager" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/requestlist-clinicmanager" class="nav-link">
+                            <img src="/images/request-icon.png" alt="Request List" class="nav-icon">
+                            <span>Request List</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="/patientlist-clinicmanager" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient List" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/assign-clinicmanager" class="nav-link">
+                            <img src="/images/chart-icon.png" alt="Assign Advisers" class="nav-icon">
+                            <span>Assign Advisers</span>
+                        </a>
+                    </li>
+                </ul>
+                <ul th:unless="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
+                    <li class="nav-item">
+                        <a href="/clinician-dashboard" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/chartrequest-clinician" class="nav-link">
+                            <img src="/images/request-icon.png" alt="Chart" class="nav-icon2">
+                            <span>Chart Request</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/patientlist-clinician" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <h2 class="page-title">Clinical Periodontics</h2>
+            <div th:if="${chart.pf3Status.name() == 'REVISE' and chart.pf3RevisionReason != null and !#strings.isEmpty(chart.pf3RevisionReason)}"
+                 style="background:#fff3cd; border-left:5px solid #e6a817; padding:14px 24px; margin:0 0 28px 0; font-family:'Poppins',sans-serif; border-radius:6px;">
+                <strong style="font-size:13px; color:#856404; display:block; margin-bottom:4px;">Revision Required</strong>
+                <p style="margin:0; font-size:13px; color:#533f03;" th:text="${chart.pf3RevisionReason}"></p>
+            </div>
+
+            <div class="form-card">
+
+                <!-- Banner -->
+                <div class="form-banner">Gingivitis Reevaluation</div>
+
+                <form th:action="@{/periodontics-pf3/{id}(id=${chart.id})}" method="post" th:object="${chart}" id="formPf3">
+                <script th:inline="javascript">var VIEW_ONLY = /*[[${viewOnly}]]*/ false;</script>
+
+                <div class="form-body">
+                <div class="form-sections" th:style="${viewOnly} ? 'pointer-events:none;' : ''">
+
+                    <input type="hidden" id="pf3GridJsonInput" th:field="*{pf3GridJson}">
+
+                    <!-- Learning Outcome + Clinician / Chart No -->
+                    <div class="top-row">
+                        <div class="learning-outcome-box">
+                            <p class="lo-title"><em>Learning Outcome</em></p>
+                            <p class="lo-text">To manage patients with periodontal disease within the recommended time frame, while maintaining professional attitudes and demonstrating empathy.</p>
+                        </div>
+                        <div class="clinician-date-group">
+                            <div class="form-group">
+                                <label>Clinician</label>
+                                <input type="text" readonly class="read-only-input"
+                                       th:value="${chart.clinician != null ? chart.clinician.firstName + ' ' + chart.clinician.lastName : (currentUser != null ? currentUser.fullName : '')}">
+                            </div>
+                            <div class="form-group">
+                                <label>Chart No.</label>
+                                <input type="text" readonly class="read-only-input" th:value="${#strings.replace(chart.chartNo, '-PF1', '-PF3')}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Patient details (read-only from patient record) -->
+                    <div class="patient-group">
+                        <div class="form-group">
+                            <label>Patient Name</label>
+                            <div class="split-input">
+                                <input type="text" readonly class="read-only-input" th:value="${chart.patient.surname}" placeholder="Surname">
+                                <input type="text" readonly class="read-only-input input-wide" th:value="${chart.patient.firstName}" placeholder="First Name">
+                                <input type="text" readonly class="read-only-input input-narrow" th:value="${chart.patient.middleInitial}" placeholder="M.I.">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-tiny">
+                                <label>Age</label>
+                                <input type="text" readonly class="read-only-input" th:value="${chart.patient.age}" placeholder="Age">
+                            </div>
+                            <div class="form-group col-tiny">
+                                <label>Gender</label>
+                                <input type="text" readonly class="read-only-input" th:value="${chart.patient.sex}" placeholder="Gender">
+                            </div>
+                            <div class="form-group col-large">
+                                <label>Occupation</label>
+                                <input type="text" readonly class="read-only-input" th:value="${chart.patient.occupation}" placeholder="Occupation">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Plaque Index + BOP Percentage -->
+                    <div class="pf3-index-row">
+                        <div class="pf3-index-box">
+                            <h3 class="pf3-box-title"><em>Plaque Index (O'Leary et al., 1972)</em></h3>
+                            <div class="pf3-index-line"><label>Recall 1</label><input type="text" th:field="*{pf3PlaqueRecall1}" placeholder="%"></div>
+                            <div class="pf3-index-line"><label>Recall 2</label><input type="text" th:field="*{pf3PlaqueRecall2}" placeholder="%"></div>
+                        </div>
+                        <div class="pf3-index-box">
+                            <h3 class="pf3-box-title"><em>BOP Percentage</em></h3>
+                            <div class="pf3-index-line"><label>Recall 1</label><input type="text" th:field="*{pf3BopRecall1}" placeholder="%"></div>
+                            <div class="pf3-index-line"><label>Recall 2</label><input type="text" th:field="*{pf3BopRecall2}" placeholder="%"></div>
+                        </div>
+                    </div>
+
+                    <!-- ═══════════ REEVALUATION CHART (built by script below) ═══════════ -->
+                    <div class="pf3-chart-group">
+                        <div class="pf3-chart" id="pf3Chart"></div>
+                        <p class="pf3-hint">Click a box to mark <strong>+</strong> or <strong>&minus;</strong> (click again to change or clear). Click a tooth number to mark the whole tooth <strong>X</strong>.</p>
+                    </div>
+
+                    <!-- Recall 1 -->
+                    <div class="recall-section">
+                        <h3 class="recall-title"><em>Recall 1</em></h3>
+                        <div class="form-group recall-date"><label>Date</label><input type="date" th:field="*{recall1Date}"></div>
+                        <div class="form-group"><label>Diagnosis</label><textarea rows="3" th:field="*{recall1Diagnosis}" placeholder="Value"></textarea></div>
+                        <div class="form-group"><label>Relevant Findings</label><textarea rows="3" th:field="*{recall1Findings}" placeholder="Value"></textarea></div>
+                        <div class="form-group"><label>Recommendation</label><textarea rows="3" th:field="*{recall1Recommendation}" placeholder="Value"></textarea></div>
+                    </div>
+
+                    <!-- Recall 2 -->
+                    <div class="recall-section">
+                        <h3 class="recall-title"><em>Recall 2</em></h3>
+                        <div class="form-group recall-date"><label>Date</label><input type="date" th:field="*{recall2Date}"></div>
+                        <div class="form-group"><label>Diagnosis</label><textarea rows="3" th:field="*{recall2Diagnosis}" placeholder="Value"></textarea></div>
+                        <div class="form-group"><label>Relevant Findings</label><textarea rows="3" th:field="*{recall2Findings}" placeholder="Value"></textarea></div>
+                        <div class="form-group"><label>Recommendation</label><textarea rows="3" th:field="*{recall2Recommendation}" placeholder="Value"></textarea></div>
+                    </div>
+
+                </div><!-- end viewOnly wrapper -->
+
+                    <!-- Navigation -->
+                    <div class="form-actions">
+                        <a th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}"
+                           th:href="@{/chartsview-clinicmanager/{id}(id=${chart.patient.id})}" class="btn-next">Back to Charts View</a>
+                        <a th:if="${currentUser != null and currentUser.role.name() == 'FACULTY'}"
+                           th:href="@{/chartsview-faculty/{id}(id=${chart.patient.id})}" class="btn-next">Back to Charts View</a>
+                        <a th:if="${currentUser == null or currentUser.role.name() == 'CLINICIAN'}"
+                           th:href="@{/chartsview-clinician/{id}(id=${chart.patient.id})}" class="btn-next">Back</a>
+                        <button th:if="${!viewOnly}" type="submit" class="btn-submit">Save</button>
+                    </div>
+
+                </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script th:inline="none">
+/* ── PF3 chart layout (mirrors the paper form) ──
+   Each section lists its rows from top to bottom; R1 rows sit closest to the teeth pictures. */
+var UPPER_TEETH = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28];
+var LOWER_TEETH = [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
+var RECALL_ROWS_OUTER = [ ['r2','bop'], ['r2','plaque'], ['r1','bop'], ['r1','plaque'] ];   /* image below these rows */
+var RECALL_ROWS_INNER = [ ['r1','bop'], ['r1','plaque'], ['r2','bop'], ['r2','plaque'] ];   /* image above these rows */
+var LAYOUT = [
+    { type: 'teeth', arch: 'upper', teeth: UPPER_TEETH },
+    { type: 'rows',  section: 'upperBuccal',  arch: 'upper', rows: RECALL_ROWS_OUTER },
+    { type: 'image', src: '/images/pf3-upper.png', alt: 'Upper arch' },
+    { type: 'rows',  section: 'upperPalatal', arch: 'upper', rows: RECALL_ROWS_INNER },
+    { type: 'rows',  section: 'lowerLingual', arch: 'lower', rows: RECALL_ROWS_OUTER, divider: true },
+    { type: 'image', src: '/images/pf3-lower.png', alt: 'Lower arch' },
+    { type: 'rows',  section: 'lowerBuccal',  arch: 'lower', rows: RECALL_ROWS_INNER },
+    { type: 'teeth', arch: 'lower', teeth: LOWER_TEETH }
+];
+
+function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+}
+
+(function buildChart() {
+    var chart = document.getElementById('pf3Chart');
+    LAYOUT.forEach(function(part) {
+        if (part.type === 'teeth') {
+            var row = el('div', 'pf3-row pf3-teeth-row');
+            part.teeth.forEach(function(t, i) {
+                var b = el('button', 'pf3-tooth-btn', String(t));
+                b.type = 'button';
+                b.title = 'Mark tooth ' + t + ' as X (missing)';
+                b.dataset.arch = part.arch;
+                b.dataset.col  = String(i);
+                row.appendChild(b);
+            });
+            row.appendChild(el('div', 'pf3-label-cell'));
+            chart.appendChild(row);
+        } else if (part.type === 'image') {
+            var wrap = el('div', 'pf3-row pf3-image-row');
+            var img = el('img', 'pf3-teeth-img');
+            img.src = part.src; img.alt = part.alt;
+            wrap.appendChild(img);
+            wrap.appendChild(el('div', 'pf3-label-cell'));
+            chart.appendChild(wrap);
+        } else {
+            /* Rows come in BOP + Plaque pairs for the same recall; the R1/R2 label spans the pair */
+            for (var pi = 0; pi < part.rows.length; pi += 2) {
+                var recall = part.rows[pi][0];
+                var pair = el('div', 'pf3-pair' + (recall === 'r2' ? ' pf3-recall2' : ''));
+                if (part.divider && pi === 0) pair.classList.add('pf3-divider');
+                var pairRows = el('div', 'pf3-pair-rows');
+                [part.rows[pi], part.rows[pi + 1]].forEach(function(r) {
+                    var row = el('div', 'pf3-row pf3-mark-row pf3-' + r[1]);
+                    row.dataset.key = part.section + '.' + r[0] + '.' + r[1];
+                    for (var c = 0; c < 16; c++) {
+                        var cell = el('div', 'pf3-cell');
+                        cell.dataset.arch = part.arch;
+                        cell.dataset.col  = String(c);
+                        row.appendChild(cell);
+                    }
+                    row.appendChild(el('div', 'pf3-label-cell', r[1] === 'bop' ? 'BOP' : 'Plaque'));
+                    pairRows.appendChild(row);
+                });
+                pair.appendChild(pairRows);
+                pair.appendChild(el('div', 'pf3-recall-box', recall.toUpperCase()));
+                chart.appendChild(pair);
+            }
+        }
+    });
+})();
+
+function setCell(cell, v) {
+    cell.dataset.val = v;
+    cell.textContent = v;
+    cell.classList.toggle('is-x', v === 'X');
+}
+
+/* Click a box: blank → + → − → blank */
+document.getElementById('pf3Chart').addEventListener('click', function(e) {
+    if (VIEW_ONLY) return;
+    var cell = e.target.closest('.pf3-cell');
+    if (cell) {
+        var states = ['', '+', '−'];
+        var cur = cell.dataset.val || '';
+        var idx = states.indexOf(cur);
+        setCell(cell, states[(idx + 1) % states.length]);
+        return;
+    }
+    /* Click a tooth number: mark/unmark every box of that tooth (same arch) with X */
+    var btn = e.target.closest('.pf3-tooth-btn');
+    if (btn) {
+        var cells = document.querySelectorAll('#pf3Chart .pf3-cell[data-arch="' + btn.dataset.arch + '"][data-col="' + btn.dataset.col + '"]');
+        var allX = Array.from(cells).every(function(c) { return c.dataset.val === 'X'; });
+        cells.forEach(function(c) { setCell(c, allX ? '' : 'X'); });
+        btn.classList.toggle('is-x', !allX);
+    }
+});
+
+/* Load saved marks */
+(function() {
+    var val = document.getElementById('pf3GridJsonInput').value;
+    if (!val) return;
+    var data;
+    try { data = JSON.parse(val); } catch (e) { return; }
+    document.querySelectorAll('#pf3Chart .pf3-mark-row').forEach(function(row) {
+        var vals = data[row.dataset.key] || [];
+        row.querySelectorAll('.pf3-cell').forEach(function(cell, i) { setCell(cell, vals[i] || ''); });
+    });
+    document.querySelectorAll('#pf3Chart .pf3-tooth-btn').forEach(function(btn) {
+        var cells = document.querySelectorAll('#pf3Chart .pf3-cell[data-arch="' + btn.dataset.arch + '"][data-col="' + btn.dataset.col + '"]');
+        btn.classList.toggle('is-x', cells.length > 0 && Array.from(cells).every(function(c) { return c.dataset.val === 'X'; }));
+    });
+})();
+
+/* Save: pack every row into one JSON field, keyed by section.recall.type */
+document.getElementById('formPf3').addEventListener('submit', function() {
+    var data = {};
+    document.querySelectorAll('#pf3Chart .pf3-mark-row').forEach(function(row) {
+        var vals = [];
+        row.querySelectorAll('.pf3-cell').forEach(function(cell) { vals.push(cell.dataset.val || ''); });
+        data[row.dataset.key] = vals;
+    });
+    document.getElementById('pf3GridJsonInput').value = JSON.stringify(data);
+});
+
+/* ── UI handlers ── */
+document.querySelector('.menu-icon').onclick = function() {
+    document.querySelector('.sidebar').classList.toggle('expanded');
+};
+document.querySelector('.user-profile').onclick = function(e) {
+    e.stopPropagation();
+    document.querySelector('.user-dropdown').classList.toggle('show');
+};
+document.addEventListener('click', function() {
+    var d = document.querySelector('.user-dropdown');
+    if (d.classList.contains('show')) d.classList.remove('show');
+});
+document.querySelector('.user-dropdown').addEventListener('click', function(e) { e.stopPropagation(); });
+</script>
+
+</body>
+</html>

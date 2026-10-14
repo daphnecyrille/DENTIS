@@ -84,7 +84,7 @@ body { height: 100vh; overflow: hidden; }
 .dropdown-item:last-child { border-radius: 0 0 6px 6px; }
 
 /* LAYOUT */
-.main-container { display: flex; height: 100%; }
+.main-container { display: flex; height: calc(100vh - 77px); /* fill the space below the 77px header so the last rows can be scrolled into view */ }
 
 .main-content {
     flex: 1;

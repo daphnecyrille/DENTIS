@@ -438,7 +438,7 @@
 var VIEW_ONLY = /*[[${viewOnly}]]*/ false;
 </script>
 
-<script>
+<script th:inline="none">
 /* ── Module-level marks storage and redraw references ── */
 var panelMarks  = { canvasLeft: [], canvasRight: [] };
 var panelRedraw = {};
@@ -819,7 +819,7 @@ if (formEl) {
 (function() {
     /* Grids — older saves are a plain array of rows; newer ones also hold the extra * rows */
     var grids = {};
-    [['leftPanel', 'formCLeftGridJsonInput'], ['rightPanel', 'formCRightGridJsonInput']].forEach(function(pair) {
+    [ ['leftPanel', 'formCLeftGridJsonInput'], ['rightPanel', 'formCRightGridJsonInput'] ].forEach(function(pair) {
         var val = document.getElementById(pair[1]).value;
         var data = null;
         if (val) { try { data = JSON.parse(val); } catch(e) {} }
