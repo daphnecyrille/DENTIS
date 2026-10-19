@@ -82,37 +82,82 @@
 .pf3-row:last-child { border-bottom: none; }
 
 .pf3-teeth-row { background: #f6f6f6; }
+/* Tooth number = one large "mark missing" button (number + ✕ icon) */
+.pf3-teeth-row { padding: 4px 0; }
 .pf3-tooth-btn {
-    border: none;
-    border-right: 1px solid #ddd;
-    background: transparent;
-    height: 32px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    color: #222;
-    cursor: pointer;
-}
-.pf3-tooth-btn:hover { background: #eef2f6; }
-.pf3-tooth-btn.is-x { color: #c0392b; }
-
-.pf3-image-row { background: white; }
-.pf3-teeth-img { grid-column: 1 / 17; width: 100%; display: block; }
-
-.pf3-mark-row { height: 28px; }
-.pf3-cell {
-    border-right: 1px solid #ddd;
+    margin: 0 2px;
+    min-height: 36px;
+    border: 1.5px solid #c8d1dc;
+    border-radius: 6px;
+    background: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    gap: 4px;
+    font-family: 'Poppins', sans-serif;
+    color: #222;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+.pf3-tooth-num  { font-size: 13px; font-weight: 700; }
+/* ✕ inside a small square box, like a checkbox, so it reads as something to click */
+.pf3-tooth-icon {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid #c0392b;
+    border-radius: 3px;
+    background: white;
+    color: #c0392b;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.pf3-tooth-btn:hover { border-color: #c0392b; background: #fff5f4; }
+.pf3-tooth-btn:hover .pf3-tooth-icon { background: #c0392b; color: white; }
+.pf3-tooth-btn:focus-visible { outline: 3px solid #2d4a6b; outline-offset: 1px; }
+.pf3-tooth-btn.is-x { background: #c0392b; border-color: #c0392b; color: white; }
+.pf3-tooth-btn.is-x .pf3-tooth-icon { background: white; color: #c0392b; border-color: white; }
+.pf3-hint-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 6px;
+    border: 1.5px solid #c8d1dc;
+    border-radius: 4px;
+    font-weight: 700;
+    color: #222;
+}
+
+.pf3-image-row { background: white; }
+.pf3-img-wrap { grid-column: 1 / 17; position: relative; }
+.pf3-teeth-img { width: 100%; display: block; }
+.pf3-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+.pf3-mark-row { height: 28px; }
+.pf3-cell {
+    border-right: 1px solid #ccc;
+    display: flex;
+    align-items: stretch;
+}
+.pf3-site {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
     font-weight: 700;
     color: #2d4a6b;
     cursor: pointer;
     user-select: none;
+    border-right: 1px dotted #e2e2e2;
 }
-.pf3-cell:hover { background: rgba(45,74,107,0.08); }
-.pf3-cell.is-x { color: #c0392b; font-size: 13px; }
+.pf3-site:last-child { border-right: none; }
+.pf3-site:hover { background: rgba(45,74,107,0.10); }
+.pf3-site.is-x { color: #c0392b; font-size: 11px; }
 .pf3-recall2 .pf3-cell { background: #fafbfc; }
 
 .pf3-label-cell {
@@ -147,3 +192,56 @@
 .pf3-hint { margin: 0; font-size: 12px; color: #666; }
 
 .recall-date input { max-width: 220px; }
+
+/* ─── BOP symbols (same as PF1) ─── */
+.perio-legend {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px 14px;
+    background: #fafafa;
+    font-size: 12px;
+    color: #333;
+    flex-wrap: wrap;
+}
+.legend-col { display: flex; flex-direction: column; gap: 4px; }
+.legend-title { font-weight: 700; color: #2d4a6b; }
+
+.symbol-picker {
+    position: fixed;
+    display: none;
+    flex-direction: row;
+    gap: 4px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 6px 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    z-index: 9999;
+    pointer-events: all;
+}
+.sym-btn {
+    background: #fff0f0;
+    border: 1px solid #c0392b;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 17px;
+    font-weight: 600;
+    color: #c0392b;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+}
+.sym-btn:hover { background: #c0392b; color: white; }
+.sym-clear { border-color: #f5c6c6; }
+
+/* Sites of a missing tooth (X) can't be clicked — unmark the tooth number first */
+.pf3-site.is-x { cursor: not-allowed; }
+.pf3-site.is-x:hover { background: transparent; }
+.pf3-hint-chip .pf3-tooth-icon { width: 13px; height: 13px; font-size: 8px; }
+.pf3-hint .pf3-tooth-icon { width: 14px; height: 14px; font-size: 9px; vertical-align: middle; }
+
+/* ─── Clearer tooth columns: strong line between teeth, faint line between the 3 sites (same as PF1) ─── */
+.pf3-cell { border-right: 2px solid #c3cbd6; }
+.pf3-site { border-right: 1px dotted #b8b8b8; }

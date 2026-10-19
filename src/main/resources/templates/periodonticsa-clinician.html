@@ -5,6 +5,7 @@
     <title>Clinical Periodontics - DentIS</title>
     <link rel="stylesheet" href="/css/periodonticsa-clinician.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/form-common.css">
 </head>
 
 <body>
@@ -134,6 +135,15 @@
             <script th:inline="javascript">var VIEW_ONLY = /*[[${viewOnly}]]*/ false;</script>
 
             <div class="form-card">
+                <!-- Back to Charts (top-left arrow) -->
+                <a th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}" th:href="@{/chartsview-clinicmanager/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <a th:if="${currentUser != null and currentUser.role.name() == 'FACULTY'}" th:href="@{/chartsview-faculty/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <a th:if="${currentUser == null or currentUser.role.name() == 'CLINICIAN'}" th:href="@{/chartsview-clinician/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <div th:if="${param.saved != null}" class="saved-toast" role="status">
+                    <span class="saved-toast-icon">&#10003;</span>
+                    <span>Changes saved</span>
+                    <button type="button" class="saved-toast-close" aria-label="Close" onclick="this.parentNode.remove()">&times;</button>
+                </div>
                 <div class="form-banner">Periodontal Chart</div>
 
                 <div class="form-body">
@@ -253,7 +263,7 @@
                                 <button type="button" class="sym-btn" data-sym="|">|</button>
                                 <button type="button" class="sym-btn" data-sym="||">||</button>
                                 <button type="button" class="sym-btn" data-sym="o">o</button>
-                                <button type="button" class="sym-btn sym-clear" data-sym="">&#10005;</button>
+                                <button type="button" class="sym-btn sym-clear" data-sym="" title="Remove mark">Clear</button>
                             </div>
                         </div>
 
@@ -288,6 +298,7 @@
                     <!-- ═══════════ END CHART ═══════════ -->
 
                     <!-- Legend -->
+                    <p class="chart-hint"><strong>BOP:</strong> click a site in the chart to pick a symbol. &nbsp;<strong>Missing tooth:</strong> click <span class="tooth-btn-icon">&#10005;</span> on its number.</p>
                     <div class="chart-bottom-bar">
                         <div class="perio-legend">
                             <div class="legend-col">
@@ -335,10 +346,9 @@
                 </div><!-- end viewOnly wrapper -->
 
                     <div class="form-actions">
-                        <a th:if="${viewOnly and currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}"
-                           th:href="@{/chartsview-clinicmanager/{id}(id=${chart.patient.id})}" class="btn-next">Back to Charts View</a>
                         <a th:if="${viewOnly}" th:href="@{/periodontics-b/{id}/view(id=${chart.id})}" class="btn-next">Next</a>
-                        <button th:if="${!viewOnly}" type="submit" class="btn-next">Next</button>
+                        <button th:if="${!viewOnly}" type="submit" name="action" value="save" class="btn-next btn-save">Save</button>
+                        <button th:if="${!viewOnly}" type="submit" name="action" value="next" class="btn-next">Next</button>
                     </div>
 
                 </div>
@@ -387,16 +397,114 @@ function makeExtraRow(values) {
     return row;
 }
 
-function addUpperRow()    { document.getElementById('upperExtraRows').appendChild(makeExtraRow()); }
+function addUpperRow()    { var r = makeExtraRow(); document.getElementById('upperExtraRows').appendChild(r); applyMissingToRow(r, 'upper'); }
 function removeUpperRow() {
     var c = document.getElementById('upperExtraRows');
     if (c.lastElementChild) c.removeChild(c.lastElementChild);
 }
-function addLowerRow()    { document.getElementById('lowerExtraRows').appendChild(makeExtraRow()); }
+function addLowerRow()    { var r = makeExtraRow(); document.getElementById('lowerExtraRows').appendChild(r); applyMissingToRow(r, 'lower'); }
 function removeLowerRow() {
     var c = document.getElementById('lowerExtraRows');
     if (c.lastElementChild) c.removeChild(c.lastElementChild);
 }
+
+/* ── Missing tooth: tooth-number button marks every site of that tooth X, draws an X on the picture,
+      and locks the sites (same as PF1 page 2, PF2 and PF3) ── */
+var TOOTH_CENTERS = {   /* centre of each tooth in perio-chart.png, fraction of picture width (tooth-number order) */
+    upper: [0.1185, 0.1778, 0.2415, 0.3007, 0.3481, 0.4000, 0.4489, 0.4993, 0.5615, 0.6089, 0.6563, 0.7111, 0.7526, 0.8104, 0.8785, 0.9378],
+    lower: [0.1259, 0.1881, 0.2593, 0.3244, 0.3733, 0.4252, 0.4711, 0.5052, 0.5496, 0.5896, 0.6296, 0.6859, 0.7333, 0.8000, 0.8696, 0.9333]
+};
+var ARCH_Y = { upper: { cy: 0.23, hh: 0.17 }, lower: { cy: 0.72, hh: 0.20 } };
+var ARCH_ROWS = {
+    upper: '#upperExtraRows .extra-perio-row, #upperEmptyRow, #upperBRow, #upperLRow',
+    lower: '#lowerLRow, #lowerBRow, #lowerEmptyRow, #lowerExtraRows .extra-perio-row'
+};
+
+function toothInputs(arch, col) {
+    var inputs = [];
+    document.querySelectorAll(ARCH_ROWS[arch]).forEach(function(row) {
+        var cell = row.querySelectorAll('.grid-input-cell')[col];
+        if (cell) cell.querySelectorAll('input').forEach(function(inp) { inputs.push(inp); });
+    });
+    return inputs;
+}
+function isToothX(arch, col) {
+    var inputs = toothInputs(arch, col);
+    return inputs.length > 0 && inputs.every(function(inp) { return inp.value === 'X'; });
+}
+function lockIfX(inp) {
+    var x = inp.value === 'X';
+    inp.readOnly = x;
+    inp.classList.toggle('x-locked', x);
+}
+function setToothBtnTitle(b, missing) {
+    var t = b.dataset.tooth;
+    b.title = missing ? 'Tooth ' + t + ' is marked missing \u2014 click to undo' : 'Mark tooth ' + t + ' as missing';
+    b.setAttribute('aria-pressed', missing ? 'true' : 'false');
+}
+function syncTeeth() {
+    document.querySelectorAll('.tooth-btn').forEach(function(b) {
+        var missing = isToothX(b.dataset.arch, parseInt(b.dataset.col, 10));
+        b.classList.toggle('is-x', missing);
+        setToothBtnTitle(b, missing);
+    });
+    if (window.pageARedraw) window.pageARedraw();
+}
+function setToothX(arch, col, on) {
+    toothInputs(arch, col).forEach(function(inp) { inp.value = on ? 'X' : ''; lockIfX(inp); });
+    syncTeeth();
+}
+function applyMissingToRow(row, arch) {
+    document.querySelectorAll('.tooth-btn.is-x[data-arch="' + arch + '"]').forEach(function(b) {
+        var cell = row.querySelectorAll('.grid-input-cell')[parseInt(b.dataset.col, 10)];
+        if (cell) cell.querySelectorAll('input').forEach(function(inp) { inp.value = 'X'; lockIfX(inp); });
+    });
+}
+function drawMissingTeeth(ctx, canvas) {
+    ctx.strokeStyle = '#c0392b';
+    ctx.lineCap     = 'round';
+    ctx.lineWidth   = Math.max(2, canvas.width * 0.004);
+    ['upper', 'lower'].forEach(function(arch) {
+        var c = TOOTH_CENTERS[arch];
+        for (var i = 0; i < 16; i++) {
+            if (!isToothX(arch, i)) continue;
+            var left  = i > 0  ? c[i] - c[i - 1] : c[1] - c[0];
+            var right = i < 15 ? c[i + 1] - c[i] : c[15] - c[14];
+            var hw = Math.min(left, right) / 2 * 0.85 * canvas.width;
+            var hh = ARCH_Y[arch].hh * canvas.height;
+            var cx = c[i] * canvas.width, cy = ARCH_Y[arch].cy * canvas.height;
+            ctx.beginPath();
+            ctx.moveTo(cx - hw, cy - hh); ctx.lineTo(cx + hw, cy + hh);
+            ctx.moveTo(cx + hw, cy - hh); ctx.lineTo(cx - hw, cy + hh);
+            ctx.stroke();
+        }
+    });
+}
+
+/* Turn the tooth numbers into buttons */
+document.querySelectorAll('.tooth-num-row').forEach(function(row) {
+    var arch = row.id === 'upperToothRow' ? 'upper' : 'lower';
+    row.querySelectorAll('.grid-num-cell').forEach(function(cell, col) {
+        var tooth = cell.textContent.trim();
+        cell.textContent = '';
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'tooth-btn';
+        btn.dataset.arch = arch;
+        btn.dataset.col = String(col);
+        btn.dataset.tooth = tooth;
+        var num = document.createElement('span');  num.className = 'tooth-btn-num';  num.textContent = tooth;
+        var ico = document.createElement('span');  ico.className = 'tooth-btn-icon'; ico.textContent = '\u2715';
+        btn.appendChild(num); btn.appendChild(ico);
+        setToothBtnTitle(btn, false);
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (VIEW_ONLY) return;
+            setToothX(arch, col, !isToothX(arch, col));
+        });
+        cell.appendChild(btn);
+    });
+});
 
 /* ── Canvas ── */
 var annotations = [];
@@ -421,7 +529,9 @@ var annotations = [];
             ctx.font = 'bold ' + fontSize + 'px Poppins, sans-serif';
             ctx.fillText(a.sym, a.x * canvas.width, a.y * canvas.height);
         });
+        drawMissingTeeth(ctx, canvas);
     }
+    window.pageARedraw = function() { if (canvas.width) redraw(); };
 
     canvas.addEventListener('click', function(e) {
         if (VIEW_ONLY) return;
@@ -535,6 +645,10 @@ document.getElementById('formA').addEventListener('submit', function() {
     document.getElementById('formACanvasJsonInput').value = JSON.stringify(annotations);
 });
 
+/* Lock sites of teeth saved as missing and show their X on the picture */
+document.querySelectorAll('.grid-input-cell input').forEach(lockIfX);
+syncTeeth();
+
 /* ── Sidebar / dropdown ── */
 document.querySelector('.menu-icon').onclick = function() {
     document.querySelector('.sidebar').classList.toggle('expanded');
@@ -548,6 +662,33 @@ document.addEventListener('click', function() {
     if (d.classList.contains('show')) d.classList.remove('show');
 });
 document.querySelector('.user-dropdown').addEventListener('click', function(e) { e.stopPropagation(); });
+
+/* ── Warn before leaving with unsaved changes ──
+   Any edit (typing, a chart mark, a missing tooth, a symbol, adding/removing a row or chart) marks the page as changed.
+   Leaving by a link, the sidebar, reload or closing the tab then asks for confirmation. Saving clears the flag. */
+(function() {
+    if (typeof VIEW_ONLY !== 'undefined' && VIEW_ONLY) return;
+    var dirty = false;
+    var EDIT_TARGETS = [
+        '.box-spot', '.tooth-btn', '.col-x-btn', '.col-x-btn-c', '.sym-btn', 'canvas',
+        '.pf3-site', '.pi-input', '.star-cell', '.btn-row', '.btn-pm', '.btn-star',
+        '.chart-tab-add', '.tab-remove'
+    ].join(',');
+    function markDirty() { dirty = true; }
+    document.addEventListener('input',  markDirty, true);
+    document.addEventListener('change', markDirty, true);
+    document.addEventListener('click', function(e) {
+        if (e.target.closest && e.target.closest(EDIT_TARGETS)) markDirty();
+    }, true);
+    document.querySelectorAll('form').forEach(function(f) {
+        f.addEventListener('submit', function() { dirty = false; });
+    });
+    window.addEventListener('beforeunload', function(e) {
+        if (!dirty) return;
+        e.preventDefault();
+        e.returnValue = '';
+    });
+})();
 </script>
 
 </body>

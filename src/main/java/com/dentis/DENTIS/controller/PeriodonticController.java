@@ -53,9 +53,11 @@ public class PeriodonticController {
 
     @PostMapping("/periodontics-a/{id}")
     public String saveFormA(@PathVariable Long id,
-                            @ModelAttribute("chart") PeriodonticChart updated) {
-        PeriodonticChart chart = periodonticChartService.saveFormA(id, updated);
-        // "Next" navigates to Form B
+                            @ModelAttribute("chart") PeriodonticChart updated,
+                            @RequestParam(value = "action", defaultValue = "next") String action) {
+        periodonticChartService.saveFormA(id, updated);
+        // "Save" stays on page 1; "Next" saves and goes to page 2
+        if ("save".equals(action)) return "redirect:/periodontics-a/" + id + "?saved";
         return "redirect:/periodontics-b/" + id;
     }
 
@@ -82,8 +84,9 @@ public class PeriodonticController {
     @PostMapping("/periodontics-b/{id}")
     public String saveFormB(@PathVariable Long id,
                             @ModelAttribute("chart") PeriodonticChart updated) {
-        PeriodonticChart chart = periodonticChartService.saveFormB(id, updated);
-        return "redirect:/chartsview-clinician/" + chart.getPatient().getId();
+        periodonticChartService.saveFormB(id, updated);
+        // "Save" keeps the user on page 2
+        return "redirect:/periodontics-b/" + id + "?saved";
     }
 
     // ── Clinician: Form C ────────────────────────────────────────────────────
@@ -110,7 +113,7 @@ public class PeriodonticController {
     public String saveFormC(@PathVariable Long id,
                             @ModelAttribute("chart") PeriodonticChart updated) {
         PeriodonticChart chart = periodonticChartService.saveFormC(id, updated);
-        return "redirect:/chartsview-clinician/" + chart.getPatient().getId();
+        return "redirect:/periodontics-c/" + id + "?saved";   // Save keeps the user on the form
     }
 
     // ── Clinician: PF3 (Gingivitis Reevaluation Chart) ──────────────────────
@@ -137,7 +140,7 @@ public class PeriodonticController {
     public String savePf3(@PathVariable Long id,
                           @ModelAttribute("chart") PeriodonticChart updated) {
         PeriodonticChart chart = periodonticChartService.savePf3(id, updated);
-        return "redirect:/chartsview-clinician/" + chart.getPatient().getId();
+        return "redirect:/periodontics-pf3/" + id + "?saved";   // Save keeps the user on the form
     }
 
     // ── Clinician: submit PF1 (Form A/B) ────────────────────────────────────

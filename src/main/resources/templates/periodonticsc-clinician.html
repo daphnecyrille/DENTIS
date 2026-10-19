@@ -5,6 +5,7 @@
     <title>Clinical Periodontics - DentIS</title>
     <link rel="stylesheet" href="/css/periodonticsc-clinician.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/form-common.css">
 </head>
 
 <body>
@@ -128,6 +129,15 @@
             </div>
 
             <div class="form-card">
+                <!-- Back to Charts (top-left) + "Changes saved" popup -->
+                <a th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}" th:href="@{/chartsview-clinicmanager/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <a th:if="${currentUser != null and currentUser.role.name() == 'FACULTY'}" th:href="@{/chartsview-faculty/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <a th:if="${currentUser == null or currentUser.role.name() == 'CLINICIAN'}" th:href="@{/chartsview-clinician/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <div th:if="${param.saved != null}" class="saved-toast" role="status">
+                    <span class="saved-toast-icon">&#10003;</span>
+                    <span>Changes saved</span>
+                    <button type="button" class="saved-toast-close" aria-label="Close" onclick="this.parentNode.remove()">&times;</button>
+                </div>
                 <div class="form-banner">Periodontal Chart 2</div>
 
                 <form th:action="@{/periodontics-c/{id}(id=${chart.id})}" method="post" th:object="${chart}" id="formC">
@@ -212,7 +222,6 @@
                                     <button type="button" class="sym-btn" data-sym="circle" title="Circle">&#9675;</button>
                                     <button type="button" class="sym-btn" data-sym="half"   title="Half shaded">&#9680;</button>
                                     <button type="button" class="sym-btn" data-sym="full"   title="Full shaded">&#9679;</button>
-                                    <button type="button" class="sym-btn sym-x" data-sym="x" title="X (missing tooth)">X</button>
                                     <button type="button" class="sym-btn sym-clear" data-sym="" title="Remove mark">Clear</button>
                                 </div>
                             </div>
@@ -332,7 +341,6 @@
                                     <button type="button" class="sym-btn" data-sym="circle" title="Circle">&#9675;</button>
                                     <button type="button" class="sym-btn" data-sym="half"   title="Half shaded">&#9680;</button>
                                     <button type="button" class="sym-btn" data-sym="full"   title="Full shaded">&#9679;</button>
-                                    <button type="button" class="sym-btn sym-x" data-sym="x" title="X (missing tooth)">X</button>
                                     <button type="button" class="sym-btn sym-clear" data-sym="" title="Remove mark">Clear</button>
                                 </div>
                             </div>
@@ -382,6 +390,18 @@
                     </div>
                     <!-- ═══════════ END CHART ═══════════ -->
 
+                    <div class="chart-hint chart-guide">
+                        <div><strong>PI</strong> click site to switch between + / &minus;</div>
+                        <div><strong>BOP</strong> click site to pick a symbol (<span class="guide-sym">-</span> <span class="guide-sym">&bull;</span> <span class="guide-sym">|</span> <span class="guide-sym">||</span> <span class="guide-sym">o</span>)</div>
+                        <div><strong>Mob</strong> type 0&ndash;3</div>
+                        <div><strong>Sup</strong> type on each site &minus;</div>
+                        <div><strong>CAL / PPD</strong> type 0&ndash;15</div>
+                        <div><strong>CEJ-GM</strong> type &minus;15 to 15</div>
+                        <div><strong>* rows</strong> + / &minus; adds or removes a row; click a tooth to mark *</div>
+                        <div><strong>Chart</strong> click a tooth to pick a symbol (<span class="guide-dot"></span> <span class="guide-dot half"></span> <span class="guide-dot full"></span>)</div>
+                        <div><strong>Missing tooth</strong> click <span class="tooth-btn-icon">&#10005;</span> on its number</div>
+                    </div>
+
                     <!-- Notes -->
                     <div class="form-group chart-notes">
                         <label>Notes</label>
@@ -410,9 +430,6 @@
 
                     </div><!-- end pointer-events wrapper -->
 
-                    <div class="form-actions" th:if="${viewOnly and currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
-                        <a th:href="@{/chartsview-clinicmanager/{id}(id=${chart.patient.id})}" class="btn-next">Back to Charts View</a>
-                    </div>
                     <div class="form-actions" th:if="${!viewOnly}">
                         <button type="submit" class="btn-submit">Save</button>
                     </div>
@@ -431,7 +448,7 @@
     <button type="button" class="sym-btn" data-sym="|">|</button>
     <button type="button" class="sym-btn" data-sym="||">||</button>
     <button type="button" class="sym-btn" data-sym="o">o</button>
-    <button type="button" class="sym-btn sym-clear" data-sym="">&#10005;</button>
+    <button type="button" class="sym-btn sym-clear" data-sym="" title="Remove mark">Clear</button>
 </div>
 
 <script th:inline="javascript">
@@ -486,8 +503,24 @@ function initCanvas(canvasId, pickerId) {
     function redraw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         panelMarks[canvasId].forEach(function(m) {
-            drawMark(m.x * canvas.width, m.y * canvas.height, m.sym);
+            drawMark(picToCol(canvas.closest('.c-panel'), m.x) * canvas.width, m.y * canvas.height, m.sym);
         });
+        /* Missing teeth (marked with the tooth-number X): red X centred on the tooth */
+        var panel = canvas.closest('.c-panel');
+        var fr = toothFractions(panel);
+        ctx.strokeStyle = '#c0392b';
+        ctx.lineCap     = 'round';
+        ctx.lineWidth   = Math.max(2, canvas.width * 0.004);
+        for (var col = 0; col < 16; col++) {
+            if (!isToothX(panel, col)) continue;
+            var cx = fr.centers[col] * canvas.width;
+            var hw = fr.widths[col] / 2 * 0.7 * canvas.width;
+            var cy = canvas.height / 2, hh = canvas.height * 0.36;
+            ctx.beginPath();
+            ctx.moveTo(cx - hw, cy - hh); ctx.lineTo(cx + hw, cy + hh);
+            ctx.moveTo(cx + hw, cy - hh); ctx.lineTo(cx - hw, cy + hh);
+            ctx.stroke();
+        }
     }
     panelRedraw[canvasId] = redraw;
 
@@ -501,7 +534,10 @@ function initCanvas(canvasId, pickerId) {
         if (VIEW_ONLY) return;
         e.stopPropagation();
         var rect = canvas.getBoundingClientRect();
-        pendingX = (e.clientX - rect.left) / rect.width;
+        var panelEl = canvas.closest('.c-panel'), colX = (e.clientX - rect.left) / rect.width;
+        /* A missing (X) tooth can't be marked */
+        if (isToothX(panelEl, colAt(panelEl, colX))) { picker.style.display = 'none'; return; }
+        pendingX = colToPic(panelEl, colX);   /* saved in picture space */
         pendingY = (e.clientY - rect.top)  / rect.height;
         var rFrac = r() / canvas.width;
         var hit = -1;
@@ -573,33 +609,129 @@ document.querySelectorAll('.mob-row .c-cell').forEach(function(cell) {
     cell.classList.add('mob-cell');
 });
 
-/* ── Column X buttons ── */
-document.querySelectorAll('.c-tooth-row').forEach(function(row) {
-    var panel        = row.closest('.c-panel');
-    var teethWrapper = panel.querySelector('.c-teeth-wrapper');
-    var isTopRow     = !!(row.compareDocumentPosition(teethWrapper) & Node.DOCUMENT_POSITION_FOLLOWING);
-    var cells        = row.querySelectorAll('.c-tooth-num');
+/* ── Missing tooth: tooth-number X marks every site of that tooth X (above and below the picture),
+      draws an X on the picture, and locks the sites ── */
+var TOOTH_FR = {   /* column widths used by the grid (see .c-panel.left/.right in the CSS):
+                     picture widths evened out so the narrow incisors are not cramped */
+    leftPanel:  [58,58,60,53,54,54,53,59,59,53,54,54,53,60,58,58],
+    rightPanel: [62,59,61,54,53,53,52,54,54,52,53,53,54,60,59,62]
+};
+var PIC_FR = {    /* tooth widths in the pictures (dividers measured from perio-grid-upper/lower.png) */
+    leftPanel:  [63,62,70,45,48,47,45,68,67,45,47,48,45,70,63,63],
+    rightPanel: [79,67,75,49,45,43,40,48,49,40,43,45,48,74,68,82]
+};
+function bounds(fr) {
+    var tot = fr.reduce(function(a, b) { return a + b; }, 0), acc = 0, out = [0];
+    fr.forEach(function(f) { acc += f; out.push(acc / tot); });
+    return out;
+}
+/* Convert a horizontal position between picture space (how marks are saved) and column space (how they are shown) */
+function mapX(x, from, to) {
+    for (var k = 0; k < 16; k++) {
+        if (x <= from[k + 1] || k === 15) {
+            var t = (x - from[k]) / (from[k + 1] - from[k]);
+            return to[k] + t * (to[k + 1] - to[k]);
+        }
+    }
+    return x;
+}
+function picToCol(panel, x) { return mapX(x, bounds(PIC_FR[panel.id]), bounds(TOOTH_FR[panel.id])); }
+function colToPic(panel, x) { return mapX(x, bounds(TOOTH_FR[panel.id]), bounds(PIC_FR[panel.id])); }
+function picFractions(panel) {
+    var b = bounds(PIC_FR[panel.id]), centers = [];
+    for (var k = 0; k < 16; k++) centers.push((b[k] + b[k + 1]) / 2);
+    return { centers: centers };
+}
+/* Show the picture as 16 slices, each tooth stretched to fill its column */
+document.querySelectorAll('.c-teeth-wrapper').forEach(function(wrap) {
+    var panel = wrap.closest('.c-panel'), img = wrap.querySelector('.c-chart-img');
+    var b = bounds(PIC_FR[panel.id]);
+    var box = document.createElement('div');
+    box.className = 'c-teeth-slices';
+    for (var k = 0; k < 16; k++) {
+        var w = b[k + 1] - b[k], sl = document.createElement('div');
+        sl.className = 'c-teeth-slice';
+        sl.style.backgroundImage    = 'url("' + img.getAttribute('src') + '")';
+        sl.style.backgroundSize     = (100 / w) + '% 100%';
+        sl.style.backgroundPosition = (b[k] / (1 - w) * 100) + '% 0';
+        box.appendChild(sl);
+    }
+    wrap.insertBefore(box, img.nextSibling);
+});
+function toothFractions(panel) {
+    var fr = TOOTH_FR[panel.id], tot = fr.reduce(function(a, b) { return a + b; }, 0), acc = 0;
+    var centers = [], widths = [];
+    fr.forEach(function(f) { centers.push((acc + f / 2) / tot); widths.push(f / tot); acc += f; });
+    return { centers: centers, widths: widths };
+}
+function toothInputs(panel, col) {
+    var inputs = [];
+    panel.querySelectorAll('.c-grid-row').forEach(function(row) {
+        var cell = row.querySelectorAll('.c-cell')[col];
+        if (cell) cell.querySelectorAll('input').forEach(function(inp) { inputs.push(inp); });
+    });
+    return inputs;
+}
+function isToothX(panel, col) {
+    var inputs = toothInputs(panel, col);
+    return inputs.length > 0 && inputs.every(function(inp) { return inp.value === 'X'; });
+}
+function lockIfX(inp) {
+    var x = inp.value === 'X';
+    inp.classList.toggle('x-marked', x);
+    inp.classList.toggle('x-locked', x);
+    inp.readOnly = x || inp.classList.contains('pi-input') || !!inp.closest('.bop-row');   /* PI and BOP are picked, not typed */
+}
+function setToothBtnTitle(b, missing) {
+    var t = b.dataset.tooth;
+    b.title = missing ? 'Tooth ' + t + ' is marked missing \u2014 click to undo' : 'Mark tooth ' + t + ' as missing';
+    b.setAttribute('aria-pressed', missing ? 'true' : 'false');
+}
+function syncPanelTeeth(panel) {
+    panel.querySelectorAll('.col-x-btn-c').forEach(function(b) {
+        var missing = isToothX(panel, parseInt(b.dataset.col, 10));
+        b.classList.toggle('is-x', missing);
+        setToothBtnTitle(b, missing);
+    });
+    var canvas = panel.querySelector('.c-canvas');
+    if (canvas && panelRedraw[canvas.id]) panelRedraw[canvas.id]();
+}
+/* Which tooth column a horizontal position (column space, 0-1) falls in */
+function colAt(panel, x) {
+    var b = bounds(TOOTH_FR[panel.id]);
+    for (var k = 0; k < 15; k++) if (x < b[k + 1]) return k;
+    return 15;
+}
+function setToothX(panel, col, on) {
+    toothInputs(panel, col).forEach(function(inp) { inp.value = on ? 'X' : ''; lockIfX(inp); });
+    if (on) {
+        /* Remove any symbols already placed on this tooth in the picture */
+        var canvasId = panel.id === 'leftPanel' ? 'canvasLeft' : 'canvasRight';
+        var b = bounds(PIC_FR[panel.id]);
+        panelMarks[canvasId] = panelMarks[canvasId].filter(function(m) { return m.x < b[col] || m.x >= b[col + 1]; });
+        if (panelRedraw[canvasId]) panelRedraw[canvasId]();
+    }
+    syncPanelTeeth(panel);
+}
 
-    cells.forEach(function(cell, colIdx) {
+document.querySelectorAll('.c-tooth-row').forEach(function(row) {
+    var panel = row.closest('.c-panel');
+    row.querySelectorAll('.c-tooth-num').forEach(function(cell, colIdx) {
+        var tooth = cell.textContent.trim();
+        cell.textContent = '';
         var btn = document.createElement('button');
-        btn.type      = 'button';
-        btn.className = 'col-x-btn-c';
-        btn.textContent = 'X';
+        btn.type        = 'button';
+        btn.className   = 'col-x-btn-c tooth-btn';
+        btn.dataset.col = String(colIdx);
+        btn.dataset.tooth = tooth;
+        var num = document.createElement('span');  num.className = 'tooth-btn-num';  num.textContent = tooth;
+        var ico = document.createElement('span');  ico.className = 'tooth-btn-icon'; ico.textContent = '\u2715';
+        btn.appendChild(num); btn.appendChild(ico);
+        setToothBtnTitle(btn, false);
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
-            var inputs = [];
-            panel.querySelectorAll('.c-grid-row').forEach(function(gridRow) {
-                var gridIsBelow = !!(teethWrapper.compareDocumentPosition(gridRow) & Node.DOCUMENT_POSITION_FOLLOWING);
-                if (isTopRow === !gridIsBelow) {
-                    var colCell = gridRow.querySelectorAll('.c-cell')[colIdx];
-                    if (colCell) colCell.querySelectorAll('input').forEach(function(inp) { inputs.push(inp); });
-                }
-            });
-            var allX = inputs.length > 0 && inputs.every(function(inp) { return inp.value === 'X'; });
-            inputs.forEach(function(inp) {
-                inp.value = allX ? '' : 'X';
-                inp.classList.toggle('x-marked', !allX);
-            });
+            if (VIEW_ONLY) return;
+            setToothX(panel, colIdx, !isToothX(panel, colIdx));
         });
         cell.appendChild(btn);
     });
@@ -618,6 +750,7 @@ document.querySelectorAll('.pi-input').forEach(function(inp) {
     inp.style.cursor = 'pointer';
     inp.addEventListener('click', function() {
         if (VIEW_ONLY) return;
+        if (this.value === 'X') return;   /* missing tooth: locked */
         var states = ['', '+', '-'];
         var next = states[(states.indexOf(this.value) + 1) % states.length];
         this.value = next;
@@ -632,7 +765,9 @@ var bopActiveInput = null;
 document.querySelectorAll('.bop-row .c-cell input').forEach(function(inp) {
     inp.addEventListener('click', function(e) {
         if (VIEW_ONLY) return;
+        if (this.value === 'X') return;   /* missing tooth: locked */
         e.stopPropagation();
+        if (bopPicker.style.display === 'flex' && bopActiveInput === this) { bopPicker.style.display = 'none'; bopActiveInput = null; return; }
         bopActiveInput = this;
         bopPicker.style.left    = (e.clientX + 8) + 'px';
         bopPicker.style.top     = (e.clientY + 8) + 'px';
@@ -853,8 +988,137 @@ if (formEl) {
         } catch(e) {}
     }
 
+    /* Older saves placed X marks freely on the picture: turn each into a missing tooth */
+    [ ['canvasLeft', 'leftPanel'], ['canvasRight', 'rightPanel'] ].forEach(function(pair) {
+        var panel = document.getElementById(pair[1]);
+        var fr = picFractions(panel);   /* saved marks are in picture space */
+        panelMarks[pair[0]] = (panelMarks[pair[0]] || []).filter(function(m) {
+            if (m.sym !== 'x') return true;
+            var best = 0;
+            for (var k = 1; k < 16; k++) if (Math.abs(fr.centers[k] - m.x) < Math.abs(fr.centers[best] - m.x)) best = k;
+            toothInputs(panel, best).forEach(function(inp) { inp.value = 'X'; });
+            return false;
+        });
+    });
+    document.querySelectorAll('.c-grid-row .c-cell input').forEach(lockIfX);
+    syncPanelTeeth(document.getElementById('leftPanel'));
+    syncPanelTeeth(document.getElementById('rightPanel'));
+
     /* Apply PPD colors for loaded data */
     document.querySelectorAll('.ppd-row .c-cell input').forEach(function(inp) { updatePPDColor(inp); });
+})();
+
+/* ── No letters in the sites: BOP/PI are picked; Sup takes digits and + / -; the other rows are validated above ── */
+document.querySelectorAll('.c-grid-row').forEach(function(row) {
+    if (row.classList.length === 1 && !row.querySelector('.pi-cell')) row.classList.add('sup-row');
+});
+document.querySelectorAll('.c-grid-row .c-cell input').forEach(function(inp) {
+    if (inp.closest('.bop-row') || inp.classList.contains('pi-input')) return;
+    var sup = !!inp.closest('.sup-row');
+    inp.addEventListener('keydown', function(e) {
+        if (e.ctrlKey || e.metaKey || e.altKey || e.key.length > 1) return;   /* shortcuts, arrows, Backspace, Tab… */
+        if (!(sup ? /^[0-9+\-]$/ : /^[0-9\-]$/).test(e.key)) e.preventDefault();
+    });
+    inp.addEventListener('input', function() {   /* catches pasted text too */
+        if (this.value === 'X') return;            /* missing-tooth mark set by the page */
+        var clean = this.value.replace(sup ? /[^0-9+\-]/g : /[^0-9\-]/g, '');
+        if (clean !== this.value) this.value = clean;
+    });
+});
+
+/* ── Keyboard: arrow keys move between boxes (no auto-advance) ── */
+(function() {
+    function rowInputs(row) { return Array.prototype.slice.call(row.querySelectorAll('.c-cell input')); }
+    function where(inp) {
+        var row = inp.closest('.c-grid-row'), cell = inp.closest('.c-cell');
+        var cells = Array.prototype.slice.call(row.querySelectorAll('.c-cell'));
+        var sites = Array.prototype.slice.call(cell.querySelectorAll('input'));
+        return { row: row, panel: row.closest('.c-panel'), col: cells.indexOf(cell),
+                 site: sites.indexOf(inp), nSites: sites.length };
+    }
+    function go(inp) { if (inp) { inp.focus(); if (!inp.readOnly) inp.select(); } }
+
+    /* Next/previous box in the same row, skipping missing (X) teeth */
+    function step(inp, dir) {
+        var w = where(inp), list = rowInputs(w.row), i = list.indexOf(inp) + dir;
+        while (i >= 0 && i < list.length) {
+            var t = where(list[i]);
+            if (!isToothX(t.panel, t.col)) return list[i];
+            i += dir;
+        }
+        return null;
+    }
+    /* Same tooth (and same site where possible) in the row above/below */
+    function vertical(inp, dir) {
+        var w = where(inp);
+        var rows = Array.prototype.slice.call(w.panel.querySelectorAll('.c-grid-row'));
+        var r = rows[rows.indexOf(w.row) + dir];
+        if (!r) return null;
+        var cell = r.querySelectorAll('.c-cell')[w.col];
+        if (!cell) return null;
+        var sites = cell.querySelectorAll('input');
+        var s = w.nSites === sites.length ? w.site : (sites.length === 1 ? 0 : 1);
+        return sites[s];
+    }
+    function openBopFor(inp) {
+        var r = inp.getBoundingClientRect();
+        bopActiveInput = inp;
+        bopPicker.style.left    = (r.left) + 'px';
+        bopPicker.style.top     = (r.bottom + 6) + 'px';
+        bopPicker.style.display = 'flex';
+        requestAnimationFrame(function() {
+            var pr = bopPicker.getBoundingClientRect();
+            if (pr.right  > window.innerWidth)  bopPicker.style.left = (window.innerWidth  - pr.width  - 8) + 'px';
+            if (pr.bottom > window.innerHeight) bopPicker.style.top  = (r.top - pr.height - 6) + 'px';
+            bopPicker.querySelector('.sym-btn').focus();
+        });
+    }
+
+    document.querySelectorAll('.c-grid-row .c-cell input').forEach(function(inp) {
+        inp.addEventListener('keydown', function(e) {
+            var k = e.key, target = null;
+            if (k === 'ArrowRight') target = step(this, 1);
+            else if (k === 'ArrowLeft') target = step(this, -1);
+            else if (k === 'ArrowDown') target = vertical(this, 1);
+            else if (k === 'ArrowUp') target = vertical(this, -1);
+            else if (k === 'Enter') {
+                e.preventDefault();
+                if (VIEW_ONLY || this.value === 'X') return;
+                if (this.closest('.bop-row')) { openBopFor(this); return; }
+                if (this.classList.contains('pi-input')) { this.click(); return; }
+                return;
+            }
+            else if (this.classList.contains('pi-input') && (k === '+' || k === '=' || k === '-')) {
+                e.preventDefault();
+                if (VIEW_ONLY || this.value === 'X') return;
+                this.value = (k === '-') ? '-' : '+';
+                this.dispatchEvent(new Event('input', { bubbles: true }));   /* counts as an unsaved change */
+                return;
+            }
+            else return;
+            e.preventDefault();
+            go(target);
+        });
+    });
+
+    /* BOP picker by keyboard: ← → choose, Enter picks, Esc closes */
+    bopPicker.addEventListener('keydown', function(e) {
+        var btns = Array.prototype.slice.call(bopPicker.querySelectorAll('.sym-btn'));
+        var i = btns.indexOf(document.activeElement);
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+            e.preventDefault();
+            btns[(i + (e.key === 'ArrowRight' ? 1 : btns.length - 1)) % btns.length].focus();
+        } else if (e.key === 'Escape') {
+            bopPicker.style.display = 'none';
+            if (bopActiveInput) bopActiveInput.focus();
+        } else if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            var from = bopActiveInput;
+            document.activeElement.click();
+            if (from) from.dispatchEvent(new Event('input', { bubbles: true }));   /* counts as an unsaved change */
+            if (from) from.focus();
+        }
+    });
 })();
 
 /* ── Sidebar toggle ── */
@@ -874,6 +1138,33 @@ document.addEventListener('click', function() {
 document.querySelector('.user-dropdown').addEventListener('click', function(e) {
     e.stopPropagation();
 });
+
+/* ── Warn before leaving with unsaved changes ──
+   Any edit (typing, a chart mark, a missing tooth, a symbol, adding/removing a row or chart) marks the page as changed.
+   Leaving by a link, the sidebar, reload or closing the tab then asks for confirmation. Saving clears the flag. */
+(function() {
+    if (typeof VIEW_ONLY !== 'undefined' && VIEW_ONLY) return;
+    var dirty = false;
+    var EDIT_TARGETS = [
+        '.box-spot', '.tooth-btn', '.col-x-btn', '.col-x-btn-c', '.sym-btn', 'canvas',
+        '.pf3-site', '.pi-input', '.star-cell', '.btn-row', '.btn-pm', '.btn-star',
+        '.chart-tab-add', '.tab-remove'
+    ].join(',');
+    function markDirty() { dirty = true; }
+    document.addEventListener('input',  markDirty, true);
+    document.addEventListener('change', markDirty, true);
+    document.addEventListener('click', function(e) {
+        if (e.target.closest && e.target.closest(EDIT_TARGETS)) markDirty();
+    }, true);
+    document.querySelectorAll('form').forEach(function(f) {
+        f.addEventListener('submit', function() { dirty = false; });
+    });
+    window.addEventListener('beforeunload', function(e) {
+        if (!dirty) return;
+        e.preventDefault();
+        e.returnValue = '';
+    });
+})();
 </script>
 
 </body>

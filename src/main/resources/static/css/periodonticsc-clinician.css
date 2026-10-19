@@ -525,3 +525,143 @@ body { height: 100vh; overflow: hidden; }
     line-height: 1;
 }
 .cl-star-label { height: 30px; font-size: 13px; }
+
+/* ─── Dotted lines between the 3 sites of each tooth ─── */
+.c-grid-row .c-cell { align-items: stretch; }
+.c-grid-row .c-cell input[type="text"] {
+    flex: 1;
+    width: 0;          /* lets the 3 inputs share the tooth width instead of using the browser default input width */
+    min-width: 0;
+    border-right: 1px dotted #d6d6d6;
+}
+.c-grid-row .c-cell input[type="text"]:last-child { border-right: none; }
+
+/* ─── Missing tooth (X) ─── */
+.col-x-btn-c.is-x { background: #c0392b; color: white; }
+.c-cell input.x-locked { cursor: not-allowed; }
+.c-cell input.x-locked:focus { background: transparent; }
+
+/* ─── Tooth number = one large "mark missing" button (number + boxed ✕), same as PF3 ─── */
+.tooth-btn {
+    width: calc(100% - 4px);
+    margin: 0 2px;
+    min-height: 32px;
+    border: 1.5px solid #c8d1dc;
+    border-radius: 6px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 0 2px;
+    font-family: 'Poppins', sans-serif;
+    color: #222;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+.tooth-btn-num { font-size: 12px; font-weight: 700; }
+.tooth-btn-icon {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid #c0392b;
+    border-radius: 3px;
+    background: white;
+    color: #c0392b;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.tooth-btn:hover { border-color: #c0392b; background: #fff5f4; color: #222; }
+.tooth-btn:hover .tooth-btn-icon { background: #c0392b; color: white; }
+.tooth-btn:focus-visible { outline: 3px solid #2d4a6b; outline-offset: 1px; }
+.tooth-btn.is-x { background: #c0392b; border-color: #c0392b; color: white; }
+.tooth-btn.is-x .tooth-btn-icon { background: white; color: #c0392b; border-color: white; }
+.chart-hint { margin: 6px 0 0; font-size: 12px; color: #666; }
+.chart-hint .tooth-btn-icon { width: 14px; height: 14px; font-size: 9px; vertical-align: middle; }
+
+.c-tooth-row { height: auto; min-height: 44px; padding: 4px 0; }
+
+/* ─── Clearer tooth columns: strong line between teeth, faint line between the 3 sites (same as PF1) ─── */
+.c-cell,
+.c-tooth-row .c-tooth-num { border-right: 2px solid #c3cbd6; }
+.c-grid-row .c-cell input[type="text"] { border-right: 1px dotted #b8b8b8; }
+
+/* ─── Tooth columns: narrow teeth (incisors) are widened and wide molars narrowed so no column is cramped.
+       Columns never grow to fit their content, so numbers, sites and picture stay lined up.
+       Keep in sync with TOOTH_FR in periodonticsc-clinician.html ─── */
+.c-panel.left .c-tooth-row,
+.c-panel.left .c-grid-row,
+.c-panel.left .c-star-row {
+    grid-template-columns: minmax(0,58fr) minmax(0,58fr) minmax(0,60fr) minmax(0,53fr) minmax(0,54fr) minmax(0,54fr) minmax(0,53fr) minmax(0,59fr) minmax(0,59fr) minmax(0,53fr) minmax(0,54fr) minmax(0,54fr) minmax(0,53fr) minmax(0,60fr) minmax(0,58fr) minmax(0,58fr);
+}
+.c-panel.right .c-tooth-row,
+.c-panel.right .c-grid-row,
+.c-panel.right .c-star-row {
+    grid-template-columns: minmax(0,62fr) minmax(0,59fr) minmax(0,61fr) minmax(0,54fr) minmax(0,53fr) minmax(0,53fr) minmax(0,52fr) minmax(0,54fr) minmax(0,54fr) minmax(0,52fr) minmax(0,53fr) minmax(0,53fr) minmax(0,54fr) minmax(0,60fr) minmax(0,59fr) minmax(0,62fr);
+}
+.c-tooth-num { min-width: 0; }
+/* Number above the ✕ box so the button fits even the narrowest tooth */
+.c-tooth-num .tooth-btn { flex-direction: column; gap: 2px; padding: 3px 0; min-width: 0; }
+/* Smaller X in the sites so three of them fit inside the narrow incisor columns */
+.c-grid-row .c-cell input.x-locked { font-size: 10px; }
+
+/* Picture is shown as 16 tooth slices, each stretched to its column (built in JS);
+   the <img> stays only to give the picture its height */
+.c-teeth-wrapper .c-chart-img { visibility: hidden; }
+.c-teeth-slices { position: absolute; inset: 0; display: grid; z-index: 1; }
+.c-panel.left  .c-teeth-slices { grid-template-columns: minmax(0,58fr) minmax(0,58fr) minmax(0,60fr) minmax(0,53fr) minmax(0,54fr) minmax(0,54fr) minmax(0,53fr) minmax(0,59fr) minmax(0,59fr) minmax(0,53fr) minmax(0,54fr) minmax(0,54fr) minmax(0,53fr) minmax(0,60fr) minmax(0,58fr) minmax(0,58fr); }
+.c-panel.right .c-teeth-slices { grid-template-columns: minmax(0,62fr) minmax(0,59fr) minmax(0,61fr) minmax(0,54fr) minmax(0,53fr) minmax(0,53fr) minmax(0,52fr) minmax(0,54fr) minmax(0,54fr) minmax(0,52fr) minmax(0,53fr) minmax(0,53fr) minmax(0,54fr) minmax(0,60fr) minmax(0,59fr) minmax(0,62fr); }
+.c-teeth-slice { background-repeat: no-repeat; }
+
+/* Clear highlight on the box being typed in (keyboard navigation) */
+.c-grid-row .c-cell input:focus { background: rgba(45,74,107,0.12); box-shadow: inset 0 0 0 2px #2d4a6b; border-radius: 3px; }
+#bopPicker .sym-btn:focus-visible { outline: 3px solid #2d4a6b; outline-offset: 1px; }
+
+/* Row labels line up with the rows: tooth-number rows and their label spacers share one fixed height */
+.c-tooth-row { height: 52px; min-height: 0; }
+.cl-spacer   { height: 52px; }
+
+/* Chart instructions: one short line per row */
+.chart-guide {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px 20px;
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: #f7f9fb;
+    border: 1px solid #e1e6ec;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #555;
+}
+.chart-guide strong { color: #2d4a6b; margin-right: 4px; }
+
+/* Picture symbols in the guide, drawn with CSS so all three are the same size (font glyphs differ) */
+.guide-dot {
+    display: inline-block;
+    width: 10px; height: 10px;
+    border: 1.5px solid #c0392b;
+    border-radius: 50%;
+    vertical-align: -1px;
+}
+.guide-dot.half { background: linear-gradient(to right, #c0392b 50%, transparent 50%); }
+.guide-dot.full { background: #c0392b; }
+
+/* BOP symbols in the guide: each in an equal-sized box so they read as the same size */
+.guide-sym {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px; height: 14px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    color: #2d4a6b;
+    vertical-align: -2px;
+}
+/* Same size and red as the chart symbols beside it */
+.guide-sym { width: 13px; height: 13px; font-size: 14px; color: #c0392b; vertical-align: -2px; }

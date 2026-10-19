@@ -5,6 +5,7 @@
     <title>Clinical Oral Surgery - Odontectomy - DentIS</title>
     <link rel="stylesheet" href="/css/oralsurgery2-clinician.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/form-common.css">
 </head>
 
 <body>
@@ -75,6 +76,15 @@
             </div>
 
             <div class="form-card">
+                <!-- Back to Charts (top-left) + "Changes saved" popup -->
+                <a th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}" th:href="@{/chartsview-clinicmanager/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <a th:if="${currentUser != null and currentUser.role.name() == 'FACULTY'}" th:href="@{/chartsview-faculty/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <a th:if="${currentUser == null or currentUser.role.name() == 'CLINICIAN'}" th:href="@{/chartsview-clinician/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <div th:if="${param.saved != null}" class="saved-toast" role="status">
+                    <span class="saved-toast-icon">&#10003;</span>
+                    <span>Changes saved</span>
+                    <button type="button" class="saved-toast-close" aria-label="Close" onclick="this.parentNode.remove()">&times;</button>
+                </div>
                 <div class="form-banner">Odontectomy Case Patient Workup Form</div>
 
                 <form th:action="@{/oralsurgery2-clinician/{id}(id=${chart.id})}" th:object="${chart}" method="post">
@@ -227,5 +237,34 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 });
 </script>
 
+<script th:inline="javascript">var VIEW_ONLY = /*[[${viewOnly == true}]]*/ false;</script>
+<script th:inline="none">
+/* ── Warn before leaving with unsaved changes ──
+   Any edit (typing, a chart mark, a missing tooth, a symbol, adding/removing a row or chart) marks the page as changed.
+   Leaving by a link, the sidebar, reload or closing the tab then asks for confirmation. Saving clears the flag. */
+(function() {
+    if (typeof VIEW_ONLY !== 'undefined' && VIEW_ONLY) return;
+    var dirty = false;
+    var EDIT_TARGETS = [
+        '.box-spot', '.tooth-btn', '.col-x-btn', '.col-x-btn-c', '.sym-btn', 'canvas',
+        '.pf3-site', '.pi-input', '.star-cell', '.btn-row', '.btn-pm', '.btn-star',
+        '.chart-tab-add', '.tab-remove'
+    ].join(',');
+    function markDirty() { dirty = true; }
+    document.addEventListener('input',  markDirty, true);
+    document.addEventListener('change', markDirty, true);
+    document.addEventListener('click', function(e) {
+        if (e.target.closest && e.target.closest(EDIT_TARGETS)) markDirty();
+    }, true);
+    document.querySelectorAll('form').forEach(function(f) {
+        f.addEventListener('submit', function() { dirty = false; });
+    });
+    window.addEventListener('beforeunload', function(e) {
+        if (!dirty) return;
+        e.preventDefault();
+        e.returnValue = '';
+    });
+})();
+</script>
 </body>
 </html>

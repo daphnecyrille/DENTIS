@@ -58,7 +58,7 @@ public class EndodonticsController {
     public String saveForm1(@PathVariable Long id,
                             @ModelAttribute("chart") EndodonticsChart updated) {
         EndodonticsChart chart = endodonticsChartService.saveForm1(id, updated);
-        return "redirect:/chartsview-clinician/" + chart.getPatient().getId();
+        return "redirect:/endodontics-clinician/" + id + "?saved";   // Save keeps the user on the form
     }
 
     @PostMapping("/endodontics-clinician/{id}/submit")
@@ -109,7 +109,7 @@ public class EndodonticsController {
     public String saveForm2(@PathVariable Long id,
                             @ModelAttribute("chart") EndodonticsChart updated) {
         EndodonticsChart chart = endodonticsChartService.saveForm2(id, updated);
-        return "redirect:/chartsview-clinician/" + chart.getPatient().getId();
+        return "redirect:/endodontics2-clinician/" + id + "?saved";   // Save keeps the user on the form
     }
 
     @PostMapping("/endodontics2-clinician/{id}/submit")

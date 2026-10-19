@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="/css/periodonticsb-clinician.css">
     <link rel="stylesheet" href="/css/periodonticspf3-clinician.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/form-common.css">
 </head>
 
 <body>
@@ -102,6 +103,15 @@
             </div>
 
             <div class="form-card">
+                <!-- Back to Charts (top-left) + "Changes saved" popup -->
+                <a th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}" th:href="@{/chartsview-clinicmanager/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <a th:if="${currentUser != null and currentUser.role.name() == 'FACULTY'}" th:href="@{/chartsview-faculty/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <a th:if="${currentUser == null or currentUser.role.name() == 'CLINICIAN'}" th:href="@{/chartsview-clinician/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <div th:if="${param.saved != null}" class="saved-toast" role="status">
+                    <span class="saved-toast-icon">&#10003;</span>
+                    <span>Changes saved</span>
+                    <button type="button" class="saved-toast-close" aria-label="Close" onclick="this.parentNode.remove()">&times;</button>
+                </div>
 
                 <!-- Banner -->
                 <div class="form-banner">Gingivitis Reevaluation</div>
@@ -176,7 +186,17 @@
                     <!-- ═══════════ REEVALUATION CHART (built by script below) ═══════════ -->
                     <div class="pf3-chart-group">
                         <div class="pf3-chart" id="pf3Chart"></div>
-                        <p class="pf3-hint">Click a box to mark <strong>+</strong> or <strong>&minus;</strong> (click again to change or clear). Click a tooth number to mark the whole tooth <strong>X</strong>.</p>
+                        <p class="pf3-hint"><strong>BOP:</strong> click a site to pick a symbol. &nbsp;<strong>Plaque:</strong> click site to switch + / &minus;. &nbsp;<strong>Missing tooth:</strong> click <span class="pf3-tooth-icon">&#10005;</span> on its number.</p>
+
+                        <!-- BOP symbol picker (shown next to the clicked box) -->
+                        <div class="symbol-picker" id="bopPicker">
+                            <button type="button" class="sym-btn" data-sym="-">-</button>
+                            <button type="button" class="sym-btn" data-sym="&bull;">&bull;</button>
+                            <button type="button" class="sym-btn" data-sym="|">|</button>
+                            <button type="button" class="sym-btn" data-sym="||">||</button>
+                            <button type="button" class="sym-btn" data-sym="o">o</button>
+                            <button type="button" class="sym-btn sym-clear" data-sym="" title="Clear">&#10005;</button>
+                        </div>
                     </div>
 
                     <!-- Recall 1 -->
@@ -201,12 +221,6 @@
 
                     <!-- Navigation -->
                     <div class="form-actions">
-                        <a th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}"
-                           th:href="@{/chartsview-clinicmanager/{id}(id=${chart.patient.id})}" class="btn-next">Back to Charts View</a>
-                        <a th:if="${currentUser != null and currentUser.role.name() == 'FACULTY'}"
-                           th:href="@{/chartsview-faculty/{id}(id=${chart.patient.id})}" class="btn-next">Back to Charts View</a>
-                        <a th:if="${currentUser == null or currentUser.role.name() == 'CLINICIAN'}"
-                           th:href="@{/chartsview-clinician/{id}(id=${chart.patient.id})}" class="btn-next">Back</a>
                         <button th:if="${!viewOnly}" type="submit" class="btn-submit">Save</button>
                     </div>
 
@@ -227,10 +241,10 @@ var RECALL_ROWS_INNER = [ ['r1','bop'], ['r1','plaque'], ['r2','bop'], ['r2','pl
 var LAYOUT = [
     { type: 'teeth', arch: 'upper', teeth: UPPER_TEETH },
     { type: 'rows',  section: 'upperBuccal',  arch: 'upper', rows: RECALL_ROWS_OUTER },
-    { type: 'image', src: '/images/pf3-upper.png', alt: 'Upper arch' },
+    { type: 'image', arch: 'upper', src: '/images/pf3-upper.png', alt: 'Upper arch' },
     { type: 'rows',  section: 'upperPalatal', arch: 'upper', rows: RECALL_ROWS_INNER },
     { type: 'rows',  section: 'lowerLingual', arch: 'lower', rows: RECALL_ROWS_OUTER, divider: true },
-    { type: 'image', src: '/images/pf3-lower.png', alt: 'Lower arch' },
+    { type: 'image', arch: 'lower', src: '/images/pf3-lower.png', alt: 'Lower arch' },
     { type: 'rows',  section: 'lowerBuccal',  arch: 'lower', rows: RECALL_ROWS_INNER },
     { type: 'teeth', arch: 'lower', teeth: LOWER_TEETH }
 ];
@@ -248,9 +262,13 @@ function el(tag, cls, text) {
         if (part.type === 'teeth') {
             var row = el('div', 'pf3-row pf3-teeth-row');
             part.teeth.forEach(function(t, i) {
-                var b = el('button', 'pf3-tooth-btn', String(t));
+                var b = el('button', 'pf3-tooth-btn');
                 b.type = 'button';
-                b.title = 'Mark tooth ' + t + ' as X (missing)';
+                b.dataset.tooth = String(t);
+                b.appendChild(el('span', 'pf3-tooth-num', String(t)));
+                b.appendChild(el('span', 'pf3-tooth-icon', '\u2715'));
+                b.title = 'Mark tooth ' + t + ' as missing';
+                b.setAttribute('aria-pressed', 'false');
                 b.dataset.arch = part.arch;
                 b.dataset.col  = String(i);
                 row.appendChild(b);
@@ -259,9 +277,14 @@ function el(tag, cls, text) {
             chart.appendChild(row);
         } else if (part.type === 'image') {
             var wrap = el('div', 'pf3-row pf3-image-row');
+            var imgWrap = el('div', 'pf3-img-wrap');
             var img = el('img', 'pf3-teeth-img');
             img.src = part.src; img.alt = part.alt;
-            wrap.appendChild(img);
+            var canvas = el('canvas', 'pf3-canvas');
+            canvas.dataset.arch = part.arch;
+            imgWrap.appendChild(img);
+            imgWrap.appendChild(canvas);
+            wrap.appendChild(imgWrap);
             wrap.appendChild(el('div', 'pf3-label-cell'));
             chart.appendChild(wrap);
         } else {
@@ -278,6 +301,7 @@ function el(tag, cls, text) {
                         var cell = el('div', 'pf3-cell');
                         cell.dataset.arch = part.arch;
                         cell.dataset.col  = String(c);
+                        for (var si = 0; si < 3; si++) cell.appendChild(el('span', 'pf3-site'));   /* 3 sites per tooth, like PF2 */
                         row.appendChild(cell);
                     }
                     row.appendChild(el('div', 'pf3-label-cell', r[1] === 'bop' ? 'BOP' : 'Plaque'));
@@ -291,34 +315,130 @@ function el(tag, cls, text) {
     });
 })();
 
-function setCell(cell, v) {
-    cell.dataset.val = v;
-    cell.textContent = v;
-    cell.classList.toggle('is-x', v === 'X');
+function setToothBtnState(btn, missing) {
+    btn.classList.toggle('is-x', missing);
+    btn.setAttribute('aria-pressed', missing ? 'true' : 'false');
+    btn.title = missing ? 'Tooth ' + btn.dataset.tooth + ' is marked missing — click to undo'
+                        : 'Mark tooth ' + btn.dataset.tooth + ' as missing';
 }
 
-/* Click a box: blank → + → − → blank */
+function setSite(site, v) {
+    site.dataset.val = v;
+    site.textContent = v;
+    site.classList.toggle('is-x', v === 'X');
+}
+
+/* Same behaviour as PF2: Plaque sites cycle blank → + → -;  BOP sites open the bleeding-symbol picker. */
+var bopPicker = document.getElementById('bopPicker');
+var bopTarget = null;
+
+function closeBopPicker() { bopPicker.style.display = 'none'; bopTarget = null; }
+
 document.getElementById('pf3Chart').addEventListener('click', function(e) {
     if (VIEW_ONLY) return;
-    var cell = e.target.closest('.pf3-cell');
-    if (cell) {
-        var states = ['', '+', '−'];
-        var cur = cell.dataset.val || '';
-        var idx = states.indexOf(cur);
-        setCell(cell, states[(idx + 1) % states.length]);
+    var site = e.target.closest('.pf3-site');
+    if (site) {
+        e.stopPropagation();
+        if (site.dataset.val === 'X') return;   /* missing tooth: sites are locked until the tooth number is clicked again */
+        if (site.closest('.pf3-bop')) {
+            /* clicking the same site again closes the picker */
+            if (bopPicker.style.display === 'flex' && bopTarget === site) { closeBopPicker(); return; }
+            bopTarget = site;
+            bopPicker.style.left = (e.clientX + 8) + 'px';
+            bopPicker.style.top  = (e.clientY + 8) + 'px';
+            bopPicker.style.display = 'flex';
+            requestAnimationFrame(function() {
+                var pr = bopPicker.getBoundingClientRect();
+                if (pr.right  > window.innerWidth)  bopPicker.style.left = (window.innerWidth  - pr.width  - 8) + 'px';
+                if (pr.bottom > window.innerHeight) bopPicker.style.top  = (window.innerHeight - pr.height - 8) + 'px';
+            });
+        } else {
+            var states = ['', '+', '-'];
+            var idx = states.indexOf(site.dataset.val || '');
+            setSite(site, states[(idx + 1) % states.length]);
+        }
         return;
     }
-    /* Click a tooth number: mark/unmark every box of that tooth (same arch) with X */
+    /* Click a tooth number: mark/unmark every site of that tooth (same arch) with X */
     var btn = e.target.closest('.pf3-tooth-btn');
     if (btn) {
-        var cells = document.querySelectorAll('#pf3Chart .pf3-cell[data-arch="' + btn.dataset.arch + '"][data-col="' + btn.dataset.col + '"]');
-        var allX = Array.from(cells).every(function(c) { return c.dataset.val === 'X'; });
-        cells.forEach(function(c) { setCell(c, allX ? '' : 'X'); });
-        btn.classList.toggle('is-x', !allX);
+        var sites = document.querySelectorAll('#pf3Chart .pf3-cell[data-arch="' + btn.dataset.arch + '"][data-col="' + btn.dataset.col + '"] .pf3-site');
+        var allX = Array.from(sites).every(function(st) { return st.dataset.val === 'X'; });
+        sites.forEach(function(st) { setSite(st, allX ? '' : 'X'); });
+        setToothBtnState(btn, !allX);
+        redrawToothPictures();
     }
 });
 
-/* Load saved marks */
+bopPicker.querySelectorAll('.sym-btn').forEach(function(b) {
+    b.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (bopTarget) setSite(bopTarget, b.dataset.sym);
+        closeBopPicker();
+    });
+});
+bopPicker.addEventListener('click', function(e) { e.stopPropagation(); });
+document.addEventListener('click', closeBopPicker);
+window.addEventListener('scroll', closeBopPicker, true);
+
+/* ── Red X on the teeth pictures, drawn automatically for teeth marked X via their tooth number ──
+   Centres of each tooth in the pictures (fraction of picture width, in tooth-number order);
+   measured from the PF3 form because the teeth are not evenly spaced. */
+var TOOTH_CENTERS = {
+    upper: [0.0596, 0.1233, 0.1933, 0.2591, 0.3051, 0.3605, 0.4127, 0.4681, 0.5308, 0.5852, 0.6374, 0.6949, 0.7398, 0.8046, 0.8725, 0.9383],
+    lower: [0.0648, 0.1358, 0.2090, 0.2800, 0.3323, 0.3866, 0.4368, 0.4754, 0.5172, 0.5611, 0.6113, 0.6688, 0.7231, 0.7941, 0.8621, 0.9300]
+};
+var canvasRedraw = {};
+
+function missingTeeth(arch) {
+    var cols = [];
+    document.querySelectorAll('#pf3Chart .pf3-tooth-btn[data-arch="' + arch + '"].is-x').forEach(function(b) {
+        cols.push(parseInt(b.dataset.col, 10));
+    });
+    return cols;
+}
+
+document.querySelectorAll('#pf3Chart .pf3-canvas').forEach(function(canvas) {
+    var arch = canvas.dataset.arch;
+    var ctx  = canvas.getContext('2d');
+    var centers = TOOTH_CENTERS[arch];
+
+    function redraw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#c0392b';
+        ctx.lineCap     = 'round';
+        ctx.lineWidth   = Math.max(2, canvas.width * 0.004);
+        missingTeeth(arch).forEach(function(col) {
+            /* X width follows the tooth: half the gap to its neighbours */
+            var left  = col > 0  ? centers[col] - centers[col - 1] : centers[1] - centers[0];
+            var right = col < 15 ? centers[col + 1] - centers[col] : centers[15] - centers[14];
+            var hw = Math.min(left, right) / 2 * 0.85 * canvas.width;
+            var hh = canvas.height * 0.32;
+            var cx = centers[col] * canvas.width, cy = canvas.height / 2;
+            ctx.beginPath();
+            ctx.moveTo(cx - hw, cy - hh); ctx.lineTo(cx + hw, cy + hh);
+            ctx.moveTo(cx + hw, cy - hh); ctx.lineTo(cx - hw, cy + hh);
+            ctx.stroke();
+        });
+    }
+    function resize() {
+        if (!canvas.offsetWidth) return;
+        canvas.width  = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        redraw();
+    }
+    canvasRedraw[arch] = redraw;
+    window.addEventListener('resize', resize);
+    if (window.ResizeObserver) new ResizeObserver(resize).observe(canvas);
+    resize();
+});
+
+function redrawToothPictures() {
+    if (canvasRedraw.upper) canvasRedraw.upper();
+    if (canvasRedraw.lower) canvasRedraw.lower();
+}
+
+/* Load saved marks (each tooth = 3 sites; older saves stored one value per tooth) */
 (function() {
     var val = document.getElementById('pf3GridJsonInput').value;
     if (!val) return;
@@ -326,12 +446,18 @@ document.getElementById('pf3Chart').addEventListener('click', function(e) {
     try { data = JSON.parse(val); } catch (e) { return; }
     document.querySelectorAll('#pf3Chart .pf3-mark-row').forEach(function(row) {
         var vals = data[row.dataset.key] || [];
-        row.querySelectorAll('.pf3-cell').forEach(function(cell, i) { setCell(cell, vals[i] || ''); });
+        row.querySelectorAll('.pf3-cell').forEach(function(cell, i) {
+            var v = vals[i];
+            if (v === '\u2212') v = '-';
+            var three = Array.isArray(v) ? v : (v === 'X' ? ['X', 'X', 'X'] : ['', v || '', '']);
+            cell.querySelectorAll('.pf3-site').forEach(function(site, k) { setSite(site, three[k] || ''); });
+        });
     });
     document.querySelectorAll('#pf3Chart .pf3-tooth-btn').forEach(function(btn) {
-        var cells = document.querySelectorAll('#pf3Chart .pf3-cell[data-arch="' + btn.dataset.arch + '"][data-col="' + btn.dataset.col + '"]');
-        btn.classList.toggle('is-x', cells.length > 0 && Array.from(cells).every(function(c) { return c.dataset.val === 'X'; }));
+        var sites = document.querySelectorAll('#pf3Chart .pf3-cell[data-arch="' + btn.dataset.arch + '"][data-col="' + btn.dataset.col + '"] .pf3-site');
+        setToothBtnState(btn, sites.length > 0 && Array.from(sites).every(function(st) { return st.dataset.val === 'X'; }));
     });
+    redrawToothPictures();
 })();
 
 /* Save: pack every row into one JSON field, keyed by section.recall.type */
@@ -339,7 +465,11 @@ document.getElementById('formPf3').addEventListener('submit', function() {
     var data = {};
     document.querySelectorAll('#pf3Chart .pf3-mark-row').forEach(function(row) {
         var vals = [];
-        row.querySelectorAll('.pf3-cell').forEach(function(cell) { vals.push(cell.dataset.val || ''); });
+        row.querySelectorAll('.pf3-cell').forEach(function(cell) {
+            var three = [];
+            cell.querySelectorAll('.pf3-site').forEach(function(site) { three.push(site.dataset.val || ''); });
+            vals.push(three);
+        });
         data[row.dataset.key] = vals;
     });
     document.getElementById('pf3GridJsonInput').value = JSON.stringify(data);
@@ -358,6 +488,33 @@ document.addEventListener('click', function() {
     if (d.classList.contains('show')) d.classList.remove('show');
 });
 document.querySelector('.user-dropdown').addEventListener('click', function(e) { e.stopPropagation(); });
+
+/* ── Warn before leaving with unsaved changes ──
+   Any edit (typing, a chart mark, a missing tooth, a symbol, adding/removing a row or chart) marks the page as changed.
+   Leaving by a link, the sidebar, reload or closing the tab then asks for confirmation. Saving clears the flag. */
+(function() {
+    if (typeof VIEW_ONLY !== 'undefined' && VIEW_ONLY) return;
+    var dirty = false;
+    var EDIT_TARGETS = [
+        '.box-spot', '.tooth-btn', '.col-x-btn', '.col-x-btn-c', '.sym-btn', 'canvas',
+        '.pf3-site', '.pi-input', '.star-cell', '.btn-row', '.btn-pm', '.btn-star',
+        '.chart-tab-add', '.tab-remove'
+    ].join(',');
+    function markDirty() { dirty = true; }
+    document.addEventListener('input',  markDirty, true);
+    document.addEventListener('change', markDirty, true);
+    document.addEventListener('click', function(e) {
+        if (e.target.closest && e.target.closest(EDIT_TARGETS)) markDirty();
+    }, true);
+    document.querySelectorAll('form').forEach(function(f) {
+        f.addEventListener('submit', function() { dirty = false; });
+    });
+    window.addEventListener('beforeunload', function(e) {
+        if (!dirty) return;
+        e.preventDefault();
+        e.returnValue = '';
+    });
+})();
 </script>
 
 </body>

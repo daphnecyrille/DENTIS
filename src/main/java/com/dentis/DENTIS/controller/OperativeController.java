@@ -81,7 +81,7 @@ public class OperativeController {
     public String saveFormA(@PathVariable Long id,
                             @ModelAttribute("chart") OperativeChart updated) {
         OperativeChart chart = operativeChartService.saveFormC(id, updated);
-        return "redirect:/chartsview-clinician/" + chart.getPatient().getId();
+        return "redirect:/operative-a/" + id + "?saved";   // Save keeps the user on the form
     }
 
     @PostMapping("/operative-a/{id}/submit")
@@ -112,8 +112,10 @@ public class OperativeController {
 
     @PostMapping("/operative-b/{id}")
     public String saveFormB(@PathVariable Long id,
-                            @ModelAttribute("chart") OperativeChart updated) {
+                            @ModelAttribute("chart") OperativeChart updated,
+                            @RequestParam(value = "action", defaultValue = "next") String action) {
         operativeChartService.saveFormA(id, updated);
+        if ("save".equals(action)) return "redirect:/operative-b/" + id + "?saved";   // Save stays on this page
         return "redirect:/operative-c/" + id;
     }
 
@@ -141,7 +143,7 @@ public class OperativeController {
     public String saveFormC(@PathVariable Long id,
                             @ModelAttribute("chart") OperativeChart updated) {
         OperativeChart chart = operativeChartService.saveFormB(id, updated);
-        return "redirect:/chartsview-clinician/" + chart.getPatient().getId();
+        return "redirect:/operative-c/" + id + "?saved";   // Save keeps the user on the form
     }
 
     @PostMapping("/operative-c/{id}/submit")

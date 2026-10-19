@@ -65,7 +65,7 @@ public class OralSurgeryController {
     public String saveForm1(@PathVariable Long id,
                             @ModelAttribute("chart") OralSurgeryChart updated) {
         OralSurgeryChart chart = oralSurgeryChartService.saveForm1(id, updated);
-        return "redirect:/chartsview-clinician/" + chart.getPatient().getId();
+        return "redirect:/oralsurgery-clinician/" + id + "?saved";   // Save keeps the user on the form
     }
 
     // ── Clinician: Form 2 (Odontectomy Workup) ───────────────────────────────
@@ -98,7 +98,7 @@ public class OralSurgeryController {
     public String saveForm2(@PathVariable Long id,
                             @ModelAttribute("chart") OralSurgeryChart updated) {
         OralSurgeryChart chart = oralSurgeryChartService.saveForm2(id, updated);
-        return "redirect:/chartsview-clinician/" + chart.getPatient().getId();
+        return "redirect:/oralsurgery2-clinician/" + id + "?saved";   // Save keeps the user on the form
     }
 
     @PostMapping("/oralsurgery-clinician/{id}/submit")

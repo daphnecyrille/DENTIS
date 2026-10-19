@@ -96,8 +96,9 @@ public class ProsthodonticsController {
 
         if ("submit".equals(action)) {
             chartService.submit(id);
+            return "redirect:/chartsview-clinician/" + chart.getPatient().getId();
         }
-        return "redirect:/chartsview-clinician/" + chart.getPatient().getId();
+        return "redirect:/prosthodontics-clinician/" + id + "?saved";   // Save keeps the user on the form
     }
 
     /** Submit-only endpoint used from chartsview — does NOT touch form data. */

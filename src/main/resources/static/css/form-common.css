@@ -1,0 +1,91 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Shared look for all chart forms (loaded after each page's own stylesheet)
+   - one navy for buttons, the "Back to Charts" button, the "Changes saved" popup
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ─── Buttons: one navy everywhere (same as the form banner) ─── */
+.form-actions .btn-next,
+.form-actions .btn-submit,
+.form-actions .btn-save {
+    background: #2d4a6b;
+    color: white;
+    border: 1.5px solid #2d4a6b;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.15s, color 0.15s;
+}
+.form-actions .btn-next:hover,
+.form-actions .btn-submit:hover,
+.form-actions .btn-save:hover { background: #1d3550; border-color: #1d3550; color: white; }
+
+/* Secondary buttons (Back to a previous page, or Save next to Save & Next): white with navy outline */
+.form-actions .btn-back,
+.form-actions .btn-save.btn-next {
+    background: white;
+    color: #2d4a6b;
+    border: 1.5px solid #2d4a6b;
+    text-decoration: none;
+    display: inline-block;
+}
+.form-actions .btn-back:hover,
+.form-actions .btn-save.btn-next:hover { background: #2d4a6b; color: white; border-color: #2d4a6b; }
+
+/* ─── Back to Charts: outlined navy button at the top-left of the form card ─── */
+.form-card { position: relative; padding-top: 74px; }
+.back-arrow {
+    position: absolute;
+    top: 14px;
+    left: 20px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: 2px solid #2d4a6b;
+    border-radius: 8px;
+    background: white;
+    color: #2d4a6b;
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    transition: background 0.15s, color 0.15s;
+}
+.back-arrow:hover { background: #2d4a6b; color: white; }
+.back-arrow:focus-visible { outline: 3px solid #2d4a6b; outline-offset: 1px; }
+.back-arrow-icon { font-size: 22px; line-height: 1; position: relative; top: -2px; }
+
+/* ─── "Changes saved" popup: green box, top-right of the screen under the header ─── */
+.saved-toast {
+    position: fixed;
+    top: 95px;
+    right: 24px;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    min-width: 240px;
+    border-radius: 8px;
+    background: #2e7d32;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.22);
+    animation: toastIn 0.3s ease-out, toastOut 0.4s ease-in 4s forwards;
+}
+.saved-toast-icon {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: white; color: #2e7d32;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; flex-shrink: 0;
+}
+.saved-toast-close {
+    margin-left: auto; background: none; border: none; color: white;
+    font-size: 20px; line-height: 1; cursor: pointer; opacity: 0.8;
+}
+.saved-toast-close:hover { opacity: 1; }
+@keyframes toastIn  { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes toastOut { to { transform: translateX(120%); opacity: 0; visibility: hidden; } }
