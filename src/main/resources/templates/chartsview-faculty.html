@@ -514,6 +514,76 @@
                 </div>
             </section>
 
+            <!-- Evaluation Forms (periodontics): added by the faculty; the clinician sees a form once it is sent -->
+            <section class="section eval-section" th:if="${!#lists.isEmpty(perioCharts)}">
+                <div class="section-header eval-section-header">
+                    <h2>Evaluation Forms</h2>
+                    <div class="eval-add">
+                        <button type="button" class="btn-eval-add" onclick="toggleEvalMenu(event)">+ Add Evaluation</button>
+                        <div class="eval-menu" id="evalMenu">
+                            <th:block th:each="pc : ${perioCharts}">
+                                <p class="eval-menu-chart" th:if="${#lists.size(perioCharts) > 1}" th:text="${'Chart ' + pc.chartNo}"></p>
+                                <form th:each="ft : ${@perioEvaluationService.offeredForms()}"
+                                      th:action="@{/perio-eval-faculty/chart/{id}/add(id=${pc.id})}" method="post">
+                                    <input type="hidden" name="form" th:value="${ft.name()}">
+                                    <button type="submit" class="eval-menu-item">
+                                        <strong th:text="${ft.name()}">PF4</strong>
+                                        <span th:text="${ft.displayName}"></span>
+                                    </button>
+                                </form>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="charts-table">
+                        <thead>
+                            <tr>
+                                <th>Form</th>
+                                <th>Chart Number</th>
+                                <th>Date</th>
+                                <th>Clinician</th>
+                                <th>Status</th>
+                                <th>Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <th:block th:each="pc : ${perioCharts}">
+                            <tr th:each="ev : ${@perioEvaluationService.listForChart(pc)}">
+                                <td>
+                                    <strong th:text="${ev.formType.name()}"></strong> &ndash;
+                                    <span th:text="${ev.formType.displayName}"></span>
+                                    <span th:if="${ev.formType.repeatable}" th:text="${'(Visit ' + ev.visitNo + ')'}"></span>
+                                    <span th:if="${!ev.formType.repeatable and ev.visitNo != null and ev.visitNo > 1}" th:text="${'(#' + ev.visitNo + ')'}"></span>
+                                </td>
+                                <td th:text="${#strings.replace(pc.chartNo, '-PF1', '-' + ev.formType.name())}"></td>
+                                <td th:text="${ev.date}"></td>
+                                <td th:text="${pc.clinician != null ? pc.clinician.fullName : '—'}"></td>
+                                <td th:if="${ev.status.name() == 'DRAFT'}" class="status in-progress">Draft</td>
+                                <td th:if="${ev.status.name() == 'GRADED'}" class="status approved">Sent to clinician</td>
+                                <td th:text="${ev.totalScore != null ? ev.totalScore : '—'}"></td>
+                                <td>
+                                    <span style="display:flex; gap:6px; justify-content:center;">
+                                        <a th:href="@{/perio-eval-faculty/{id}(id=${ev.id})}" class="btn-action btn-view"
+                                           th:text="${ev.status.name() == 'DRAFT' ? 'Edit' : 'Open'}">Edit</a>
+                                        <button type="button" class="btn-action btn-eval-delete"
+                                                th:data-action="@{/perio-eval-faculty/{id}/delete(id=${ev.id})}"
+                                                th:data-name="${ev.formType.name() + (ev.formType.repeatable ? ' (Visit ' + ev.visitNo + ')' : (ev.visitNo != null and ev.visitNo > 1 ? ' (#' + ev.visitNo + ')' : ''))}"
+                                                th:data-sent="${ev.status.name() == 'GRADED'}"
+                                                onclick="openDeleteEvalModal(this)">Delete</button>
+                                    </span>
+                                </td>
+                            </tr>
+                            </th:block>
+                            <tr th:if="${@perioEvaluationService.countForCharts(perioCharts) == 0}">
+                                <td colspan="7" class="eval-empty">No evaluation forms yet. Use <strong>+ Add Evaluation</strong> to start one.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
         </main>
     </div>
 </div>
@@ -529,6 +599,24 @@
             <div class="modal-row"><span class="modal-label">Year Level</span><span id="modal-year"></span></div>
             <div class="modal-row"><span class="modal-label">Total Patients</span><span id="modal-total"></span></div>
         </div>
+    </div>
+</div>
+
+<!-- Delete Evaluation Modal -->
+<div id="deleteEvalModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:2000; align-items:center; justify-content:center;">
+    <div style="background:white; border-radius:10px; padding:28px 32px; width:420px; max-width:90%; box-shadow:0 8px 32px rgba(0,0,0,0.2); font-family:'Poppins',sans-serif;">
+        <h3 style="margin:0 0 8px 0; font-size:17px; color:#061F40;">Delete <span id="deleteEvalName"></span>?</h3>
+        <p style="margin:0 0 6px 0; font-size:13px; color:#555;">This permanently removes the evaluation and its grades. It can&rsquo;t be undone.</p>
+        <p id="deleteEvalSentNote" style="display:none; margin:8px 0 0 0; padding:8px 12px; font-size:13px; color:#721c24; background:#f8d7da; border-radius:6px;">
+            This form was already sent &mdash; it will also disappear from the clinician&rsquo;s view.</p>
+        <form id="deleteEvalForm" method="post">
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px;">
+                <button type="button" onclick="closeDeleteEvalModal()"
+                    style="background:transparent; color:#555; padding:9px 20px; border:1px solid #ccc; border-radius:6px; font-size:14px; font-family:'Poppins',sans-serif; cursor:pointer;">Cancel</button>
+                <button type="submit"
+                    style="background:#8B0000; color:white; padding:9px 22px; border:none; border-radius:6px; font-size:14px; font-family:'Poppins',sans-serif; cursor:pointer;">Delete</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -568,6 +656,28 @@ function showClinicianModal(el) {
 function closeClinicianModal() {
     document.getElementById('clinicianModal').style.display = 'none';
 }
+
+/* ── Evaluation Forms: add menu + delete confirmation ── */
+function toggleEvalMenu(e) {
+    e.stopPropagation();
+    document.getElementById('evalMenu').classList.toggle('open');
+}
+document.addEventListener('click', function(e) {
+    var m = document.getElementById('evalMenu');
+    if (m && !e.target.closest('.eval-add')) m.classList.remove('open');
+});
+function openDeleteEvalModal(btn) {
+    document.getElementById('deleteEvalForm').action = btn.getAttribute('data-action');
+    document.getElementById('deleteEvalName').textContent = btn.getAttribute('data-name');
+    document.getElementById('deleteEvalSentNote').style.display = btn.getAttribute('data-sent') === 'true' ? 'block' : 'none';
+    document.getElementById('deleteEvalModal').style.display = 'flex';
+}
+function closeDeleteEvalModal() {
+    document.getElementById('deleteEvalModal').style.display = 'none';
+}
+document.getElementById('deleteEvalModal').addEventListener('click', function(e) {
+    if (e.target === this) closeDeleteEvalModal();
+});
 
 function openReviseModal(btn) {
     document.getElementById('reviseForm').action = btn.getAttribute('data-action');
@@ -612,5 +722,7 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 });
 </script>
 
+<script src="/js/textarea-min-size.js"></script>
+<script src="/js/sidebar-hover.js"></script>
 </body>
 </html>

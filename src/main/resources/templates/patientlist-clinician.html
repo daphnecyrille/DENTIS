@@ -63,131 +63,93 @@
                             <span>Patient List</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="/evaluations-clinician" class="nav-link" style="position:relative;">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="14" height="17" rx="2" stroke="#333" stroke-width="2"/><path d="M9 4V3h6v1" stroke="#333" stroke-width="2" stroke-linecap="round"/><path d="M8.5 12.5l2.2 2.2 4.8-4.8" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span>Evaluations</span>
+                            <b th:if="${currentUser != null and @perioEvaluationService.unreadCount(currentUser) > 0}" th:text="${@perioEvaluationService.unreadCount(currentUser)}"
+                               style="position:absolute; top:2px; right:6px; min-width:18px; height:18px; padding:0 5px; box-sizing:border-box; border-radius:9px; background:#c0392b; color:white; font-size:11px; font-weight:700; line-height:18px; text-align:center;">1</b>
+                        </a>
+                    </li>
                 </ul>
             </nav>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Patient List Section -->
+            <!-- Patient List: one row per patient; search, status and section filters, 10 per page (filtering is done on the page) -->
             <section class="section">
-                <div class="section-header">
+                <div class="section-header pl-header">
                     <h2>Patient List</h2>
+                    <span class="pl-count" th:text="${#lists.size(patientRows) + (#lists.size(patientRows) == 1 ? ' patient' : ' patients')}">0 patients</span>
                 </div>
+
+                <div class="pl-toolbar">
+                    <div class="pl-search">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#8a97a8" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="#8a97a8" stroke-width="2" stroke-linecap="round"/></svg>
+                        <input type="text" id="plSearch" placeholder="Search by patient name or chart number" autocomplete="off">
+                    </div>
+                    <div class="pl-filters">
+                        <div class="pl-fgroup" id="plStatus">
+                            <span class="pl-flabel">Status</span>
+                            <button type="button" class="pl-chip on" data-status="all">All <span class="n"></span></button>
+                            <button type="button" class="pl-chip" data-status="revise">Needs Revision <span class="n"></span></button>
+                            <button type="button" class="pl-chip" data-status="toSubmit">To Submit <span class="n"></span></button>
+                            <button type="button" class="pl-chip" data-status="awaiting">Awaiting Approval <span class="n"></span></button>
+                            <button type="button" class="pl-chip" data-status="done">Completed <span class="n"></span></button>
+                        </div>
+                        <div class="pl-fgroup" id="plSection">
+                            <span class="pl-flabel">Section</span>
+                            <button type="button" class="pl-chip on" data-section="all">All</button>
+                            <button type="button" class="pl-chip" data-section="OS">OS</button>
+                            <button type="button" class="pl-chip" data-section="Endo">Endo</button>
+                            <button type="button" class="pl-chip" data-section="Perio">Perio</button>
+                            <button type="button" class="pl-chip" data-section="Resto">Resto</button>
+                            <button type="button" class="pl-chip" data-section="Prostho">Prostho</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="table-container">
                     <table class="patient-table">
                         <thead>
                             <tr>
-                                <th>Chart Number</th>
-                                <th>Chart Type</th>
+                                <th>Chart No.</th>
                                 <th>Patient Name</th>
-                                <th>Contact Number</th>
-                                <th>Email</th>
-                                <th>View</th>
+                                <th>Charts</th>
+                                <th>Last Updated</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr th:each="osc : ${osCharts}">
-                                <td th:text="${osc.chartNo}"></td>
-                                <td th:text="${osc.chartType != null ? osc.chartType.displayName : '—'}"></td>
-                                <td th:text="${osc.patient.surname + ', ' + osc.patient.firstName + (osc.patient.middleInitial != null ? ' ' + osc.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${osc.patient.contactNumber}"></td>
-                                <td th:text="${osc.patient.email}"></td>
-                                <td>
-                                    <a th:href="@{/chartsview-clinician/{id}(id=${osc.patient.id})}" class="btn-view-chart">View</a>
+                        <tbody id="plBody">
+                            <tr th:each="row : ${patientRows}" th:with="pt=${row['patient']}" class="pl-row"
+                                th:classappend="${row['revise']} ? 'has-revise'"
+                                th:attr="data-revise=${row['revise']},data-to-submit=${row['toSubmit']},data-awaiting=${row['awaiting']},data-done=${row['done']},data-sections=${row['sections']},data-updated=${row['lastUpdated'] != null ? row['lastUpdated'] : ''}">
+                                <td class="pl-no" th:text="${pt.chartNo != null ? pt.chartNo : '—'}"></td>
+                                <td class="pl-name" th:text="${pt.surname + ', ' + pt.firstName + (pt.middleInitial != null ? ' ' + pt.middleInitial + '.' : '')}"></td>
+                                <td class="chart-tags">
+                                    <span th:each="t : ${row['tags']}" th:class="'chart-tag ' + ${t['css']}" th:title="${t['title']}" th:text="${t['code']}">PF1</span>
+                                    <span th:if="${row['done']}" class="pl-done">&#10003; all approved</span>
                                 </td>
+                                <td class="pl-updated" th:text="${row['lastUpdated'] != null ? #temporals.format(row['lastUpdated'], 'MMM d, yyyy') : '—'}"></td>
+                                <td><a th:href="@{/chartsview-clinician/{id}(id=${pt.id})}" class="btn-view-chart">Go to Charts</a></td>
                             </tr>
-                            <tr th:each="ec : ${endoCharts}">
-                                <td th:text="${ec.chartNo}"></td>
-                                <td>Endodontics - Patient Workup</td>
-                                <td th:text="${ec.patient.surname + ', ' + ec.patient.firstName + (ec.patient.middleInitial != null ? ' ' + ec.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${ec.patient.contactNumber}"></td>
-                                <td th:text="${ec.patient.email}"></td>
-                                <td>
-                                    <a th:href="@{/chartsview-clinician/{id}(id=${ec.patient.id})}" class="btn-view-chart">View</a>
-                                </td>
-                            </tr>
-                            <tr th:each="ec : ${endoCharts}">
-                                <td th:text="${#strings.replace(ec.chartNo, '-ENDO1', '-ENDO2')}"></td>
-                                <td>Endodontics - Endodontic Evaluation &amp; Treatment Planning</td>
-                                <td th:text="${ec.patient.surname + ', ' + ec.patient.firstName + (ec.patient.middleInitial != null ? ' ' + ec.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${ec.patient.contactNumber}"></td>
-                                <td th:text="${ec.patient.email}"></td>
-                                <td>
-                                    <a th:href="@{/chartsview-clinician/{id}(id=${ec.patient.id})}" class="btn-view-chart">View</a>
-                                </td>
-                            </tr>
-                            <!-- Periodontics PF1 (Forms A+B) -->
-                            <tr th:each="pc : ${perioCharts}">
-                                <td th:text="${pc.chartNo}"></td>
-                                <td>Periodontics - Periodontal Chart</td>
-                                <td th:text="${pc.patient.surname + ', ' + pc.patient.firstName + (pc.patient.middleInitial != null ? ' ' + pc.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${pc.patient.contactNumber}"></td>
-                                <td th:text="${pc.patient.email}"></td>
-                                <td>
-                                    <a th:href="@{/chartsview-clinician/{id}(id=${pc.patient.id})}" class="btn-view-chart">View</a>
-                                </td>
-                            </tr>
-                            <!-- Periodontics PF2 (Form C) -->
-                            <tr th:each="pc : ${perioCharts}">
-                                <td th:text="${#strings.replace(pc.chartNo, '-PF1', '-PF2')}"></td>
-                                <td>Periodontics - PPD/CAL/BOP Chart</td>
-                                <td th:text="${pc.patient.surname + ', ' + pc.patient.firstName + (pc.patient.middleInitial != null ? ' ' + pc.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${pc.patient.contactNumber}"></td>
-                                <td th:text="${pc.patient.email}"></td>
-                                <td>
-                                    <a th:href="@{/chartsview-clinician/{id}(id=${pc.patient.id})}" class="btn-view-chart">View</a>
-                                </td>
-                            </tr>
-                            <!-- Periodontics PF3 (Gingivitis Reevaluation) -->
-                            <tr th:each="pc : ${perioCharts}">
-                                <td th:text="${#strings.replace(pc.chartNo, '-PF1', '-PF3')}"></td>
-                                <td>Periodontics - Gingivitis Reevaluation Chart</td>
-                                <td th:text="${pc.patient.surname + ', ' + pc.patient.firstName + (pc.patient.middleInitial != null ? ' ' + pc.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${pc.patient.contactNumber}"></td>
-                                <td th:text="${pc.patient.email}"></td>
-                                <td>
-                                    <a th:href="@{/chartsview-clinician/{id}(id=${pc.patient.id})}" class="btn-view-chart">View</a>
-                                </td>
-                            </tr>
-                            <!-- RESTO10 (Assessment Form) -->
-                            <tr th:each="oc : ${operativeCharts}">
-                                <td th:text="${oc.chartNo}"></td>
-                                <td>Operative Dentistry - Assessment Form</td>
-                                <td th:text="${oc.patient.surname + ', ' + oc.patient.firstName + (oc.patient.middleInitial != null ? ' ' + oc.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${oc.patient.contactNumber}"></td>
-                                <td th:text="${oc.patient.email}"></td>
-                                <td>
-                                    <a th:href="@{/chartsview-clinician/{id}(id=${oc.patient.id})}" class="btn-view-chart">View</a>
-                                </td>
-                            </tr>
-                            <!-- RESTO6 (Caries Risk Assessment) -->
-                            <tr th:each="oc : ${operativeCharts}">
-                                <td th:text="${#strings.replace(oc.chartNo, '-RESTO10', '-RESTO6')}"></td>
-                                <td>Operative Dentistry - Caries Risk Assessment</td>
-                                <td th:text="${oc.patient.surname + ', ' + oc.patient.firstName + (oc.patient.middleInitial != null ? ' ' + oc.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${oc.patient.contactNumber}"></td>
-                                <td th:text="${oc.patient.email}"></td>
-                                <td>
-                                    <a th:href="@{/chartsview-clinician/{id}(id=${oc.patient.id})}" class="btn-view-chart">View</a>
-                                </td>
-                            </tr>
-                            <!-- Prosthodontics -->
-                            <tr th:each="pc : ${prosthoCharts}">
-                                <td th:text="${pc.chartNo}"></td>
-                                <td th:text="'Prosthodontics (' + ${pc.caseType} + ')'"></td>
-                                <td th:text="${pc.patient.surname + ', ' + pc.patient.firstName + (pc.patient.middleInitial != null ? ' ' + pc.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${pc.patient.contactNumber}"></td>
-                                <td th:text="${pc.patient.email}"></td>
-                                <td>
-                                    <a th:href="@{/chartsview-clinician/{id}(id=${pc.patient.id})}" class="btn-view-chart">View</a>
-                                </td>
-                            </tr>
-                            <tr th:if="${#lists.isEmpty(osCharts) and #lists.isEmpty(endoCharts) and #lists.isEmpty(perioCharts) and #lists.isEmpty(operativeCharts) and #lists.isEmpty(prosthoCharts)}">
-                                <td colspan="6" style="text-align:center; color:#888;">No charts assigned yet.</td>
-                            </tr>
+                            <tr id="plEmpty" style="display:none;"><td colspan="5" class="pl-empty">No patients match. Try a different search or filter.</td></tr>
+                            <tr th:if="${#lists.isEmpty(patientRows)}"><td colspan="5" class="pl-empty">No patients assigned yet.</td></tr>
                         </tbody>
                     </table>
+                    <div class="tag-legend" th:if="${!#lists.isEmpty(patientRows)}">
+                        <span class="chart-tag created">Not Started</span>
+                        <span class="chart-tag in-progress">In Progress</span>
+                        <span class="chart-tag pending">Awaiting Approval</span>
+                        <span class="chart-tag revise">For Revision</span>
+                        <span class="chart-tag approved">Approved</span>
+                        <span class="tag-legend-hint">Hover over a tag for the chart name.</span>
+                    </div>
+                    <div class="pl-pager" th:if="${!#lists.isEmpty(patientRows)}">
+                        <span id="plRange"></span>
+                        <div class="pl-pages" id="plPages"></div>
+                    </div>
                 </div>
             </section>
         </main>
@@ -220,5 +182,90 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 });
 </script>
 
+<script src="/js/sidebar-hover.js"></script>
+<script>
+/* Patient List: search + status + section filters, "Today / Yesterday / n days ago", 10 per page */
+(function () {
+    var rows = Array.prototype.slice.call(document.querySelectorAll('#plBody tr.pl-row'));
+    if (!rows.length) return;
+    var PER = 10, page = 1, status = 'all', section = 'all', q = '';
+    var DATA = { revise: 'revise', toSubmit: 'toSubmit', awaiting: 'awaiting', done: 'done' };
+
+    /* friendlier dates for the last week */
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    rows.forEach(function (tr) {
+        var raw = tr.dataset.updated; if (!raw) return;
+        var d = new Date(raw); var day = new Date(d); day.setHours(0, 0, 0, 0);
+        var diff = Math.round((today - day) / 86400000);
+        var cell = tr.querySelector('.pl-updated');
+        cell.title = cell.textContent;
+        if (diff === 0) cell.textContent = 'Today';
+        else if (diff === 1) cell.textContent = 'Yesterday';
+        else if (diff > 1 && diff < 7) cell.textContent = diff + ' days ago';
+        tr._name = tr.querySelector('.pl-name').textContent;
+        tr._no = tr.querySelector('.pl-no').textContent;
+    });
+    rows.forEach(function (tr) { tr._name = tr._name || tr.querySelector('.pl-name').textContent; tr._no = tr._no || tr.querySelector('.pl-no').textContent; });
+
+    function flag(tr, key) { return tr.dataset[key === 'toSubmit' ? 'toSubmit' : key] === 'true'; }
+    function matchStatus(tr, s) { return s === 'all' || flag(tr, s); }
+    function matchSection(tr) { return section === 'all' || (' ' + tr.dataset.sections + ' ').indexOf(' ' + section + ' ') >= 0; }
+    function matchSearch(tr) {
+        if (!q) return true;
+        return tr._name.toLowerCase().indexOf(q) >= 0 || tr._no.toLowerCase().indexOf(q) >= 0;
+    }
+    function highlight(el, text) {
+        if (!q) { el.textContent = text; return; }
+        var i = text.toLowerCase().indexOf(q);
+        if (i < 0) { el.textContent = text; return; }
+        el.innerHTML = '';
+        el.appendChild(document.createTextNode(text.slice(0, i)));
+        var m = document.createElement('mark'); m.textContent = text.slice(i, i + q.length); el.appendChild(m);
+        el.appendChild(document.createTextNode(text.slice(i + q.length)));
+    }
+
+    function render() {
+        /* counts on the status chips follow the section filter and search */
+        document.querySelectorAll('#plStatus .pl-chip').forEach(function (c) {
+            var s = c.dataset.status;
+            c.querySelector('.n').textContent = rows.filter(function (tr) { return matchStatus(tr, s) && matchSection(tr) && matchSearch(tr); }).length;
+            c.classList.toggle('on', s === status);
+        });
+        document.querySelectorAll('#plSection .pl-chip').forEach(function (c) { c.classList.toggle('on', c.dataset.section === section); });
+
+        var list = rows.filter(function (tr) { return matchStatus(tr, status) && matchSection(tr) && matchSearch(tr); });
+        var pages = Math.max(1, Math.ceil(list.length / PER));
+        if (page > pages) page = pages;
+        var from = (page - 1) * PER, to = page * PER;
+        rows.forEach(function (tr) { tr.style.display = 'none'; });
+        list.forEach(function (tr, i) {
+            if (i >= from && i < to) tr.style.display = '';
+            highlight(tr.querySelector('.pl-name'), tr._name);
+            highlight(tr.querySelector('.pl-no'), tr._no);
+        });
+        document.getElementById('plEmpty').style.display = list.length ? 'none' : '';
+        document.getElementById('plRange').textContent = list.length
+            ? 'Showing ' + (from + 1) + '\u2013' + Math.min(to, list.length) + ' of ' + list.length : '';
+
+        var pg = document.getElementById('plPages'); pg.innerHTML = '';
+        if (pages > 1) {
+            function btn(label, p, disabled, on) {
+                var b = document.createElement('button'); b.type = 'button'; b.textContent = label;
+                b.disabled = disabled; if (on) b.className = 'on';
+                b.onclick = function () { page = p; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+                pg.appendChild(b);
+            }
+            btn('\u2039', page - 1, page === 1);
+            for (var i = 1; i <= pages; i++) btn(String(i), i, false, i === page);
+            btn('\u203A', page + 1, page === pages);
+        }
+    }
+
+    document.getElementById('plSearch').addEventListener('input', function () { q = this.value.trim().toLowerCase(); page = 1; render(); });
+    document.querySelectorAll('#plStatus .pl-chip').forEach(function (c) { c.addEventListener('click', function () { status = c.dataset.status; page = 1; render(); }); });
+    document.querySelectorAll('#plSection .pl-chip').forEach(function (c) { c.addEventListener('click', function () { section = c.dataset.section; page = 1; render(); }); });
+    render();
+})();
+</script>
 </body>
 </html>

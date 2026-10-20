@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${form.code + ' Evaluation - DentIS'}">Evaluation - DentIS</title>
+    <link rel="stylesheet" href="/css/periodonticsb-clinician.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/form-common.css">
+    <link rel="stylesheet" href="/css/perio-eval.css">
+</head>
+
+<body>
+<div class="background"></div>
+<div class="perio-page">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
+                <div class="dropdown-icon">&#9660;</div>
+                <div class="user-dropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul th:if="${currentUser != null and currentUser.role.name() == 'FACULTY'}">
+                    <li class="nav-item"><a href="/faculty-dashboard" class="nav-link"><img src="/images/home-icon.png" alt="Home" class="nav-icon"><span>Home</span></a></li>
+                    <li class="nav-item active"><a href="/faculty-patientlist" class="nav-link"><img src="/images/patient-icon.png" alt="Patient List" class="nav-icon"><span>Patient List</span></a></li>
+                    <li class="nav-item"><a href="/faculty-advisees" class="nav-link"><img src="/images/chart-icon.png" alt="My Advisees" class="nav-icon"><span>My Advisees</span></a></li>
+                </ul>
+                <ul th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
+                    <li class="nav-item"><a href="/dashboard-clinicmanager" class="nav-link"><img src="/images/home-icon.png" alt="Home" class="nav-icon"><span>Home</span></a></li>
+                    <li class="nav-item active"><a href="/patientlist-clinicmanager" class="nav-link"><img src="/images/patient-icon.png" alt="Patient List" class="nav-icon"><span>Patient List</span></a></li>
+                </ul>
+                <ul th:if="${currentUser == null or currentUser.role.name() == 'CLINICIAN'}">
+                    <li class="nav-item"><a href="/clinician-dashboard" class="nav-link"><img src="/images/home-icon.png" alt="Home" class="nav-icon"><span>Home</span></a></li>
+                    <li class="nav-item"><a href="/chartrequest-clinician" class="nav-link"><img src="/images/request-icon.png" alt="Chart" class="nav-icon2"><span>Chart Request</span></a></li>
+                    <li class="nav-item active"><a href="/patientlist-clinician" class="nav-link"><img src="/images/patient-icon.png" alt="Patient" class="nav-icon"><span>Patient List</span></a></li>
+                    <li class="nav-item">
+                        <a href="/evaluations-clinician" class="nav-link" style="position:relative;">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="14" height="17" rx="2" stroke="#333" stroke-width="2"/><path d="M9 4V3h6v1" stroke="#333" stroke-width="2" stroke-linecap="round"/><path d="M8.5 12.5l2.2 2.2 4.8-4.8" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span>Evaluations</span>
+                            <b th:if="${currentUser != null and @perioEvaluationService.unreadCount(currentUser) > 0}" th:text="${@perioEvaluationService.unreadCount(currentUser)}"
+                               style="position:absolute; top:2px; right:6px; min-width:18px; height:18px; padding:0 5px; box-sizing:border-box; border-radius:9px; background:#c0392b; color:white; font-size:11px; font-weight:700; line-height:18px; text-align:center;">1</b>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <h2 class="page-title">Clinical Periodontics</h2>
+
+            <div class="form-card">
+                <!-- Back to Charts (top-left) + popups -->
+                <a th:if="${currentUser != null and currentUser.role.name() == 'FACULTY'}" th:href="@{/chartsview-faculty/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <a th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}" th:href="@{/chartsview-clinicmanager/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <a th:if="${currentUser == null or currentUser.role.name() == 'CLINICIAN'}" th:href="@{/chartsview-clinician/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <div th:if="${param.saved != null}" class="saved-toast" role="status">
+                    <span class="saved-toast-icon">&#10003;</span><span>Draft saved</span>
+                    <button type="button" class="saved-toast-close" aria-label="Close" onclick="this.parentNode.remove()">&times;</button>
+                </div>
+                <div th:if="${param.sent != null}" class="saved-toast" role="status">
+                    <span class="saved-toast-icon">&#10003;</span><span>Sent to clinician</span>
+                    <button type="button" class="saved-toast-close" aria-label="Close" onclick="this.parentNode.remove()">&times;</button>
+                </div>
+                <div th:if="${param.recalled != null}" class="saved-toast" role="status">
+                    <span class="saved-toast-icon">&#10003;</span><span>Recalled &mdash; you can edit it again</span>
+                    <button type="button" class="saved-toast-close" aria-label="Close" onclick="this.parentNode.remove()">&times;</button>
+                </div>
+
+                <!-- Form code (top-right) + title -->
+                <div class="form-banner" th:text="${form.title}">Evaluation Form</div>
+                <div class="eval-code-row">
+                    <span class="eval-code" th:text="${form.courses == '' ? form.code : form.code + ' · ' + form.courses}">PF4</span>
+                    <span th:if="${facultyMode and eval.status.name() == 'DRAFT'}" class="eval-status draft">&#9679; Draft</span>
+                    <span th:if="${facultyMode and eval.status.name() == 'GRADED'}" class="eval-status sent">&#9679; Sent</span>
+                </div>
+
+                <form th:action="@{/perio-eval-faculty/{id}(id=${eval.id})}" method="post" id="evalForm">
+                <script th:inline="javascript">var VIEW_ONLY = /*[[${viewOnly}]]*/ false;</script>
+                <div class="form-body">
+
+                    <!-- Learning outcome + names -->
+                    <div class="eval-top">
+                        <div class="learning-outcome-box">
+                            <p class="lo-title"><em>Learning Outcome</em></p>
+                            <p class="lo-text">To manage patients with periodontal disease within the recommended time frame, while maintaining professional attitudes and demonstrating empathy.</p>
+                        </div>
+                        <div class="eval-info">
+                            <div class="form-group"><label>Clinician&rsquo;s Name</label>
+                                <input type="text" readonly class="read-only-input" th:value="${chart.clinician != null ? chart.clinician.fullName : ''}"></div>
+                            <div class="form-group"><label>Date</label>
+                                <input type="date" name="date" th:value="${eval.date}" th:readonly="${viewOnly}" th:classappend="${viewOnly} ? 'read-only-input'"></div>
+                            <div class="form-group"><label>Patient&rsquo;s Name</label>
+                                <input type="text" readonly class="read-only-input" th:value="${chart.patient.surname + ', ' + chart.patient.firstName}"></div>
+                            <div class="form-group"><label>Chart No.</label>
+                                <input type="text" readonly class="read-only-input" th:value="${#strings.replace(chart.chartNo, '-PF1', '-' + form.code)}"></div>
+                        </div>
+                    </div>
+
+                    <!-- Grading tables (same layout as the paper form) -->
+                    <div class="eval-tables" th:classappend="${!form.hasRight} ? 'single'">
+
+                        <table class="eval-table" id="leftTable" th:attr="data-mult=${form.leftMultiplier}">
+                            <thead>
+                                <tr><th class="col-crit">Criteria</th><th class="col-grade">Grade</th><th class="col-score">Score</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="c : ${form.left}" th:attr="data-weight=${c['weight']}">
+                                    <td class="col-crit" th:text="${c['label']}"></td>
+                                    <td class="col-grade">
+                                        <input type="text" inputmode="decimal" class="grade" autocomplete="off"
+                                               th:name="${c['field']}" th:value="${grades[c['field']]}" th:readonly="${viewOnly}">
+                                        <span class="mult" th:text="${'x' + c['weight']}"></span>
+                                    </td>
+                                    <td class="col-score"></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr><td class="col-crit"></td><td class="col-grade"></td><td class="col-score"><span class="mult" th:text="${form.leftMultiplierLabel}"></span><span id="leftSub"></span></td></tr>
+                            </tfoot>
+                        </table>
+
+                        <table class="eval-table" id="rightTable" th:if="${form.hasRight}" th:attr="data-mult=${form.rightMultiplier},data-mult-norp=${form.rightMultiplierNoRp}">
+                            <thead>
+                                <tr><th class="col-crit">Criteria</th><th class="col-att">1<sup>st</sup></th><th class="col-att">2<sup>nd</sup></th><th class="col-att">3<sup>rd</sup></th><th class="col-score">Ave</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="c : ${form.right}" th:attr="data-weight=${c['weight']}" th:classappend="${c['field'] == form.rootPlaningField} ? 'rp-row'">
+                                    <td class="col-crit" th:text="${c['label']}"></td>
+                                    <td class="col-att" th:each="a : ${ {'1st','2nd','3rd'} }">
+                                        <input type="text" inputmode="decimal" class="grade attempt" autocomplete="off"
+                                               th:name="${c['field'] + a}" th:value="${grades[c['field'] + a]}" th:readonly="${viewOnly}">
+                                    </td>
+                                    <td class="col-score"><span class="ave"></span><span class="mult" th:text="${'x' + c['weight']}"></span></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr th:if="${form.hasRootPlaning}"><td class="col-crit rp-na" colspan="5">
+                                    <label><input type="checkbox" name="rootPlaningNA" id="rpNa" value="1" th:checked="${grades['rootPlaningNA'] != null}" th:disabled="${viewOnly}">
+                                    If RP is NA, the multiplier is 0.615</label></td></tr>
+                                <tr><td class="col-crit total-label" colspan="4">Total</td><td class="col-score"><span class="mult" id="rightMultLabel" th:text="${form.rightMultiplierLabel}"></span><span id="rightSub"></span></td></tr>
+                            </tfoot>
+                        </table>
+
+                        <!-- One-table forms (PF7, PF17): Remarks beside the table, as on the paper -->
+                        <div class="form-group eval-remarks-side" th:if="${!form.hasRight}"><label>Remarks</label>
+                            <textarea name="remarks" th:text="${eval.remarks}" th:readonly="${viewOnly}"></textarea></div>
+                    </div>
+
+                    <!-- Total -->
+                    <div class="eval-total">
+                        <span class="eval-total-label">Total</span>
+                        <span class="eval-total-value"><span id="totalScore">0</span> <small>/ 100</small></span>
+                    </div>
+
+                    <!-- Diagnosis + rating scale + remarks -->
+                    <div class="eval-bottom">
+                        <div class="eval-col">
+                            <div class="form-group"><label>Diagnosis</label>
+                                <textarea name="diagnosis" rows="3" th:text="${eval.diagnosis}" th:readonly="${viewOnly}"></textarea></div>
+                            <div class="rating-scale">
+                                <div class="rs-row"><span class="rs-num">1</span><span>Performed <b>&lt; or = 40%</b> of the procedures accurately and thoroughly</span></div>
+                                <div class="rs-row"><span class="rs-num">2</span><span>Performed <b>&lt;60% but &gt; 40%</b> of the procedures accurately and thoroughly</span></div>
+                                <div class="rs-row"><span class="rs-num">3</span><span>Performed <b>60&ndash;75%</b> of the procedures accurately and thoroughly</span></div>
+                                <div class="rs-row"><span class="rs-num">4</span><span>Performed <b>&gt;75% up to 90%</b> of the procedures accurately and thoroughly</span></div>
+                                <div class="rs-row"><span class="rs-num">5</span><span>Performed <b>&gt; 90%</b> of the procedures accurately and thoroughly</span></div>
+                            </div>
+                        </div>
+                        <div class="eval-col" th:if="${form.hasRight}">
+                            <div class="form-group eval-remarks"><label>Remarks</label>
+                                <textarea name="remarks" rows="9" th:text="${eval.remarks}" th:readonly="${viewOnly}"></textarea></div>
+                        </div>
+                    </div>
+
+                    <!-- Actions (faculty) -->
+                    <div class="form-actions" th:if="${facultyMode and !viewOnly}">
+                        <span class="eval-action-note">Not visible to the clinician until sent.</span>
+                        <button type="submit" name="action" value="save" class="btn-next btn-save">Save draft</button>
+                        <button type="submit" name="action" value="send" class="btn-submit" id="btnSend">Send to clinician</button>
+                    </div>
+                </div>
+                </form>
+                <div th:if="${facultyMode and eval.status.name() == 'GRADED'}" class="eval-sent-bar">
+                    <span>&#10003; Sent to the clinician<span th:if="${eval.sentAt != null}" th:text="${' on ' + #temporals.format(eval.sentAt, 'MMM d, yyyy')}"></span>. Recall it to make changes.</span>
+                    <form th:action="@{/perio-eval-faculty/{id}/recall(id=${eval.id})}" method="post">
+                        <button type="submit" class="btn-recall">Recall to edit</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script th:inline="none">
+/* ── Grades: typed, 1 to 5, decimals allowed (e.g. 4.5) ── */
+function gradeOf(inp) {
+    var v = inp.value.trim();
+    if (v === '') return null;
+    var g = parseFloat(v);
+    return (!isNaN(g) && g >= 1 && g <= 5 && /^\d(\.\d{1,2})?$/.test(v)) ? g : NaN;
+}
+function fmt(x) { return (Math.round(x * 100) / 100).toString(); }
+
+document.querySelectorAll('input.grade').forEach(function(inp) {
+    inp.addEventListener('keydown', function(e) {
+        if (e.ctrlKey || e.metaKey || e.altKey || e.key.length > 1) return;          /* arrows, Tab, Backspace… */
+        if (!/[0-9.]/.test(e.key) || (e.key === '.' && this.value.indexOf('.') >= 0)) e.preventDefault();
+    });
+    inp.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');  /* pasted text too */
+        recompute();
+    });
+});
+
+/* ── Scores (as on the form): Score = grade × weight; Ave = average of the attempts given;
+      bottom rows apply the form's multipliers (PF6: x0.615 when root planing is N/A) ── */
+var LEFT_MULT  = parseFloat(document.getElementById('leftTable').dataset.mult);
+var RIGHT_TBL  = document.getElementById('rightTable');
+var RP_NA      = document.getElementById('rpNa');
+function rightMult() {
+    if (!RIGHT_TBL) return 0;
+    return (RP_NA && RP_NA.checked) ? parseFloat(RIGHT_TBL.dataset.multNorp) : parseFloat(RIGHT_TBL.dataset.mult);
+}
+function syncRp() {
+    if (!RP_NA) return;
+    var row = document.querySelector('#rightTable tr.rp-row');
+    if (!row) return;
+    row.classList.toggle('na', RP_NA.checked);
+    row.querySelectorAll('input.grade').forEach(function(i) { i.readOnly = RP_NA.checked || VIEW_ONLY; if (RP_NA.checked) i.value = ''; });
+    document.getElementById('rightMultLabel').textContent = RP_NA.checked ? 'x0.615' : 'x0.5';
+}
+if (RP_NA) RP_NA.addEventListener('change', function() { syncRp(); recompute(); });
+syncRp();
+function recompute() {
+    var left = 0, right = 0;
+    document.querySelectorAll('#leftTable tbody tr').forEach(function(tr) {
+        var w = parseInt(tr.dataset.weight, 10), inp = tr.querySelector('input.grade'), g = gradeOf(inp);
+        inp.classList.toggle('invalid', Number.isNaN(g));
+        tr.querySelector('.col-score').textContent = (g == null || isNaN(g)) ? '' : fmt(g * w);
+        if (g != null && !isNaN(g)) left += g * w;
+    });
+    document.querySelectorAll('#rightTable tbody tr').forEach(function(tr) {
+        var w = parseInt(tr.dataset.weight, 10), sum = 0, n = 0;
+        tr.querySelectorAll('input.grade').forEach(function(inp) {
+            var g = gradeOf(inp);
+            inp.classList.toggle('invalid', Number.isNaN(g));
+            if (g != null && !isNaN(g)) { sum += g; n++; }
+        });
+        var ave = n ? sum / n : null;
+        tr.querySelector('.ave').textContent = ave == null ? '' : fmt(ave);
+        if (ave != null) right += ave * w;
+    });
+    document.getElementById('leftSub').textContent = fmt(left * LEFT_MULT);
+    if (RIGHT_TBL) document.getElementById('rightSub').textContent = fmt(right * rightMult());
+    document.getElementById('totalScore').textContent = fmt(left * LEFT_MULT + right * rightMult());
+}
+recompute();
+
+/* ── Send: check grades, confirm ── */
+var btnSend = document.getElementById('btnSend');
+var form = document.getElementById('evalForm');
+if (form) form.addEventListener('submit', function(e) {
+    if (document.querySelector('input.grade.invalid')) {
+        e.preventDefault();
+        alertBar('Grades must be from 1 to 5 (for example 4 or 4.5). Fix the boxes in red.');
+        document.querySelector('input.grade.invalid').focus();
+    }
+});
+if (btnSend) btnSend.addEventListener('click', function(e) {
+    if (document.querySelector('input.grade.invalid')) return;   /* handled on submit */
+    var missing = 0;
+    document.querySelectorAll('#leftTable input.grade').forEach(function(i) { if (!i.value.trim()) missing++; });
+    document.querySelectorAll('#rightTable tbody tr:not(.na)').forEach(function(tr) {
+        if (!tr.querySelector('input.grade').value.trim()) missing++;   /* at least the 1st attempt */
+    });
+    var msg = (missing ? missing + ' criteria have no grade yet.\n\n' : '') +
+              'Send this evaluation to the clinician? It will be locked until you recall it.';
+    if (!confirm(msg)) e.preventDefault();
+});
+function alertBar(text) {
+    var bar = document.getElementById('gradeError');
+    if (!bar) {
+        bar = document.createElement('div');
+        bar.id = 'gradeError';
+        bar.className = 'grade-error';
+        document.querySelector('.eval-tables').before(bar);
+    }
+    bar.textContent = text;
+}
+
+/* ── UI handlers ── */
+document.querySelector('.menu-icon').onclick = function() {
+    document.querySelector('.sidebar').classList.toggle('expanded');
+};
+document.querySelector('.user-profile').onclick = function(e) {
+    e.stopPropagation();
+    document.querySelector('.user-dropdown').classList.toggle('show');
+};
+document.addEventListener('click', function() {
+    var d = document.querySelector('.user-dropdown');
+    if (d.classList.contains('show')) d.classList.remove('show');
+});
+
+/* ── Warn before leaving with unsaved changes ── */
+(function() {
+    if (typeof VIEW_ONLY !== 'undefined' && VIEW_ONLY) return;
+    var dirty = false;
+    document.addEventListener('input',  function() { dirty = true; }, true);
+    document.addEventListener('change', function() { dirty = true; }, true);
+    document.querySelectorAll('form').forEach(function(f) { f.addEventListener('submit', function() { dirty = false; }); });
+    window.addEventListener('beforeunload', function(e) { if (!dirty) return; e.preventDefault(); e.returnValue = ''; });
+})();
+</script>
+
+<script src="/js/textarea-min-size.js"></script>
+<script src="/js/sidebar-hover.js"></script>
+</body>
+</html>

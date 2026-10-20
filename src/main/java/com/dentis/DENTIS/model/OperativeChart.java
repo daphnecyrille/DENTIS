@@ -47,6 +47,10 @@ public class OperativeChart {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    /** Set automatically every time the chart is saved (Patient List "Last Updated"). */
+    @org.hibernate.annotations.UpdateTimestamp
+    private LocalDateTime updatedAt;
+
     // ── Form A (operativea-clinician) — Patient info & examination ───────────
 
     private Boolean dent171;

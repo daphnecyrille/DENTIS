@@ -245,3 +245,7 @@
 /* ─── Clearer tooth columns: strong line between teeth, faint line between the 3 sites (same as PF1) ─── */
 .pf3-cell { border-right: 2px solid #c3cbd6; }
 .pf3-site { border-right: 1px dotted #b8b8b8; }
+
+/* Picker "Clear": same look as the Clear in PF1 and PF2 */
+.sym-clear { background: #fff0f0; border-color: #f5c6c6; color: #c0392b; font-size: 12px; }
+.sym-clear:hover { background: #c0392b; color: white; border-color: #c0392b; }

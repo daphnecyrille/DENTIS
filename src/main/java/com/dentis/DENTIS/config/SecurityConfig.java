@@ -38,7 +38,8 @@ public class SecurityConfig {
                     "/faculty-dashboard", "/faculty-assign", "/faculty-patientlist", "/faculty-advisees",
                     "/chartsview-faculty/**", "/faculty-dashboard/**", "/admitting-view-faculty/**",
                     "/operative-view-faculty/**", "/operative2-view-faculty/**",
-                    "/operative-faculty/**", "/operative2-faculty/**"
+                    "/operative-faculty/**", "/operative2-faculty/**",
+                    "/perio-eval-faculty/**"
                 ).hasRole("FACULTY")
                 .requestMatchers(
                     "/oralsurgery-view-faculty/**", "/oralsurgery2-view-faculty/**",
@@ -61,7 +62,7 @@ public class SecurityConfig {
                     "/clinician-dashboard", "/chartsview-clinician/**", "/chartrequest-clinician",
                     "/patientlist-clinician", "/admitting-edit-clinician/**",
                     "/admitting-view-clinician/**", "/oralsurgery-clinician/**", "/oralsurgery2-clinician/**",
-                    "/endodontics-clinician/**", "/endodontics2-clinician/**", "/periodonticsa-clinician/**", "/periodonticsb-clinician/**"
+                    "/endodontics-clinician/**", "/endodontics2-clinician/**", "/periodonticsa-clinician/**", "/periodonticsb-clinician/**", "/evaluations-clinician"
                 ).hasRole("CLINICIAN")
                 .requestMatchers("/complete-profile").authenticated()
                 .anyRequest().authenticated()

@@ -9,7 +9,7 @@ public enum OperativeChartStatus {
 
     public String getDisplayName() {
         return switch (this) {
-            case CREATED     -> "In Progress";
+            case CREATED     -> "Not Started";   // never saved yet (saving moves it to IN_PROGRESS)
             case IN_PROGRESS -> "In Progress";
             case SUBMITTED   -> "Awaiting Approval";
             case APPROVED    -> "Approved";

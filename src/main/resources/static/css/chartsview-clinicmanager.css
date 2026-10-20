@@ -302,3 +302,41 @@ td:last-child { border-right: none; }
 }
 
 .modal-label { color: #888; font-weight: 500; }
+
+/* ─── Evaluation Forms (periodontics) ─── */
+.eval-section { overflow: visible; }          /* lets the Add menu drop below the header */
+.eval-section .table-container { border-radius: 0 0 8px 8px; overflow: hidden; }
+.eval-section-header { display: flex; align-items: center; justify-content: space-between; }
+.eval-section-header h2 { margin: 0; }
+.eval-add { position: relative; }
+.btn-eval-add {
+    background: white; color: #2d4a6b; border: none; border-radius: 6px;
+    padding: 7px 16px; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.btn-eval-add:hover { background: #e4ebf3; }
+.eval-menu {
+    display: none; position: absolute; right: 0; top: calc(100% + 6px); z-index: 50;
+    width: 340px; background: white; border-radius: 10px; padding: 6px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+}
+.eval-menu.open { display: block; }
+.eval-menu form { margin: 0; }
+.eval-menu-chart { margin: 6px 10px 2px; font-size: 11px; color: #6b7a8c; font-weight: 600; }
+.eval-menu-item {
+    width: 100%; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; text-align: left;
+    background: none; border: none; border-radius: 6px; padding: 9px 12px; cursor: pointer;
+    font-family: 'Poppins', sans-serif; font-size: 13px; color: #222;
+}
+.eval-menu-item:hover:not(:disabled) { background: #eef3f9; }
+.eval-menu-item strong { color: #2d4a6b; min-width: 38px; }
+.eval-menu-item em { flex-basis: 100%; padding-left: 46px; font-size: 11px; color: #8a97a8; font-style: normal; }
+.eval-menu-item:disabled { cursor: default; color: #9aa5b1; }
+.eval-menu-item:disabled strong { color: #9aa5b1; }
+.eval-empty { text-align: center; color: #6b7a8c; font-size: 13px; padding: 18px !important; }
+.btn-eval-delete { background: #8B0000; color: white; }
+.btn-eval-delete:hover { background: #a31515; }
+/* menu item: code in its own column, name and note beside it */
+.eval-menu { width: 380px; }
+.eval-menu-item { display: grid; grid-template-columns: 46px 1fr; gap: 2px 6px; }
+.eval-menu-item strong { min-width: 0; }
+.eval-menu-item em { grid-column: 2; padding-left: 0; }

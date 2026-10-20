@@ -32,7 +32,6 @@ public class PeriodonticChartService {
         chart.setChartNo(patient.getChartNo() + "-PF1");
         chart.setChiefComplaint(patient.getChiefComplaint());
         PeriodonticChart saved = repo.save(chart);
-        perioEvaluationService.initForChart(saved);
         return saved;
     }
 

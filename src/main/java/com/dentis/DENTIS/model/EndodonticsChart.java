@@ -178,4 +178,8 @@ public class EndodonticsChart {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    /** Set automatically every time the chart is saved (Patient List "Last Updated"). */
+    @org.hibernate.annotations.UpdateTimestamp
+    private LocalDateTime updatedAt;
 }

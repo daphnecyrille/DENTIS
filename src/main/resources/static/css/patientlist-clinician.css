@@ -318,3 +318,68 @@ button {
 .btn-view-chart:hover {
     background: #2c5282;
 }
+
+/* ─── Patient List: one row per patient, search + filters + pages ─── */
+.pl-header { display: flex; align-items: center; justify-content: space-between; }
+.pl-count { font-size: 13px; opacity: 0.85; }
+.pl-toolbar { padding: 16px 20px 8px; display: flex; flex-direction: column; gap: 12px; }
+.pl-search { position: relative; }
+.pl-search svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); }
+.pl-search input {
+    width: 100%; box-sizing: border-box; padding: 11px 14px 11px 40px;
+    border: 1.5px solid #c8d1dc; border-radius: 8px; font-size: 14px; font-family: 'Poppins', sans-serif; outline: none;
+}
+.pl-search input:focus { border-color: #2d4a6b; box-shadow: 0 0 0 3px rgba(45,74,107,0.15); }
+.pl-filters { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; }
+.pl-fgroup { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.pl-flabel { font-size: 12px; font-weight: 600; color: #6b7a8c; margin-right: 2px; }
+.pl-chip {
+    border: 1.5px solid #c8d1dc; background: white; border-radius: 16px; padding: 5px 12px;
+    font-size: 12px; font-weight: 600; color: #3d4b5c; cursor: pointer; font-family: 'Poppins', sans-serif;
+}
+.pl-chip:hover { border-color: #2d4a6b; }
+.pl-chip.on { background: #2d4a6b; border-color: #2d4a6b; color: white; }
+.pl-chip .n { opacity: 0.7; font-weight: 500; margin-left: 2px; }
+tr.has-revise td { background: #fff5f4; }
+.chart-tags { text-align: center; }
+.chart-tag {
+    display: inline-block; margin: 2px 3px; padding: 3px 9px; border-radius: 12px;
+    font-size: 11px; font-weight: 600; cursor: default; background: #e2e8f0; color: #4a5568;
+}
+.chart-tag.created     { background: #e2e8f0; color: #4a5568; }
+.chart-tag.in-progress { background: #cce5ff; color: #004085; }
+.chart-tag.pending, .chart-tag.submitted, .chart-tag.awaiting { background: #fff3cd; color: #856404; }
+.chart-tag.revise      { background: #f8d7da; color: #721c24; }
+.chart-tag.approved    { background: #d4edda; color: #155724; }
+.pl-done { font-size: 11px; color: #2e7d32; font-weight: 600; margin-left: 6px; }
+.pl-empty { text-align: center; color: #888; padding: 26px !important; }
+.pl-row mark { background: #fff3a3; padding: 0; }
+.tag-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 10px 20px 4px; font-size: 12px; }
+.tag-legend-hint { margin-left: 8px; color: #888; }
+.pl-pager { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px 16px; font-size: 13px; color: #555; }
+.pl-pages { display: flex; gap: 4px; }
+.pl-pages button {
+    min-width: 32px; height: 32px; border: 1.5px solid #c8d1dc; background: white; border-radius: 6px;
+    cursor: pointer; font-family: 'Poppins', sans-serif; font-weight: 600; color: #2d4a6b;
+}
+.pl-pages button.on { background: #2d4a6b; color: white; border-color: #2d4a6b; }
+.pl-pages button:disabled { opacity: 0.4; cursor: default; }
+
+/* ─── My Evaluations (clinician) ─── */
+.ev-title { font-size: 30px; font-weight: 700; color: #061F40; margin: 0 0 16px; }
+.ev-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 20px; max-width: 760px; }
+.ev-card {
+    display: flex; flex-direction: column; gap: 2px; padding: 16px 20px;
+    background: rgba(255,255,255,0.95); border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 6px solid #c8d1dc;
+}
+.ev-card b { font-size: 30px; font-weight: 600; color: #2d4a6b; line-height: 1.1; }
+.ev-card span { font-size: 13px; color: #555; }
+.ev-card.ev-new.has-items { border-left-color: #c0392b; background: #fff5f4; }
+.ev-card.ev-new.has-items b { color: #c0392b; }
+.ev-form-col { text-align: left !important; padding-left: 22px !important; }
+.ev-row.unread td { background: #fffaf9; }
+.ev-score { font-weight: 700; color: #2d4a6b; }
+.new-tag {
+    display: inline-block; margin-right: 6px; padding: 2px 8px; border-radius: 10px;
+    background: #c0392b; color: white; font-size: 11px; font-weight: 600; vertical-align: 1px;
+}

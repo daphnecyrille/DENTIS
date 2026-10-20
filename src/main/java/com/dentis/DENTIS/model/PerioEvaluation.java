@@ -50,11 +50,27 @@ public class PerioEvaluation {
     /** EPA Grade field shown on PF5 and PF17. */
     private String epaGrade;
 
+    /**
+     * All grades of the form as JSON, e.g. {"determinedHistory":4.5,"healthEd1st":4}.
+     * Grades may have decimals (1–5), so they are kept here rather than in the older Integer columns below.
+     */
+    @Column(columnDefinition = "TEXT")
+    private String gradesJson;
+
     /** Computed total score stored on submit. */
     private Double totalScore;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    /** Visit number for forms that can be added more than once (PF7, PF18); 1 for the others. */
+    private Integer visitNo;
+
+    /** When the clinician first opened the sent evaluation (null = still new/unread for them). */
+    private LocalDateTime viewedAt;
+
+    /** When the faculty sent the evaluation to the clinician (null while it is a draft). */
+    private LocalDateTime sentAt;
 
     // ── Left / Single table criteria (all nullable, grade 1–5) ──────────────
 

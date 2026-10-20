@@ -364,3 +364,87 @@ button {
     background: #f8d7da;
     color: #721c24;
 }
+/* ─── New (unread) evaluation forms ─── */
+.new-tag {
+    display: inline-block; margin-right: 6px; padding: 2px 8px; border-radius: 10px;
+    background: #c0392b; color: white; font-size: 11px; font-weight: 600; vertical-align: 1px;
+}
+.new-count {
+    display: inline-block; margin-left: 8px; min-width: 22px; padding: 1px 7px; border-radius: 11px;
+    background: #c0392b; color: white; font-size: 13px; font-weight: 600; text-align: center; vertical-align: 2px;
+}
+
+/* ─── Summary cards ─── */
+.dash-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 20px; }
+.dash-card {
+    display: flex; flex-direction: column; gap: 2px; padding: 16px 20px;
+    background: rgba(255,255,255,0.95); border-radius: 10px; text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 6px solid #c8d1dc;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.dash-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.14); }
+.dash-card-num { font-size: 30px; font-weight: 600; color: #2d4a6b; line-height: 1.1; }
+.dash-card-label { font-size: 13px; font-weight: 500; color: #555; }
+.card-revise   { border-left-color: #f1b0b7; }
+.card-revise.has-items   { border-left-color: #c0392b; background: #fff5f4; }
+.card-revise.has-items .dash-card-num { color: #c0392b; }
+.card-progress { border-left-color: #7fa7d6; }
+.card-awaiting { border-left-color: #e6a817; }
+.card-evals    { border-left-color: #c8d1dc; }
+.card-evals.has-items    { border-left-color: #2e7d32; background: #f1f8f2; }
+.card-evals.has-items .dash-card-num { color: #2e7d32; }
+
+/* ─── Needs Submission: revisions on top ─── */
+tr.row-revise td { background: #fff5f4; }
+.revise-note {
+    margin-top: 4px; font-size: 12px; color: #8a1f14; font-style: italic;
+    max-width: 340px; margin-left: auto; margin-right: auto;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.btn-view-chart.btn-revise { background: #c0392b; }
+.btn-view-chart.btn-revise:hover { background: #a93226; }
+
+/* ─── Chart status colours (same as the charts view) ─── */
+.status.created     { background: #e2e8f0; color: #4a5568; }
+.status.in-progress { background: #cce5ff; color: #004085; }
+.status.submitted   { background: #d4edda; color: #155724; }
+.status.awaiting    { background: #fff3cd; color: #856404; }
+.status.revise      { background: #f8d7da; color: #721c24; font-weight: 600; }
+.status.update      { background: #f8d7da; color: #721c24; }
+
+/* ─── Patient List: one row per patient with chart status tags ─── */
+.section-header-row { display: flex; align-items: center; justify-content: space-between; }
+.view-all { color: white; font-size: 13px; font-weight: 500; text-decoration: none; opacity: 0.9; }
+.view-all:hover { opacity: 1; text-decoration: underline; }
+.chart-tags { text-align: center; }
+.chart-tag {
+    display: inline-block; margin: 2px 3px; padding: 3px 9px; border-radius: 12px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.2px; cursor: default;
+    background: #e2e8f0; color: #4a5568;
+}
+.chart-tag.created     { background: #e2e8f0; color: #4a5568; }
+.chart-tag.in-progress { background: #cce5ff; color: #004085; }
+.chart-tag.pending, .chart-tag.awaiting { background: #fff3cd; color: #856404; }
+.chart-tag.submitted   { background: #fff3cd; color: #856404; }
+.chart-tag.revise      { background: #f8d7da; color: #721c24; }
+.chart-tag.approved    { background: #d4edda; color: #155724; }
+.tag-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 10px 20px 14px; font-size: 12px; }
+.tag-legend-hint { margin-left: 8px; color: #888; }
+
+/* ─── Card filters + Show all ─── */
+.dash-card[data-filter] { cursor: pointer; }
+.dash-card.active { outline: 3px solid #2d4a6b; outline-offset: -3px; }
+.dash-card.static { cursor: default; }
+.dash-card.static:hover { transform: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.filter-note { font-size: 12px; font-weight: 400; opacity: 0.85; margin-left: 10px; }
+.show-all {
+    display: block; width: 100%; border: none; background: #f4f6f9; color: #2d4a6b;
+    font-weight: 600; font-size: 13px; padding: 10px; cursor: pointer; font-family: 'Poppins', sans-serif;
+}
+.show-all:hover { background: #e8edf3; }
+
+/* Five summary cards */
+.dash-cards { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.card-requests { border-left-color: #f0dfa8; }
+.card-requests.has-items { border-left-color: #e6a817; background: #fffaeb; }
+.card-requests.has-items .dash-card-num { color: #a87700; }

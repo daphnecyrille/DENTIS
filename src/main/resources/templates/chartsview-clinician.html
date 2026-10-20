@@ -59,6 +59,14 @@
                             <span>Patient List</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="/evaluations-clinician" class="nav-link" style="position:relative;">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="14" height="17" rx="2" stroke="#333" stroke-width="2"/><path d="M9 4V3h6v1" stroke="#333" stroke-width="2" stroke-linecap="round"/><path d="M8.5 12.5l2.2 2.2 4.8-4.8" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span>Evaluations</span>
+                            <b th:if="${currentUser != null and @perioEvaluationService.unreadCount(currentUser) > 0}" th:text="${@perioEvaluationService.unreadCount(currentUser)}"
+                               style="position:absolute; top:2px; right:6px; min-width:18px; height:18px; padding:0 5px; box-sizing:border-box; border-radius:9px; background:#c0392b; color:white; font-size:11px; font-weight:700; line-height:18px; text-align:center;">1</b>
+                        </a>
+                    </li>
                 </ul>
             </nav>
         </aside>
@@ -188,7 +196,7 @@
                                     <a th:if="${(osc.chartType == null or osc.chartType.name() == 'OSF1') and osc.status.name() != 'APPROVED'}"
                                        th:href="@{/oralsurgery-clinician/{id}(id=${osc.id})}"
                                        class="btn-action btn-edit">Edit</a>
-                                    <span th:if="${osc.status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">Approved</span>
+                                    <span th:if="${osc.status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td>
                                     <form th:if="${osc.status.name() != 'APPROVED' and osc.status.name() != 'SUBMITTED'}" th:action="@{/oralsurgery-clinician/{id}/submit(id=${osc.id})}" method="post" style="display:inline;">
@@ -207,7 +215,7 @@
                                 <td><a th:href="@{/endodontics-clinician/{id}/view(id=${ec.id})}" class="btn-action btn-view">View</a></td>
                                 <td>
                                     <a th:if="${ec.status.name() != 'APPROVED'}" th:href="@{/endodontics-clinician/{id}(id=${ec.id})}" class="btn-action btn-edit">Edit</a>
-                                    <span th:if="${ec.status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">Approved</span>
+                                    <span th:if="${ec.status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td>
                                     <form th:if="${ec.status.name() != 'APPROVED' and ec.status.name() != 'SUBMITTED'}" th:action="@{/endodontics-clinician/{id}/submit(id=${ec.id})}" method="post" style="display:inline;">
@@ -226,7 +234,7 @@
                                 <td><a th:href="@{/endodontics2-clinician/{id}/view(id=${ec.id})}" class="btn-action btn-view">View</a></td>
                                 <td>
                                     <a th:if="${ec.form2Status.name() != 'APPROVED'}" th:href="@{/endodontics2-clinician/{id}(id=${ec.id})}" class="btn-action btn-edit">Edit</a>
-                                    <span th:if="${ec.form2Status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">Approved</span>
+                                    <span th:if="${ec.form2Status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td>
                                     <form th:if="${ec.form2Status.name() != 'APPROVED' and ec.form2Status.name() != 'SUBMITTED'}" th:action="@{/endodontics2-clinician/{id}/submit(id=${ec.id})}" method="post" style="display:inline;">
@@ -246,7 +254,7 @@
                                 <td><a th:href="@{/periodontics-a/{id}/view(id=${pc.id})}" class="btn-action btn-view">View</a></td>
                                 <td>
                                     <a th:if="${pc.status.name() != 'APPROVED'}" th:href="@{/periodontics-a/{id}(id=${pc.id})}" class="btn-action btn-edit">Edit</a>
-                                    <span th:if="${pc.status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">Approved</span>
+                                    <span th:if="${pc.status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td>
                                     <form th:if="${pc.status.name() != 'APPROVED' and pc.status.name() != 'SUBMITTED'}" th:action="@{/periodontics-ab/{id}/submit(id=${pc.id})}" method="post" style="display:inline;">
@@ -266,7 +274,7 @@
                                 <td><a th:href="@{/periodontics-c/{id}/view(id=${pc.id})}" class="btn-action btn-view">View</a></td>
                                 <td>
                                     <a th:if="${pc.formCStatus.name() != 'APPROVED'}" th:href="@{/periodontics-c/{id}(id=${pc.id})}" class="btn-action btn-edit">Edit</a>
-                                    <span th:if="${pc.formCStatus.name() == 'APPROVED'}" style="color:#888; font-size:12px;">Approved</span>
+                                    <span th:if="${pc.formCStatus.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td>
                                     <form th:if="${pc.formCStatus.name() != 'APPROVED' and pc.formCStatus.name() != 'SUBMITTED'}" th:action="@{/periodontics-c/{id}/submit(id=${pc.id})}" method="post" style="display:inline;">
@@ -286,7 +294,7 @@
                                 <td><a th:href="@{/periodontics-pf3/{id}/view(id=${pc.id})}" class="btn-action btn-view">View</a></td>
                                 <td>
                                     <a th:if="${pc.pf3Status.name() != 'APPROVED'}" th:href="@{/periodontics-pf3/{id}(id=${pc.id})}" class="btn-action btn-edit">Edit</a>
-                                    <span th:if="${pc.pf3Status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">Approved</span>
+                                    <span th:if="${pc.pf3Status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td>
                                     <form th:if="${pc.pf3Status.name() != 'APPROVED' and pc.pf3Status.name() != 'SUBMITTED'}" th:action="@{/periodontics-pf3/{id}/submit(id=${pc.id})}" method="post" style="display:inline;">
@@ -306,7 +314,7 @@
                                 <td><a th:href="@{/operative-b/{id}/view(id=${oc.id})}" class="btn-action btn-view">View</a></td>
                                 <td>
                                     <a th:if="${oc.status.name() != 'APPROVED'}" th:href="@{/operative-b/{id}(id=${oc.id})}" class="btn-action btn-edit">Edit</a>
-                                    <span th:if="${oc.status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">Approved</span>
+                                    <span th:if="${oc.status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td>
                                     <form th:if="${oc.status.name() != 'APPROVED' and oc.status.name() != 'SUBMITTED'}" th:action="@{/operative-c/{id}/submit(id=${oc.id})}" method="post" style="display:inline;">
@@ -326,7 +334,7 @@
                                 <td><a th:href="@{/operative-a/{id}/view(id=${oc.id})}" class="btn-action btn-view">View</a></td>
                                 <td>
                                     <a th:if="${oc.form2Status.name() != 'APPROVED'}" th:href="@{/operative-a/{id}(id=${oc.id})}" class="btn-action btn-edit">Edit</a>
-                                    <span th:if="${oc.form2Status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">Approved</span>
+                                    <span th:if="${oc.form2Status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td>
                                     <form th:if="${oc.form2Status.name() != 'APPROVED' and oc.form2Status.name() != 'SUBMITTED'}" th:action="@{/operative-a/{id}/submit(id=${oc.id})}" method="post" style="display:inline;">
@@ -340,13 +348,13 @@
                             <tr th:each="pc : ${prosthoCharts}">
                                 <td th:text="${pc.chartNo}"></td>
                                 <td th:text="'Prosthodontics (' + ${pc.caseType} + ')'"></td>
-                                <td th:class="'status ' + ${pc.status.name().toLowerCase()}"
+                                <td th:class="'status ' + ${pc.status.cssClass}"
                                     th:text="${pc.status.displayName}"></td>
                                 <td th:text="${pc.createdAt.toLocalDate()}"></td>
                                 <td><a th:href="@{/prosthodontics-clinician/{id}/view(id=${pc.id})}" class="btn-action btn-view">View</a></td>
                                 <td>
                                     <a th:if="${pc.status.name() != 'APPROVED'}" th:href="@{/prosthodontics-clinician/{id}(id=${pc.id})}" class="btn-action btn-edit">Edit</a>
-                                    <span th:if="${pc.status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">Approved</span>
+                                    <span th:if="${pc.status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td>
                                     <form th:if="${pc.status.name() != 'APPROVED' and pc.status.name() != 'SUBMITTED'}" th:action="@{/prosthodontics-clinician/{id}/submit(id=${pc.id})}" method="post" style="display:inline;">
@@ -357,6 +365,45 @@
                                 </td>
                                 <td th:text="${pc.faculty != null ? pc.faculty.fullName : '—'}"></td>
                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Evaluation Forms: only the ones the faculty has sent -->
+            <section class="section" th:if="${!#lists.isEmpty(perioCharts) and @perioEvaluationService.countSentForCharts(perioCharts) > 0}">
+                <div class="section-header">
+                    <h2>Evaluation Forms</h2>
+                </div>
+                <div class="table-container">
+                    <table class="charts-table">
+                        <thead>
+                            <tr>
+                                <th>Form</th>
+                                <th>Chart Number</th>
+                                <th>Date</th>
+                                <th>Total</th>
+                                <th>View</th>
+                                <th>Faculty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <th:block th:each="pc : ${perioCharts}">
+                            <tr th:each="ev : ${@perioEvaluationService.listSentForChart(pc)}">
+                                <td>
+                                    <span th:if="${ev.viewedAt == null}" class="new-tag">New</span>
+                                    <strong th:text="${ev.formType.name()}"></strong> &ndash;
+                                    <span th:text="${ev.formType.displayName}"></span>
+                                    <span th:if="${ev.formType.repeatable}" th:text="${'(Visit ' + ev.visitNo + ')'}"></span>
+                                    <span th:if="${!ev.formType.repeatable and ev.visitNo != null and ev.visitNo > 1}" th:text="${'(#' + ev.visitNo + ')'}"></span>
+                                </td>
+                                <td th:text="${#strings.replace(pc.chartNo, '-PF1', '-' + ev.formType.name())}"></td>
+                                <td th:text="${ev.date}"></td>
+                                <td th:text="${ev.totalScore != null ? ev.totalScore : '—'}"></td>
+                                <td><a th:href="@{/perio-eval-view/{id}(id=${ev.id})}" class="btn-action btn-view">View</a></td>
+                                <td th:text="${pc.faculty != null ? pc.faculty.fullName : (patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—')}"></td>
+                            </tr>
+                            </th:block>
                         </tbody>
                     </table>
                 </div>
@@ -385,5 +432,6 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 });
 </script>
 
+<script src="/js/sidebar-hover.js"></script>
 </body>
 </html>

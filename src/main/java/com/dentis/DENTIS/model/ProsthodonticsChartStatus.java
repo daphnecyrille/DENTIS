@@ -5,7 +5,7 @@ public enum ProsthodonticsChartStatus {
 
     public String getDisplayName() {
         return switch (this) {
-            case CREATED -> "In Progress";
+            case CREATED -> "Not Started";   // never saved yet (saving moves it to IN_PROGRESS)
             case IN_PROGRESS -> "In Progress";
             case SUBMITTED -> "Submitted";
             case APPROVED -> "Approved";
@@ -15,7 +15,8 @@ public enum ProsthodonticsChartStatus {
 
     public String getCssClass() {
         return switch (this) {
-            case CREATED, IN_PROGRESS -> "in-progress";
+            case CREATED -> "created";
+            case IN_PROGRESS -> "in-progress";
             case SUBMITTED -> "submitted";
             case APPROVED -> "approved";
             case REVISE -> "revise";

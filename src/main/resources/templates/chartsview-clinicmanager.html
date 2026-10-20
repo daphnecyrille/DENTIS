@@ -437,7 +437,7 @@
                             <tr th:each="pc : ${prosthoCharts}">
                                 <td th:text="${pc.chartNo}"></td>
                                 <td th:text="'Prosthodontics (' + ${pc.caseType} + ')'"></td>
-                                <td th:class="'status ' + ${pc.status.name().toLowerCase()}" th:text="${pc.status.displayName}"></td>
+                                <td th:class="'status ' + ${pc.status.cssClass}" th:text="${pc.status.displayName}"></td>
                                 <td th:text="${pc.createdAt.toLocalDate()}"></td>
                                 <td><a th:href="@{/prosthodontics-view/{id}(id=${pc.id})}" class="btn-action btn-view">View</a></td>
                                 <td th:text="${pc.faculty != null ? pc.faculty.fullName : '—'}"></td>
@@ -516,5 +516,6 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 });
 </script>
 
+<script src="/js/sidebar-hover.js"></script>
 </body>
 </html>

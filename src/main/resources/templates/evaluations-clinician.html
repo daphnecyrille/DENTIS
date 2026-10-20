@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Evaluations - DentIS</title>
+    <link rel="stylesheet" href="/css/patientlist-clinician.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div class="background"></div>
+<div class="patientlist-clinician">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+
+                <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
+
+                <div class="dropdown-icon">▼</div>
+                
+                <!-- Dropdown Menu -->
+                <div class="user-dropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="/clinician-dashboard" class="nav-link">
+                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/chartrequest-clinician" class="nav-link">
+                            <img src="/images/request-icon.png" alt="Chart" class="nav-icon2">
+                            <span>Chart Request</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/patientlist-clinician" class="nav-link">
+                            <img src="/images/patient-icon.png" alt="Patient" class="nav-icon">
+                            <span>Patient List</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="/evaluations-clinician" class="nav-link" style="position:relative;">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="14" height="17" rx="2" stroke="#333" stroke-width="2"/><path d="M9 4V3h6v1" stroke="#333" stroke-width="2" stroke-linecap="round"/><path d="M8.5 12.5l2.2 2.2 4.8-4.8" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span>Evaluations</span>
+                            <b th:if="${currentUser != null and @perioEvaluationService.unreadCount(currentUser) > 0}" th:text="${@perioEvaluationService.unreadCount(currentUser)}"
+                               style="position:absolute; top:2px; right:6px; min-width:18px; height:18px; padding:0 5px; box-sizing:border-box; border-radius:9px; background:#c0392b; color:white; font-size:11px; font-weight:700; line-height:18px; text-align:center;">1</b>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <h1 class="ev-title">My Evaluations</h1>
+
+            <div class="ev-cards">
+                <div class="ev-card"><b th:text="${#lists.size(evals)}">0</b><span>Evaluations received</span></div>
+                <div class="ev-card ev-new" th:classappend="${unreadCount > 0} ? 'has-items'"><b th:text="${unreadCount}">0</b><span>New (not opened yet)</span></div>
+            </div>
+
+            <section class="section">
+                <div class="section-header pl-header"><h2>Evaluation Forms</h2></div>
+                <div class="pl-toolbar">
+                    <div class="pl-search">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#8a97a8" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="#8a97a8" stroke-width="2" stroke-linecap="round"/></svg>
+                        <input type="text" id="evSearch" placeholder="Search by patient, chart number or faculty" autocomplete="off">
+                    </div>
+                    <div class="pl-fgroup" id="evSection">
+                        <span class="pl-flabel">Section</span>
+                        <button type="button" class="pl-chip on" data-section="all">All</button>
+                        <button type="button" class="pl-chip" data-section="OS">OS</button>
+                        <button type="button" class="pl-chip" data-section="Endo">Endo</button>
+                        <button type="button" class="pl-chip" data-section="Perio">Perio</button>
+                        <button type="button" class="pl-chip" data-section="Resto">Resto</button>
+                        <button type="button" class="pl-chip" data-section="Prostho">Prostho</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="patient-table">
+                        <thead>
+                            <tr>
+                                <th class="ev-form-col">Form</th>
+                                <th>Patient</th>
+                                <th>Chart No.</th>
+                                <th>Faculty</th>
+                                <th>Date Sent</th>
+                                <th>Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="evBody">
+                            <tr th:each="ev : ${evals}" th:with="pc=${ev.perioChart}" class="ev-row"
+                                th:classappend="${ev.viewedAt == null} ? 'unread'" th:attr="data-section=${ev.formType.section}">
+                                <td class="ev-form-col">
+                                    <span th:if="${ev.viewedAt == null}" class="new-tag">New</span>
+                                    <strong th:text="${ev.formType.name()}"></strong> &ndash; <span th:text="${ev.formType.displayName}"></span>
+                                    <span th:if="${ev.formType.repeatable}" th:text="${'(Visit ' + ev.visitNo + ')'}"></span>
+                                </td>
+                                <td class="ev-search" th:text="${pc.patient.surname + ', ' + pc.patient.firstName + (pc.patient.middleInitial != null ? ' ' + pc.patient.middleInitial + '.' : '')}"></td>
+                                <td class="ev-search" th:text="${#strings.replace(pc.chartNo, '-PF1', '-' + ev.formType.name())}"></td>
+                                <td class="ev-search" th:text="${pc.faculty != null ? pc.faculty.fullName : '—'}"></td>
+                                <td th:text="${ev.sentAt != null ? #temporals.format(ev.sentAt, 'MMM d, yyyy') : '—'}"></td>
+                                <td class="ev-score" th:text="${ev.totalScore != null ? ev.totalScore : '—'}"></td>
+                                <td><a th:href="@{/perio-eval-view/{id}(id=${ev.id})}" class="btn-view-chart">View</a></td>
+                            </tr>
+                            <tr id="evEmpty" style="display:none;"><td colspan="7" class="pl-empty">No evaluations match. Try a different search or section.</td></tr>
+                            <tr th:if="${#lists.isEmpty(evals)}"><td colspan="7" class="pl-empty">No evaluations yet. They appear here once your faculty sends them.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script>
+/* Header + sidebar */
+document.querySelector('.user-profile').onclick = function (e) {
+    e.stopPropagation();
+    document.querySelector('.user-dropdown').classList.toggle('show');
+};
+document.addEventListener('click', function () {
+    var d = document.querySelector('.user-dropdown');
+    if (d && d.classList.contains('show')) d.classList.remove('show');
+});
+
+/* Search + section filter */
+(function () {
+    var rows = Array.prototype.slice.call(document.querySelectorAll('#evBody tr.ev-row'));
+    if (!rows.length) return;
+    var q = '', section = 'all';
+    function render() {
+        var shown = 0;
+        rows.forEach(function (tr) {
+            var text = Array.prototype.map.call(tr.querySelectorAll('.ev-search'), function (td) { return td.textContent; }).join(' ').toLowerCase();
+            var ok = (section === 'all' || tr.dataset.section === section) && (!q || text.indexOf(q) >= 0);
+            tr.style.display = ok ? '' : 'none';
+            if (ok) shown++;
+        });
+        document.getElementById('evEmpty').style.display = shown ? 'none' : '';
+        document.querySelectorAll('#evSection .pl-chip').forEach(function (c) { c.classList.toggle('on', c.dataset.section === section); });
+    }
+    document.getElementById('evSearch').addEventListener('input', function () { q = this.value.trim().toLowerCase(); render(); });
+    document.querySelectorAll('#evSection .pl-chip').forEach(function (c) { c.addEventListener('click', function () { section = c.dataset.section; render(); }); });
+    render();
+})();
+</script>
+<script src="/js/sidebar-hover.js"></script>
+</body>
+</html>
