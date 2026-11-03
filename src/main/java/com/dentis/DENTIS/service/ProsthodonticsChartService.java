@@ -232,12 +232,14 @@ public class ProsthodonticsChartService {
 
     public ProsthodonticsChart approve(Long id) {
         ProsthodonticsChart chart = repo.findById(id).orElseThrow();
+        if (chart.getStatus() != ProsthodonticsChartStatus.SUBMITTED) return chart;   // only a submitted chart can be reviewed
         chart.setStatus(ProsthodonticsChartStatus.APPROVED);
         return repo.save(chart);
     }
 
     public ProsthodonticsChart revise(Long id, String reason) {
         ProsthodonticsChart chart = repo.findById(id).orElseThrow();
+        if (chart.getStatus() != ProsthodonticsChartStatus.SUBMITTED) return chart;   // only a submitted chart can be reviewed
         chart.setStatus(ProsthodonticsChartStatus.REVISE);
         chart.setRevisionReason(reason);
         return repo.save(chart);

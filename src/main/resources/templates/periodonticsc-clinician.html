@@ -438,8 +438,16 @@
 
                     </div><!-- end pointer-events wrapper -->
 
-                    <div class="form-actions" th:if="${!viewOnly}">
-                        <button type="submit" class="btn-submit">Save</button>
+                    <div class="form-actions">
+                        <button th:if="${!viewOnly}" type="submit" class="btn-submit">Save</button>
+                        <th:block th:if="${currentUser != null and currentUser.role.name() == 'FACULTY' and chart.formCStatus.name() == 'SUBMITTED'}">
+                            <button type="button" class="btn-revise"
+                                    th:data-action="@{/periodontics2-faculty/{id}/revise(id=${chart.id})}"
+                                    onclick="openReviseModal(this)">Revise</button>
+                            <button type="button" class="btn-approve"
+                                    th:data-action="@{/periodontics2-faculty/{id}/approve(id=${chart.id})}"
+                                    onclick="openApproveModal(this)">Approve</button>
+                        </th:block>
                     </div>
 
                 </div>
@@ -1177,5 +1185,6 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 
 <script src="/js/textarea-min-size.js"></script>
 <script src="/js/sidebar-hover.js"></script>
+<th:block th:replace="~{fragments/faculty-review :: modals}"></th:block>
 </body>
 </html>

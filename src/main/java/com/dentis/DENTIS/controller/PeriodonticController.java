@@ -112,7 +112,7 @@ public class PeriodonticController {
     @PostMapping("/periodontics-c/{id}")
     public String saveFormC(@PathVariable Long id,
                             @ModelAttribute("chart") PeriodonticChart updated) {
-        PeriodonticChart chart = periodonticChartService.saveFormC(id, updated);
+        periodonticChartService.saveFormC(id, updated);
         return "redirect:/periodontics-c/" + id + "?saved";   // Save keeps the user on the form
     }
 
@@ -139,7 +139,7 @@ public class PeriodonticController {
     @PostMapping("/periodontics-pf3/{id}")
     public String savePf3(@PathVariable Long id,
                           @ModelAttribute("chart") PeriodonticChart updated) {
-        PeriodonticChart chart = periodonticChartService.savePf3(id, updated);
+        periodonticChartService.savePf3(id, updated);
         return "redirect:/periodontics-pf3/" + id + "?saved";   // Save keeps the user on the form
     }
 
@@ -195,8 +195,15 @@ public class PeriodonticController {
     // ── Faculty: Approve / Revise PF1 (Form A/B) ────────────────────────────
 
     @PostMapping("/periodontics-faculty/{id}/approve")
-    public String approveFormAB(@PathVariable Long id) {
-        PeriodonticChart chart = periodonticChartService.approveFormAB(id);
+    public String approveFormAB(@PathVariable Long id,
+                                @RequestParam(value = "signature", required = false) String signature,
+                                Authentication authentication) {
+        PeriodonticChart chart = periodonticChartService.getById(id);
+        if (!PeriodonticChartService.isSignature(signature)) {
+            // approving PF1 needs the faculty's drawn signature: back to page 2, where Approve is
+            return "redirect:/periodontics-b/" + id + "/view?signRequired";
+        }
+        periodonticChartService.approveFormAB(id, signature, getCurrentUser(authentication));
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 
@@ -231,8 +238,14 @@ public class PeriodonticController {
     // ── Faculty: Approve / Revise PF3 (Gingivitis Reevaluation) ─────────────
 
     @PostMapping("/periodontics3-faculty/{id}/approve")
-    public String approvePf3(@PathVariable Long id) {
-        PeriodonticChart chart = periodonticChartService.approvePf3(id);
+    public String approvePf3(@PathVariable Long id,
+                             @RequestParam(value = "signature", required = false) String signature,
+                             Authentication authentication) {
+        if (!PeriodonticChartService.isSignature(signature)) {
+            // each PF3 recall is approved with the faculty's drawn signature
+            return "redirect:/periodontics-pf3/" + id + "/view?signRequired";
+        }
+        PeriodonticChart chart = periodonticChartService.approvePf3(id, signature, getCurrentUser(authentication));
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 

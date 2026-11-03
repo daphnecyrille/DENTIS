@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="/css/periodonticsa-clinician.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/form-common.css">
+    <link rel="stylesheet" href="/css/signature.css">
 </head>
 
 <body>
@@ -332,6 +333,31 @@
                     <div class="form-group">
                         <label>Treatment Plan</label>
                         <textarea th:field="*{treatmentPlan}" placeholder="Value" rows="10" style="min-height: 220px;"></textarea>
+                    </div>
+
+                    <!-- Signatures (drawn on screen): patient signs here; faculty signs when approving in the charts view -->
+                    <input type="hidden" id="patientSignatureInput" th:field="*{patientSignature}">
+                    <div class="sig-row">
+                        <div class="sig-box" style="pointer-events:auto;">
+                            <span class="sig-label">Patient Signature</span>
+                            <div id="patientSigArea">
+                                <div th:if="${chart.patientSignature != null}" class="sig-signed">
+                                    <img th:src="${chart.patientSignature}" alt="Patient signature">
+                                    <div class="sig-meta" th:text="${'✓ Signed by patient' + (chart.patientSignedAt != null ? ' · ' + #temporals.format(chart.patientSignedAt, 'MMM d, yyyy, h:mm a') : '')}"></div>
+                                </div>
+                                <div th:if="${chart.patientSignature == null and viewOnly}" class="sig-waiting"><b>Not signed</b></div>
+                            </div>
+                            <div class="sig-btns" th:if="${!viewOnly}" id="patientSigBtns"></div>
+                            
+                        </div>
+                        <div class="sig-box">
+                            <span class="sig-label">Faculty Signature</span>
+                            <div th:if="${chart.facultySignature != null}" class="sig-signed">
+                                <img th:src="${chart.facultySignature}" alt="Faculty signature">
+                                <div class="sig-meta" th:text="${'✓ Signed by ' + (chart.facultySignedBy != null ? chart.facultySignedBy : 'faculty') + (chart.facultySignedAt != null ? ' · ' + #temporals.format(chart.facultySignedAt, 'MMM d, yyyy, h:mm a') : '')}"></div>
+                            </div>
+                            <div th:if="${chart.facultySignature == null}" class="sig-waiting"><b>Waiting for faculty</b>Signed by the faculty when they approve this chart.</div>
+                        </div>
                     </div>
 
                     <!-- Occlusal Examination -->
@@ -701,5 +727,40 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 
 <script src="/js/textarea-min-size.js"></script>
 <script src="/js/sidebar-hover.js"></script>
+<script src="/js/signature-pad.js"></script>
+<script>
+/* PF1 patient signature: draw -> Done puts the drawing in the form (saved with Save/Next); Sign again redraws */
+(function () {
+    if (typeof VIEW_ONLY !== 'undefined' && VIEW_ONLY) return;
+    var area = document.getElementById('patientSigArea'), btns = document.getElementById('patientSigBtns');
+    var input = document.getElementById('patientSignatureInput');
+    if (!area || !btns || !input) return;
+    var saved = area.innerHTML;
+
+    function showSigned(html, canRedo) {
+        area.innerHTML = html;
+        btns.innerHTML = '<button type="button" class="sig-btn-sec">Sign again</button>';
+        btns.querySelector('button').onclick = showPad;
+    }
+    function showPad() {
+        var pad;
+        btns.innerHTML = '<button type="button" class="sig-btn-sec" data-act="cancel" style="margin-right:auto;' + (input.value ? '' : 'display:none;') + '">Cancel</button>' +
+                         '<button type="button" class="sig-btn-sec" data-act="clear">Clear</button>' +
+                         '<button type="button" class="sig-btn-pri" data-act="done" disabled>Done</button>';
+        var done = btns.querySelector('[data-act=done]');
+        pad = DentisSignaturePad.create(area, { hint: 'Patient signs here', onChange: function (ink) { done.disabled = !ink; } });
+        btns.querySelector('[data-act=clear]').onclick = function () { pad.clear(); };
+        btns.querySelector('[data-act=cancel]').onclick = function () { showSigned(saved); };
+        done.onclick = function () {
+            input.value = pad.toDataURL();
+            input.dispatchEvent(new Event('input', { bubbles: true }));   /* counts as an unsaved change */
+            saved = '<div class="sig-signed"><img src="' + input.value + '" alt="Patient signature">' +
+                    '<div class="sig-meta unsaved">Signed \u2014 press Save to keep it</div></div>';
+            showSigned(saved);
+        };
+    }
+    if (input.value) showSigned(saved); else showPad();
+})();
+</script>
 </body>
 </html>

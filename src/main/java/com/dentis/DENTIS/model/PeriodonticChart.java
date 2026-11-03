@@ -91,6 +91,15 @@ public class PeriodonticChart {
     @Column(columnDefinition = "TEXT") private String diagnosis;
     @Column(columnDefinition = "TEXT") private String treatmentPlan;
 
+    // ── PF1 signatures (drawn on screen; stored as PNG data URLs) ──
+    /** Patient's signature under the Treatment Plan, drawn on the clinician's device. */
+    @Column(columnDefinition = "TEXT") private String patientSignature;
+    private LocalDateTime patientSignedAt;
+    /** Faculty signature, drawn by the faculty when they approve PF1. */
+    @Column(columnDefinition = "TEXT") private String facultySignature;
+    private LocalDateTime facultySignedAt;
+    private String facultySignedBy;
+
     // ── Form B: Plaque / Bleeding Chart ──────────────────────────────────────
 
     private String plaqueScorePercent;
@@ -197,6 +206,24 @@ public class PeriodonticChart {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @Column(name = "recall2_date")
     private LocalDate recall2Date;
+
+    /** PF3: the faculty signs each recall at its own visit (drawn on screen when approving). */
+    @Column(name = "pf3_recall1_signature", columnDefinition = "TEXT") private String pf3Recall1Signature;
+    @Column(name = "pf3_recall1_signed_at") private LocalDateTime pf3Recall1SignedAt;
+    @Column(name = "pf3_recall1_signed_by") private String pf3Recall1SignedBy;
+    @Column(name = "pf3_recall2_signature", columnDefinition = "TEXT") private String pf3Recall2Signature;
+    @Column(name = "pf3_recall2_signed_at") private LocalDateTime pf3Recall2SignedAt;
+    @Column(name = "pf3_recall2_signed_by") private String pf3Recall2SignedBy;
+
+    /** The PF3 recall waiting for the faculty's signature: 1, 2, or 0 when both are signed. */
+    public int getPf3CurrentRecall() {
+        if (pf3Recall1Signature == null) return 1;
+        if (pf3Recall2Signature == null) return 2;
+        return 0;
+    }
+
+    /** Recall 1 is locked once the faculty has signed it. */
+    public boolean isPf3Recall1Locked() { return pf3Recall1Signature != null; }
 
     /** Charts created before PF3 existed have no PF3 status yet — treat them as not started. */
     public PeriodonticChartStatus getPf3Status() {

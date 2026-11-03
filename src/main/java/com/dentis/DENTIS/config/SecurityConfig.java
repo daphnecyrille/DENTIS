@@ -12,8 +12,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
-import java.io.IOException;
-
 @Configuration
 public class SecurityConfig {
 
@@ -39,7 +37,11 @@ public class SecurityConfig {
                     "/chartsview-faculty/**", "/faculty-dashboard/**", "/admitting-view-faculty/**",
                     "/operative-view-faculty/**", "/operative2-view-faculty/**",
                     "/operative-faculty/**", "/operative2-faculty/**",
-                    "/perio-eval-faculty/**"
+                    "/perio-eval-faculty/**",
+                    "/periodontics-faculty/**", "/periodontics2-faculty/**", "/periodontics3-faculty/**",
+                    "/periodontics-view-faculty/**",
+                    "/oralsurgery-faculty/**", "/endodontics-faculty/**", "/endodontics2-faculty/**",
+                    "/operative-view2-faculty/**", "/prosthodontics-faculty/**"
                 ).hasRole("FACULTY")
                 .requestMatchers(
                     "/oralsurgery-view-faculty/**", "/oralsurgery2-view-faculty/**",

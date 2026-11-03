@@ -2,13 +2,9 @@ package com.dentis.DENTIS.service;
 
 import com.dentis.DENTIS.model.*;
 import com.dentis.DENTIS.repository.PeriodonticChartRepository;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -16,12 +12,9 @@ import java.util.List;
 public class PeriodonticChartService {
 
     private final PeriodonticChartRepository repo;
-    private final PerioEvaluationService perioEvaluationService;
 
-    public PeriodonticChartService(PeriodonticChartRepository repo,
-                                   @Lazy PerioEvaluationService perioEvaluationService) {
+    public PeriodonticChartService(PeriodonticChartRepository repo) {
         this.repo = repo;
-        this.perioEvaluationService = perioEvaluationService;
     }
 
     public PeriodonticChart createForPatient(Patient patient, User clinician, User faculty) {
@@ -31,17 +24,7 @@ public class PeriodonticChartService {
         chart.setFaculty(faculty);
         chart.setChartNo(patient.getChartNo() + "-PF1");
         chart.setChiefComplaint(patient.getChiefComplaint());
-        PeriodonticChart saved = repo.save(chart);
-        return saved;
-    }
-
-    private String generateChartNo() {
-        LocalDate today = LocalDate.now();
-        LocalDateTime start = today.atStartOfDay();
-        LocalDateTime end = today.plusDays(1).atStartOfDay();
-        long count = repo.countByCreatedAtBetween(start, end);
-        String dateStr = today.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        return String.format("PF1-%s-%05d", dateStr, count + 1);
+        return repo.save(chart);
     }
 
     public PeriodonticChart getById(Long id) {
@@ -126,6 +109,17 @@ public class PeriodonticChartService {
         chart.setOccFormLingual(updated.getOccFormLingual());
         chart.setDiagnosis(updated.getDiagnosis());
         chart.setTreatmentPlan(updated.getTreatmentPlan());
+        // Patient signature: only a drawn PNG is accepted; a new drawing updates the signing time
+        String sig = updated.getPatientSignature();
+        if (sig != null && !sig.equals(chart.getPatientSignature())) {
+            if (sig.isBlank()) {
+                chart.setPatientSignature(null);
+                chart.setPatientSignedAt(null);
+            } else if (isSignature(sig)) {
+                chart.setPatientSignature(sig);
+                chart.setPatientSignedAt(java.time.LocalDateTime.now());
+            }
+        }
         if (chart.getStatus() == PeriodonticChartStatus.CREATED) {
             chart.setStatus(PeriodonticChartStatus.IN_PROGRESS);
         }
@@ -187,23 +181,48 @@ public class PeriodonticChartService {
 
     public PeriodonticChart savePf3(Long id, PeriodonticChart updated) {
         PeriodonticChart chart = repo.findById(id).orElseThrow();
-        chart.setPf3GridJson(updated.getPf3GridJson());
-        chart.setPf3PlaqueRecall1(updated.getPf3PlaqueRecall1());
-        chart.setPf3PlaqueRecall2(updated.getPf3PlaqueRecall2());
-        chart.setPf3BopRecall1(updated.getPf3BopRecall1());
-        chart.setPf3BopRecall2(updated.getPf3BopRecall2());
-        chart.setRecall1Date(updated.getRecall1Date());
-        chart.setRecall1Diagnosis(updated.getRecall1Diagnosis());
-        chart.setRecall1Findings(updated.getRecall1Findings());
-        chart.setRecall1Recommendation(updated.getRecall1Recommendation());
-        chart.setRecall2Date(updated.getRecall2Date());
-        chart.setRecall2Diagnosis(updated.getRecall2Diagnosis());
-        chart.setRecall2Findings(updated.getRecall2Findings());
-        chart.setRecall2Recommendation(updated.getRecall2Recommendation());
+        if (chart.getPf3CurrentRecall() == 0) return chart;      // both recalls signed: nothing can change
+        boolean r1Locked = chart.isPf3Recall1Locked();           // Recall 1 signed by the faculty: keep it as signed
+        chart.setPf3GridJson(r1Locked ? keepRecall1Marks(chart.getPf3GridJson(), updated.getPf3GridJson())
+                                      : updated.getPf3GridJson());
+        if (r1Locked) {                                          // Recall 2 opens once Recall 1 is signed
+            chart.setPf3PlaqueRecall2(updated.getPf3PlaqueRecall2());
+            chart.setPf3BopRecall2(updated.getPf3BopRecall2());
+            chart.setRecall2Date(updated.getRecall2Date());
+            chart.setRecall2Diagnosis(updated.getRecall2Diagnosis());
+            chart.setRecall2Findings(updated.getRecall2Findings());
+            chart.setRecall2Recommendation(updated.getRecall2Recommendation());
+        }
+        if (!r1Locked) {
+            chart.setPf3PlaqueRecall1(updated.getPf3PlaqueRecall1());
+            chart.setPf3BopRecall1(updated.getPf3BopRecall1());
+            chart.setRecall1Date(updated.getRecall1Date());
+            chart.setRecall1Diagnosis(updated.getRecall1Diagnosis());
+            chart.setRecall1Findings(updated.getRecall1Findings());
+            chart.setRecall1Recommendation(updated.getRecall1Recommendation());
+        }
         if (chart.getPf3Status() == PeriodonticChartStatus.CREATED) {
             chart.setPf3Status(PeriodonticChartStatus.IN_PROGRESS);
         }
         return repo.save(chart);
+    }
+
+    private static final com.fasterxml.jackson.databind.ObjectMapper JSON = new com.fasterxml.jackson.databind.ObjectMapper();
+
+    /** PF3 chart marks are keyed "section.r1.bop" etc.; once Recall 1 is signed its rows keep their saved values. */
+    @SuppressWarnings("unchecked")
+    private static String keepRecall1Marks(String savedJson, String newJson) {
+        try {
+            java.util.Map<String, Object> saved = savedJson == null || savedJson.isBlank()
+                    ? new java.util.LinkedHashMap<>() : JSON.readValue(savedJson, java.util.LinkedHashMap.class);
+            java.util.Map<String, Object> incoming = newJson == null || newJson.isBlank()
+                    ? new java.util.LinkedHashMap<>() : JSON.readValue(newJson, java.util.LinkedHashMap.class);
+            incoming.keySet().removeIf(k -> k.contains(".r1."));
+            saved.forEach((k, v) -> { if (k.contains(".r1.")) incoming.put(k, v); });
+            return JSON.writeValueAsString(incoming);
+        } catch (Exception e) {
+            return savedJson;   // unreadable data: keep what was saved
+        }
     }
 
     // ── Form A/B (PF1) status transitions ────────────────────────────────────
@@ -214,17 +233,33 @@ public class PeriodonticChartService {
         return repo.save(chart);
     }
 
-    public PeriodonticChart approveFormAB(Long id) {
+    /** Approves PF1; the faculty must draw a signature, which goes in PF1's Faculty Signature box. */
+    public PeriodonticChart approveFormAB(Long id, String signature, User faculty) {
         PeriodonticChart chart = repo.findById(id).orElseThrow();
+        if (chart.getStatus() != PeriodonticChartStatus.SUBMITTED) return chart;   // only a submitted chart can be reviewed
+        if (!isSignature(signature)) throw new IllegalArgumentException("A drawn signature is required to approve.");
         chart.setStatus(PeriodonticChartStatus.APPROVED);
+        chart.setFacultySignature(signature);
+        chart.setFacultySignedAt(java.time.LocalDateTime.now());
+        chart.setFacultySignedBy(faculty != null ? faculty.getFullName() : null);
         return repo.save(chart);
     }
 
     public PeriodonticChart reviseFormAB(Long id, String reason) {
         PeriodonticChart chart = repo.findById(id).orElseThrow();
+        if (chart.getStatus() != PeriodonticChartStatus.SUBMITTED) return chart;   // only a submitted chart can be reviewed
         chart.setStatus(PeriodonticChartStatus.REVISE);
         chart.setRevisionReason(reason);
+        chart.setFacultySignature(null);       // not approved, so no faculty signature
+        chart.setFacultySignedAt(null);
+        chart.setFacultySignedBy(null);
         return repo.save(chart);
+    }
+
+    /** A signature must be a PNG drawn on the page (data URL), under ~400 KB. */
+    public static boolean isSignature(String s) {
+        return s != null && s.startsWith("data:image/png;base64,") && s.length() < 400_000
+                && s.substring(22).matches("[A-Za-z0-9+/=]+");
     }
 
     // ── Form C (PF2) status transitions ──────────────────────────────────────
@@ -237,12 +272,14 @@ public class PeriodonticChartService {
 
     public PeriodonticChart approveFormC(Long id) {
         PeriodonticChart chart = repo.findById(id).orElseThrow();
+        if (chart.getFormCStatus() != PeriodonticChartStatus.SUBMITTED) return chart;   // only a submitted chart can be reviewed
         chart.setFormCStatus(PeriodonticChartStatus.APPROVED);
         return repo.save(chart);
     }
 
     public PeriodonticChart reviseFormC(Long id, String reason) {
         PeriodonticChart chart = repo.findById(id).orElseThrow();
+        if (chart.getFormCStatus() != PeriodonticChartStatus.SUBMITTED) return chart;   // only a submitted chart can be reviewed
         chart.setFormCStatus(PeriodonticChartStatus.REVISE);
         chart.setFormCRevisionReason(reason);
         return repo.save(chart);
@@ -256,14 +293,33 @@ public class PeriodonticChartService {
         return repo.save(chart);
     }
 
-    public PeriodonticChart approvePf3(Long id) {
+    /**
+     * Approves the PF3 recall that is waiting (Recall 1, then Recall 2) with the faculty's drawn signature.
+     * After Recall 1 the chart goes back to In Progress for the clinician's Recall 2 visit; after Recall 2 it is Approved.
+     */
+    public PeriodonticChart approvePf3(Long id, String signature, User faculty) {
         PeriodonticChart chart = repo.findById(id).orElseThrow();
-        chart.setPf3Status(PeriodonticChartStatus.APPROVED);
+        if (chart.getPf3Status() != PeriodonticChartStatus.SUBMITTED) return chart;   // only a submitted chart can be reviewed
+        if (!isSignature(signature)) throw new IllegalArgumentException("A drawn signature is required to approve.");
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+        String by = faculty != null ? faculty.getFullName() : null;
+        if (chart.getPf3CurrentRecall() == 1) {
+            chart.setPf3Recall1Signature(signature);
+            chart.setPf3Recall1SignedAt(now);
+            chart.setPf3Recall1SignedBy(by);
+            chart.setPf3Status(PeriodonticChartStatus.IN_PROGRESS);
+        } else if (chart.getPf3CurrentRecall() == 2) {
+            chart.setPf3Recall2Signature(signature);
+            chart.setPf3Recall2SignedAt(now);
+            chart.setPf3Recall2SignedBy(by);
+            chart.setPf3Status(PeriodonticChartStatus.APPROVED);
+        }
         return repo.save(chart);
     }
 
     public PeriodonticChart revisePf3(Long id, String reason) {
         PeriodonticChart chart = repo.findById(id).orElseThrow();
+        if (chart.getPf3Status() != PeriodonticChartStatus.SUBMITTED) return chart;   // only a submitted chart can be reviewed
         chart.setPf3Status(PeriodonticChartStatus.REVISE);
         chart.setPf3RevisionReason(reason);
         return repo.save(chart);

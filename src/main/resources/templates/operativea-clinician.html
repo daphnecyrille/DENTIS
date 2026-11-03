@@ -397,6 +397,16 @@
                 <div class="form-actions" th:unless="${viewOnly}">
                     <button type="submit" class="btn-save">Save</button>
                 </div>
+                <div class="form-actions" th:if="${viewOnly and currentUser != null and currentUser.role.name() == 'FACULTY' and chart.form2Status.name() == 'SUBMITTED'}">
+                    <th:block th:if="${currentUser != null and currentUser.role.name() == 'FACULTY' and chart.form2Status.name() == 'SUBMITTED'}">
+                        <button type="button" class="btn-revise"
+                                th:data-action="@{/operative2-faculty/{id}/revise(id=${chart.id})}"
+                                onclick="openReviseModal(this)">Revise</button>
+                        <button type="button" class="btn-approve"
+                                th:data-action="@{/operative2-faculty/{id}/approve(id=${chart.id})}"
+                                onclick="openApproveModal(this)">Approve</button>
+                    </th:block>
+                </div>
 
                 </div>
             </div>
@@ -526,5 +536,6 @@ updateRiskMatrix();
 })();
 </script>
 <script src="/js/sidebar-hover.js"></script>
+<th:block th:replace="~{fragments/faculty-review :: modals}"></th:block>
 </body>
 </html>

@@ -166,7 +166,6 @@
                                 <th>Chart Type</th>
                                 <th>Chart Status</th>
                                 <th>Date Created</th>
-                                <th>View</th>
                                 <th>Assigned Clinician</th>
                                 <th>Action</th>
                             </tr>
@@ -177,7 +176,6 @@
                                 <td>Admitting Section Chart</td>
                                 <td class="status submitted">Submitted</td>
                                 <td th:text="${patient.registrationDate}">—</td>
-                                <td><a th:href="@{/admitting-view-faculty/{id}(id=${patient.id})}" class="btn-action btn-view">View</a></td>
                                 <td>
                                     <span th:if="${patient.assignedClinician != null}"
                                           class="clinician-link"
@@ -191,7 +189,9 @@
                                           onclick="showClinicianModal(this)"></span>
                                     <span th:if="${patient.assignedClinician == null}">—</span>
                                 </td>
-                                <td>—</td>
+                                <td>
+                                    <a th:href="@{/admitting-view-faculty/{id}(id=${patient.id})}" class="btn-action btn-view">View</a>
+                                </td>
                             </tr>
                             <tr th:each="osc : ${osCharts}">
                                 <td th:text="${osc.chartNo}"></td>
@@ -199,12 +199,6 @@
                                 <td th:class="'status ' + ${osc.status.cssClass}"
                                     th:text="${osc.status.displayName}"></td>
                                 <td th:text="${osc.createdAt.toLocalDate()}"></td>
-                                <td>
-                                    <a th:if="${osc.chartType != null and osc.chartType.name() == 'OSF2'}"
-                                       th:href="@{/oralsurgery2-view-faculty/{id}(id=${osc.id})}" class="btn-action btn-view">View</a>
-                                    <a th:if="${osc.chartType == null or osc.chartType.name() == 'OSF1'}"
-                                       th:href="@{/oralsurgery-view-faculty/{id}(id=${osc.id})}" class="btn-action btn-view">View</a>
-                                </td>
                                 <td>
                                     <span th:if="${osc.clinician != null}"
                                           class="clinician-link"
@@ -219,15 +213,10 @@
                                     <span th:if="${osc.clinician == null}">—</span>
                                 </td>
                                 <td>
-                                    <span th:if="${osc.status.name() == 'SUBMITTED'}" style="display:flex; gap:6px;">
-                                        <form th:action="@{/oralsurgery-faculty/{id}/approve(id=${osc.id})}" method="post" style="display:inline;">
-                                            <button type="submit" class="btn-action btn-accept">Approve</button>
-                                        </form>
-                                        <button type="button" class="btn-action btn-deny"
-                                                th:data-action="@{/oralsurgery-faculty/{id}/revise(id=${osc.id})}"
-                                                onclick="openReviseModal(this)">Revise</button>
-                                    </span>
-                                    <span th:if="${osc.status.name() != 'SUBMITTED'}">—</span>
+                                    <a th:if="${(osc.chartType != null and osc.chartType.name() == 'OSF2') and osc.status.name() == 'SUBMITTED'}" th:href="@{/oralsurgery2-view-faculty/{id}(id=${osc.id})}" class="btn-action btn-accept">Review</a>
+                                    <a th:if="${(osc.chartType != null and osc.chartType.name() == 'OSF2') and osc.status.name() != 'SUBMITTED'}" th:href="@{/oralsurgery2-view-faculty/{id}(id=${osc.id})}" class="btn-action btn-view">View</a>
+                                    <a th:if="${(osc.chartType == null or osc.chartType.name() == 'OSF1') and osc.status.name() == 'SUBMITTED'}" th:href="@{/oralsurgery-view-faculty/{id}(id=${osc.id})}" class="btn-action btn-accept">Review</a>
+                                    <a th:if="${(osc.chartType == null or osc.chartType.name() == 'OSF1') and osc.status.name() != 'SUBMITTED'}" th:href="@{/oralsurgery-view-faculty/{id}(id=${osc.id})}" class="btn-action btn-view">View</a>
                                 </td>
                             </tr>
                             <!-- Endo Row 1: Clinician Patient Workup (Form 1) -->
@@ -238,9 +227,6 @@
                                     th:text="${ec.status.displayName}"></td>
                                 <td th:text="${ec.createdAt.toLocalDate()}"></td>
                                 <td>
-                                    <a th:href="@{/endodontics-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-view">View</a>
-                                </td>
-                                <td>
                                     <span th:if="${ec.clinician != null}"
                                           class="clinician-link"
                                           th:data-name="${ec.clinician.fullName}"
@@ -254,15 +240,8 @@
                                     <span th:if="${ec.clinician == null}">—</span>
                                 </td>
                                 <td>
-                                    <span th:if="${ec.status.name() == 'SUBMITTED'}" style="display:flex; gap:6px;">
-                                        <form th:action="@{/endodontics-faculty/{id}/approve(id=${ec.id})}" method="post" style="display:inline;">
-                                            <button type="submit" class="btn-action btn-accept">Approve</button>
-                                        </form>
-                                        <button type="button" class="btn-action btn-deny"
-                                                th:data-action="@{/endodontics-faculty/{id}/revise(id=${ec.id})}"
-                                                onclick="openReviseModal(this)">Revise</button>
-                                    </span>
-                                    <span th:if="${ec.status.name() != 'SUBMITTED'}">—</span>
+                                    <a th:if="${ec.status.name() == 'SUBMITTED'}" th:href="@{/endodontics-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-accept">Review</a>
+                                    <a th:if="${ec.status.name() != 'SUBMITTED'}" th:href="@{/endodontics-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-view">View</a>
                                 </td>
                             </tr>
                             <!-- Endo Row 2: Endodontic Evaluation & Treatment Planning (Form 2) -->
@@ -273,9 +252,6 @@
                                     th:text="${ec.form2Status.displayName}"></td>
                                 <td th:text="${ec.createdAt.toLocalDate()}"></td>
                                 <td>
-                                    <a th:href="@{/endodontics2-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-view">View</a>
-                                </td>
-                                <td>
                                     <span th:if="${ec.clinician != null}"
                                           class="clinician-link"
                                           th:data-name="${ec.clinician.fullName}"
@@ -289,15 +265,8 @@
                                     <span th:if="${ec.clinician == null}">—</span>
                                 </td>
                                 <td>
-                                    <span th:if="${ec.form2Status.name() == 'SUBMITTED'}" style="display:flex; gap:6px;">
-                                        <form th:action="@{/endodontics2-faculty/{id}/approve(id=${ec.id})}" method="post" style="display:inline;">
-                                            <button type="submit" class="btn-action btn-accept">Approve</button>
-                                        </form>
-                                        <button type="button" class="btn-action btn-deny"
-                                                th:data-action="@{/endodontics2-faculty/{id}/revise(id=${ec.id})}"
-                                                onclick="openReviseModal(this)">Revise</button>
-                                    </span>
-                                    <span th:if="${ec.form2Status.name() != 'SUBMITTED'}">—</span>
+                                    <a th:if="${ec.form2Status.name() == 'SUBMITTED'}" th:href="@{/endodontics2-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-accept">Review</a>
+                                    <a th:if="${ec.form2Status.name() != 'SUBMITTED'}" th:href="@{/endodontics2-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-view">View</a>
                                 </td>
                             </tr>
                             <!-- Periodontics PF1 (Forms A+B) -->
@@ -308,9 +277,6 @@
                                     th:text="${pc.status.displayName}"></td>
                                 <td th:text="${pc.createdAt.toLocalDate()}"></td>
                                 <td>
-                                    <a th:href="@{/periodontics-a/{id}/view(id=${pc.id})}" class="btn-action btn-view">View</a>
-                                </td>
-                                <td>
                                     <span th:if="${pc.clinician != null}"
                                           class="clinician-link"
                                           th:data-name="${pc.clinician.fullName}"
@@ -324,15 +290,8 @@
                                     <span th:if="${pc.clinician == null}">—</span>
                                 </td>
                                 <td>
-                                    <span th:if="${pc.status.name() == 'SUBMITTED'}" style="display:flex; gap:6px;">
-                                        <form th:action="@{/periodontics-faculty/{id}/approve(id=${pc.id})}" method="post" style="display:inline;">
-                                            <button type="submit" class="btn-action btn-accept">Approve</button>
-                                        </form>
-                                        <button type="button" class="btn-action btn-deny"
-                                                th:data-action="@{/periodontics-faculty/{id}/revise(id=${pc.id})}"
-                                                onclick="openReviseModal(this)">Revise</button>
-                                    </span>
-                                    <span th:if="${pc.status.name() != 'SUBMITTED'}">—</span>
+                                    <a th:if="${pc.status.name() == 'SUBMITTED'}" th:href="@{/periodontics-a/{id}/view(id=${pc.id})}" class="btn-action btn-accept">Review</a>
+                                    <a th:if="${pc.status.name() != 'SUBMITTED'}" th:href="@{/periodontics-a/{id}/view(id=${pc.id})}" class="btn-action btn-view">View</a>
                                 </td>
                             </tr>
                             <!-- Periodontics PF2 (Form C) -->
@@ -343,9 +302,6 @@
                                     th:text="${pc.formCStatus.displayName}"></td>
                                 <td th:text="${pc.createdAt.toLocalDate()}"></td>
                                 <td>
-                                    <a th:href="@{/periodontics-view-faculty/{id}(id=${pc.id})}" class="btn-action btn-view">View</a>
-                                </td>
-                                <td>
                                     <span th:if="${pc.clinician != null}"
                                           class="clinician-link"
                                           th:data-name="${pc.clinician.fullName}"
@@ -359,15 +315,8 @@
                                     <span th:if="${pc.clinician == null}">—</span>
                                 </td>
                                 <td>
-                                    <span th:if="${pc.formCStatus.name() == 'SUBMITTED'}" style="display:flex; gap:6px;">
-                                        <form th:action="@{/periodontics2-faculty/{id}/approve(id=${pc.id})}" method="post" style="display:inline;">
-                                            <button type="submit" class="btn-action btn-accept">Approve</button>
-                                        </form>
-                                        <button type="button" class="btn-action btn-deny"
-                                                th:data-action="@{/periodontics2-faculty/{id}/revise(id=${pc.id})}"
-                                                onclick="openReviseModal(this)">Revise</button>
-                                    </span>
-                                    <span th:if="${pc.formCStatus.name() != 'SUBMITTED'}">—</span>
+                                    <a th:if="${pc.formCStatus.name() == 'SUBMITTED'}" th:href="@{/periodontics-view-faculty/{id}(id=${pc.id})}" class="btn-action btn-accept">Review</a>
+                                    <a th:if="${pc.formCStatus.name() != 'SUBMITTED'}" th:href="@{/periodontics-view-faculty/{id}(id=${pc.id})}" class="btn-action btn-view">View</a>
                                 </td>
                             </tr>
                             <tr th:each="pc : ${perioCharts}">
@@ -377,9 +326,6 @@
                                     th:text="${pc.pf3Status.displayName}"></td>
                                 <td th:text="${pc.createdAt.toLocalDate()}"></td>
                                 <td>
-                                    <a th:href="@{/periodontics-pf3/{id}/view(id=${pc.id})}" class="btn-action btn-view">View</a>
-                                </td>
-                                <td>
                                     <span th:if="${pc.clinician != null}"
                                           class="clinician-link"
                                           th:data-name="${pc.clinician.fullName}"
@@ -393,15 +339,8 @@
                                     <span th:if="${pc.clinician == null}">—</span>
                                 </td>
                                 <td>
-                                    <span th:if="${pc.pf3Status.name() == 'SUBMITTED'}" style="display:flex; gap:6px;">
-                                        <form th:action="@{/periodontics3-faculty/{id}/approve(id=${pc.id})}" method="post" style="display:inline;">
-                                            <button type="submit" class="btn-action btn-accept">Approve</button>
-                                        </form>
-                                        <button type="button" class="btn-action btn-deny"
-                                                th:data-action="@{/periodontics3-faculty/{id}/revise(id=${pc.id})}"
-                                                onclick="openReviseModal(this)">Revise</button>
-                                    </span>
-                                    <span th:if="${pc.pf3Status.name() != 'SUBMITTED'}">—</span>
+                                    <a th:if="${pc.pf3Status.name() == 'SUBMITTED'}" th:href="@{/periodontics-pf3/{id}/view(id=${pc.id})}" class="btn-action btn-accept">Review</a>
+                                    <a th:if="${pc.pf3Status.name() != 'SUBMITTED'}" th:href="@{/periodontics-pf3/{id}/view(id=${pc.id})}" class="btn-action btn-view">View</a>
                                 </td>
                             </tr>
                             <!-- RESTO10 (operativeb/c - Assessment Form) -->
@@ -412,9 +351,6 @@
                                     th:text="${oc.status.displayName}"></td>
                                 <td th:text="${oc.createdAt.toLocalDate()}"></td>
                                 <td>
-                                    <a th:href="@{/operative-view-faculty/{id}(id=${oc.id})}" class="btn-action btn-view">View</a>
-                                </td>
-                                <td>
                                     <span th:if="${oc.clinician != null}"
                                           class="clinician-link"
                                           th:data-name="${oc.clinician.fullName}"
@@ -428,15 +364,8 @@
                                     <span th:if="${oc.clinician == null}">—</span>
                                 </td>
                                 <td>
-                                    <span th:if="${oc.status.name() == 'SUBMITTED'}" style="display:flex; gap:6px;">
-                                        <form th:action="@{/operative-faculty/{id}/approve(id=${oc.id})}" method="post" style="display:inline;">
-                                            <button type="submit" class="btn-action btn-accept">Approve</button>
-                                        </form>
-                                        <button type="button" class="btn-action btn-deny"
-                                                th:data-action="@{/operative-faculty/{id}/revise(id=${oc.id})}"
-                                                onclick="openReviseModal(this)">Revise</button>
-                                    </span>
-                                    <span th:if="${oc.status.name() != 'SUBMITTED'}">—</span>
+                                    <a th:if="${oc.status.name() == 'SUBMITTED'}" th:href="@{/operative-view-faculty/{id}(id=${oc.id})}" class="btn-action btn-accept">Review</a>
+                                    <a th:if="${oc.status.name() != 'SUBMITTED'}" th:href="@{/operative-view-faculty/{id}(id=${oc.id})}" class="btn-action btn-view">View</a>
                                 </td>
                             </tr>
                             <!-- RESTO6 (operativea - Caries Risk Assessment) -->
@@ -447,9 +376,6 @@
                                     th:text="${oc.form2Status.displayName}"></td>
                                 <td th:text="${oc.createdAt.toLocalDate()}"></td>
                                 <td>
-                                    <a th:href="@{/operative2-view-faculty/{id}(id=${oc.id})}" class="btn-action btn-view">View</a>
-                                </td>
-                                <td>
                                     <span th:if="${oc.clinician != null}"
                                           class="clinician-link"
                                           th:data-name="${oc.clinician.fullName}"
@@ -463,15 +389,8 @@
                                     <span th:if="${oc.clinician == null}">—</span>
                                 </td>
                                 <td>
-                                    <span th:if="${oc.form2Status.name() == 'SUBMITTED'}" style="display:flex; gap:6px;">
-                                        <form th:action="@{/operative2-faculty/{id}/approve(id=${oc.id})}" method="post" style="display:inline;">
-                                            <button type="submit" class="btn-action btn-accept">Approve</button>
-                                        </form>
-                                        <button type="button" class="btn-action btn-deny"
-                                                th:data-action="@{/operative2-faculty/{id}/revise(id=${oc.id})}"
-                                                onclick="openReviseModal(this)">Revise</button>
-                                    </span>
-                                    <span th:if="${oc.form2Status.name() != 'SUBMITTED'}">—</span>
+                                    <a th:if="${oc.form2Status.name() == 'SUBMITTED'}" th:href="@{/operative2-view-faculty/{id}(id=${oc.id})}" class="btn-action btn-accept">Review</a>
+                                    <a th:if="${oc.form2Status.name() != 'SUBMITTED'}" th:href="@{/operative2-view-faculty/{id}(id=${oc.id})}" class="btn-action btn-view">View</a>
                                 </td>
                             </tr>
                             <!-- Prosthodontics -->
@@ -481,9 +400,6 @@
                                 <td th:class="'status ' + ${pc.status.cssClass}"
                                     th:text="${pc.status.displayName}"></td>
                                 <td th:text="${pc.createdAt.toLocalDate()}"></td>
-                                <td>
-                                    <a th:href="@{/prosthodontics-faculty/{id}(id=${pc.id})}" class="btn-action btn-view">View</a>
-                                </td>
                                 <td>
                                     <span th:if="${pc.clinician != null}"
                                           class="clinician-link"
@@ -498,15 +414,8 @@
                                     <span th:if="${pc.clinician == null}">—</span>
                                 </td>
                                 <td>
-                                    <span th:if="${pc.status.name() == 'SUBMITTED'}" style="display:flex; gap:6px;">
-                                        <form th:action="@{/prosthodontics-faculty/{id}/approve(id=${pc.id})}" method="post" style="display:inline;">
-                                            <button type="submit" class="btn-action btn-accept">Approve</button>
-                                        </form>
-                                        <button type="button" class="btn-action btn-deny"
-                                                th:data-action="@{/prosthodontics-faculty/{id}/revise(id=${pc.id})}"
-                                                onclick="openReviseModal(this)">Revise</button>
-                                    </span>
-                                    <span th:if="${pc.status.name() != 'SUBMITTED'}">—</span>
+                                    <a th:if="${pc.status.name() == 'SUBMITTED'}" th:href="@{/prosthodontics-faculty/{id}(id=${pc.id})}" class="btn-action btn-accept">Review</a>
+                                    <a th:if="${pc.status.name() != 'SUBMITTED'}" th:href="@{/prosthodontics-faculty/{id}(id=${pc.id})}" class="btn-action btn-view">View</a>
                                 </td>
                             </tr>
                         </tbody>
@@ -620,25 +529,6 @@
     </div>
 </div>
 
-<!-- Revision Reason Modal -->
-<div id="reviseModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:2000; align-items:center; justify-content:center;">
-    <div style="background:white; border-radius:10px; padding:28px 32px; width:420px; max-width:90%; box-shadow:0 8px 32px rgba(0,0,0,0.2);">
-        <h3 style="margin:0 0 6px 0; font-size:17px; color:#061F40;">Request Revision</h3>
-        <p style="margin:0 0 16px 0; font-size:13px; color:#666;">Please add a note for the clinician.</p>
-        <form id="reviseForm" method="post">
-            <textarea id="revisionReasonInput" name="revisionReason" rows="4"
-                placeholder="Enter note..."
-                style="width:100%; padding:9px 11px; border:1px solid #ccc; border-radius:6px; font-family:'Poppins',sans-serif; font-size:13px; resize:vertical; outline:none; box-sizing:border-box;"></textarea>
-            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
-                <button type="button" onclick="closeReviseModal()"
-                    style="background:transparent; color:#555; padding:9px 20px; border:1px solid #ccc; border-radius:6px; font-size:14px; font-family:'Poppins',sans-serif; cursor:pointer;">Cancel</button>
-                <button type="submit" id="reviseSubmitBtn"
-                    style="background:#8B0000; color:white; padding:9px 22px; border:none; border-radius:6px; font-size:14px; font-family:'Poppins',sans-serif; cursor:pointer;">Confirm Revision</button>
-            </div>
-        </form>
-    </div>
-</div>
-
 <script th:inline="javascript">
 const clinicianPatientCounts = /*[[${clinicianPatientCounts}]]*/ {};
 
@@ -677,30 +567,6 @@ function closeDeleteEvalModal() {
 }
 document.getElementById('deleteEvalModal').addEventListener('click', function(e) {
     if (e.target === this) closeDeleteEvalModal();
-});
-
-function openReviseModal(btn) {
-    document.getElementById('reviseForm').action = btn.getAttribute('data-action');
-    document.getElementById('revisionReasonInput').value = '';
-    const modal = document.getElementById('reviseModal');
-    modal.style.display = 'flex';
-}
-function closeReviseModal() {
-    document.getElementById('reviseModal').style.display = 'none';
-}
-document.getElementById('reviseModal').addEventListener('click', function(e) {
-    if (e.target === this) closeReviseModal();
-});
-document.getElementById('reviseSubmitBtn').addEventListener('click', function(e) {
-    const reason = document.getElementById('revisionReasonInput').value.trim();
-    if (!reason) {
-        e.preventDefault();
-        document.getElementById('revisionReasonInput').style.borderColor = '#c00';
-        document.getElementById('revisionReasonInput').focus();
-    }
-});
-document.getElementById('revisionReasonInput').addEventListener('input', function() {
-    this.style.borderColor = '#ccc';
 });
 
 document.querySelector('.menu-icon').onclick = function() {

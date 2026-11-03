@@ -89,3 +89,4 @@
 .saved-toast-close:hover { opacity: 1; }
 @keyframes toastIn  { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes toastOut { to { transform: translateX(120%); opacity: 0; visibility: hidden; } }
+

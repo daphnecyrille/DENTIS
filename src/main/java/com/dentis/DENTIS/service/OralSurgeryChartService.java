@@ -129,12 +129,14 @@ public class OralSurgeryChartService {
 
     public OralSurgeryChart approve(Long id) {
         OralSurgeryChart chart = repo.findById(id).orElseThrow();
+        if (chart.getStatus() != OralSurgeryChartStatus.SUBMITTED) return chart;   // only a submitted chart can be reviewed
         chart.setStatus(OralSurgeryChartStatus.APPROVED);
         return repo.save(chart);
     }
 
     public OralSurgeryChart revise(Long id, String reason) {
         OralSurgeryChart chart = repo.findById(id).orElseThrow();
+        if (chart.getStatus() != OralSurgeryChartStatus.SUBMITTED) return chart;   // only a submitted chart can be reviewed
         chart.setStatus(OralSurgeryChartStatus.REVISE);
         chart.setRevisionReason(reason);
         return repo.save(chart);

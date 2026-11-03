@@ -290,6 +290,14 @@
                 </div>
                 <div class="form-actions" th:if="${viewOnly}">
                     <a th:href="@{/operative-b/{id}/view(id=${chart.id})}" class="btn-back">Back</a>
+                    <th:block th:if="${currentUser != null and currentUser.role.name() == 'FACULTY' and chart.status.name() == 'SUBMITTED'}">
+                        <button type="button" class="btn-revise"
+                                th:data-action="@{/operative-faculty/{id}/revise(id=${chart.id})}"
+                                onclick="openReviseModal(this)">Revise</button>
+                        <button type="button" class="btn-approve"
+                                th:data-action="@{/operative-faculty/{id}/approve(id=${chart.id})}"
+                                onclick="openApproveModal(this)">Approve</button>
+                    </th:block>
                 </div>
 
                 </div>
@@ -349,5 +357,6 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 })();
 </script>
 <script src="/js/sidebar-hover.js"></script>
+<th:block th:replace="~{fragments/faculty-review :: modals}"></th:block>
 </body>
 </html>

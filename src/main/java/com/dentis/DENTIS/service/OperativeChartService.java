@@ -223,12 +223,14 @@ public class OperativeChartService {
 
     public OperativeChart approveForm1(Long id) {
         OperativeChart c = repo.findById(id).orElseThrow();
+        if (c.getStatus() != OperativeChartStatus.SUBMITTED) return c;   // only a submitted chart can be reviewed
         c.setStatus(OperativeChartStatus.APPROVED);
         return repo.save(c);
     }
 
     public OperativeChart reviseForm1(Long id, String reason) {
         OperativeChart c = repo.findById(id).orElseThrow();
+        if (c.getStatus() != OperativeChartStatus.SUBMITTED) return c;   // only a submitted chart can be reviewed
         c.setStatus(OperativeChartStatus.REVISE);
         c.setRevisionReason(reason);
         return repo.save(c);
@@ -244,12 +246,14 @@ public class OperativeChartService {
 
     public OperativeChart approveForm2(Long id) {
         OperativeChart c = repo.findById(id).orElseThrow();
+        if (c.getForm2Status() != OperativeChartStatus.SUBMITTED) return c;   // only a submitted chart can be reviewed
         c.setForm2Status(OperativeChartStatus.APPROVED);
         return repo.save(c);
     }
 
     public OperativeChart reviseForm2(Long id, String reason) {
         OperativeChart c = repo.findById(id).orElseThrow();
+        if (c.getForm2Status() != OperativeChartStatus.SUBMITTED) return c;   // only a submitted chart can be reviewed
         c.setForm2Status(OperativeChartStatus.REVISE);
         c.setForm2RevisionReason(reason);
         return repo.save(c);

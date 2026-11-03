@@ -249,3 +249,10 @@
 /* Picker "Clear": same look as the Clear in PF1 and PF2 */
 .sym-clear { background: #fff0f0; border-color: #f5c6c6; color: #c0392b; font-size: 12px; }
 .sym-clear:hover { background: #c0392b; color: white; border-color: #c0392b; }
+
+/* ─── Faculty signature per recall; Recall 1 locks once signed ─── */
+.recall-sig { margin-top: 14px; }
+.recall-locked input, .recall-locked textarea,
+.pf3-index-line input[readonly] { background: #f3f5f8; color: #555; cursor: default; }
+.pf3-mark-row.pf3-locked .pf3-site { background: #f3f5f8; cursor: default; }
+.recall-lock-note { margin: -4px 0 10px; font-size: 12px; color: #8a97a8; font-style: italic; }

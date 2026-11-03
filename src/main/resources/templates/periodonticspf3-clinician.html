@@ -125,7 +125,7 @@
                 <div class="form-banner">Gingivitis Reevaluation</div>
 
                 <form th:action="@{/periodontics-pf3/{id}(id=${chart.id})}" method="post" th:object="${chart}" id="formPf3">
-                <script th:inline="javascript">var VIEW_ONLY = /*[[${viewOnly}]]*/ false;</script>
+                <script th:inline="javascript">var VIEW_ONLY = /*[[${viewOnly}]]*/ false; var R1_LOCKED = /*[[${chart.pf3Recall1Locked}]]*/ false; var R2_LOCKED = !R1_LOCKED;</script>
 
                 <div class="form-body">
                 <div class="form-sections" th:style="${viewOnly} ? 'pointer-events:none;' : ''">
@@ -181,13 +181,13 @@
                     <div class="pf3-index-row">
                         <div class="pf3-index-box">
                             <h3 class="pf3-box-title"><em>Plaque Index (O'Leary et al., 1972)</em></h3>
-                            <div class="pf3-index-line"><label>Recall 1</label><input type="text" th:field="*{pf3PlaqueRecall1}" placeholder="%"></div>
-                            <div class="pf3-index-line"><label>Recall 2</label><input type="text" th:field="*{pf3PlaqueRecall2}" placeholder="%"></div>
+                            <div class="pf3-index-line"><label>Recall 1</label><input type="text" th:field="*{pf3PlaqueRecall1}" th:readonly="${chart.pf3Recall1Locked}" placeholder="%"></div>
+                            <div class="pf3-index-line"><label>Recall 2</label><input type="text" th:field="*{pf3PlaqueRecall2}" th:readonly="${!chart.pf3Recall1Locked}" placeholder="%"></div>
                         </div>
                         <div class="pf3-index-box">
                             <h3 class="pf3-box-title"><em>BOP Percentage</em></h3>
-                            <div class="pf3-index-line"><label>Recall 1</label><input type="text" th:field="*{pf3BopRecall1}" placeholder="%"></div>
-                            <div class="pf3-index-line"><label>Recall 2</label><input type="text" th:field="*{pf3BopRecall2}" placeholder="%"></div>
+                            <div class="pf3-index-line"><label>Recall 1</label><input type="text" th:field="*{pf3BopRecall1}" th:readonly="${chart.pf3Recall1Locked}" placeholder="%"></div>
+                            <div class="pf3-index-line"><label>Recall 2</label><input type="text" th:field="*{pf3BopRecall2}" th:readonly="${!chart.pf3Recall1Locked}" placeholder="%"></div>
                         </div>
                     </div>
 
@@ -207,22 +207,43 @@
                         </div>
                     </div>
 
-                    <!-- Recall 1 -->
-                    <div class="recall-section">
+                    <!-- Recall 1 (locked once the faculty signs it) -->
+                    <div class="recall-section" th:classappend="${chart.pf3Recall1Locked} ? 'recall-locked'">
                         <h3 class="recall-title"><em>Recall 1</em></h3>
-                        <div class="form-group recall-date"><label>Date</label><input type="date" th:field="*{recall1Date}"></div>
-                        <div class="form-group"><label>Diagnosis</label><textarea rows="3" th:field="*{recall1Diagnosis}" placeholder="Value"></textarea></div>
-                        <div class="form-group"><label>Relevant Findings</label><textarea rows="3" th:field="*{recall1Findings}" placeholder="Value"></textarea></div>
-                        <div class="form-group"><label>Recommendation</label><textarea rows="3" th:field="*{recall1Recommendation}" placeholder="Value"></textarea></div>
+                        <div class="form-group recall-date"><label>Date</label><input type="date" th:field="*{recall1Date}" th:readonly="${chart.pf3Recall1Locked}"></div>
+                        <div class="form-group"><label>Diagnosis</label><textarea rows="3" th:field="*{recall1Diagnosis}" th:readonly="${chart.pf3Recall1Locked}" placeholder="Value"></textarea></div>
+                        <div class="form-group"><label>Relevant Findings</label><textarea rows="3" th:field="*{recall1Findings}" th:readonly="${chart.pf3Recall1Locked}" placeholder="Value"></textarea></div>
+                        <div class="form-group"><label>Recommendation</label><textarea rows="3" th:field="*{recall1Recommendation}" th:readonly="${chart.pf3Recall1Locked}" placeholder="Value"></textarea></div>
+                        <div class="sig-row recall-sig">
+                            <div class="sig-box">
+                                <span class="sig-label">Faculty Signature</span>
+                                <div th:if="${chart.pf3Recall1Signature != null}" class="sig-signed">
+                                    <img th:src="${chart.pf3Recall1Signature}" alt="Faculty signature, Recall 1">
+                                    <div class="sig-meta" th:text="${'✓ Signed by ' + (chart.pf3Recall1SignedBy != null ? chart.pf3Recall1SignedBy : 'faculty') + (chart.pf3Recall1SignedAt != null ? ' · ' + #temporals.format(chart.pf3Recall1SignedAt, 'MMM d, yyyy, h:mm a') : '')}"></div>
+                                </div>
+                                <div th:if="${chart.pf3Recall1Signature == null}" class="sig-waiting"><b>Waiting for faculty</b>Signed by the faculty when they approve Recall 1.</div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Recall 2 -->
-                    <div class="recall-section">
+                    <div class="recall-section" th:classappend="${!chart.pf3Recall1Locked} ? 'recall-locked'">
                         <h3 class="recall-title"><em>Recall 2</em></h3>
-                        <div class="form-group recall-date"><label>Date</label><input type="date" th:field="*{recall2Date}"></div>
-                        <div class="form-group"><label>Diagnosis</label><textarea rows="3" th:field="*{recall2Diagnosis}" placeholder="Value"></textarea></div>
-                        <div class="form-group"><label>Relevant Findings</label><textarea rows="3" th:field="*{recall2Findings}" placeholder="Value"></textarea></div>
-                        <div class="form-group"><label>Recommendation</label><textarea rows="3" th:field="*{recall2Recommendation}" placeholder="Value"></textarea></div>
+                        <p class="recall-lock-note" th:if="${!chart.pf3Recall1Locked}">Opens after the faculty approves Recall 1.</p>
+                        <div class="form-group recall-date"><label>Date</label><input type="date" th:field="*{recall2Date}" th:readonly="${!chart.pf3Recall1Locked}"></div>
+                        <div class="form-group"><label>Diagnosis</label><textarea rows="3" th:field="*{recall2Diagnosis}" th:readonly="${!chart.pf3Recall1Locked}" placeholder="Value"></textarea></div>
+                        <div class="form-group"><label>Relevant Findings</label><textarea rows="3" th:field="*{recall2Findings}" th:readonly="${!chart.pf3Recall1Locked}" placeholder="Value"></textarea></div>
+                        <div class="form-group"><label>Recommendation</label><textarea rows="3" th:field="*{recall2Recommendation}" th:readonly="${!chart.pf3Recall1Locked}" placeholder="Value"></textarea></div>
+                        <div class="sig-row recall-sig">
+                            <div class="sig-box">
+                                <span class="sig-label">Faculty Signature</span>
+                                <div th:if="${chart.pf3Recall2Signature != null}" class="sig-signed">
+                                    <img th:src="${chart.pf3Recall2Signature}" alt="Faculty signature, Recall 2">
+                                    <div class="sig-meta" th:text="${'✓ Signed by ' + (chart.pf3Recall2SignedBy != null ? chart.pf3Recall2SignedBy : 'faculty') + (chart.pf3Recall2SignedAt != null ? ' · ' + #temporals.format(chart.pf3Recall2SignedAt, 'MMM d, yyyy, h:mm a') : '')}"></div>
+                                </div>
+                                <div th:if="${chart.pf3Recall2Signature == null}" class="sig-waiting"><b>Waiting for faculty</b>Signed by the faculty when they approve Recall 2.</div>
+                            </div>
+                        </div>
                     </div>
 
                 </div><!-- end viewOnly wrapper -->
@@ -230,6 +251,17 @@
                     <!-- Navigation -->
                     <div class="form-actions">
                         <button th:if="${!viewOnly}" type="submit" class="btn-submit">Save</button>
+                        <th:block th:if="${currentUser != null and currentUser.role.name() == 'FACULTY' and chart.pf3Status.name() == 'SUBMITTED'}">
+                            <button type="button" class="btn-revise"
+                                    th:data-action="@{/periodontics3-faculty/{id}/revise(id=${chart.id})}"
+                                    onclick="openReviseModal(this)">Revise</button>
+                            <button type="button" class="btn-approve" data-sign="true"
+                                    th:data-title="${'Approve Recall ' + chart.pf3CurrentRecall + '?'}"
+                                    th:data-sign-text="${'Sign below to approve. Your signature is placed in the Faculty Signature box of Recall ' + chart.pf3CurrentRecall + '.'}"
+                                    th:data-action="@{/periodontics3-faculty/{id}/approve(id=${chart.id})}"
+                                    onclick="openApproveModal(this)"
+                                    th:text="${'Approve Recall ' + chart.pf3CurrentRecall}">Approve</button>
+                        </th:block>
                     </div>
 
                 </div>
@@ -305,6 +337,8 @@ function el(tag, cls, text) {
                 [part.rows[pi], part.rows[pi + 1]].forEach(function(r) {
                     var row = el('div', 'pf3-row pf3-mark-row pf3-' + r[1]);
                     row.dataset.key = part.section + '.' + r[0] + '.' + r[1];
+                    if (R1_LOCKED && r[0] === 'r1') row.classList.add('pf3-locked', 'pf3-signed');   /* signed by the faculty */
+                    if (R2_LOCKED && r[0] === 'r2') row.classList.add('pf3-locked');                 /* opens after Recall 1 is signed */
                     for (var c = 0; c < 16; c++) {
                         var cell = el('div', 'pf3-cell');
                         cell.dataset.arch = part.arch;
@@ -330,6 +364,18 @@ function setToothBtnState(btn, missing) {
                         : 'Mark tooth ' + btn.dataset.tooth + ' as missing';
 }
 
+/* Sites of one tooth that a missing-tooth X changes: every row, except Recall 1 once it is signed.
+   (A tooth missing at Recall 1 is carried into the still-locked Recall 2 rows.) */
+function toothSites(btn) {
+    var sel = '#pf3Chart .pf3-mark-row' + (R1_LOCKED ? ':not(.pf3-signed)' : '') +
+              ' .pf3-cell[data-arch="' + btn.dataset.arch + '"][data-col="' + btn.dataset.col + '"] .pf3-site';
+    return document.querySelectorAll(sel);
+}
+function lockedMissing(btn) {
+    var s = document.querySelectorAll('#pf3Chart .pf3-signed .pf3-cell[data-arch="' + btn.dataset.arch + '"][data-col="' + btn.dataset.col + '"] .pf3-site');
+    return s.length > 0 && Array.from(s).every(function(st) { return st.dataset.val === 'X'; });
+}
+
 function setSite(site, v) {
     site.dataset.val = v;
     site.textContent = v;
@@ -348,6 +394,7 @@ document.getElementById('pf3Chart').addEventListener('click', function(e) {
     if (site) {
         e.stopPropagation();
         if (site.dataset.val === 'X') return;   /* missing tooth: sites are locked until the tooth number is clicked again */
+        if (site.closest('.pf3-locked')) return;   /* Recall 1 is signed: its marks can't change */
         if (site.closest('.pf3-bop')) {
             /* clicking the same site again closes the picker */
             if (bopPicker.style.display === 'flex' && bopTarget === site) { closeBopPicker(); return; }
@@ -370,7 +417,8 @@ document.getElementById('pf3Chart').addEventListener('click', function(e) {
     /* Click a tooth number: mark/unmark every site of that tooth (same arch) with X */
     var btn = e.target.closest('.pf3-tooth-btn');
     if (btn) {
-        var sites = document.querySelectorAll('#pf3Chart .pf3-cell[data-arch="' + btn.dataset.arch + '"][data-col="' + btn.dataset.col + '"] .pf3-site');
+        if (R1_LOCKED && lockedMissing(btn)) return;   /* missing at the signed Recall 1: stays missing */
+        var sites = toothSites(btn);
         var allX = Array.from(sites).every(function(st) { return st.dataset.val === 'X'; });
         sites.forEach(function(st) { setSite(st, allX ? '' : 'X'); });
         setToothBtnState(btn, !allX);
@@ -462,7 +510,7 @@ function redrawToothPictures() {
         });
     });
     document.querySelectorAll('#pf3Chart .pf3-tooth-btn').forEach(function(btn) {
-        var sites = document.querySelectorAll('#pf3Chart .pf3-cell[data-arch="' + btn.dataset.arch + '"][data-col="' + btn.dataset.col + '"] .pf3-site');
+        var sites = toothSites(btn);
         setToothBtnState(btn, sites.length > 0 && Array.from(sites).every(function(st) { return st.dataset.val === 'X'; }));
     });
     redrawToothPictures();
@@ -527,5 +575,6 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 
 <script src="/js/textarea-min-size.js"></script>
 <script src="/js/sidebar-hover.js"></script>
+<th:block th:replace="~{fragments/faculty-review :: modals}"></th:block>
 </body>
 </html>

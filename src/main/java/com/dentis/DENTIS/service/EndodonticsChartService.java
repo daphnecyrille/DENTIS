@@ -157,12 +157,14 @@ public class EndodonticsChartService {
 
     public EndodonticsChart approve(Long id) {
         EndodonticsChart chart = repo.findById(id).orElseThrow();
+        if (chart.getStatus() != EndodonticsChartStatus.SUBMITTED) return chart;   // only a submitted chart can be reviewed
         chart.setStatus(EndodonticsChartStatus.APPROVED);
         return repo.save(chart);
     }
 
     public EndodonticsChart revise(Long id, String reason) {
         EndodonticsChart chart = repo.findById(id).orElseThrow();
+        if (chart.getStatus() != EndodonticsChartStatus.SUBMITTED) return chart;   // only a submitted chart can be reviewed
         chart.setStatus(EndodonticsChartStatus.REVISE);
         chart.setRevisionReason(reason);
         return repo.save(chart);
@@ -170,12 +172,14 @@ public class EndodonticsChartService {
 
     public EndodonticsChart approveForm2(Long id) {
         EndodonticsChart chart = repo.findById(id).orElseThrow();
+        if (chart.getForm2Status() != EndodonticsChartStatus.SUBMITTED) return chart;   // only a submitted chart can be reviewed
         chart.setForm2Status(EndodonticsChartStatus.APPROVED);
         return repo.save(chart);
     }
 
     public EndodonticsChart reviseForm2(Long id, String reason) {
         EndodonticsChart chart = repo.findById(id).orElseThrow();
+        if (chart.getForm2Status() != EndodonticsChartStatus.SUBMITTED) return chart;   // only a submitted chart can be reviewed
         chart.setForm2Status(EndodonticsChartStatus.REVISE);
         chart.setForm2RevisionReason(reason);
         return repo.save(chart);

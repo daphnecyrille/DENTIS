@@ -219,42 +219,21 @@
                 </div>
 
                 <!-- Faculty Actions -->
-                <div class="form-actions" style="pointer-events:auto; width:100%; padding:0 45px 20px 45px; box-sizing:border-box;">
+                <div class="form-actions review-actions" style="pointer-events:auto; width:100%; padding:0 45px 20px 45px; box-sizing:border-box;">
                     <form id="gradeForm" th:action="@{/prosthodontics-faculty/{id}/grade(id=${chart.id})}" method="post" style="display:none;"></form>
                     <button type="submit" form="gradeForm" class="btn-save">Save Grade</button>
 
-                    <form th:if="${chart.status.name() == 'SUBMITTED'}"
-                          th:action="@{/prosthodontics-faculty/{id}/approve(id=${chart.id})}" method="post" style="display:inline;">
-                        <button type="submit" class="btn-save" style="background:#4a7c59;">Approve</button>
-                    </form>
-
-                    <button th:if="${chart.status.name() == 'SUBMITTED'}"
-                            type="button" class="btn-save"
-                            th:data-action="@{/prosthodontics-faculty/{id}/revise(id=${chart.id})}"
-                            onclick="openReviseModal(this)"
-                            style="background:#c0392b;">Revise</button>
+                    <th:block th:if="${currentUser != null and currentUser.role.name() == 'FACULTY' and chart.status.name() == 'SUBMITTED'}">
+                        <button type="button" class="btn-revise"
+                                th:data-action="@{/prosthodontics-faculty/{id}/revise(id=${chart.id})}"
+                                onclick="openReviseModal(this)">Revise</button>
+                        <button type="button" class="btn-approve"
+                                th:data-action="@{/prosthodontics-faculty/{id}/approve(id=${chart.id})}"
+                                onclick="openApproveModal(this)">Approve</button>
+                    </th:block>
                 </div>
             </div>
         </main>
-    </div>
-</div>
-
-<!-- Revise Modal -->
-<div id="reviseModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:2000; align-items:center; justify-content:center;">
-    <div style="background:white; border-radius:10px; padding:28px 32px; width:420px; max-width:90vw; box-shadow:0 8px 32px rgba(0,0,0,0.18);">
-        <h3 style="margin:0 0 8px 0; font-size:16px; color:#2d2d2d;">Request Revision</h3>
-        <p style="margin:0 0 16px 0; font-size:13px; color:#555;">Please provide a reason so the clinician knows what to correct.</p>
-        <form id="reviseForm" method="post">
-            <textarea id="revisionReasonInput" name="revisionReason" rows="4"
-                      style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; font-size:13px; font-family:'Poppins',sans-serif; resize:vertical; box-sizing:border-box;"
-                      placeholder="Enter revision reason..."></textarea>
-            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
-                <button type="button" onclick="closeReviseModal()"
-                        style="padding:8px 20px; border:1px solid #ccc; border-radius:6px; background:white; cursor:pointer; font-size:13px;">Cancel</button>
-                <button type="submit" id="reviseSubmitBtn"
-                        style="padding:8px 20px; background:#c0392b; color:white; border:none; border-radius:6px; cursor:pointer; font-size:13px;">Confirm Revision</button>
-            </div>
-        </form>
     </div>
 </div>
 
@@ -271,28 +250,10 @@ document.addEventListener('click', function() {
     if (d && d.classList.contains('show')) d.classList.remove('show');
 });
 document.querySelector('.user-dropdown').addEventListener('click', function(e) { e.stopPropagation(); });
-
-function openReviseModal(btn) {
-    document.getElementById('reviseForm').action = btn.getAttribute('data-action');
-    document.getElementById('revisionReasonInput').value = '';
-    const modal = document.getElementById('reviseModal');
-    modal.style.display = 'flex';
-}
-function closeReviseModal() {
-    document.getElementById('reviseModal').style.display = 'none';
-}
-document.getElementById('reviseModal').addEventListener('click', function(e) {
-    if (e.target === this) closeReviseModal();
-});
-document.getElementById('reviseForm').addEventListener('submit', function(e) {
-    if (!document.getElementById('revisionReasonInput').value.trim()) {
-        e.preventDefault();
-        alert('Please enter a revision reason.');
-    }
-});
 </script>
 
 <script src="/js/textarea-min-size.js"></script>
 <script src="/js/sidebar-hover.js"></script>
+<th:block th:replace="~{fragments/faculty-review :: modals}"></th:block>
 </body>
 </html>

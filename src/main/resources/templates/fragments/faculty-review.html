@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Faculty review: Approve (with drawn signature when the form has a faculty signature box) and Revise.
+     Include at the end of <body>:  <th:block th:replace="~{fragments/faculty-review :: modals}"></th:block>
+     Buttons on the form call openApproveModal(this) / openReviseModal(this) with data-action (and data-sign="true" to sign). -->
+<th:block th:fragment="modals">
+<link rel="stylesheet" href="/css/signature.css">
+<link rel="stylesheet" href="/css/faculty-review.css">
+
+<!-- Approve -->
+<div id="approveModal" class="review-modal">
+    <div class="review-box">
+        <h3 id="approveTitle">Approve this chart?</h3>
+        <p id="approvePlainText">The clinician will see it as Approved and it can no longer be edited.</p>
+        <p id="approveSignText">Sign below to approve. Your signature is placed in the Faculty Signature box of this chart.</p>
+        <div id="approveSignPad"></div>
+        <form id="approveForm" method="post">
+            <input type="hidden" name="signature" id="approveSignInput">
+            <div class="sig-btns review-btns">
+                <button type="button" class="sig-btn-sec" id="approveSignClear" style="margin-right:auto;">Clear</button>
+                <button type="button" class="sig-btn-sec" onclick="closeApproveModal()">Cancel</button>
+                <button type="submit" class="sig-btn-pri" id="approveSubmit">Approve</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Revise -->
+<div id="reviseModal" class="review-modal">
+    <div class="review-box">
+        <h3>Request Revision</h3>
+        <p>Please add a note for the clinician.</p>
+        <form id="reviseForm" method="post">
+            <textarea id="revisionReasonInput" name="revisionReason" rows="4" placeholder="Enter note..."></textarea>
+            <div class="sig-btns review-btns">
+                <button type="button" class="sig-btn-sec" onclick="closeReviseModal()">Cancel</button>
+                <button type="submit" class="review-btn-revise" id="reviseSubmitBtn">Confirm Revision</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div th:if="${param.signRequired != null}" class="review-toast">
+    Please draw your signature to approve the chart.
+    <button type="button" onclick="this.parentNode.remove()">&times;</button>
+</div>
+
+<script src="/js/signature-pad.js"></script>
+<script src="/js/faculty-review.js"></script>
+</th:block>
+</body>
+</html>
