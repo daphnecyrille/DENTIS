@@ -220,12 +220,6 @@ public class PerioEvaluationService {
 
     private static double round2(double d) { return Math.round(d * 100.0) / 100.0; }
 
-    private static Map<String, Integer> linked(Object... kv) {
-        Map<String, Integer> m = new LinkedHashMap<>();
-        for (int i = 0; i < kv.length; i += 2) m.put((String) kv[i], (Integer) kv[i + 1]);
-        return java.util.Collections.unmodifiableMap(m);
-    }
-
     private static LocalDate date(String v) {
         try { return (v == null || v.isBlank()) ? null : LocalDate.parse(v); }
         catch (Exception ex) { return null; }

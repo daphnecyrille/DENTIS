@@ -5,9 +5,6 @@ import com.dentis.DENTIS.repository.EndodonticsChartRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,15 +26,6 @@ public class EndodonticsChartService {
         chart.setChartNo(patient.getChartNo() + "-ENDO1");
         chart.setChiefComplaint(patient.getChiefComplaint());
         return repo.save(chart);
-    }
-
-    private String generateChartNo() {
-        LocalDate today = LocalDate.now();
-        LocalDateTime start = today.atStartOfDay();
-        LocalDateTime end = today.plusDays(1).atStartOfDay();
-        long count = repo.countByCreatedAtBetween(start, end);
-        String dateStr = today.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        return String.format("ENDO1-%s-%05d", dateStr, count + 1);
     }
 
     public EndodonticsChart getById(Long id) {

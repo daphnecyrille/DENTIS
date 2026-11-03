@@ -5,9 +5,6 @@ import com.dentis.DENTIS.repository.OralSurgeryChartRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,16 +29,6 @@ public class OralSurgeryChartService {
         chart.setChartNo(patient.getChartNo() + "-" + suffix);
         chart.setChiefComplaint(patient.getChiefComplaint());
         return repo.save(chart);
-    }
-
-    private String generateChartNo(OralSurgeryChartType type) {
-        LocalDate today = LocalDate.now();
-        LocalDateTime start = today.atStartOfDay();
-        LocalDateTime end = today.plusDays(1).atStartOfDay();
-        long count = repo.countByCreatedAtBetween(start, end);
-        String dateStr = today.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        String prefix = type == OralSurgeryChartType.OSF1 ? "OSF1" : "OSF2";
-        return String.format("%s-%s-%05d", prefix, dateStr, count + 1);
     }
 
     public OralSurgeryChart getById(Long id) {

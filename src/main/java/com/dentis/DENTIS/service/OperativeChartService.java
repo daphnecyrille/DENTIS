@@ -5,9 +5,6 @@ import com.dentis.DENTIS.repository.OperativeChartRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -28,15 +25,6 @@ public class OperativeChartService {
         chart.setChartNo(patient.getChartNo() + "-RESTO10");
         chart.setChiefComplaint(patient.getChiefComplaint());
         return repo.save(chart);
-    }
-
-    private String generateChartNo() {
-        LocalDate today = LocalDate.now();
-        LocalDateTime start = today.atStartOfDay();
-        LocalDateTime end = today.plusDays(1).atStartOfDay();
-        long count = repo.countByCreatedAtBetween(start, end);
-        String dateStr = today.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        return String.format("RESTO10-%s-%05d", dateStr, count + 1);
     }
 
     public OperativeChart getById(Long id) {

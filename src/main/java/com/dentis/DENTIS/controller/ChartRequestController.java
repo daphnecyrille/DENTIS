@@ -285,14 +285,6 @@ public class ChartRequestController {
         }
     }
 
-    private List<com.dentis.DENTIS.model.Patient> getUniquePatientsForClinician(User clinician) {
-        return oralSurgeryChartService.findByClinicianOrderByCreatedAtDesc(clinician)
-                .stream()
-                .map(c -> c.getPatient())
-                .distinct()
-                .toList();
-    }
-
     @GetMapping("/chartrequest-clinician")
     public String showForm(Model model, Authentication authentication) {
         User clinician = getCurrentUser(authentication);

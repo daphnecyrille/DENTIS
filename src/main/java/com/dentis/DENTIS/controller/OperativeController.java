@@ -80,7 +80,7 @@ public class OperativeController {
     @PostMapping("/operative-a/{id}")
     public String saveFormA(@PathVariable Long id,
                             @ModelAttribute("chart") OperativeChart updated) {
-        OperativeChart chart = operativeChartService.saveFormC(id, updated);
+        operativeChartService.saveFormC(id, updated);
         return "redirect:/operative-a/" + id + "?saved";   // Save keeps the user on the form
     }
 
@@ -142,7 +142,7 @@ public class OperativeController {
     @PostMapping("/operative-c/{id}")
     public String saveFormC(@PathVariable Long id,
                             @ModelAttribute("chart") OperativeChart updated) {
-        OperativeChart chart = operativeChartService.saveFormB(id, updated);
+        operativeChartService.saveFormB(id, updated);
         return "redirect:/operative-c/" + id + "?saved";   // Save keeps the user on the form
     }
 

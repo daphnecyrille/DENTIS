@@ -5,7 +5,6 @@ import com.dentis.DENTIS.model.OralSurgeryChartStatus;
 import com.dentis.DENTIS.model.User;
 import com.dentis.DENTIS.repository.UserRepository;
 import com.dentis.DENTIS.service.OralSurgeryChartService;
-import com.dentis.DENTIS.service.PatientService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
@@ -16,14 +15,11 @@ import org.springframework.web.bind.annotation.*;
 public class OralSurgeryController {
 
     private final OralSurgeryChartService oralSurgeryChartService;
-    private final PatientService patientService;
     private final UserRepository userRepository;
 
     public OralSurgeryController(OralSurgeryChartService oralSurgeryChartService,
-                                 PatientService patientService,
                                  UserRepository userRepository) {
         this.oralSurgeryChartService = oralSurgeryChartService;
-        this.patientService = patientService;
         this.userRepository = userRepository;
     }
 
@@ -64,7 +60,7 @@ public class OralSurgeryController {
     @PostMapping("/oralsurgery-clinician/{id}")
     public String saveForm1(@PathVariable Long id,
                             @ModelAttribute("chart") OralSurgeryChart updated) {
-        OralSurgeryChart chart = oralSurgeryChartService.saveForm1(id, updated);
+        oralSurgeryChartService.saveForm1(id, updated);
         return "redirect:/oralsurgery-clinician/" + id + "?saved";   // Save keeps the user on the form
     }
 
@@ -97,7 +93,7 @@ public class OralSurgeryController {
     @PostMapping("/oralsurgery2-clinician/{id}")
     public String saveForm2(@PathVariable Long id,
                             @ModelAttribute("chart") OralSurgeryChart updated) {
-        OralSurgeryChart chart = oralSurgeryChartService.saveForm2(id, updated);
+        oralSurgeryChartService.saveForm2(id, updated);
         return "redirect:/oralsurgery2-clinician/" + id + "?saved";   // Save keeps the user on the form
     }
 

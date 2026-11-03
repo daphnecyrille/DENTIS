@@ -7,10 +7,6 @@ import com.dentis.DENTIS.model.Role;
 import com.dentis.DENTIS.model.User;
 import com.dentis.DENTIS.repository.PatientRepository;
 import com.dentis.DENTIS.repository.UserRepository;
-import com.dentis.DENTIS.service.OralSurgeryChartService;
-import com.dentis.DENTIS.service.EndodonticsChartService;
-import com.dentis.DENTIS.service.PeriodonticChartService;
-import com.dentis.DENTIS.service.ProsthodonticsChartService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

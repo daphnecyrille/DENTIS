@@ -140,7 +140,7 @@ public class ProsthodonticsController {
 
     @PostMapping("/prosthodontics-faculty/{id}/grade")
     public String saveGrade(@PathVariable Long id, @RequestParam String grade) {
-        ProsthodonticsChart chart = chartService.saveGrade(id, grade);
+        chartService.saveGrade(id, grade);
         return "redirect:/prosthodontics-faculty/" + id + "?graded=true";
     }
 }
