@@ -30,6 +30,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String email = oAuth2User.getAttribute("email");
 
         User user = userRepository.findByEmail(email).orElseThrow();
+        user.setLastLoginAt(java.time.LocalDateTime.now());   // shown on the admin's user list
+        userRepository.save(user);
 
         boolean profileIncomplete = user.getFirstName() == null || user.getFirstName().isBlank();
         String redirectUrl = profileIncomplete ? "/complete-profile" : resolveRedirectUrl(user.getRole());

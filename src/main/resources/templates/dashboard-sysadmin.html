@@ -40,13 +40,22 @@
         <aside class="sidebar" id="sidebar">
             <nav class="nav-menu">
                 <ul>
-                    <li class="nav-item active">
+                    <li class="nav-item" th:classappend="${adminPage == null or adminPage == 'users'} ? 'active'">
                         <a href="/dashboard-sysadmin" class="nav-link">
-                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 9L12 2l9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                                <polyline points="9 22 9 12 15 12 15 22"/>
-                            </svg>
-                            <span>Dashboard</span>
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <span>Users</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" th:classappend="${adminPage == 'overview'} ? 'active'">
+                        <a href="/overview-sysadmin" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+                            <span>Clinic Overview</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" th:classappend="${adminPage == 'activity'} ? 'active'">
+                        <a href="/activity-sysadmin" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+                            <span>Activity Log</span>
                         </a>
                     </li>
                 </ul>
@@ -56,89 +65,47 @@
         <!-- Main Content -->
         <main class="main-content" id="mainContent">
 
-            <div class="page-title">
-                System Administrator Dashboard
-                <span class="subtitle">— Manage accounts and system access</span>
-            </div>
+            <div th:if="${msg != null}" class="sa-toast ok" role="status"><span>&#10003;</span><span th:text="${msg}"></span><button type="button" onclick="this.parentNode.remove()">&times;</button></div>
+            <div th:if="${err != null}" class="sa-toast bad" role="alert"><span>!</span><span th:text="${err}"></span><button type="button" onclick="this.parentNode.remove()">&times;</button></div>
 
-            <!-- Stats -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon blue">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                            <circle cx="9" cy="7" r="4"/>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <div class="stat-value" th:text="${statTotalUsers}">0</div>
-                        <div class="stat-label">Total Users</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon green">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                            <polyline points="22 4 12 14.01 9 11.01"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <div class="stat-value" th:text="${statActiveUsers}">0</div>
-                        <div class="stat-label">Active Users</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon amber">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                            <circle cx="12" cy="7" r="4"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <div class="stat-value" th:text="${statClinicians}">0</div>
-                        <div class="stat-label">Clinicians</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon navy">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="2" y="3" width="20" height="14" rx="2"/>
-                            <path d="M8 21h8M12 17v4"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <div class="stat-value" th:text="${statFaculty}">0</div>
-                        <div class="stat-label">Faculty</div>
-                    </div>
-                </div>
+            <!-- Summary cards (click to filter the table) -->
+            <div class="sa-cards">
+                <button type="button" class="sa-card" data-status="all" data-role="all"><b th:text="${statTotalUsers}">0</b><span>Total Users</span></button>
+                <button type="button" class="sa-card c-active" data-status="active"><b th:text="${statActiveUsers}">0</b><span>Active</span></button>
+                <button type="button" class="sa-card c-inactive" data-status="inactive" th:classappend="${statInactive > 0} ? 'has-items'"><b th:text="${statInactive}">0</b><span>Inactive</span></button>
+                <button type="button" class="sa-card c-setup" data-status="setup" th:classappend="${statNeedsSetup > 0} ? 'has-items'"
+                        title="Faculty without a section, clinicians without student no. or year level, or accounts without a name">
+                    <b th:text="${statNeedsSetup}">0</b><span>Needs Setup</span></button>
+                <button type="button" class="sa-card c-never" data-status="never" th:classappend="${statNeverSignedIn > 0} ? 'has-items'"
+                        title="Active accounts that have never signed in (check the email address)">
+                    <b th:text="${statNeverSignedIn}">0</b><span>Never Signed In</span></button>
             </div>
 
             <!-- User Management Section -->
             <div class="section-card">
                 <div class="section-header">
                     <h2>User Accounts</h2>
-                    <button class="btn-create" onclick="openCreateModal()">
-                        &#43; Create User
-                    </button>
+                    <div class="sa-actions">
+                        <button type="button" class="btn-ghost" onclick="openModalById('semesterModal')">End of Semester</button>
+                        <button type="button" class="btn-ghost" onclick="openModalById('importModal')">Import from file</button>
+                        <button class="btn-create" onclick="openCreateModal()">&#43; Create User</button>
+                    </div>
                 </div>
 
-                <!-- Tab Filters -->
-                <div class="tab-filters">
-                    <button class="filter-btn active" onclick="filterTable('all', this)">
-                        All (<span th:text="${statTotalUsers}">0</span>)
-                    </button>
-                    <button class="filter-btn" onclick="filterTable('clinician', this)">
-                        Clinicians (<span th:text="${statClinicians}">0</span>)
-                    </button>
-                    <button class="filter-btn" onclick="filterTable('faculty', this)">
-                        Faculty (<span th:text="${statFaculty}">0</span>)
-                    </button>
-                    <button class="filter-btn" onclick="filterTable('clinic_manager', this)">
-                        Clinic Managers (<span th:text="${statManagers}">0</span>)
-                    </button>
+                <div class="sa-toolbar">
+                    <div class="sa-tabs" id="saRoles">
+                        <button type="button" class="sa-tab on" data-role="all">All <span class="n" th:text="${statTotalUsers}">0</span></button>
+                        <button type="button" class="sa-tab" data-role="clinician">Clinicians <span class="n" th:text="${statClinicians}">0</span></button>
+                        <button type="button" class="sa-tab" data-role="faculty">Faculty <span class="n" th:text="${statFaculty}">0</span></button>
+                        <button type="button" class="sa-tab" data-role="clinic_manager">Clinic Managers <span class="n" th:text="${statManagers}">0</span></button>
+                        <button type="button" class="sa-tab" data-role="admin">Admins <span class="n" th:text="${statAdmins}">0</span></button>
+                    </div>
+                    <div class="sa-search">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#8a97a8" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="#8a97a8" stroke-width="2" stroke-linecap="round"/></svg>
+                        <input type="text" id="saSearch" placeholder="Search name, email, section or student no." autocomplete="off">
+                    </div>
                 </div>
+                <div class="sa-filternote" id="saNote"></div>
 
                 <!-- Table -->
                 <div class="table-wrapper">
@@ -151,14 +118,19 @@
                                 <th>Section</th>
                                 <th>Year Level</th>
                                 <th>Status</th>
+                                <th>Last Sign-in</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="user : ${users}"
-                                th:attr="data-role=${user.role.name().toLowerCase()}">
-                                <td th:text="${user.fullName}">—</td>
-                                <td th:text="${user.email}">—</td>
+                            <tr th:each="user : ${users}" class="sa-row"
+                                th:attr="data-role=${user.role.name().toLowerCase()},data-status=${user.status != null and user.status.name() == 'ACTIVE' ? 'active' : 'inactive'},data-setup=${!#strings.isEmpty(setupIssues[user.id])},data-never=${user.lastLoginAt == null}">
+                                <td class="sa-left">
+                                    <span class="sa-name" th:text="${user.firstName != null and !#strings.isEmpty(user.firstName) ? user.fullName : '(no name yet)'}">—</span>
+                                    <span class="sa-sub" th:if="${user.studentNumber != null}" th:text="${user.studentNumber}"></span>
+                                    <span class="sa-issue" th:if="${!#strings.isEmpty(setupIssues[user.id])}" th:text="${'Needs setup: ' + setupIssues[user.id]}"></span>
+                                </td>
+                                <td class="sa-left" th:text="${user.email}">—</td>
                                 <td>
                                     <span th:if="${user.role.name() == 'CLINICIAN'}"  class="badge badge-clinician">Clinician</span>
                                     <span th:if="${user.role.name() == 'FACULTY'}"    class="badge badge-faculty">Faculty</span>
@@ -177,6 +149,10 @@
                                         <span class="status-dot"></span>Inactive
                                     </span>
                                 </td>
+                                <td class="sa-login" th:attr="data-at=${user.lastLoginAt}">
+                                    <span th:if="${user.lastLoginAt != null}" th:text="${#temporals.format(user.lastLoginAt, 'MMM d, yyyy')}"></span>
+                                    <span th:if="${user.lastLoginAt == null}" class="sa-never">Never</span>
+                                </td>
                                 <td>
                                     <div class="actions-cell">
                                         <button class="btn-edit"
@@ -191,7 +167,8 @@
                                                 onclick="openEditModal(this)">
                                             Edit
                                         </button>
-                                        <button th:if="${user.status != null and user.status.name() == 'ACTIVE'}"
+                                        <span th:if="${currentUser != null and user.id == currentUser.id}" class="sa-you">You</span>
+                                        <button th:if="${user.status != null and user.status.name() == 'ACTIVE' and (currentUser == null or user.id != currentUser.id)}"
                                                 class="btn-deactivate"
                                                 th:data-id="${user.id}"
                                                 th:data-name="${user.fullName}"
@@ -211,10 +188,12 @@
                                 </td>
                             </tr>
                             <tr class="empty-row" th:if="${#lists.isEmpty(users)}">
-                                <td colspan="7">No users found.</td>
+                                <td colspan="8">No users found.</td>
                             </tr>
+                            <tr class="empty-row" id="saEmpty" style="display:none;"><td colspan="8">No account matches.</td></tr>
                         </tbody>
                     </table>
+                    <div class="sa-pager"><span id="saRange"></span><div class="sa-pages" id="saPages"></div></div>
                 </div>
             </div>
 
@@ -243,6 +222,7 @@
                             <option value="CLINICIAN">Clinician</option>
                             <option value="FACULTY">Faculty</option>
                             <option value="CLINIC_MANAGER">Clinic Manager</option>
+                            <option value="ADMIN">Admin</option>
                         </select>
                     </div>
                     <div id="createFacultyFields" style="display:none; grid-column: 1 / -1;">
@@ -307,6 +287,7 @@
                             <option value="CLINICIAN">Clinician</option>
                             <option value="FACULTY">Faculty</option>
                             <option value="CLINIC_MANAGER">Clinic Manager</option>
+                            <option value="ADMIN">Admin</option>
                         </select>
                     </div>
                     <div class="form-group" id="editSectionGroup" style="display:none;">
@@ -324,8 +305,12 @@
                         <label>Year Level</label>
                         <select name="yearLevel" id="editYearLevel">
                             <option value="">-- Select Year --</option>
+                            <option value="1st-Year">1st Year</option>
+                            <option value="2nd-Year">2nd Year</option>
                             <option value="3rd-Year">3rd Year</option>
                             <option value="4th-Year">4th Year</option>
+                            <option value="5th-Year">5th Year</option>
+                            <option value="6th-Year">6th Year</option>
                         </select>
                     </div>
                     <div class="form-group" id="editStudentNumGroup" style="display:none;">
@@ -343,6 +328,64 @@
 </div>
 
 <!-- ══════════════ CONFIRM DEACTIVATE/ACTIVATE MODAL ══════════════ -->
+
+<!-- Import accounts from a CSV file: read here, checked row by row, then created on the server -->
+<div class="modal-overlay" id="importModal">
+    <div class="modal-box sa-modal-wide">
+        <div class="modal-header"><h3>Import accounts from a file</h3><button type="button" class="modal-close" onclick="closeModal('importModal')">&times;</button></div>
+        <div class="sa-modal-body">
+            <p class="sa-help">Use a CSV file (Excel: <i>File &rsaquo; Save As &rsaquo; CSV</i>) with these columns:
+                <code>email, firstName, lastName, role, section, yearLevel, studentNumber</code>.
+                Role is Clinician, Faculty, Clinic Manager or Admin. Faculty need a section (OS, ENDO, PERIO, Resto, PROSTHO); clinicians' year level is 1st-Year to 6th-Year.
+                <a href="/files/accounts-template.csv" download>Download the template</a></p>
+            <input type="file" id="importFile" accept=".csv,text/csv">
+            <div id="importPreview"></div>
+        </div>
+        <form th:action="@{/import-users-sysadmin}" method="post" id="importForm" class="sa-modal-foot">
+            <input type="hidden" name="rows" id="importRows">
+            <span id="importSummary" class="sa-help"></span>
+            <button type="button" class="btn-cancel" onclick="closeModal('importModal')">Cancel</button>
+            <button type="submit" class="btn-submit" id="importSubmit" disabled>Create accounts</button>
+        </form>
+    </div>
+</div>
+
+<!-- End of semester -->
+<div class="modal-overlay" id="semesterModal">
+    <div class="modal-box sa-modal-wide">
+        <div class="modal-header"><h3>End of Semester</h3><button type="button" class="modal-close" onclick="closeModal('semesterModal')">&times;</button></div>
+        <div class="sa-modal-body">
+            <div class="sa-step">
+                <h4>1. Deactivate graduating 6th-year clinicians</h4>
+                <p class="sa-help">Untick anyone who is not graduating yet; they stay active in 6th year. Ticked clinicians can no longer sign in; their patients and charts stay in the records.</p>
+                <form th:action="@{/semester-deactivate-sysadmin}" method="post" id="gradForm">
+                    <div class="sa-gradlist">
+                        <label th:each="g : ${graduating}" class="sa-grad"><input type="checkbox" name="userIds" th:value="${g.id}" checked>
+                            <span th:text="${g.fullName}"></span><small th:text="${g.studentNumber != null ? g.studentNumber : ''}"></small></label>
+                        <p th:if="${#lists.isEmpty(graduating)}" class="sa-help">No active 6th-year clinicians.</p>
+                    </div>
+                    <button type="submit" class="btn-deactivate" th:disabled="${#lists.isEmpty(graduating)}"
+                            onclick="return confirm('Deactivate the ticked clinicians? They will no longer be able to sign in.')">Deactivate ticked</button>
+                </form>
+            </div>
+            <div class="sa-step">
+                <h4>2. Move clinicians up one year</h4>
+                <p class="sa-help">1st Year to 2nd Year, and so on up to 6th Year. Untick anyone who should stay at their current year (e.g. on leave).</p>
+                <form th:action="@{/semester-promote-sysadmin}" method="post" id="promoteForm">
+                    <div class="sa-gradlist">
+                        <label th:each="t : ${movingUp}" class="sa-grad"><input type="checkbox" name="userIds" th:value="${t.id}" checked>
+                            <span th:text="${t.fullName}"></span><small th:text="${t.yearLevel.replace('-', ' ') + (t.studentNumber != null ? ' · ' + t.studentNumber : '')}"></small></label>
+                        <p th:if="${#lists.isEmpty(movingUp)}" class="sa-help">No active clinicians below 6th year.</p>
+                    </div>
+                    <button type="submit" class="btn-submit" th:disabled="${#lists.isEmpty(movingUp)}"
+                            onclick="return confirm('Move the ticked clinicians up one year?')">Move ticked up one year</button>
+                </form>
+            </div>
+            <p class="sa-help">Tip: do step 1 first, so graduating 6th years are deactivated before everyone moves up.</p>
+        </div>
+    </div>
+</div>
+
 <div class="modal-overlay" id="confirmModal">
     <div class="modal-box" style="max-width:400px;">
         <div class="modal-header" id="confirmHeader">
@@ -459,6 +502,119 @@ function filterTable(role, btn) {
 }
 </script>
 
-<script src="/js/sidebar-hover.js"></script>
+<script src="/js/sidebar-hover.js?v=3"></script>
+<script>
+function openModalById(id) { var m = document.getElementById(id); if (m) m.classList.add('open'); }
+/* CSV import: parse in the browser, check each row, show a preview; only valid rows are sent */
+(function () {
+    var input = document.getElementById('importFile'); if (!input) return;
+    var existing = Array.prototype.map.call(document.querySelectorAll('#userTable tr.sa-row td:nth-child(2)'), function (td) { return td.textContent.trim().toLowerCase(); });
+    var ROLES = { 'clinician': 'CLINICIAN', 'faculty': 'FACULTY', 'clinic manager': 'CLINIC_MANAGER', 'clinic_manager': 'CLINIC_MANAGER', 'admin': 'ADMIN' };
+    var KEYS = { email: 'email', firstname: 'firstName', 'first name': 'firstName', lastname: 'lastName', 'last name': 'lastName', role: 'role',
+                 section: 'section', yearlevel: 'yearLevel', 'year level': 'yearLevel', studentnumber: 'studentNumber', 'student number': 'studentNumber', 'student no.': 'studentNumber' };
+    function parseCsv(text) {
+        var rows = [], row = [], cell = '', q = false;
+        for (var i = 0; i < text.length; i++) {
+            var c = text[i];
+            if (q) { if (c === '"' && text[i + 1] === '"') { cell += '"'; i++; } else if (c === '"') q = false; else cell += c; }
+            else if (c === '"') q = true;
+            else if (c === ',') { row.push(cell); cell = ''; }
+            else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+            else cell += c;
+        }
+        if (cell || row.length) { row.push(cell); rows.push(row); }
+        return rows.filter(function (r) { return r.some(function (x) { return x.trim(); }); });
+    }
+    input.addEventListener('change', function () {
+        var file = input.files[0]; if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+            var data = parseCsv(String(reader.result).replace(/^\ufeff/, ''));
+            var head = (data.shift() || []).map(function (h) { return KEYS[h.trim().toLowerCase()] || null; });
+            var seen = {}, good = [], html = '<table class="sa-preview"><thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Section / Year</th><th>Check</th></tr></thead><tbody>';
+            data.forEach(function (cells) {
+                var r = {}; head.forEach(function (k, i) { if (k) r[k] = (cells[i] || '').trim(); });
+                var email = (r.email || '').toLowerCase(), role = ROLES[ String(r.role || '').toLowerCase() ], problem = '';
+                if (!email || email.indexOf('@') < 0) problem = 'Missing or invalid email';
+                else if (existing.indexOf(email) >= 0) problem = 'Already has an account';
+                else if (seen[email]) problem = 'Listed twice';
+                else if (!role) problem = 'Unknown role';
+                else if (role === 'FACULTY' && !r.section) problem = 'Faculty needs a section';
+                seen[email] = true;
+                if (!problem) { r.email = email; r.role = role; good.push(r); }
+                html += '<tr class="' + (problem ? 'bad' : 'ok') + '"><td>' + esc(email) + '</td><td>' + esc((r.lastName || '') + (r.firstName ? ', ' + r.firstName : '')) +
+                        '</td><td>' + esc(r.role || '') + '</td><td>' + esc(r.section || r.yearLevel || '') + '</td><td>' + (problem ? '&#9888; ' + esc(problem) : '&#10003; Ready') + '</td></tr>';
+            });
+            html += '</tbody></table>';
+            document.getElementById('importPreview').innerHTML = data.length ? html : '<p class="sa-help">The file has no rows.</p>';
+            document.getElementById('importRows').value = JSON.stringify(good);
+            var bad = data.length - good.length;
+            document.getElementById('importSummary').textContent = good.length + ' ready' + (bad ? ' \u00b7 ' + bad + ' will be skipped' : '');
+            var btn = document.getElementById('importSubmit');
+            btn.disabled = !good.length;
+            btn.textContent = 'Create ' + good.length + (good.length === 1 ? ' account' : ' accounts');
+        };
+        reader.readAsText(file);
+    });
+    function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+})();
+</script>
+<script>
+/* User accounts: role tabs + status cards + search, 10 per page */
+(function () {
+    var rows = Array.prototype.slice.call(document.querySelectorAll('#userTable tr.sa-row'));
+    var role = 'all', status = 'all', q = '', page = 1, PER = 10;
+    rows.forEach(function (tr) { tr._text = tr.textContent.replace(/\s+/g, ' ').toLowerCase(); });
+    /* Last sign-in: Today / Yesterday / n days ago for the last week */
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    document.querySelectorAll('.sa-login[data-at]').forEach(function (td) {
+        var raw = td.getAttribute('data-at'); if (!raw) return;
+        var d = new Date(raw), day = new Date(d); day.setHours(0, 0, 0, 0);
+        var n = Math.round((today - day) / 86400000), span = td.querySelector('span');
+        span.title = d.toLocaleString();
+        if (n === 0) span.textContent = 'Today, ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        else if (n === 1) span.textContent = 'Yesterday';
+        else if (n < 7) span.textContent = n + ' days ago';
+    });
+    var NOTE = { never: 'Showing active accounts that have never signed in (check their email address)', active: 'Showing active accounts', inactive: 'Showing inactive accounts (they cannot sign in)', setup: 'Showing accounts that still need details' };
+    function ok(tr) {
+        if (role !== 'all' && tr.dataset.role !== role) return false;
+        if (status === 'active' && tr.dataset.status !== 'active') return false;
+        if (status === 'inactive' && tr.dataset.status !== 'inactive') return false;
+        if (status === 'setup' && tr.dataset.setup !== 'true') return false;
+        if (status === 'never' && (tr.dataset.never !== 'true' || tr.dataset.status !== 'active')) return false;
+        return !q || tr._text.indexOf(q) >= 0;
+    }
+    function render() {
+        var list = rows.filter(ok);
+        var pages = Math.max(1, Math.ceil(list.length / PER)); if (page > pages) page = pages;
+        rows.forEach(function (tr) { tr.style.display = 'none'; });
+        list.forEach(function (tr, i) { if (i >= (page - 1) * PER && i < page * PER) tr.style.display = ''; });
+        document.getElementById('saEmpty').style.display = list.length || !rows.length ? 'none' : '';
+        document.querySelectorAll('.sa-tab').forEach(function (t) { t.classList.toggle('on', t.dataset.role === role); });
+        document.querySelectorAll('.sa-card').forEach(function (c) { c.classList.toggle('on', status !== 'all' && c.dataset.status === status); });
+        var note = document.getElementById('saNote');
+        note.innerHTML = '';
+        if (status !== 'all') {
+            note.textContent = NOTE[status] + ' \u00b7 ';
+            var clr = document.createElement('a'); clr.href = '#'; clr.textContent = 'Show all';
+            clr.onclick = function (e) { e.preventDefault(); status = 'all'; page = 1; render(); };
+            note.appendChild(clr);
+        }
+        document.getElementById('saRange').textContent = pages > 1
+            ? 'Accounts ' + ((page - 1) * PER + 1) + '\u2013' + Math.min(page * PER, list.length) + ' of ' + list.length : '';
+        var pg = document.getElementById('saPages'); pg.innerHTML = '';
+        if (pages > 1) for (var i = 1; i <= pages; i++) (function (p) {
+            var b = document.createElement('button'); b.type = 'button'; b.textContent = p; if (p === page) b.className = 'on';
+            b.onclick = function () { page = p; render(); }; pg.appendChild(b);
+        })(i);
+    }
+    document.querySelectorAll('.sa-tab').forEach(function (t) { t.addEventListener('click', function () { role = t.dataset.role; page = 1; render(); }); });
+    document.querySelectorAll('.sa-card').forEach(function (c) { c.addEventListener('click', function () {
+        status = (status === c.dataset.status) ? 'all' : c.dataset.status; if (c.dataset.role === 'all') role = 'all'; page = 1; render(); }); });
+    document.getElementById('saSearch').addEventListener('input', function () { q = this.value.trim().toLowerCase(); page = 1; render(); });
+    render();
+})();
+</script>
 </body>
 </html>

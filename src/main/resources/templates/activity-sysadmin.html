@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Activity Log - DentIS</title>
+    <link rel="stylesheet" href="/css/dashboard-sysadmin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="background"></div>
+<div class="sysadmin-dashboard">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="menu-icon" id="menuToggle">&#9776;</div>
+            <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+            <h1>DentIS</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-profile" id="userProfileBtn">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (System Admin)' : 'System Admin'}">Admin</span>
+                <div class="dropdown-icon">&#9660;</div>
+                <div class="user-dropdown" id="userDropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item" th:classappend="${adminPage == null or adminPage == 'users'} ? 'active'">
+                        <a href="/dashboard-sysadmin" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <span>Users</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" th:classappend="${adminPage == 'overview'} ? 'active'">
+                        <a href="/overview-sysadmin" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+                            <span>Clinic Overview</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" th:classappend="${adminPage == 'activity'} ? 'active'">
+                        <a href="/activity-sysadmin" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+                            <span>Activity Log</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <div class="ad-head"><h1>Activity Log</h1></div>
+            <div class="ad-panel">
+                <form class="ad-filters" method="get" action="/activity-sysadmin" id="adDaysForm">
+                    <span class="sa-flabel" style="font-size:12px;font-weight:600;color:#6b7a8c;">Period</span>
+                    <select name="days" onchange="this.form.submit()">
+                        <option value="1" th:selected="${days == 1}">Today</option>
+                        <option value="7" th:selected="${days == 7}">Last 7 days</option>
+                        <option value="30" th:selected="${days == 30}">Last 30 days</option>
+                        <option value="90" th:selected="${days == 90}">Last 90 days</option>
+                        <option value="365" th:selected="${days == 365}">Last year</option>
+                    </select>
+                    <input type="text" id="adSearch" placeholder="Search person, action, chart number or patient" autocomplete="off">
+                </form>
+                <div class="ad-filters" id="adCats">
+                    <button type="button" class="ad-chip on" data-cat="all">All</button>
+                    <button type="button" class="ad-chip" data-cat="APPROVE">Approvals</button>
+                    <button type="button" class="ad-chip" data-cat="REVISE">Revisions</button>
+                    <button type="button" class="ad-chip" data-cat="SUBMIT">Submissions</button>
+                    <button type="button" class="ad-chip" data-cat="EVALUATION">Evaluations</button>
+                    <button type="button" class="ad-chip" data-cat="ASSIGN">Assignments</button>
+                    <button type="button" class="ad-chip" data-cat="REQUEST">Requests</button>
+                    <button type="button" class="ad-chip" data-cat="PATIENT">Patients</button>
+                    <button type="button" class="ad-chip" data-cat="ACCOUNT">Accounts</button>
+                </div>
+                <div class="ad-body">
+                    <table class="ad-table">
+                        <thead><tr><th style="width:150px;">When</th><th>Who</th><th>What</th><th>Record</th></tr></thead>
+                        <tbody id="adBody">
+                            <tr th:each="e : ${entries}" class="ad-row" th:attr="data-cat=${e.category}">
+                                <td><span th:text="${#temporals.format(e.at, 'MMM d, yyyy')}"></span><span class="ad-sub" th:text="${#temporals.format(e.at, 'h:mm a')}"></span></td>
+                                <td><span th:text="${e.actorName != null ? e.actorName : 'System'}"></span><span class="ad-sub" th:text="${e.actorRole}"></span></td>
+                                <td><span class="cat" th:classappend="${e.category}" th:text="${e.category == 'APPROVE' ? 'Approval' : e.category == 'REVISE' ? 'Revision' : e.category == 'SUBMIT' ? 'Submission' : e.category == 'ASSIGN' ? 'Assignment' : e.category == 'REQUEST' ? 'Request' : e.category == 'ACCOUNT' ? 'Account' : e.category == 'PATIENT' ? 'Patient' : e.category == 'EVALUATION' ? 'Evaluation' : e.category}"></span> <span th:text="${e.action}" style="margin-left:6px;"></span></td>
+                                <td th:text="${e.target != null ? e.target : '—'}"></td>
+                            </tr>
+                            <tr id="adEmpty" style="display:none;"><td colspan="4" class="ad-empty">Nothing matches.</td></tr>
+                            <tr th:if="${#lists.isEmpty(entries)}"><td colspan="4" class="ad-empty">No activity in this period yet. Approvals, submissions, assignments and account changes appear here as they happen.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<script>
+document.getElementById('menuToggle').addEventListener('click', function () {
+    document.getElementById('sidebar').classList.toggle('expanded');
+    document.getElementById('mainContent').classList.toggle('shifted');
+});
+document.getElementById('userProfileBtn').addEventListener('click', function (e) { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('show'); });
+document.addEventListener('click', function () { document.getElementById('userDropdown').classList.remove('show'); });
+</script>
+<script src="/js/sidebar-hover.js?v=3"></script>
+<script>
+(function () {
+    var rows = Array.prototype.slice.call(document.querySelectorAll('#adBody tr.ad-row')), cat = 'all', q = '';
+    rows.forEach(function (tr) { tr._t = tr.textContent.replace(/\s+/g, ' ').toLowerCase(); });
+    function render() {
+        var n = 0;
+        rows.forEach(function (tr) { var ok = (cat === 'all' || tr.dataset.cat === cat) && (!q || tr._t.indexOf(q) >= 0); tr.style.display = ok ? '' : 'none'; if (ok) n++; });
+        document.getElementById('adEmpty').style.display = rows.length && !n ? '' : 'none';
+        document.querySelectorAll('.ad-chip').forEach(function (c) { c.classList.toggle('on', c.dataset.cat === cat); });
+    }
+    document.querySelectorAll('.ad-chip').forEach(function (c) { c.addEventListener('click', function () { cat = c.dataset.cat; render(); }); });
+    document.getElementById('adSearch').addEventListener('input', function () { q = this.value.trim().toLowerCase(); render(); });
+    document.getElementById('adDaysForm').addEventListener('submit', function (e) { if (document.activeElement && document.activeElement.id === 'adSearch') e.preventDefault(); });
+})();
+</script>
+</body>
+</html>

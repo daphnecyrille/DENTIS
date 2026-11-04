@@ -31,7 +31,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/css/**", "/images/**", "/js/**", "/uploads/**", "/login", "/oauth2/**").permitAll()
+                .requestMatchers("/css/**", "/images/**", "/js/**", "/files/**", "/uploads/**", "/login", "/oauth2/**").permitAll()
                 .requestMatchers(
                     "/faculty-dashboard", "/faculty-assign", "/faculty-patientlist", "/faculty-advisees",
                     "/chartsview-faculty/**", "/faculty-dashboard/**", "/admitting-view-faculty/**",
@@ -58,7 +58,9 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/dashboard-sysadmin",
                     "/create-user-sysadmin", "/edit-user-sysadmin", "/toggle-status-sysadmin",
-                    "/usermanagement-sysadmin"
+                    "/usermanagement-sysadmin",
+                    "/activity-sysadmin", "/overview-sysadmin", "/import-users-sysadmin",
+                    "/semester-promote-sysadmin", "/semester-deactivate-sysadmin"
                 ).hasRole("ADMIN")
                 .requestMatchers(
                     "/clinician-dashboard", "/chartsview-clinician/**", "/chartrequest-clinician",
@@ -85,7 +87,9 @@ public class SecurityConfig {
             .exceptionHandling(ex -> ex
                 .accessDeniedHandler(roleBasedAccessDeniedHandler())
             )
-            .csrf(csrf -> csrf.disable());
+            .csrf(csrf -> csrf.disable())
+            // allow our own pages to show uploaded PDFs in a preview frame (still blocked for other sites)
+            .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
 
         return http.build();
     }

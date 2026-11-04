@@ -35,6 +35,9 @@ public class User {
     @Column(nullable = false)
     private AccountStatus status = AccountStatus.ACTIVE;
 
+    /** Last successful sign-in (null = never signed in). */
+    private java.time.LocalDateTime lastLoginAt;
+
     private String studentNumber;
     private String yearLevel;
 

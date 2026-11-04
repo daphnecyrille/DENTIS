@@ -1,6 +1,7 @@
 package com.dentis.DENTIS.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -11,6 +12,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
+
+    private final ActivityLogInterceptor activityLogInterceptor;
+
+    public WebMvcConfig(ActivityLogInterceptor activityLogInterceptor) {
+        this.activityLogInterceptor = activityLogInterceptor;
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(activityLogInterceptor);   // writes the activity log after important actions
+    }
 
     private static final String UPLOAD_FS_PATH =
             System.getProperty("user.dir") + "/src/main/resources/static/uploads/";

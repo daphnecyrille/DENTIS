@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Clinic Overview - DentIS</title>
+    <link rel="stylesheet" href="/css/dashboard-sysadmin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="background"></div>
+<div class="sysadmin-dashboard">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="menu-icon" id="menuToggle">&#9776;</div>
+            <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+            <h1>DentIS</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-profile" id="userProfileBtn">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (System Admin)' : 'System Admin'}">Admin</span>
+                <div class="dropdown-icon">&#9660;</div>
+                <div class="user-dropdown" id="userDropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item" th:classappend="${adminPage == null or adminPage == 'users'} ? 'active'">
+                        <a href="/dashboard-sysadmin" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <span>Users</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" th:classappend="${adminPage == 'overview'} ? 'active'">
+                        <a href="/overview-sysadmin" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+                            <span>Clinic Overview</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" th:classappend="${adminPage == 'activity'} ? 'active'">
+                        <a href="/activity-sysadmin" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+                            <span>Activity Log</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <div class="ad-head"><h1>Clinic Overview</h1>
+                <div class="ad-note">
+                    <span class="ad-pill" th:classappend="${pendingRequests == 0} ? 'ok'" th:text="${pendingRequests + ' pending chart requests'}"></span>
+                    <span class="ad-pill" th:classappend="${needsFaculty == 0} ? 'ok'" th:text="${needsFaculty + ' patients without a faculty'}"></span>
+                </div>
+            </div>
+
+            <!-- chart forms across the clinic -->
+            <div class="ad-kpis">
+                <div class="ad-kpi k-wait"><b th:text="${waitingCount}">0</b><span>Waiting for faculty review</span></div>
+                <div class="ad-kpi k-rev"><b th:text="${reviseCount}">0</b><span>Sent back for revision</span></div>
+                <div class="ad-kpi k-prog"><b th:text="${progressCount}">0</b><span>Not started / in progress</span></div>
+                <div class="ad-kpi k-ok"><b th:text="${approvedCount}">0</b><span>Approved</span></div>
+            </div>
+
+            <div class="ad-grid">
+                <div class="ad-panel">
+                    <h2>Waiting for review, by faculty</h2>
+                    <div class="ad-body">
+                        <table class="ad-table">
+                            <thead><tr><th>Faculty</th><th style="text-align:center;">Waiting</th><th>Oldest waiting</th></tr></thead>
+                            <tbody>
+                                <tr th:each="f : ${facultyRows}">
+                                    <td th:text="${f['name']}"></td>
+                                    <td style="text-align:center;"><b th:text="${f['count']}"></b></td>
+                                    <td class="since" th:attr="data-since=${f['oldest']}" th:text="${#temporals.format(f['oldest'], 'MMM d, yyyy')}"></td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(facultyRows)}"><td colspan="3" class="ad-empty">&#10003; Nothing is waiting for review.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="ad-panel">
+                    <h2>Patients by section</h2>
+                    <div class="ad-body">
+                        <div class="ad-bar" th:each="e : ${sections}">
+                            <span th:text="${e.key}"></span>
+                            <div class="track"><div class="fill" th:style="'width:' + ${e.value * 100 / maxSection} + '%'"></div></div>
+                            <b th:text="${e.value}">0</b>
+                        </div>
+                        <p class="sa-help" style="margin-top:14px;"><b>Active clinicians by year:</b>
+                            <span th:each="y, it : ${years}" th:text="${y.key + ': ' + y.value + (it.last ? '' : ' · ')}"></span>
+                            <span th:if="${#maps.isEmpty(years)}">none</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ad-panel">
+                <h2>Longest-waiting reviews</h2>
+                <div class="ad-body">
+                    <table class="ad-table">
+                        <thead><tr><th>Form</th><th>Chart No.</th><th>Patient</th><th>Clinician</th><th>Faculty</th><th>Waiting</th></tr></thead>
+                        <tbody>
+                            <tr th:each="w : ${waiting}">
+                                <td th:text="${w.label}"></td>
+                                <td th:text="${w.chartNo}"></td>
+                                <td th:text="${w.patient}"></td>
+                                <td th:text="${w.clinician != null ? w.clinician : '—'}"></td>
+                                <td th:text="${w.faculty != null ? w.faculty : '—'}"></td>
+                                <td class="since" th:attr="data-since=${w.when}" th:text="${w.when != null ? #temporals.format(w.when, 'MMM d, yyyy') : '—'}"></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(waiting)}"><td colspan="6" class="ad-empty">&#10003; Nothing is waiting for review.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="ad-panel">
+                <h2>Recent activity <a href="/activity-sysadmin">Open Activity Log &rsaquo;</a></h2>
+                <div class="ad-body">
+                    <table class="ad-table">
+                        <tbody>
+                            <tr th:each="e : ${recent}">
+                                <td style="width:150px;"><span th:text="${#temporals.format(e.at, 'MMM d, h:mm a')}"></span></td>
+                                <td th:text="${e.actorName != null ? e.actorName : 'System'}"></td>
+                                <td><span class="cat" th:classappend="${e.category}" th:text="${e.category == 'APPROVE' ? 'Approval' : e.category == 'REVISE' ? 'Revision' : e.category == 'SUBMIT' ? 'Submission' : e.category == 'ASSIGN' ? 'Assignment' : e.category == 'REQUEST' ? 'Request' : e.category == 'ACCOUNT' ? 'Account' : e.category == 'PATIENT' ? 'Patient' : e.category == 'EVALUATION' ? 'Evaluation' : e.category}"></span> <span th:text="${e.action}" style="margin-left:6px;"></span></td>
+                                <td th:text="${e.target != null ? e.target : '—'}"></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(recent)}"><td class="ad-empty">No activity recorded yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<script>
+document.getElementById('menuToggle').addEventListener('click', function () {
+    document.getElementById('sidebar').classList.toggle('expanded');
+    document.getElementById('mainContent').classList.toggle('shifted');
+});
+document.getElementById('userProfileBtn').addEventListener('click', function (e) { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('show'); });
+document.addEventListener('click', function () { document.getElementById('userDropdown').classList.remove('show'); });
+</script>
+<script src="/js/sidebar-hover.js?v=3"></script>
+<script>
+/* "n days" waiting; 3+ days in gold */
+(function () {
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    document.querySelectorAll('.since[data-since]').forEach(function (td) {
+        var raw = td.getAttribute('data-since'); if (!raw) return;
+        var d = new Date(raw); d.setHours(0, 0, 0, 0);
+        var n = Math.round((today - d) / 86400000);
+        td.title = td.textContent;
+        td.textContent = n <= 0 ? 'Today' : n === 1 ? '1 day' : n + ' days';
+        if (n >= 3) td.classList.add('long');
+    });
+})();
+</script>
+</body>
+</html>
