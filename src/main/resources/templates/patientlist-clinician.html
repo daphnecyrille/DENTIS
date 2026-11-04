@@ -67,7 +67,7 @@
                         <a href="/evaluations-clinician" class="nav-link" style="position:relative;">
                             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="14" height="17" rx="2" stroke="#333" stroke-width="2"/><path d="M9 4V3h6v1" stroke="#333" stroke-width="2" stroke-linecap="round"/><path d="M8.5 12.5l2.2 2.2 4.8-4.8" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             <span>Evaluations</span>
-                            <b th:if="${currentUser != null and @perioEvaluationService.unreadCount(currentUser) > 0}" th:text="${@perioEvaluationService.unreadCount(currentUser)}"
+                            <b th:if="${currentUser != null and @notificationService.newEvaluationCount(currentUser) > 0}" th:text="${@notificationService.newEvaluationCount(currentUser)}"
                                style="position:absolute; top:2px; right:6px; min-width:18px; height:18px; padding:0 5px; box-sizing:border-box; border-radius:9px; background:#c0392b; color:white; font-size:11px; font-weight:700; line-height:18px; text-align:center;">1</b>
                         </a>
                     </li>
@@ -182,7 +182,7 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 });
 </script>
 
-<script src="/js/sidebar-hover.js"></script>
+<script src="/js/sidebar-hover.js?v=3"></script>
 <script>
 /* Patient List: search + status + section filters, "Today / Yesterday / n days ago", 10 per page */
 (function () {
@@ -244,8 +244,9 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
             highlight(tr.querySelector('.pl-no'), tr._no);
         });
         document.getElementById('plEmpty').style.display = list.length ? 'none' : '';
-        document.getElementById('plRange').textContent = list.length
-            ? 'Showing ' + (from + 1) + '\u2013' + Math.min(to, list.length) + ' of ' + list.length : '';
+        /* "Patients 11–20 of 34" only when the list spans more than one page */
+        document.getElementById('plRange').textContent = pages > 1
+            ? 'Patients ' + (from + 1) + '\u2013' + Math.min(to, list.length) + ' of ' + list.length : '';
 
         var pg = document.getElementById('plPages'); pg.innerHTML = '';
         if (pages > 1) {

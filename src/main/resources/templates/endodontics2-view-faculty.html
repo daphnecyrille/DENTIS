@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Clinical Endodontics - Faculty View</title>
     <link rel="stylesheet" href="/css/endodontics2-clinician.css">
+    <link rel="stylesheet" href="/css/form-common.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 
@@ -107,6 +108,9 @@
             <h2 class="page-title">Clinical Endodontics</h2>
 
             <div class="form-card">
+                <!-- Back to Charts (top-left) -->
+                <a th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}" th:href="@{/chartsview-clinicmanager/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <a th:if="${currentUser == null or currentUser.role.name() != 'CLINIC_MANAGER'}" th:href="@{/chartsview-faculty/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
 
                 <!-- Banner -->
                 <div class="form-banner">Endodontic Evaluation</div>
@@ -220,7 +224,7 @@
                     <div class="form-actions" th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
                         <a th:href="@{/chartsview-clinicmanager/{id}(id=${chart.patient.id})}" class="btn-next">Back to Charts View</a>
                     </div>
-                    <div class="form-actions review-actions" th:if="${currentUser != null and currentUser.role.name() == 'FACULTY' and chart.form2Status.name() == 'SUBMITTED'}">
+                    <div class="form-actions review-actions" th:if="${currentUser != null and currentUser.role.name() == 'FACULTY' and chart.faculty != null and chart.faculty.id == currentUser.id and chart.form2Status.name() == 'SUBMITTED'}">
                         <th:block>
                             <button type="button" class="btn-revise"
                                     th:data-action="@{/endodontics2-faculty/{id}/revise(id=${chart.id})}"
@@ -258,7 +262,7 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 </script>
 
 <script src="/js/textarea-min-size.js"></script>
-<script src="/js/sidebar-hover.js"></script>
+<script src="/js/sidebar-hover.js?v=3"></script>
 <th:block th:replace="~{fragments/faculty-review :: modals}"></th:block>
 </body>
 </html>

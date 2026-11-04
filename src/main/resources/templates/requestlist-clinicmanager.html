@@ -73,54 +73,78 @@
 
         <!-- Main Content -->
         <main class="main-content">
+            <div th:if="${justDone != null}" class="assign-toast" role="status"
+                 th:classappend="${justDone.status.name() == 'DENIED'} ? 'denied'">
+                <span th:text="${justDone.status.name() == 'DENIED' ? '✕' : '✓'}">✓</span>
+                <span th:text="${(justDone.status.name() == 'DENIED' ? 'Denied' : 'Accepted') + ': ' + (justDone.clinician != null ? justDone.clinician.fullName : 'clinician') + ' — ' + (justDone.patientName != null ? justDone.patientName : justDone.chartNo) + (justDone.section != null ? ' (' + justDone.section + ')' : '')}"></span>
+                <button type="button" onclick="this.parentNode.remove()">&times;</button>
+            </div>
+
             <section class="section">
-                <div class="section-header">
+                <div class="section-header rq-header">
                     <h2>Request List</h2>
+                    <span class="rq-count" th:text="${pendingCount + ' pending'}">0 pending</span>
                 </div>
+
+                <div class="rq-toolbar">
+                    <div class="rq-tabs" id="rqTabs">
+                        <button type="button" class="rq-tab on" data-tab="PENDING">Pending <span class="n" th:text="${pendingCount}">0</span></button>
+                        <button type="button" class="rq-tab" data-tab="APPROVED">Accepted <span class="n" th:text="${acceptedCount}">0</span></button>
+                        <button type="button" class="rq-tab" data-tab="DENIED">Denied <span class="n" th:text="${deniedCount}">0</span></button>
+                        <button type="button" class="rq-tab" data-tab="all">All <span class="n" th:text="${#lists.size(requests)}">0</span></button>
+                    </div>
+                    <div class="rq-search">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#8a97a8" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="#8a97a8" stroke-width="2" stroke-linecap="round"/></svg>
+                        <input type="text" id="rqSearch" placeholder="Search clinician, patient or chart number" autocomplete="off">
+                    </div>
+                </div>
+
                 <div class="table-container">
-                    <table>
+                    <table class="rq-table">
                         <thead>
-                            <tr>
-                                <th>Clinician</th>
-                                <th>Date Requested</th>
-                                <th>Requested Chart No.</th>
-                                <th>Patient Name</th>
-                                <th>Purpose</th>
-                                <th>Action</th>
-                            </tr>
+                            <tr><th class="rq-left">Clinician</th><th>Requested</th><th class="rq-left">Patient</th><th>Section</th><th class="rq-left">Purpose</th><th>Action</th></tr>
                         </thead>
-                        <tbody>
-                            <tr th:each="req : ${requests}">
-                                <td>
-                                    <span th:if="${req.clinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${req.clinician.fullName}"
-                                          th:data-email="${req.clinician.email}"
-                                          th:data-student="${req.clinician.studentNumber}"
-                                          th:data-year="${req.clinician.yearLevel}"
-                                          th:text="${req.clinician.fullName}"
-                                          onclick="showClinicianModal(this)">
-                                    </span>
+                        <tbody id="rqBody">
+                            <tr th:each="req : ${requests}" class="rq-row" th:attr="data-status=${req.status.name()}">
+                                <td class="rq-left">
+                                    <span th:if="${req.clinician != null}" class="clinician-link rq-name"
+                                          th:data-name="${req.clinician.fullName}" th:data-email="${req.clinician.email}"
+                                          th:data-student="${req.clinician.studentNumber}" th:data-year="${req.clinician.yearLevel}"
+                                          th:text="${req.clinician.fullName}" onclick="showClinicianModal(this)"></span>
                                     <span th:if="${req.clinician == null}">—</span>
+                                    <span class="rq-sub" th:if="${req.clinician != null}"
+                                          th:text="${(req.clinician.studentNumber != null ? req.clinician.studentNumber : '') + (req.clinician.yearLevel != null ? ' · ' + req.clinician.yearLevel : '')}"></span>
                                 </td>
-                                <td th:text="${req.requestDate}"></td>
-                                <td th:text="${req.chartNo}"></td>
-                                <td th:text="${req.patientName}"></td>
-                                <td th:text="${req.purpose}"></td>
-                                <td class="action-cell">
-                                    <form th:action="@{/requestlist-clinicmanager/{id}/approve(id=${req.id})}" method="post" style="display:inline;">
-                                        <button type="submit" class="btn-accept"
-                                                th:disabled="${req.status.name() != 'PENDING'}">Accept</button>
-                                    </form>
-                                    <form th:action="@{/requestlist-clinicmanager/{id}/deny(id=${req.id})}" method="post" style="display:inline;">
-                                        <button type="submit" class="btn-deny"
-                                                th:disabled="${req.status.name() != 'PENDING'}">Deny</button>
-                                    </form>
+                                <td>
+                                    <span th:text="${req.requestDate != null ? #temporals.format(req.requestDate, 'MMM d, yyyy') : '—'}"></span>
+                                    <span class="rq-sub rq-wait" th:if="${req.status.name() == 'PENDING'}" th:attr="data-since=${req.createdAt}"></span>
+                                </td>
+                                <td class="rq-left">
+                                    <span class="rq-name" th:text="${req.patientName != null and !#strings.isEmpty(req.patientName) ? req.patientName : '—'}"></span>
+                                    <span class="rq-sub">
+                                        <a th:if="${req.patient != null}" th:href="@{/chartsview-clinicmanager/{id}(id=${req.patient.id})}" th:text="${req.chartNo}" title="Open this patient's charts"></a>
+                                        <span th:if="${req.patient == null}" th:text="${req.chartNo}"></span>
+                                    </span>
+                                    <span th:if="${req.patient == null}" class="rq-warn" title="No patient has this chart number. Check it with the clinician before accepting.">&#9888; Chart number not found</span>
+                                </td>
+                                <td><span class="svc-tag" th:text="${req.section != null ? req.section : '—'}"></span></td>
+                                <td class="rq-left rq-purpose" th:text="${req.purpose != null and !#strings.isEmpty(req.purpose) ? req.purpose : '—'}"></td>
+                                <td class="rq-action">
+                                    <th:block th:if="${req.status.name() == 'PENDING'}">
+                                        <form th:action="@{/requestlist-clinicmanager/{id}/approve(id=${req.id})}" method="post" style="display:inline;">
+                                            <button type="submit" class="rq-accept">Accept</button>
+                                        </form>
+                                        <form th:action="@{/requestlist-clinicmanager/{id}/deny(id=${req.id})}" method="post" style="display:inline;" class="rq-deny-form">
+                                            <button type="button" class="rq-deny">Deny</button>
+                                            <button type="submit" class="rq-deny-confirm">Confirm deny</button>
+                                            <button type="button" class="rq-deny-cancel" title="Cancel">&times;</button>
+                                        </form>
+                                    </th:block>
+                                    <span th:if="${req.status.name() == 'APPROVED'}" class="rq-status approved">Accepted</span>
+                                    <span th:if="${req.status.name() == 'DENIED'}" class="rq-status denied">Denied</span>
                                 </td>
                             </tr>
-                            <tr th:if="${#lists.isEmpty(requests)}">
-                                <td colspan="6" style="text-align:center; color:#888;">No requests yet.</td>
-                            </tr>
+                            <tr id="rqEmpty" style="display:none;"><td colspan="6" class="rq-empty">Nothing here.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -174,6 +198,44 @@ function closeModal() {
 }
 </script>
 
-<script src="/js/sidebar-hover.js"></script>
+<script src="/js/sidebar-hover.js?v=3"></script>
+<script>
+(function () {
+    var rows = Array.prototype.slice.call(document.querySelectorAll('#rqBody tr.rq-row'));
+    var tab = 'PENDING', q = '';
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    rows.forEach(function (tr) {
+        tr._text = tr.textContent.replace(/\s+/g, ' ').toLowerCase();
+        var w = tr.querySelector('.rq-wait');
+        if (w && w.dataset.since) {
+            var d = new Date(w.dataset.since); d.setHours(0, 0, 0, 0);
+            var n = Math.round((today - d) / 86400000);
+            w.textContent = n <= 0 ? 'Today' : n === 1 ? 'Waiting 1 day' : 'Waiting ' + n + ' days';
+            if (n >= 2) w.classList.add('long');
+        }
+        /* Deny asks once more before it goes through */
+        var f = tr.querySelector('.rq-deny-form');
+        if (f) {
+            f.querySelector('.rq-deny').addEventListener('click', function () { f.classList.add('confirming'); });
+            f.querySelector('.rq-deny-cancel').addEventListener('click', function () { f.classList.remove('confirming'); });
+        }
+    });
+    function render() {
+        var shown = 0;
+        rows.forEach(function (tr) {
+            var ok = (tab === 'all' || tr.dataset.status === tab) && (!q || tr._text.indexOf(q) >= 0);
+            tr.style.display = ok ? '' : 'none'; if (ok) shown++;
+        });
+        var e = document.getElementById('rqEmpty');
+        e.style.display = shown ? 'none' : '';
+        e.firstElementChild.textContent = q ? 'No request matches your search.'
+            : tab === 'PENDING' ? '\u2713 No pending requests.' : 'Nothing here yet.';
+        document.querySelectorAll('.rq-tab').forEach(function (t) { t.classList.toggle('on', t.dataset.tab === tab); });
+    }
+    document.querySelectorAll('.rq-tab').forEach(function (t) { t.addEventListener('click', function () { tab = t.dataset.tab; render(); }); });
+    document.getElementById('rqSearch').addEventListener('input', function () { q = this.value.trim().toLowerCase(); render(); });
+    render();
+})();
+</script>
 </body>
 </html>

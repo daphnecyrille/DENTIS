@@ -47,12 +47,29 @@ public class OralSurgeryChartService {
         return repo.findByPatientOrderByCreatedAtDesc(patient);
     }
 
+    /**
+     * The patient was reassigned to another faculty: their charts in this section go to that faculty too.
+     * Charts the former faculty already fully approved stay with them, as the record of who approved them.
+     */
+    public void reassignFaculty(Patient patient, User faculty) {
+        List<OralSurgeryChart> charts = findAllByPatient(patient).stream()
+                .filter(c -> !(c.getStatus() == OralSurgeryChartStatus.APPROVED))
+                .toList();
+        charts.forEach(c -> c.setFaculty(faculty));
+        repo.saveAll(charts);
+    }
+
     public List<OralSurgeryChart> findByClinicianOrderByCreatedAtDesc(User clinician) {
         return repo.findByClinicianOrderByCreatedAtDesc(clinician);
     }
 
     public List<OralSurgeryChart> findByFacultyOrderByCreatedAtDesc(User faculty) {
         return repo.findByFacultyOrderByCreatedAtDesc(faculty);
+    }
+
+    /** Every chart of this section (all faculty of the section can see all its patients). */
+    public List<OralSurgeryChart> findAllOrderByCreatedAtDesc() {
+        return repo.findAllByOrderByCreatedAtDesc();
     }
 
     public List<OralSurgeryChart> findActionNeededByClinician(User clinician) {

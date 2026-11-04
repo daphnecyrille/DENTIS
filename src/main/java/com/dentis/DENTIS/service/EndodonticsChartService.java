@@ -40,12 +40,29 @@ public class EndodonticsChartService {
         return repo.findByPatientOrderByCreatedAtDesc(patient);
     }
 
+    /**
+     * The patient was reassigned to another faculty: their charts in this section go to that faculty too.
+     * Charts the former faculty already fully approved stay with them, as the record of who approved them.
+     */
+    public void reassignFaculty(Patient patient, User faculty) {
+        List<EndodonticsChart> charts = findAllByPatient(patient).stream()
+                .filter(c -> !(c.getStatus() == EndodonticsChartStatus.APPROVED && c.getForm2Status() == EndodonticsChartStatus.APPROVED))
+                .toList();
+        charts.forEach(c -> c.setFaculty(faculty));
+        repo.saveAll(charts);
+    }
+
     public List<EndodonticsChart> findByClinicianOrderByCreatedAtDesc(User clinician) {
         return repo.findByClinicianOrderByCreatedAtDesc(clinician);
     }
 
     public List<EndodonticsChart> findByFacultyOrderByCreatedAtDesc(User faculty) {
         return repo.findByFacultyOrderByCreatedAtDesc(faculty);
+    }
+
+    /** Every chart of this section (all faculty of the section can see all its patients). */
+    public List<EndodonticsChart> findAllOrderByCreatedAtDesc() {
+        return repo.findAllByOrderByCreatedAtDesc();
     }
 
     public List<EndodonticsChart> findActionNeededByClinician(User clinician) {

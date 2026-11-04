@@ -45,7 +45,7 @@ public class PatientService {
 
     private String getSectionForServiceCode(String code) {
         if (code == null) return "";
-        if ("CD".equalsIgnoreCase(code) || "RPD".equalsIgnoreCase(code)) return "PROSTHO";
+        if ("CD".equalsIgnoreCase(code) || "RPD".equalsIgnoreCase(code) || "FPD".equalsIgnoreCase(code)) return "PROSTHO";
         return code;
     }
 
@@ -59,6 +59,19 @@ public class PatientService {
         User faculty = userRepository.findById(facultyId).orElseThrow();
         patient.setAssignedFaculty(faculty);
         patientRepository.save(patient);
+
+        // Move the patient's charts in the new faculty's section to them, so the patient shows in
+        // their Patient List / approvals and the chart shows the right faculty.
+        String section = faculty.getSection() != null ? faculty.getSection()
+                : getSectionForServiceCode(patient.getServiceCode());
+        switch (section == null ? "" : section.toUpperCase()) {
+            case "OS" -> oralSurgeryChartService.reassignFaculty(patient, faculty);
+            case "ENDO" -> endodonticsChartService.reassignFaculty(patient, faculty);
+            case "PERIO" -> periodonticChartService.reassignFaculty(patient, faculty);
+            case "RESTO" -> operativeChartService.reassignFaculty(patient, faculty);
+            case "PROSTHO" -> prosthodonticsChartService.reassignFaculty(patient, faculty);
+            default -> { }
+        }
     }
 
     public List<Patient> getPatientsForFaculty(User faculty) {
@@ -73,6 +86,7 @@ public class PatientService {
         Patient patient = patientRepository.findById(patientId).orElseThrow();
         User clinician = userRepository.findById(clinicianId).orElseThrow();
         patient.setAssignedClinician(clinician);
+        patient.setClinicianAssignedAt(java.time.LocalDateTime.now());
         patientRepository.save(patient);
 
         String code = patient.getServiceCode() != null ? patient.getServiceCode().toUpperCase() : "";
@@ -96,7 +110,7 @@ public class PatientService {
             if (operativeChartService.findAllByPatient(patient).isEmpty()) {
                 operativeChartService.createForPatient(patient, clinician, faculty);
             }
-        } else if ("CD".equalsIgnoreCase(code) || "RPD".equalsIgnoreCase(code)) {
+        } else if ("CD".equalsIgnoreCase(code) || "RPD".equalsIgnoreCase(code) || "FPD".equalsIgnoreCase(code)) {
             if (prosthodonticsChartService.findAllByPatient(patient).isEmpty()) {
                 prosthodonticsChartService.createForPatient(patient, clinician, faculty);
             }

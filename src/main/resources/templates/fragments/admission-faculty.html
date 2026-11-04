@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Faculty cell of an admission row in the clinic manager's charts view: assign, or show the faculty with Reassign.
+     adm = the admission (patient record), options = faculty of its section, back = id of the charts view to return to. -->
+<td th:fragment="cell(adm, options, back)">
+    <div th:if="${adm.assignedFaculty != null}" style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+        <span style="font-size:13px; font-weight:600; color:#2d6a2d;">&#10003; <span th:text="${adm.assignedFaculty.fullName}"></span></span>
+        <a href="#" onclick="this.closest('td').querySelector('.reassign-form').style.display='flex'; this.style.display='none'; return false;"
+           style="font-size:11px; color:#888; text-decoration:underline; cursor:pointer;">Reassign</a>
+        <form class="reassign-form" th:action="@{/chartsview-clinicmanager/{id}/assign-faculty(id=${adm.id})}" method="post"
+              style="display:none; gap:6px; align-items:center; margin-top:2px;">
+            <input type="hidden" name="returnTo" th:value="${back}">
+            <select name="facultyId" required style="font-size:12px; padding:3px 6px; border:1px solid #ccc; border-radius:4px;">
+                <option value="">Select Faculty</option>
+                <option th:each="f : ${options}" th:value="${f.id}" th:text="${f.fullName}"
+                        th:selected="${adm.assignedFaculty.id == f.id}"></option>
+            </select>
+            <button type="submit" style="background:#324966;color:white;border:none;padding:4px 8px;border-radius:4px;font-size:11px;cursor:pointer;font-family:'Poppins',sans-serif;">Save</button>
+        </form>
+    </div>
+    <form th:if="${adm.assignedFaculty == null}" th:action="@{/chartsview-clinicmanager/{id}/assign-faculty(id=${adm.id})}" method="post"
+          style="display:flex; gap:6px; align-items:center; justify-content:center;">
+        <input type="hidden" name="returnTo" th:value="${back}">
+        <select name="facultyId" required style="font-size:13px; padding:4px 8px; border:1px solid #ccc; border-radius:4px;">
+            <option value="">Select Faculty</option>
+            <option th:each="f : ${options}" th:value="${f.id}" th:text="${f.fullName}"></option>
+        </select>
+        <button type="submit" style="background:#324966;color:white;border:none;padding:5px 10px;border-radius:4px;font-size:12px;cursor:pointer;font-family:'Poppins',sans-serif;">Assign</button>
+    </form>
+</td>
+</body>
+</html>

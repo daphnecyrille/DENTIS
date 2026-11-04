@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>My Advisees - Faculty</title>
     <link rel="stylesheet" href="/css/faculty-advisees.css">
+    <link rel="stylesheet" href="/css/patient-list.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -77,96 +78,96 @@
 
         <!-- Main Content -->
         <main class="main-content">
-
-            <div class="page-header">
-                <h2 class="page-title">My Advisees
-                    <span class="section-badge" th:text="${section}"></span>
-                </h2>
+            <div class="adv-head">
+                <h2 class="adv-title">My Advisees <span class="section-badge" th:text="${section}"></span></h2>
+                <span class="adv-sub" th:text="${#lists.size(advisees) + (#lists.size(advisees) == 1 ? ' clinician' : ' clinicians')}">0 clinicians</span>
             </div>
 
-            <!-- No advisees state -->
             <div class="empty-state" th:if="${#lists.isEmpty(advisees)}">
-                <p>No clinicians are currently assigned to you for the <strong th:text="${section}"></strong> section.</p>
+                <p>No clinicians are assigned to you yet for the <strong th:text="${section}"></strong> section.</p>
             </div>
 
-            <!-- Advisee list + detail -->
-            <div class="advisees-layout" th:if="${!#lists.isEmpty(advisees)}">
-
-                <!-- Left: scrollable advisee list -->
-                <aside class="advisee-list">
-                    <div class="advisee-list-header">Advisees <span class="count-badge" th:text="${#lists.size(advisees)}"></span></div>
-                    <div th:each="advisee, iterStat : ${advisees}"
-                         th:id="'list-item-' + ${advisee.id}"
-                         th:class="${iterStat.first} ? 'advisee-list-item active' : 'advisee-list-item'"
-                         th:onclick="'selectAdvisee(' + ${advisee.id} + ', this)'">
-                        <span class="advisee-name" th:text="${advisee.fullName}"></span>
-                        <span class="advisee-meta" th:text="${advisee.studentNumber != null ? advisee.studentNumber : ''}"></span>
-                        <span class="patient-count-badge" th:text="${#lists.size(patientsMap.get(advisee.id))} + ' patients'"></span>
+            <div class="adv-layout" th:if="${!#lists.isEmpty(advisees)}">
+                <!-- Left: advisees, the ones who need you first -->
+                <aside class="adv-list">
+                    <div class="adv-search">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#8a97a8" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="#8a97a8" stroke-width="2" stroke-linecap="round"/></svg>
+                        <input type="text" id="advSearch" placeholder="Search name or student no." autocomplete="off">
+                    </div>
+                    <div class="adv-items">
+                        <button type="button" th:each="a, it : ${advisees}" th:with="n=${countsMap[a.id]}"
+                                class="adv-item" th:classappend="${it.first} ? 'active'"
+                                th:attr="data-id=${a.id},data-search=${(a.fullName + ' ' + (a.studentNumber != null ? a.studentNumber : '')).toLowerCase()}">
+                            <span class="adv-avatar" th:text="${a.firstName != null and a.lastName != null ? a.firstName.substring(0,1) + a.lastName.substring(0,1) : '?'}">AB</span>
+                            <span class="adv-main">
+                                <span class="adv-name" th:text="${a.fullName}"></span>
+                                <span class="adv-meta" th:text="${(a.studentNumber != null ? a.studentNumber : '—') + ' · ' + n['patients'] + (n['patients'] == 1 ? ' patient' : ' patients')}"></span>
+                                <span class="adv-pills">
+                                    <span th:if="${n['awaiting'] > 0}" class="pill pill-await" th:text="${n['awaiting'] + ' awaiting'}"></span>
+                                    <span th:if="${n['revise'] > 0}" class="pill pill-revise" th:text="${n['revise'] + ' for revision'}"></span>
+                                    <span th:if="${n['awaiting'] == 0 and n['revise'] == 0 and n['patients'] > 0}" class="pill pill-ok">Nothing to review</span>
+                                </span>
+                            </span>
+                        </button>
+                        <div class="adv-none" id="advNone" style="display:none;">No advisee matches.</div>
                     </div>
                 </aside>
 
-                <!-- Right: detail panel -->
-                <div class="advisee-detail">
-                    <div th:each="advisee, iterStat : ${advisees}"
-                         th:id="'panel-' + ${advisee.id}"
-                         th:class="${iterStat.first} ? 'detail-panel active' : 'detail-panel'">
-
-                        <div class="detail-header">
-                            <h3 th:text="${advisee.fullName}"></h3>
-                        </div>
-
-                        <!-- Advisee info strip -->
-                        <div class="advisee-info">
-                            <div class="info-item">
-                                <span class="info-label">Student No.</span>
-                                <span class="info-value" th:text="${advisee.studentNumber != null ? advisee.studentNumber : '—'}"></span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Year Level</span>
-                                <span class="info-value" th:text="${advisee.yearLevel != null ? advisee.yearLevel : '—'}"></span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Email</span>
-                                <span class="info-value" th:text="${advisee.email}"></span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Total Patients</span>
-                                <span class="info-value" th:text="${#lists.size(patientsMap.get(advisee.id))}"></span>
+                <!-- Right: the selected advisee -->
+                <section class="adv-detail">
+                    <div th:each="a, it : ${advisees}" th:with="n=${countsMap[a.id]}, rows=${rowsMap[a.id]}"
+                         class="adv-panel" th:classappend="${it.first} ? 'active'" th:id="'panel-' + ${a.id}">
+                        <div class="adv-panel-head">
+                            <div>
+                                <h3 th:text="${a.fullName}"></h3>
+                                <div class="adv-info">
+                                    <span><b>Student No.</b> <span th:text="${a.studentNumber != null ? a.studentNumber : '—'}"></span></span>
+                                    <span><b>Year Level</b> <span th:text="${a.yearLevel != null ? a.yearLevel : '—'}"></span></span>
+                                    <span><b>Email</b> <a th:href="${'mailto:' + a.email}" th:text="${a.email}"></a></span>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Patient table -->
+                        <div class="adv-stats">
+                            <div class="adv-stat stat-await" th:classappend="${n['awaiting'] > 0} ? 'has-items'"><b th:text="${n['awaiting']}">0</b><span>Awaiting Approval</span></div>
+                            <div class="adv-stat stat-revise" th:classappend="${n['revise'] > 0} ? 'has-items'"><b th:text="${n['revise']}">0</b><span>For Revision</span></div>
+                            <div class="adv-stat stat-progress"><b th:text="${n['progress']}">0</b><span>In Progress</span></div>
+                            <div class="adv-stat stat-done"><b th:text="${n['done'] + ' / ' + n['patients']}">0</b><span>Patients Completed</span></div>
+                        </div>
+
                         <div class="table-container">
-                            <table>
+                            <table class="adv-table">
                                 <thead>
-                                    <tr>
-                                        <th>Chart No.</th>
-                                        <th>Patient Name</th>
-                                        <th>Contact Number</th>
-                                        <th>Email</th>
-                                        <th>Section</th>
-                                        <th>View</th>
-                                    </tr>
+                                    <tr><th>Chart No.</th><th>Patient</th><th>Charts</th><th>Last Updated</th><th>Action</th></tr>
                                 </thead>
                                 <tbody>
-                                    <tr th:each="p : ${patientsMap.get(advisee.id)}">
-                                        <td th:text="${p.chartNo}"></td>
-                                        <td th:text="${p.surname + ', ' + p.firstName + (p.middleInitial != null ? ' ' + p.middleInitial + '.' : '')}"></td>
-                                        <td th:text="${p.contactNumber}"></td>
-                                        <td th:text="${p.email}"></td>
-                                        <td th:text="${p.serviceCode}"></td>
-                                        <td><a th:href="@{/chartsview-faculty/{id}(id=${p.id})}" class="btn-view">View Chart</a></td>
+                                    <tr th:each="row : ${rows}" th:with="pt=${row['patient']}" th:classappend="${row['awaiting']} ? 'row-await'">
+                                        <td th:text="${pt.chartNo != null ? pt.chartNo : '—'}"></td>
+                                        <td class="adv-pname" th:text="${pt.surname + ', ' + pt.firstName + (pt.middleInitial != null ? ' ' + pt.middleInitial + '.' : '')}"></td>
+                                        <td class="chart-tags">
+                                            <span th:each="t : ${row['tags']}" th:class="'chart-tag ' + ${t['css']}" th:title="${t['title']}" th:text="${t['code']}">PF1</span>
+                                            <span th:if="${row['done']}" class="pl-done">&#10003; all approved</span>
+                                        </td>
+                                        <td th:text="${row['lastUpdated'] != null ? #temporals.format(row['lastUpdated'], 'MMM d, yyyy') : '—'}"></td>
+                                        <td><a th:href="@{/chartsview-faculty/{id}(id=${pt.id})}" class="btn-view-chart">View Charts</a></td>
                                     </tr>
-                                    <tr th:if="${#lists.isEmpty(patientsMap.get(advisee.id))}">
-                                        <td colspan="6" class="empty-row">No patients assigned to this clinician yet.</td>
+                                    <tr th:if="${#lists.isEmpty(rows)}">
+                                        <td colspan="5" class="pl-empty" th:text="${'No ' + section + ' patients for this clinician yet.'}">No patients yet.</td>
                                     </tr>
                                 </tbody>
                             </table>
+                            <div class="tag-legend" th:if="${!#lists.isEmpty(rows)}">
+                                <span class="chart-tag created">Not Started</span>
+                                <span class="chart-tag in-progress">In Progress</span>
+                                <span class="chart-tag pending">Awaiting Approval</span>
+                                <span class="chart-tag revise">For Revision</span>
+                                <span class="chart-tag approved">Approved</span>
+                                <span class="tag-legend-hint">Hover over a tag for the chart name.</span>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </section>
             </div>
-
         </main>
     </div>
 </div>
@@ -187,13 +188,23 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
     e.stopPropagation();
 });
 
-function selectAdvisee(id, item) {
-    document.querySelectorAll('.detail-panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.advisee-list-item').forEach(i => i.classList.remove('active'));
-    document.getElementById('panel-' + id).classList.add('active');
-    item.classList.add('active');
-}
+/* Pick an advisee on the left to show them on the right; search filters the list */
+document.querySelectorAll('.adv-item').forEach(function (item) {
+    item.addEventListener('click', function () {
+        document.querySelectorAll('.adv-item').forEach(function (i) { i.classList.toggle('active', i === item); });
+        document.querySelectorAll('.adv-panel').forEach(function (p) { p.classList.toggle('active', p.id === 'panel-' + item.dataset.id); });
+    });
+});
+var advSearch = document.getElementById('advSearch');
+if (advSearch) advSearch.addEventListener('input', function () {
+    var q = this.value.trim().toLowerCase(), shown = 0;
+    document.querySelectorAll('.adv-item').forEach(function (i) {
+        var ok = !q || i.dataset.search.indexOf(q) >= 0;
+        i.style.display = ok ? '' : 'none'; if (ok) shown++;
+    });
+    document.getElementById('advNone').style.display = shown ? 'none' : '';
+});
 </script>
-<script src="/js/sidebar-hover.js"></script>
+<script src="/js/sidebar-hover.js?v=3"></script>
 </body>
 </html>

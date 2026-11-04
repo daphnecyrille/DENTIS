@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Patient List - Clinic Manager</title>
     <link rel="stylesheet" href="/css/patientlist-clinicmanager.css">
+    <link rel="stylesheet" href="/css/patient-list.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 
@@ -73,63 +74,104 @@
 
         <!-- Main Content -->
         <main class="main-content">
+            <!-- Patient List: one row per admission (originals and readmissions); search, section and status filters, 10 per page -->
             <section class="section">
-                <div class="section-header">
+                <div class="section-header pl-header">
                     <h2>Patient List</h2>
-                    <div class="header-controls">
-                        <input type="text" class="search-input" placeholder="Search patient...">
-                        <a href="/admitting-clinicmanager" class="btn-add">+ Add Patient</a>
+                    <div style="display:flex; align-items:center; gap:14px;">
+                        <span class="pl-count" th:text="${#lists.size(patientRows) + (#lists.size(patientRows) == 1 ? ' admission' : ' admissions')}">0</span>
+                        <a href="/admitting-clinicmanager" class="pl-admit">+ Admit Patient</a>
                     </div>
                 </div>
-                <!-- Section Tabs -->
-                <div class="tab-bar">
-                    <button class="tab-btn active" data-section="all">All <span class="tab-count" id="count-all"></span></button>
-                    <button class="tab-btn" data-section="os">OS <span class="tab-count" id="count-os"></span></button>
-                    <button class="tab-btn" data-section="endo">ENDO <span class="tab-count" id="count-endo"></span></button>
-                    <button class="tab-btn" data-section="perio">PERIO <span class="tab-count" id="count-perio"></span></button>
-                    <button class="tab-btn" data-section="resto">RESTO <span class="tab-count" id="count-resto"></span></button>
-                    <button class="tab-btn" data-section="prostho">PROSTHO <span class="tab-count" id="count-prostho"></span></button>
+
+                <div class="pl-toolbar">
+                    <div class="pl-search">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#8a97a8" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="#8a97a8" stroke-width="2" stroke-linecap="round"/></svg>
+                        <input type="text" id="plSearch" placeholder="Search by patient, chart number, contact number, clinician or faculty" autocomplete="off">
+                    </div>
+                    <div class="pl-filters">
+                        <div class="pl-fgroup" id="plStatus">
+                            <span class="pl-flabel">Status</span>
+                            <button type="button" class="pl-chip on" data-status="all">All <span class="n"></span></button>
+                            <button type="button" class="pl-chip" data-status="needsFaculty">Needs Faculty <span class="n"></span></button>
+                            <button type="button" class="pl-chip" data-status="needsClinician">Needs Clinician <span class="n"></span></button>
+                            <button type="button" class="pl-chip" data-status="inProgress">In Treatment <span class="n"></span></button>
+                            <button type="button" class="pl-chip" data-status="done">Completed <span class="n"></span></button>
+                        </div>
+                        <div class="pl-fgroup" id="plSection">
+                            <span class="pl-flabel">Section</span>
+                            <button type="button" class="pl-chip on" data-section="all">All</button>
+                            <button type="button" class="pl-chip" data-section="OS">OS</button>
+                            <button type="button" class="pl-chip" data-section="Endo">Endo</button>
+                            <button type="button" class="pl-chip" data-section="Perio">Perio</button>
+                            <button type="button" class="pl-chip" data-section="Resto">Resto</button>
+                            <button type="button" class="pl-chip" data-section="Prostho">Prostho</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="table-container">
-                    <table>
+                    <table class="patient-table">
                         <thead>
                             <tr>
-                                <th>Chart Number</th>
-                                <th>Patient Name</th>
-                                <th>Contact Number</th>
-                                <th>Email</th>
-                                <th>Assigned Clinician</th>
+                                <th>Chart No.</th>
+                                <th>Patient</th>
+                                <th>Service</th>
+                                <th>Faculty</th>
+                                <th>Clinician</th>
+                                <th>Charts</th>
+                                <th>Last Updated</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr th:each="patient : ${patients}"
-                                th:attr="data-section=${patient.serviceCode != null ? patient.serviceCode.toLowerCase() : 'unknown'}">
-                                <td th:text="${patient.chartNo}"></td>
-                                <td th:text="${patient.surname + ', ' + patient.firstName + (patient.middleInitial != null ? ' ' + patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${patient.contactNumber}"></td>
-                                <td th:text="${patient.email}"></td>
-                                <td>
-                                    <span th:if="${patient.assignedClinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${patient.assignedClinician.fullName}"
-                                          th:data-email="${patient.assignedClinician.email}"
-                                          th:data-student="${patient.assignedClinician.studentNumber}"
-                                          th:data-year="${patient.assignedClinician.yearLevel}"
-                                          th:data-clinician-id="${patient.assignedClinician.id}"
-                                          th:data-patient-id="${patient.originalPatient != null ? patient.originalPatient.id : patient.id}"
-                                          th:text="${patient.assignedClinician.fullName}"
-                                          onclick="showClinicianModal(this)"></span>
-                                    <span th:if="${patient.assignedClinician == null}">—</span>
+                        <tbody id="plBody">
+                            <tr th:each="row : ${patientRows}" th:with="pt=${row['patient']}" class="pl-row"
+                                th:attr="data-status-needs-faculty=${row['needsFaculty']},data-status-needs-clinician=${row['needsClinician']},data-status-in-progress=${row['inProgress']},data-status-done=${row['done']},data-sections=${row['section']},data-updated=${row['lastUpdated'] != null ? row['lastUpdated'] : ''}">
+                                <td class="pl-no">
+                                    <span class="pl-no-text" th:text="${pt.chartNo != null ? pt.chartNo : '—'}"></span>
+                                    <span th:if="${row['readmission']}" class="readmit-tag">Readmission</span>
                                 </td>
-                                <td><a th:href="@{/chartsview-clinicmanager/{id}(id=${patient.id})}" class="btn-view">View</a></td>
+                                <td class="pl-patient">
+                                    <span class="pl-name" th:text="${pt.surname + ', ' + pt.firstName + (pt.middleInitial != null ? ' ' + pt.middleInitial + '.' : '')}"></span>
+                                    <span class="pl-sub pl-contact" th:text="${pt.contactNumber != null and !#strings.isEmpty(pt.contactNumber) ? pt.contactNumber : ''}"></span>
+                                </td>
+                                <td><span class="svc-tag" th:text="${pt.serviceCode != null ? pt.serviceCode : '—'}"></span></td>
+                                <td class="pl-fac">
+                                    <span th:if="${pt.assignedFaculty != null}" th:text="${pt.assignedFaculty.fullName}"></span>
+                                    <span th:if="${pt.assignedFaculty == null}" class="missing">Not yet assigned</span>
+                                </td>
+                                <td class="pl-clin">
+                                    <span th:if="${pt.assignedClinician != null}" class="clinician-link"
+                                          th:data-name="${pt.assignedClinician.fullName}" th:data-email="${pt.assignedClinician.email}"
+                                          th:data-student="${pt.assignedClinician.studentNumber}" th:data-year="${pt.assignedClinician.yearLevel}"
+                                          th:data-clinician-id="${pt.assignedClinician.id}" th:text="${pt.assignedClinician.fullName}"
+                                          onclick="showClinicianModal(this)"></span>
+                                    <span th:if="${pt.assignedClinician == null}" class="missing">Not yet assigned</span>
+                                </td>
+                                <td class="chart-tags">
+                                    <span th:each="t : ${row['tags']}" th:class="'chart-tag ' + ${t['css']}" th:title="${t['title']}" th:text="${t['code']}">PF1</span>
+                                    <span th:if="${#lists.isEmpty(row['tags'])}" class="pl-sub">No charts yet</span>
+                                    <span th:if="${row['done']}" class="pl-done">&#10003; all approved</span>
+                                </td>
+                                <td class="pl-updated" th:text="${row['lastUpdated'] != null ? #temporals.format(row['lastUpdated'], 'MMM d, yyyy') : '—'}"></td>
+                                <td><a th:href="@{/chartsview-clinicmanager/{id}(id=${pt.id})}" class="btn-view-chart">View Charts</a></td>
                             </tr>
-                            <tr th:if="${#lists.isEmpty(patients)}">
-                                <td colspan="6" style="text-align:center; color:#888;">No patients registered yet.</td>
-                            </tr>
+                            <tr id="plEmpty" style="display:none;"><td colspan="8" class="pl-empty">No patients match. Try a different search or filter.</td></tr>
+                            <tr th:if="${#lists.isEmpty(patientRows)}"><td colspan="8" class="pl-empty">No patients admitted yet.</td></tr>
                         </tbody>
                     </table>
+                    <div class="tag-legend" th:if="${!#lists.isEmpty(patientRows)}">
+                        <span class="chart-tag created">Not Started</span>
+                        <span class="chart-tag in-progress">In Progress</span>
+                        <span class="chart-tag pending">Awaiting Approval</span>
+                        <span class="chart-tag revise">For Revision</span>
+                        <span class="chart-tag approved">Approved</span>
+                        <span class="tag-legend-hint">Hover over a tag for the chart name.</span>
+                    </div>
+                    <div class="pl-pager" th:if="${!#lists.isEmpty(patientRows)}">
+                        <span id="plRange"></span>
+                        <div class="pl-pages" id="plPages"></div>
+                    </div>
                 </div>
             </section>
         </main>
@@ -188,52 +230,63 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
     e.stopPropagation();
 });
 
-/* ── Section tabs ── */
-let activeSection = 'all';
-
-function normSection(code) {
-    if (!code) return 'unknown';
-    const c = code.toLowerCase();
-    return (c === 'cd' || c === 'rpd') ? 'prostho' : c;
-}
-
-function applyFilters() {
-    const query = document.querySelector('.search-input').value.toLowerCase();
-    document.querySelectorAll('tbody tr:not(.empty-row)').forEach(row => {
-        const sec = normSection(row.dataset.section);
-        const matchSection = activeSection === 'all' || sec === activeSection;
-        const matchSearch  = row.textContent.toLowerCase().includes(query);
-        row.style.display  = (matchSection && matchSearch) ? '' : 'none';
+/* Patient List: search + status + section filters, "Today / Yesterday / n days ago", 10 per page */
+(function () {
+    var rows = Array.prototype.slice.call(document.querySelectorAll('#plBody tr.pl-row'));
+    if (!rows.length) return;
+    var PER = 10, page = 1, status = 'all', section = 'all', q = '';
+    var KEY = { needsFaculty: 'statusNeedsFaculty', needsClinician: 'statusNeedsClinician', inProgress: 'statusInProgress', done: 'statusDone' };
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    rows.forEach(function (tr) {
+        tr._text = tr.textContent.replace(/\s+/g, ' ').toLowerCase();
+        var raw = tr.dataset.updated; if (!raw) return;
+        var d = new Date(raw); d.setHours(0, 0, 0, 0);
+        var diff = Math.round((today - d) / 86400000);
+        var cell = tr.querySelector('.pl-updated'); cell.title = cell.textContent;
+        if (diff === 0) cell.textContent = 'Today';
+        else if (diff === 1) cell.textContent = 'Yesterday';
+        else if (diff > 1 && diff < 7) cell.textContent = diff + ' days ago';
     });
-}
-
-function updateCounts() {
-    const rows = Array.from(document.querySelectorAll('tbody tr:not(.empty-row)'));
-    const totals = { all: rows.length, os: 0, endo: 0, perio: 0, resto: 0, prostho: 0 };
-    rows.forEach(r => {
-        const s = normSection(r.dataset.section);
-        if (totals[s] !== undefined) totals[s]++;
-    });
-    Object.entries(totals).forEach(([k, v]) => {
-        const el = document.getElementById('count-' + k);
-        if (el) el.textContent = '(' + v + ')';
-    });
-}
-
-document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        activeSection = this.dataset.section;
-        applyFilters();
-    });
-});
-
-document.querySelector('.search-input').addEventListener('input', applyFilters);
-
-updateCounts();
+    function mStatus(tr, s) { return s === 'all' || tr.dataset[KEY[s]] === 'true'; }
+    function mSection(tr) { return section === 'all' || tr.dataset.sections === section; }
+    function mSearch(tr) { return !q || tr._text.indexOf(q) >= 0; }
+    function render() {
+        document.querySelectorAll('#plStatus .pl-chip').forEach(function (c) {
+            var s = c.dataset.status;
+            c.querySelector('.n').textContent = rows.filter(function (tr) { return mStatus(tr, s) && mSection(tr) && mSearch(tr); }).length;
+            c.classList.toggle('on', s === status);
+        });
+        document.querySelectorAll('#plSection .pl-chip').forEach(function (c) { c.classList.toggle('on', c.dataset.section === section); });
+        var list = rows.filter(function (tr) { return mStatus(tr, status) && mSection(tr) && mSearch(tr); });
+        var pages = Math.max(1, Math.ceil(list.length / PER));
+        if (page > pages) page = pages;
+        var from = (page - 1) * PER, to = page * PER;
+        rows.forEach(function (tr) { tr.style.display = 'none'; });
+        list.forEach(function (tr, i) { if (i >= from && i < to) tr.style.display = ''; });
+        document.getElementById('plEmpty').style.display = list.length ? 'none' : '';
+        /* "Patients 11–20 of 34" only when the list spans more than one page */
+        document.getElementById('plRange').textContent = pages > 1
+            ? 'Admissions ' + (from + 1) + '\u2013' + Math.min(to, list.length) + ' of ' + list.length : '';
+        var pg = document.getElementById('plPages'); pg.innerHTML = '';
+        if (pages > 1) {
+            function btn(label, p, disabled, on) {
+                var b = document.createElement('button'); b.type = 'button'; b.textContent = label;
+                b.disabled = disabled; if (on) b.className = 'on';
+                b.onclick = function () { page = p; render(); };
+                pg.appendChild(b);
+            }
+            btn('\u2039', page - 1, page === 1);
+            for (var i = 1; i <= pages; i++) btn(String(i), i, false, i === page);
+            btn('\u203A', page + 1, page === pages);
+        }
+    }
+    document.getElementById('plSearch').addEventListener('input', function () { q = this.value.trim().toLowerCase(); page = 1; render(); });
+    document.querySelectorAll('#plStatus .pl-chip').forEach(function (c) { c.addEventListener('click', function () { status = c.dataset.status; page = 1; render(); }); });
+    document.querySelectorAll('#plSection .pl-chip').forEach(function (c) { c.addEventListener('click', function () { section = c.dataset.section; page = 1; render(); }); });
+    render();
+})();
 </script>
 
-<script src="/js/sidebar-hover.js"></script>
+<script src="/js/sidebar-hover.js?v=3"></script>
 </body>
 </html>

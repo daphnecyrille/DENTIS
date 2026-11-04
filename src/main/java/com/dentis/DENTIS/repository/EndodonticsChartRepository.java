@@ -27,4 +27,5 @@ public interface EndodonticsChartRepository extends JpaRepository<EndodonticsCha
     List<EndodonticsChart> findByFacultyAndForm2Status(@Param("faculty") User faculty, @Param("status") EndodonticsChartStatus status);
 
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+    List<EndodonticsChart> findAllByOrderByCreatedAtDesc();
 }

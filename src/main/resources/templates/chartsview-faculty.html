@@ -213,10 +213,10 @@
                                     <span th:if="${osc.clinician == null}">—</span>
                                 </td>
                                 <td>
-                                    <a th:if="${(osc.chartType != null and osc.chartType.name() == 'OSF2') and osc.status.name() == 'SUBMITTED'}" th:href="@{/oralsurgery2-view-faculty/{id}(id=${osc.id})}" class="btn-action btn-accept">Review</a>
-                                    <a th:if="${(osc.chartType != null and osc.chartType.name() == 'OSF2') and osc.status.name() != 'SUBMITTED'}" th:href="@{/oralsurgery2-view-faculty/{id}(id=${osc.id})}" class="btn-action btn-view">View</a>
-                                    <a th:if="${(osc.chartType == null or osc.chartType.name() == 'OSF1') and osc.status.name() == 'SUBMITTED'}" th:href="@{/oralsurgery-view-faculty/{id}(id=${osc.id})}" class="btn-action btn-accept">Review</a>
-                                    <a th:if="${(osc.chartType == null or osc.chartType.name() == 'OSF1') and osc.status.name() != 'SUBMITTED'}" th:href="@{/oralsurgery-view-faculty/{id}(id=${osc.id})}" class="btn-action btn-view">View</a>
+                                    <a th:if="${((osc.chartType != null and osc.chartType.name() == 'OSF2') and osc.status.name() == 'SUBMITTED') and osc.faculty != null and osc.faculty.id == currentUser.id}" th:href="@{/oralsurgery2-view-faculty/{id}(id=${osc.id})}" class="btn-action btn-accept">Review</a>
+                                    <a th:if="${(osc.chartType != null and osc.chartType.name() == 'OSF2') and (osc.status.name() != 'SUBMITTED' or osc.faculty == null or osc.faculty.id != currentUser.id)}" th:href="@{/oralsurgery2-view-faculty/{id}(id=${osc.id})}" class="btn-action btn-view">View</a>
+                                    <a th:if="${((osc.chartType == null or osc.chartType.name() == 'OSF1') and osc.status.name() == 'SUBMITTED') and osc.faculty != null and osc.faculty.id == currentUser.id}" th:href="@{/oralsurgery-view-faculty/{id}(id=${osc.id})}" class="btn-action btn-accept">Review</a>
+                                    <a th:if="${(osc.chartType == null or osc.chartType.name() == 'OSF1') and (osc.status.name() != 'SUBMITTED' or osc.faculty == null or osc.faculty.id != currentUser.id)}" th:href="@{/oralsurgery-view-faculty/{id}(id=${osc.id})}" class="btn-action btn-view">View</a>
                                 </td>
                             </tr>
                             <!-- Endo Row 1: Clinician Patient Workup (Form 1) -->
@@ -240,8 +240,8 @@
                                     <span th:if="${ec.clinician == null}">—</span>
                                 </td>
                                 <td>
-                                    <a th:if="${ec.status.name() == 'SUBMITTED'}" th:href="@{/endodontics-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-accept">Review</a>
-                                    <a th:if="${ec.status.name() != 'SUBMITTED'}" th:href="@{/endodontics-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-view">View</a>
+                                    <a th:if="${(ec.status.name() == 'SUBMITTED') and ec.faculty != null and ec.faculty.id == currentUser.id}" th:href="@{/endodontics-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-accept">Review</a>
+                                    <a th:if="${(ec.status.name() != 'SUBMITTED' or ec.faculty == null or ec.faculty.id != currentUser.id)}" th:href="@{/endodontics-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-view">View</a>
                                 </td>
                             </tr>
                             <!-- Endo Row 2: Endodontic Evaluation & Treatment Planning (Form 2) -->
@@ -265,8 +265,8 @@
                                     <span th:if="${ec.clinician == null}">—</span>
                                 </td>
                                 <td>
-                                    <a th:if="${ec.form2Status.name() == 'SUBMITTED'}" th:href="@{/endodontics2-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-accept">Review</a>
-                                    <a th:if="${ec.form2Status.name() != 'SUBMITTED'}" th:href="@{/endodontics2-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-view">View</a>
+                                    <a th:if="${(ec.form2Status.name() == 'SUBMITTED') and ec.faculty != null and ec.faculty.id == currentUser.id}" th:href="@{/endodontics2-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-accept">Review</a>
+                                    <a th:if="${(ec.form2Status.name() != 'SUBMITTED' or ec.faculty == null or ec.faculty.id != currentUser.id)}" th:href="@{/endodontics2-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-view">View</a>
                                 </td>
                             </tr>
                             <!-- Periodontics PF1 (Forms A+B) -->
@@ -290,8 +290,8 @@
                                     <span th:if="${pc.clinician == null}">—</span>
                                 </td>
                                 <td>
-                                    <a th:if="${pc.status.name() == 'SUBMITTED'}" th:href="@{/periodontics-a/{id}/view(id=${pc.id})}" class="btn-action btn-accept">Review</a>
-                                    <a th:if="${pc.status.name() != 'SUBMITTED'}" th:href="@{/periodontics-a/{id}/view(id=${pc.id})}" class="btn-action btn-view">View</a>
+                                    <a th:if="${(pc.status.name() == 'SUBMITTED') and pc.faculty != null and pc.faculty.id == currentUser.id}" th:href="@{/periodontics-a/{id}/view(id=${pc.id})}" class="btn-action btn-accept">Review</a>
+                                    <a th:if="${(pc.status.name() != 'SUBMITTED' or pc.faculty == null or pc.faculty.id != currentUser.id)}" th:href="@{/periodontics-a/{id}/view(id=${pc.id})}" class="btn-action btn-view">View</a>
                                 </td>
                             </tr>
                             <!-- Periodontics PF2 (Form C) -->
@@ -315,8 +315,8 @@
                                     <span th:if="${pc.clinician == null}">—</span>
                                 </td>
                                 <td>
-                                    <a th:if="${pc.formCStatus.name() == 'SUBMITTED'}" th:href="@{/periodontics-view-faculty/{id}(id=${pc.id})}" class="btn-action btn-accept">Review</a>
-                                    <a th:if="${pc.formCStatus.name() != 'SUBMITTED'}" th:href="@{/periodontics-view-faculty/{id}(id=${pc.id})}" class="btn-action btn-view">View</a>
+                                    <a th:if="${(pc.formCStatus.name() == 'SUBMITTED') and pc.faculty != null and pc.faculty.id == currentUser.id}" th:href="@{/periodontics-view-faculty/{id}(id=${pc.id})}" class="btn-action btn-accept">Review</a>
+                                    <a th:if="${(pc.formCStatus.name() != 'SUBMITTED' or pc.faculty == null or pc.faculty.id != currentUser.id)}" th:href="@{/periodontics-view-faculty/{id}(id=${pc.id})}" class="btn-action btn-view">View</a>
                                 </td>
                             </tr>
                             <tr th:each="pc : ${perioCharts}">
@@ -339,8 +339,8 @@
                                     <span th:if="${pc.clinician == null}">—</span>
                                 </td>
                                 <td>
-                                    <a th:if="${pc.pf3Status.name() == 'SUBMITTED'}" th:href="@{/periodontics-pf3/{id}/view(id=${pc.id})}" class="btn-action btn-accept">Review</a>
-                                    <a th:if="${pc.pf3Status.name() != 'SUBMITTED'}" th:href="@{/periodontics-pf3/{id}/view(id=${pc.id})}" class="btn-action btn-view">View</a>
+                                    <a th:if="${(pc.pf3Status.name() == 'SUBMITTED') and pc.faculty != null and pc.faculty.id == currentUser.id}" th:href="@{/periodontics-pf3/{id}/view(id=${pc.id})}" class="btn-action btn-accept">Review</a>
+                                    <a th:if="${(pc.pf3Status.name() != 'SUBMITTED' or pc.faculty == null or pc.faculty.id != currentUser.id)}" th:href="@{/periodontics-pf3/{id}/view(id=${pc.id})}" class="btn-action btn-view">View</a>
                                 </td>
                             </tr>
                             <!-- RESTO10 (operativeb/c - Assessment Form) -->
@@ -364,8 +364,8 @@
                                     <span th:if="${oc.clinician == null}">—</span>
                                 </td>
                                 <td>
-                                    <a th:if="${oc.status.name() == 'SUBMITTED'}" th:href="@{/operative-view-faculty/{id}(id=${oc.id})}" class="btn-action btn-accept">Review</a>
-                                    <a th:if="${oc.status.name() != 'SUBMITTED'}" th:href="@{/operative-view-faculty/{id}(id=${oc.id})}" class="btn-action btn-view">View</a>
+                                    <a th:if="${(oc.status.name() == 'SUBMITTED') and oc.faculty != null and oc.faculty.id == currentUser.id}" th:href="@{/operative-view-faculty/{id}(id=${oc.id})}" class="btn-action btn-accept">Review</a>
+                                    <a th:if="${(oc.status.name() != 'SUBMITTED' or oc.faculty == null or oc.faculty.id != currentUser.id)}" th:href="@{/operative-view-faculty/{id}(id=${oc.id})}" class="btn-action btn-view">View</a>
                                 </td>
                             </tr>
                             <!-- RESTO6 (operativea - Caries Risk Assessment) -->
@@ -389,8 +389,8 @@
                                     <span th:if="${oc.clinician == null}">—</span>
                                 </td>
                                 <td>
-                                    <a th:if="${oc.form2Status.name() == 'SUBMITTED'}" th:href="@{/operative2-view-faculty/{id}(id=${oc.id})}" class="btn-action btn-accept">Review</a>
-                                    <a th:if="${oc.form2Status.name() != 'SUBMITTED'}" th:href="@{/operative2-view-faculty/{id}(id=${oc.id})}" class="btn-action btn-view">View</a>
+                                    <a th:if="${(oc.form2Status.name() == 'SUBMITTED') and oc.faculty != null and oc.faculty.id == currentUser.id}" th:href="@{/operative2-view-faculty/{id}(id=${oc.id})}" class="btn-action btn-accept">Review</a>
+                                    <a th:if="${(oc.form2Status.name() != 'SUBMITTED' or oc.faculty == null or oc.faculty.id != currentUser.id)}" th:href="@{/operative2-view-faculty/{id}(id=${oc.id})}" class="btn-action btn-view">View</a>
                                 </td>
                             </tr>
                             <!-- Prosthodontics -->
@@ -414,8 +414,8 @@
                                     <span th:if="${pc.clinician == null}">—</span>
                                 </td>
                                 <td>
-                                    <a th:if="${pc.status.name() == 'SUBMITTED'}" th:href="@{/prosthodontics-faculty/{id}(id=${pc.id})}" class="btn-action btn-accept">Review</a>
-                                    <a th:if="${pc.status.name() != 'SUBMITTED'}" th:href="@{/prosthodontics-faculty/{id}(id=${pc.id})}" class="btn-action btn-view">View</a>
+                                    <a th:if="${(pc.status.name() == 'SUBMITTED') and pc.faculty != null and pc.faculty.id == currentUser.id}" th:href="@{/prosthodontics-faculty/{id}(id=${pc.id})}" class="btn-action btn-accept">Review</a>
+                                    <a th:if="${(pc.status.name() != 'SUBMITTED' or pc.faculty == null or pc.faculty.id != currentUser.id)}" th:href="@{/prosthodontics-faculty/{id}(id=${pc.id})}" class="btn-action btn-view">View</a>
                                 </td>
                             </tr>
                         </tbody>
@@ -511,6 +511,12 @@
     </div>
 </div>
 
+<div th:if="${param.notAssigned != null}"
+     style="position:fixed; top:95px; right:24px; z-index:2100; background:#c0392b; color:white; padding:12px 18px; border-radius:8px; font-family:'Poppins',sans-serif; font-size:13px; box-shadow:0 6px 18px rgba(0,0,0,0.2);">
+    Only the faculty assigned to this chart can approve or revise it.
+    <button type="button" onclick="this.parentNode.remove()" style="margin-left:10px; background:none; border:none; color:white; font-size:16px; cursor:pointer;">&times;</button>
+</div>
+
 <!-- Delete Evaluation Modal -->
 <div id="deleteEvalModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:2000; align-items:center; justify-content:center;">
     <div style="background:white; border-radius:10px; padding:28px 32px; width:420px; max-width:90%; box-shadow:0 8px 32px rgba(0,0,0,0.2); font-family:'Poppins',sans-serif;">
@@ -589,6 +595,6 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 </script>
 
 <script src="/js/textarea-min-size.js"></script>
-<script src="/js/sidebar-hover.js"></script>
+<script src="/js/sidebar-hover.js?v=3"></script>
 </body>
 </html>

@@ -127,9 +127,6 @@ public class ChartRequestController {
     }
 
     /** One status tag on the dashboard Patient List: short code, full name, status text and colour class. */
-    private static Map<String, String> tag(String code, String title, String status, String css) {
-        return Map.of("code", code, "title", title + " \u2014 " + status, "status", status, "css", css);
-    }
 
     /** Dashboard Patient List: the clinician's own charts. */
     private List<Map<String, Object>> patientRows(User clinician) {
@@ -141,87 +138,13 @@ public class ChartRequestController {
                 prosthodonticsChartService.findByClinicianOrderByCreatedAtDesc(clinician));
     }
 
-    /**
-     * One row per patient, with a status tag for each of their charts.
-     * Row keys: "patient", "tags", "lastUpdated" (latest save of any of their charts), "sections" (e.g. "Perio Endo"),
-     * and the flags "revise", "toSubmit", "awaiting", "done" (every chart approved) used by the filters.
-     * Order: patients with a chart for revision first, fully approved patients last, otherwise most recently updated first.
-     */
+    /** One row per patient with a status tag per chart (see PatientRowBuilder). */
     private List<Map<String, Object>> patientRows(List<com.dentis.DENTIS.model.OralSurgeryChart> os,
                                                   List<com.dentis.DENTIS.model.EndodonticsChart> endo,
                                                   List<com.dentis.DENTIS.model.PeriodonticChart> perio,
                                                   List<com.dentis.DENTIS.model.OperativeChart> operative,
                                                   List<com.dentis.DENTIS.model.ProsthodonticsChart> prostho) {
-        Map<Long, Map<String, Object>> rows = new java.util.LinkedHashMap<>();
-        // add(patient, section, last saved, tag, status name)
-        class Adder {
-            void add(Patient p, String section, java.time.LocalDateTime touched, Map<String, String> t, String status) {
-                if (p == null) return;
-                Map<String, Object> row = rows.computeIfAbsent(p.getId(), k -> {
-                    Map<String, Object> r = new java.util.HashMap<>();
-                    r.put("patient", p);
-                    r.put("tags", new java.util.ArrayList<Map<String, String>>());
-                    r.put("sectionSet", new java.util.LinkedHashSet<String>());
-                    r.put("statuses", new java.util.ArrayList<String>());
-                    return r;
-                });
-                @SuppressWarnings("unchecked") List<Map<String, String>> tags = (List<Map<String, String>>) row.get("tags");
-                @SuppressWarnings("unchecked") java.util.Set<String> secs = (java.util.Set<String>) row.get("sectionSet");
-                @SuppressWarnings("unchecked") List<String> sts = (List<String>) row.get("statuses");
-                tags.add(t); secs.add(section); sts.add(status);
-                java.time.LocalDateTime last = (java.time.LocalDateTime) row.get("lastUpdated");
-                if (touched != null && (last == null || touched.isAfter(last))) row.put("lastUpdated", touched);
-            }
-        }
-        Adder a = new Adder();
-        for (var c : os) {
-            boolean f2 = c.getChartType() != null && c.getChartType().name().equals("OSF2");
-            a.add(c.getPatient(), "OS", touched(c.getUpdatedAt(), c.getCreatedAt()),
-                  tag(f2 ? "OSF2" : "OSF1", f2 ? "Oral Surgery \u2013 Odontectomy" : "Oral Surgery \u2013 Patient Workup",
-                      c.getStatus().getDisplayName(), c.getStatus().getCssClass()), c.getStatus().name());
-        }
-        for (var c : endo) {
-            var t = touched(c.getUpdatedAt(), c.getCreatedAt());
-            a.add(c.getPatient(), "Endo", t, tag("ENDO1", "Endodontics \u2013 Patient Workup", c.getStatus().getDisplayName(), c.getStatus().getCssClass()), c.getStatus().name());
-            a.add(c.getPatient(), "Endo", t, tag("ENDO2", "Endodontics \u2013 Evaluation & Treatment Planning", c.getForm2Status().getDisplayName(), c.getForm2Status().getCssClass()), c.getForm2Status().name());
-        }
-        for (var c : perio) {
-            var t = touched(c.getUpdatedAt(), c.getCreatedAt());
-            a.add(c.getPatient(), "Perio", t, tag("PF1", "Periodontics \u2013 Periodontal Chart", c.getStatus().getDisplayName(), c.getStatus().getCssClass()), c.getStatus().name());
-            a.add(c.getPatient(), "Perio", t, tag("PF2", "Periodontics \u2013 PPD/CAL/BOP Chart", c.getFormCStatus().getDisplayName(), c.getFormCStatus().getCssClass()), c.getFormCStatus().name());
-            a.add(c.getPatient(), "Perio", t, tag("PF3", "Periodontics \u2013 Gingivitis Reevaluation Chart", c.getPf3Status().getDisplayName(), c.getPf3Status().getCssClass()), c.getPf3Status().name());
-        }
-        for (var c : operative) {
-            var t = touched(c.getUpdatedAt(), c.getCreatedAt());
-            a.add(c.getPatient(), "Resto", t, tag("RESTO10", "Operative \u2013 Assessment Form", c.getStatus().getDisplayName(), c.getStatus().getCssClass()), c.getStatus().name());
-            a.add(c.getPatient(), "Resto", t, tag("RESTO6", "Operative \u2013 Caries Risk Assessment", c.getForm2Status().getDisplayName(), c.getForm2Status().getCssClass()), c.getForm2Status().name());
-        }
-        for (var c : prostho) {
-            a.add(c.getPatient(), "Prostho", touched(c.getUpdatedAt(), c.getCreatedAt()),
-                  tag("PROSTHO", "Prosthodontics" + (c.getCaseType() != null ? " (" + c.getCaseType() + ")" : ""),
-                      c.getStatus().getDisplayName(), c.getStatus().getCssClass()), c.getStatus().name());
-        }
-        List<Map<String, Object>> out = new java.util.ArrayList<>(rows.values());
-        for (Map<String, Object> r : out) {
-            @SuppressWarnings("unchecked") List<String> sts = (List<String>) r.get("statuses");
-            @SuppressWarnings("unchecked") java.util.Set<String> secs = (java.util.Set<String>) r.get("sectionSet");
-            r.put("revise", sts.contains("REVISE"));
-            r.put("toSubmit", sts.contains("CREATED") || sts.contains("IN_PROGRESS"));
-            r.put("awaiting", sts.contains("SUBMITTED"));
-            r.put("done", !sts.isEmpty() && sts.stream().allMatch("APPROVED"::equals));
-            r.put("sections", String.join(" ", secs));
-        }
-        java.util.Comparator<Map<String, Object>> order = java.util.Comparator
-            .comparing((Map<String, Object> r) -> !(Boolean) r.get("revise"))
-            .thenComparing(r -> (Boolean) r.get("done"))
-            .thenComparing((Map<String, Object> r) -> (java.time.LocalDateTime) r.get("lastUpdated"),
-                           java.util.Comparator.nullsLast(java.util.Comparator.<java.time.LocalDateTime>reverseOrder()));
-        out.sort(order);
-        return out;
-    }
-
-    private static java.time.LocalDateTime touched(java.time.LocalDateTime updated, java.time.LocalDateTime created) {
-        return updated != null ? updated : created;
+        return com.dentis.DENTIS.service.PatientRowBuilder.build(os, endo, perio, operative, prostho);
     }
 
     /**
@@ -305,13 +228,26 @@ public class ChartRequestController {
     }
 
     @GetMapping("/requestlist-clinicmanager")
-    public String requestList(Model model) {
-        model.addAttribute("requests", chartRequestService.getPendingRequests());
+    public String requestList(Model model,
+                              @RequestParam(value = "accepted", required = false) Long acceptedId,
+                              @RequestParam(value = "denied", required = false) Long deniedId) {
+        // every request: pending ones oldest first (waiting longest on top), handled ones newest first
+        List<ChartRequest> all = chartRequestService.getAllRequests();
+        List<ChartRequest> pending = new java.util.ArrayList<>(all.stream().filter(r -> r.getStatus() == ChartRequestStatus.PENDING).toList());
+        java.util.Collections.reverse(pending);
+        List<ChartRequest> rows = new java.util.ArrayList<>(pending);
+        rows.addAll(all.stream().filter(r -> r.getStatus() != ChartRequestStatus.PENDING).toList());
+        model.addAttribute("requests", rows);
+        model.addAttribute("pendingCount", pending.size());
+        model.addAttribute("acceptedCount", all.stream().filter(r -> r.getStatus() == ChartRequestStatus.APPROVED).count());
+        model.addAttribute("deniedCount", all.stream().filter(r -> r.getStatus() == ChartRequestStatus.DENIED).count());
+        if (acceptedId != null) model.addAttribute("justDone", chartRequestService.getRequestById(acceptedId));
+        if (deniedId != null) model.addAttribute("justDone", chartRequestService.getRequestById(deniedId));
         return "requestlist-clinicmanager";
     }
 
     @PostMapping("/requestlist-clinicmanager/{id}/approve")
-    public String approve(@PathVariable Long id) {
+    public String approve(@PathVariable Long id, @RequestParam(required = false) String from) {
         chartRequestService.approve(id);
         com.dentis.DENTIS.model.ChartRequest req = chartRequestService.getRequestById(id);
         com.dentis.DENTIS.model.Patient patient = req.getPatient();
@@ -344,13 +280,13 @@ public class ChartRequestController {
                 default -> {}
             }
         }
-        return "redirect:/requestlist-clinicmanager";
+        return "dashboard".equals(from) ? "redirect:/dashboard-clinicmanager" : "redirect:/requestlist-clinicmanager?accepted=" + id;
     }
 
     @PostMapping("/requestlist-clinicmanager/{id}/deny")
-    public String deny(@PathVariable Long id) {
+    public String deny(@PathVariable Long id, @RequestParam(required = false) String from) {
         chartRequestService.deny(id);
-        return "redirect:/requestlist-clinicmanager";
+        return "dashboard".equals(from) ? "redirect:/dashboard-clinicmanager" : "redirect:/requestlist-clinicmanager?denied=" + id;
     }
 
     @GetMapping("/patientlist-clinician")
@@ -440,7 +376,8 @@ public class ChartRequestController {
             operativeChartService.createForPatient(patient, patient.getAssignedClinician(), patient.getAssignedFaculty());
         }
         model.addAttribute("operativeCharts", operativeChartService.findAllByPatient(patient));
-        if (("CD".equalsIgnoreCase(patient.getServiceCode()) || "RPD".equalsIgnoreCase(patient.getServiceCode()))
+        if (("CD".equalsIgnoreCase(patient.getServiceCode()) || "RPD".equalsIgnoreCase(patient.getServiceCode())
+                || "FPD".equalsIgnoreCase(patient.getServiceCode()))
                 && prosthodonticsChartService.findAllByPatient(patient).isEmpty()
                 && patient.getAssignedClinician() != null
                 && patient.getAssignedFaculty() != null) {

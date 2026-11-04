@@ -32,4 +32,5 @@ public interface OperativeChartRepository extends JpaRepository<OperativeChart, 
             User faculty, OperativeChartStatus form2Status);
 
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+    List<OperativeChart> findAllByOrderByCreatedAtDesc();
 }

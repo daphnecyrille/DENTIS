@@ -72,117 +72,125 @@
 
         <!-- Main Content -->
         <main class="main-content">
+            <div th:if="${saved != null}" class="assign-toast" role="status">
+                <span>&#10003;</span>
+                <span th:text="${'Advisers saved for ' + saved + (saved == 1 ? ' clinician' : ' clinicians') + '.'}"></span>
+                <button type="button" onclick="this.parentNode.remove()">&times;</button>
+            </div>
+
             <section class="section">
-                <div class="section-header">
-                    <h2>Assign Faculty Advisers to Clinicians</h2>
+                <div class="section-header aa-header">
+                    <h2>Assign Faculty Advisers</h2>
+                    <span class="aa-count" th:text="${#lists.size(assignmentRows) + ' clinicians'}">0 clinicians</span>
                 </div>
-                <div class="table-container">
 
-                    <!-- Hidden forms — one per clinician, associated via HTML5 form attribute -->
-                    <div style="display:none">
-                        <form th:each="row : ${assignmentRows}"
-                              th:id="'form-' + ${row.clinician.id}"
-                              th:action="@{/assign-clinicmanager/{id}(id=${row.clinician.id})}"
-                              method="post">
-                        </form>
+                <div class="aa-toolbar">
+                    <div class="aa-search">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#8a97a8" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="#8a97a8" stroke-width="2" stroke-linecap="round"/></svg>
+                        <input type="text" id="aaSearch" placeholder="Search by name or student number" autocomplete="off">
                     </div>
+                    <div class="aa-filters">
+                        <span class="aa-flabel">Show</span>
+                        <button type="button" class="aa-chip on" data-show="all">All <span class="n"></span></button>
+                        <button type="button" class="aa-chip" data-show="missing">Missing advisers <span class="n"></span></button>
+                        <button type="button" class="aa-chip" data-show="complete">Complete <span class="n"></span></button>
+                        <span class="aa-flabel" style="margin-left:14px;">Year</span>
+                        <select id="aaYear" class="aa-year"><option value="">All years</option></select>
+                    </div>
+                </div>
 
-                    <table>
+                <p class="aa-hint">The number after each faculty name is how many advisees they already have in that section. Tick clinicians to set one section's adviser for all of them at once.</p>
+                <!-- Bulk: set one section's adviser for every ticked clinician -->
+                <div class="aa-bulk" id="aaBulk">
+                    <b id="aaBulkCount">0 selected</b>
+                    <span>Set</span>
+                    <select id="aaBulkSec"><option value="os">OS</option><option value="endo">Endo</option><option value="perio">Perio</option><option value="resto">Resto</option><option value="prostho">Prostho</option></select>
+                    <span>adviser to</span>
+                    <select id="aaBulkFac"></select>
+                    <button type="button" class="aa-btn" id="aaBulkApply">Apply</button>
+                    <button type="button" class="aa-link" id="aaBulkClear">Clear selection</button>
+                </div>
+
+                <form id="aaForm" th:action="@{/assign-clinicmanager/save-all}" method="post">
+                <div class="table-container">
+                    <table class="aa-table">
                         <thead>
                             <tr>
-                                <th style="text-align:left;">Clinician</th>
-                                <th>OS Adviser</th>
-                                <th>ENDO Adviser</th>
-                                <th>PERIO Adviser</th>
-                                <th>RESTO Adviser</th>
-                                <th>PROSTHO Adviser</th>
-                                <th>Action</th>
+                                <th class="aa-check"><input type="checkbox" id="aaAll" title="Select all shown"></th>
+                                <th class="aa-left">Clinician</th>
+                                <th>OS</th><th>Endo</th><th>Perio</th><th>Resto</th><th>Prostho</th>
+                                <th>Complete</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr th:each="row : ${assignmentRows}">
-                                <td>
-                                    <a th:href="@{/clinician-profile/{id}(id=${row.clinician.id})}"
-                                       class="clinician-profile-link"
-                                       th:text="${row.clinician.fullName}"></a>
+                        <tbody id="aaBody">
+                            <tr th:each="row : ${assignmentRows}" class="aa-row"
+                                th:attr="data-year=${row.clinician.yearLevel != null ? row.clinician.yearLevel : ''}">
+                                <td class="aa-check"><input type="checkbox" class="aa-pick"></td>
+                                <td class="aa-left">
+                                    <a th:href="@{/clinician-profile/{id}(id=${row.clinician.id})}" class="aa-name" th:text="${row.clinician.fullName}"></a>
+                                    <span class="aa-meta" th:text="${(row.clinician.studentNumber != null ? row.clinician.studentNumber : '—') + (row.clinician.yearLevel != null ? ' · ' + row.clinician.yearLevel : '')}"></span>
+                                    <span class="aa-unsaved">Unsaved changes</span>
                                 </td>
-
-                                <!-- OS -->
                                 <td>
-                                    <select name="osFacultyId" class="assign-select"
-                                            th:attr="form='form-' + ${row.clinician.id}">
-                                        <option value="">— None —</option>
-                                        <option th:each="f : ${osFaculty}"
-                                                th:value="${f.id}"
-                                                th:text="${f.fullName}"
-                                                th:selected="${row.osFaculty != null and row.osFaculty.id == f.id}">
-                                        </option>
+                                    <select th:name="${'os_' + row.clinician.id}" class="adv-select" data-sec="os"
+                                            th:attr="data-orig=${row.osFaculty != null ? row.osFaculty.id : ''}">
+                                        <option value="">Not assigned</option>
+                                        <option th:each="f : ${osFaculty}" th:value="${f.id}"
+                                                th:text="${f.fullName + ' (' + adviseeCounts[f.id] + ')'}" th:title="${adviseeCounts[f.id] + (adviseeCounts[f.id] == 1 ? ' advisee' : ' advisees')}"
+                                                th:selected="${row.osFaculty != null and row.osFaculty.id == f.id}"></option>
                                     </select>
                                 </td>
-
-                                <!-- ENDO -->
                                 <td>
-                                    <select name="endoFacultyId" class="assign-select"
-                                            th:attr="form='form-' + ${row.clinician.id}">
-                                        <option value="">— None —</option>
-                                        <option th:each="f : ${endoFaculty}"
-                                                th:value="${f.id}"
-                                                th:text="${f.fullName}"
-                                                th:selected="${row.endoFaculty != null and row.endoFaculty.id == f.id}">
-                                        </option>
+                                    <select th:name="${'endo_' + row.clinician.id}" class="adv-select" data-sec="endo"
+                                            th:attr="data-orig=${row.endoFaculty != null ? row.endoFaculty.id : ''}">
+                                        <option value="">Not assigned</option>
+                                        <option th:each="f : ${endoFaculty}" th:value="${f.id}"
+                                                th:text="${f.fullName + ' (' + adviseeCounts[f.id] + ')'}" th:title="${adviseeCounts[f.id] + (adviseeCounts[f.id] == 1 ? ' advisee' : ' advisees')}"
+                                                th:selected="${row.endoFaculty != null and row.endoFaculty.id == f.id}"></option>
                                     </select>
                                 </td>
-
-                                <!-- PERIO -->
                                 <td>
-                                    <select name="perioFacultyId" class="assign-select"
-                                            th:attr="form='form-' + ${row.clinician.id}">
-                                        <option value="">— None —</option>
-                                        <option th:each="f : ${perioFaculty}"
-                                                th:value="${f.id}"
-                                                th:text="${f.fullName}"
-                                                th:selected="${row.perioFaculty != null and row.perioFaculty.id == f.id}">
-                                        </option>
+                                    <select th:name="${'perio_' + row.clinician.id}" class="adv-select" data-sec="perio"
+                                            th:attr="data-orig=${row.perioFaculty != null ? row.perioFaculty.id : ''}">
+                                        <option value="">Not assigned</option>
+                                        <option th:each="f : ${perioFaculty}" th:value="${f.id}"
+                                                th:text="${f.fullName + ' (' + adviseeCounts[f.id] + ')'}" th:title="${adviseeCounts[f.id] + (adviseeCounts[f.id] == 1 ? ' advisee' : ' advisees')}"
+                                                th:selected="${row.perioFaculty != null and row.perioFaculty.id == f.id}"></option>
                                     </select>
                                 </td>
-
-                                <!-- RESTO -->
                                 <td>
-                                    <select name="restoFacultyId" class="assign-select"
-                                            th:attr="form='form-' + ${row.clinician.id}">
-                                        <option value="">— None —</option>
-                                        <option th:each="f : ${restoFaculty}"
-                                                th:value="${f.id}"
-                                                th:text="${f.fullName}"
-                                                th:selected="${row.restoFaculty != null and row.restoFaculty.id == f.id}">
-                                        </option>
+                                    <select th:name="${'resto_' + row.clinician.id}" class="adv-select" data-sec="resto"
+                                            th:attr="data-orig=${row.restoFaculty != null ? row.restoFaculty.id : ''}">
+                                        <option value="">Not assigned</option>
+                                        <option th:each="f : ${restoFaculty}" th:value="${f.id}"
+                                                th:text="${f.fullName + ' (' + adviseeCounts[f.id] + ')'}" th:title="${adviseeCounts[f.id] + (adviseeCounts[f.id] == 1 ? ' advisee' : ' advisees')}"
+                                                th:selected="${row.restoFaculty != null and row.restoFaculty.id == f.id}"></option>
                                     </select>
                                 </td>
-
-                                <!-- PROSTHO -->
                                 <td>
-                                    <select name="prosthoFacultyId" class="assign-select"
-                                            th:attr="form='form-' + ${row.clinician.id}">
-                                        <option value="">— None —</option>
-                                        <option th:each="f : ${prosthoFaculty}"
-                                                th:value="${f.id}"
-                                                th:text="${f.fullName}"
-                                                th:selected="${row.prosthoFaculty != null and row.prosthoFaculty.id == f.id}">
-                                        </option>
+                                    <select th:name="${'prostho_' + row.clinician.id}" class="adv-select" data-sec="prostho"
+                                            th:attr="data-orig=${row.prosthoFaculty != null ? row.prosthoFaculty.id : ''}">
+                                        <option value="">Not assigned</option>
+                                        <option th:each="f : ${prosthoFaculty}" th:value="${f.id}"
+                                                th:text="${f.fullName + ' (' + adviseeCounts[f.id] + ')'}" th:title="${adviseeCounts[f.id] + (adviseeCounts[f.id] == 1 ? ' advisee' : ' advisees')}"
+                                                th:selected="${row.prosthoFaculty != null and row.prosthoFaculty.id == f.id}"></option>
                                     </select>
                                 </td>
-
-                                <td>
-                                    <button type="submit" class="btn-save-row"
-                                            th:attr="form='form-' + ${row.clinician.id}">Save</button>
-                                </td>
+                                <td><span class="aa-done">0/5</span></td>
                             </tr>
-                            <tr th:if="${#lists.isEmpty(assignmentRows)}">
-                                <td colspan="7" class="empty-state">No active clinicians found.</td>
-                            </tr>
+                            <tr id="aaEmpty" style="display:none;"><td colspan="8" class="aa-empty">No clinician matches.</td></tr>
+                            <tr th:if="${#lists.isEmpty(assignmentRows)}"><td colspan="8" class="aa-empty">No active clinicians yet.</td></tr>
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Save bar: appears once something changes -->
+                <div class="aa-savebar" id="aaSaveBar">
+                    <span id="aaChanged">0 clinicians changed</span>
+                    <button type="button" class="aa-link" id="aaDiscard">Discard</button>
+                    <button type="submit" class="aa-btn">Save all changes</button>
+                </div>
+                </form>
             </section>
         </main>
     </div>
@@ -208,6 +216,116 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 });
 </script>
 
-<script src="/js/sidebar-hover.js"></script>
+<script th:inline="javascript">
+var AA_FACULTY = /*[[${bulkFaculty}]]*/ {};
+</script>
+<script>
+(function () {
+    var rows = Array.prototype.slice.call(document.querySelectorAll('#aaBody tr.aa-row'));
+    if (!rows.length) return;
+    var show = 'all', year = '', q = '';
+
+    function selects(tr) { return tr.querySelectorAll('.adv-select'); }
+    function refreshRow(tr) {
+        var filled = 0, changed = false;
+        selects(tr).forEach(function (sel) {
+            if (sel.value) filled++;
+            if (sel.value !== (sel.dataset.orig || '')) changed = true;
+            sel.classList.toggle('empty', !sel.value);
+            sel.classList.toggle('changed', sel.value !== (sel.dataset.orig || ''));
+        });
+        tr._filled = filled;
+        tr.classList.toggle('is-changed', changed);
+        var d = tr.querySelector('.aa-done');
+        d.textContent = filled + '/5';
+        d.className = 'aa-done' + (filled === 5 ? ' full' : filled === 0 ? ' none' : '');
+    }
+    function changedRows() { return rows.filter(function (tr) { return tr.classList.contains('is-changed'); }); }
+    function refreshBars() {
+        var n = changedRows().length;
+        document.getElementById('aaSaveBar').classList.toggle('show', n > 0);
+        document.getElementById('aaChanged').textContent = n + (n === 1 ? ' clinician changed' : ' clinicians changed');
+        var picked = rows.filter(function (tr) { return tr.querySelector('.aa-pick').checked; }).length;
+        document.getElementById('aaBulk').classList.toggle('show', picked > 0);
+        document.getElementById('aaBulkCount').textContent = picked + ' selected';
+    }
+    function match(tr, which) {
+        var w = which || show;
+        if (w === 'missing' && tr._filled === 5) return false;
+        if (w === 'complete' && tr._filled !== 5) return false;
+        if (year && tr.dataset.year !== year) return false;
+        if (q && tr._text.indexOf(q) < 0) return false;
+        return true;
+    }
+    function render() {
+        var shown = 0;
+        rows.forEach(function (tr) { var ok = match(tr); tr.style.display = ok ? '' : 'none'; if (ok) shown++; });
+        document.getElementById('aaEmpty').style.display = shown ? 'none' : '';
+        document.querySelectorAll('.aa-chip').forEach(function (c) {
+            c.classList.toggle('on', c.dataset.show === show);
+            c.querySelector('.n').textContent = rows.filter(function (tr) { return match(tr, c.dataset.show); }).length;
+        });
+    }
+
+    /* years present in the list */
+    var years = [];
+    rows.forEach(function (tr) {
+        tr._text = tr.querySelector('.aa-left').textContent.replace(/\s+/g, ' ').toLowerCase();
+        if (tr.dataset.year && years.indexOf(tr.dataset.year) < 0) years.push(tr.dataset.year);
+        refreshRow(tr);
+        selects(tr).forEach(function (sel) { sel.addEventListener('change', function () { refreshRow(tr); refreshBars(); render(); }); });
+        tr.querySelector('.aa-pick').addEventListener('change', refreshBars);
+    });
+    years.sort().forEach(function (y) { var o = document.createElement('option'); o.value = y; o.textContent = y; document.getElementById('aaYear').appendChild(o); });
+
+    document.getElementById('aaSearch').addEventListener('input', function () { q = this.value.trim().toLowerCase(); render(); });
+    document.getElementById('aaYear').addEventListener('change', function () { year = this.value; render(); });
+    document.querySelectorAll('.aa-chip').forEach(function (c) { c.addEventListener('click', function () { show = c.dataset.show; render(); }); });
+    document.getElementById('aaAll').addEventListener('change', function () {
+        var on = this.checked;
+        rows.forEach(function (tr) { if (tr.style.display !== 'none') tr.querySelector('.aa-pick').checked = on; });
+        refreshBars();
+    });
+
+    /* bulk assign: fills the dropdowns; nothing is saved until "Save all changes" */
+    var bSec = document.getElementById('aaBulkSec'), bFac = document.getElementById('aaBulkFac');
+    function fillFaculty() {
+        bFac.innerHTML = '<option value="">Not assigned</option>';
+        (AA_FACULTY[bSec.value] || []).forEach(function (f) { var o = document.createElement('option'); o.value = f.id; o.textContent = f.name; bFac.appendChild(o); });
+    }
+    bSec.addEventListener('change', fillFaculty); fillFaculty();
+    document.getElementById('aaBulkApply').addEventListener('click', function () {
+        rows.forEach(function (tr) {
+            if (!tr.querySelector('.aa-pick').checked) return;
+            var sel = tr.querySelector('.adv-select[data-sec="' + bSec.value + '"]');
+            sel.value = bFac.value; refreshRow(tr);
+        });
+        refreshBars(); render();
+    });
+    document.getElementById('aaBulkClear').addEventListener('click', function () {
+        rows.forEach(function (tr) { tr.querySelector('.aa-pick').checked = false; });
+        document.getElementById('aaAll').checked = false; refreshBars();
+    });
+
+    /* save only the rows that changed; discard puts everything back */
+    var saving = false;
+    document.getElementById('aaForm').addEventListener('submit', function () {
+        saving = true;
+        rows.forEach(function (tr) {
+            var keep = tr.classList.contains('is-changed');
+            selects(tr).forEach(function (sel) { sel.disabled = !keep; });
+        });
+    });
+    document.getElementById('aaDiscard').addEventListener('click', function () {
+        rows.forEach(function (tr) { selects(tr).forEach(function (sel) { sel.value = sel.dataset.orig || ''; }); refreshRow(tr); });
+        refreshBars(); render();
+    });
+    window.addEventListener('beforeunload', function (e) {
+        if (!saving && changedRows().length) { e.preventDefault(); e.returnValue = ''; }
+    });
+    refreshBars(); render();
+})();
+</script>
+<script src="/js/sidebar-hover.js?v=3"></script>
 </body>
 </html>

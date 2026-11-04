@@ -86,6 +86,9 @@ public class Patient {
     @JoinColumn(name = "assigned_clinician_id")
     private User assignedClinician;
 
+    /** When the faculty assigned the clinician (Assign Patients: "Assigned recently"). */
+    private LocalDateTime clinicianAssignedAt;
+
     /** Non-null only for recall visits — points to the original patient record. */
     @ManyToOne
     @JoinColumn(name = "original_patient_id")

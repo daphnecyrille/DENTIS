@@ -79,460 +79,125 @@
         <!-- Main Content -->
         <main class="main-content">
 
-            <!-- Awaiting Approval Section -->
+            <div th:if="${justAssigned != null}" class="assign-toast" role="status">
+                <span>&#10003;</span>
+                <span th:text="${justAssigned.surname + ', ' + justAssigned.firstName + ' assigned to ' + (justAssigned.assignedClinician != null ? justAssigned.assignedClinician.fullName : 'the clinician')}"></span>
+                <button type="button" onclick="this.parentNode.remove()">&times;</button>
+            </div>
+            <!-- Summary cards: what needs your attention -->
+            <div class="dash-cards">
+                <a href="#to-review" class="dash-card card-review" th:classappend="${!#lists.isEmpty(reviewRows)} ? 'has-items'" title="Submitted charts waiting for your approval">
+                    <span class="dash-card-num" th:text="${#lists.size(reviewRows)}">0</span>
+                    <span class="dash-card-label">Awaiting My Review</span>
+                </a>
+                <a href="#to-assign" class="dash-card card-assign" th:classappend="${!#lists.isEmpty(toAssign)} ? 'has-items'" title="Your patients without a clinician yet">
+                    <span class="dash-card-num" th:text="${#lists.size(toAssign)}">0</span>
+                    <span class="dash-card-label">To Assign</span>
+                </a>
+                <a href="/faculty-patientlist" class="dash-card card-active" title="Patients with charts still in progress under you">
+                    <span class="dash-card-num" th:text="${activePatientCount}">0</span>
+                    <span class="dash-card-label">Active Patients</span>
+                </a>
+                <a href="#recently-approved" class="dash-card card-approved" title="Forms you have approved">
+                    <span class="dash-card-num" th:text="${approvedCount}">0</span>
+                    <span class="dash-card-label">Approved</span>
+                </a>
+            </div>
+
+            <!-- Awaiting My Review: oldest first -->
             <section class="section">
                 <div class="section-header">
-                    <h2>Awaiting Approval</h2>
+                    <h2 id="to-review">Awaiting My Review
+                        <span class="new-count" th:if="${!#lists.isEmpty(reviewRows)}" th:text="${#lists.size(reviewRows)}">1</span></h2>
                 </div>
                 <div class="table-container">
-                    <table>
+                    <table class="dash-table" data-limit="5">
                         <thead>
-                            <tr>
-                                <th>Chart Number</th>
-                                <th>Chart Type</th>
-                                <th>Patient Name</th>
-                                <th>Assigned Clinician</th>
-                                <th>Action</th>
-                            </tr>
+                            <tr><th>Form</th><th>Chart No.</th><th>Patient</th><th>Clinician</th><th>Submitted</th><th>Action</th></tr>
                         </thead>
                         <tbody>
-                            <tr th:each="osc : ${awaitingApprovalCharts}">
-                                <td th:text="${osc.chartNo}"></td>
-                                <td th:text="${osc.chartType != null ? osc.chartType.displayName : '—'}"></td>
-                                <td th:text="${osc.patient.surname + ', ' + osc.patient.firstName + (osc.patient.middleInitial != null ? ' ' + osc.patient.middleInitial + '.' : '')}"></td>
-                                <td>
-                                    <span th:if="${osc.clinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${osc.clinician.fullName}"
-                                          th:data-email="${osc.clinician.email}"
-                                          th:data-student="${osc.clinician.studentNumber}"
-                                          th:data-year="${osc.clinician.yearLevel}"
-                                          th:data-clinician-id="${osc.clinician.id}"
-                                          th:data-patient-id="${osc.patient.originalPatient != null ? osc.patient.originalPatient.id : osc.patient.id}"
-                                          th:text="${osc.clinician.fullName}"
-                                          onclick="showClinicianModal(this)"></span>
-                                    <span th:if="${osc.clinician == null}">—</span>
-                                </td>
-                                <td><a th:href="@{/chartsview-faculty/{id}(id=${osc.patient.id})}" class="btn-view">Review</a></td>
+                            <tr th:each="r : ${reviewRows}">
+                                <td class="col-form" th:text="${r.form}"></td>
+                                <td th:text="${r.chartNo}"></td>
+                                <td th:text="${r.patient}"></td>
+                                <td th:text="${r.clinician}"></td>
+                                <td th:text="${r.when != null ? #temporals.format(r.when, 'MMM d, h:mm a') : '—'}"></td>
+                                <td><a th:href="@{${r.url}}" class="btn-review">Review</a></td>
                             </tr>
-                            <tr th:each="ec : ${awaitingApprovalEndoCharts}">
-                                <td th:text="${ec.chartNo}"></td>
-                                <td>Endodontics - Patient Workup</td>
-                                <td th:text="${ec.patient.surname + ', ' + ec.patient.firstName + (ec.patient.middleInitial != null ? ' ' + ec.patient.middleInitial + '.' : '')}"></td>
-                                <td>
-                                    <span th:if="${ec.clinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${ec.clinician.fullName}"
-                                          th:data-email="${ec.clinician.email}"
-                                          th:data-student="${ec.clinician.studentNumber}"
-                                          th:data-year="${ec.clinician.yearLevel}"
-                                          th:data-clinician-id="${ec.clinician.id}"
-                                          th:data-patient-id="${ec.patient.originalPatient != null ? ec.patient.originalPatient.id : ec.patient.id}"
-                                          th:text="${ec.clinician.fullName}"
-                                          onclick="showClinicianModal(this)"></span>
-                                    <span th:if="${ec.clinician == null}">—</span>
-                                </td>
-                                <td><a th:href="@{/chartsview-faculty/{id}(id=${ec.patient.id})}" class="btn-view">Review</a></td>
-                            </tr>
-                            <tr th:each="ec : ${awaitingApprovalEndo2Charts}">
-                                <td th:text="${#strings.replace(ec.chartNo, '-ENDO1', '-ENDO2')}"></td>
-                                <td>Endodontics - Endodontic Evaluation &amp; Treatment Planning</td>
-                                <td th:text="${ec.patient.surname + ', ' + ec.patient.firstName + (ec.patient.middleInitial != null ? ' ' + ec.patient.middleInitial + '.' : '')}"></td>
-                                <td>
-                                    <span th:if="${ec.clinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${ec.clinician.fullName}"
-                                          th:data-email="${ec.clinician.email}"
-                                          th:data-student="${ec.clinician.studentNumber}"
-                                          th:data-year="${ec.clinician.yearLevel}"
-                                          th:data-clinician-id="${ec.clinician.id}"
-                                          th:data-patient-id="${ec.patient.originalPatient != null ? ec.patient.originalPatient.id : ec.patient.id}"
-                                          th:text="${ec.clinician.fullName}"
-                                          onclick="showClinicianModal(this)"></span>
-                                    <span th:if="${ec.clinician == null}">—</span>
-                                </td>
-                                <td><a th:href="@{/chartsview-faculty/{id}(id=${ec.patient.id})}" class="btn-view">Review</a></td>
-                            </tr>
-                            <tr th:each="pc : ${awaitingApprovalPerioCharts}">
-                                <td th:text="${pc.chartNo}"></td>
-                                <td>Periodontics - Periodontal Chart</td>
-                                <td th:text="${pc.patient.surname + ', ' + pc.patient.firstName + (pc.patient.middleInitial != null ? ' ' + pc.patient.middleInitial + '.' : '')}"></td>
-                                <td>
-                                    <span th:if="${pc.clinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${pc.clinician.fullName}"
-                                          th:data-email="${pc.clinician.email}"
-                                          th:data-student="${pc.clinician.studentNumber}"
-                                          th:data-year="${pc.clinician.yearLevel}"
-                                          th:data-clinician-id="${pc.clinician.id}"
-                                          th:data-patient-id="${pc.patient.originalPatient != null ? pc.patient.originalPatient.id : pc.patient.id}"
-                                          th:text="${pc.clinician.fullName}"
-                                          onclick="showClinicianModal(this)"></span>
-                                    <span th:if="${pc.clinician == null}">—</span>
-                                </td>
-                                <td><a th:href="@{/chartsview-faculty/{id}(id=${pc.patient.id})}" class="btn-view">Review</a></td>
-                            </tr>
-                            <tr th:each="pc : ${awaitingApprovalPerio2Charts}">
-                                <td th:text="${#strings.replace(pc.chartNo, '-PF1', '-PF2')}"></td>
-                                <td>Periodontics - PPD/CAL/BOP Chart</td>
-                                <td th:text="${pc.patient.surname + ', ' + pc.patient.firstName + (pc.patient.middleInitial != null ? ' ' + pc.patient.middleInitial + '.' : '')}"></td>
-                                <td>
-                                    <span th:if="${pc.clinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${pc.clinician.fullName}"
-                                          th:data-email="${pc.clinician.email}"
-                                          th:data-student="${pc.clinician.studentNumber}"
-                                          th:data-year="${pc.clinician.yearLevel}"
-                                          th:data-clinician-id="${pc.clinician.id}"
-                                          th:data-patient-id="${pc.patient.originalPatient != null ? pc.patient.originalPatient.id : pc.patient.id}"
-                                          th:text="${pc.clinician.fullName}"
-                                          onclick="showClinicianModal(this)"></span>
-                                    <span th:if="${pc.clinician == null}">—</span>
-                                </td>
-                                <td><a th:href="@{/chartsview-faculty/{id}(id=${pc.patient.id})}" class="btn-view">Review</a></td>
-                            </tr>
-                            <tr th:each="pc : ${awaitingApprovalPerio3Charts}">
-                                <td th:text="${#strings.replace(pc.chartNo, '-PF1', '-PF3')}"></td>
-                                <td>Periodontics - Gingivitis Reevaluation Chart</td>
-                                <td th:text="${pc.patient.surname + ', ' + pc.patient.firstName + (pc.patient.middleInitial != null ? ' ' + pc.patient.middleInitial + '.' : '')}"></td>
-                                <td>
-                                    <span th:if="${pc.clinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${pc.clinician.fullName}"
-                                          th:data-email="${pc.clinician.email}"
-                                          th:data-student="${pc.clinician.studentNumber}"
-                                          th:data-year="${pc.clinician.yearLevel}"
-                                          th:data-clinician-id="${pc.clinician.id}"
-                                          th:data-patient-id="${pc.patient.originalPatient != null ? pc.patient.originalPatient.id : pc.patient.id}"
-                                          th:text="${pc.clinician.fullName}"
-                                          onclick="showClinicianModal(this)"></span>
-                                    <span th:if="${pc.clinician == null}">—</span>
-                                </td>
-                                <td><a th:href="@{/chartsview-faculty/{id}(id=${pc.patient.id})}" class="btn-view">Review</a></td>
-                            </tr>
-                            <tr th:each="oc : ${awaitingApprovalOperative10Charts}">
-                                <td th:text="${oc.chartNo}"></td>
-                                <td>Operative Dentistry - Assessment Form</td>
-                                <td th:text="${oc.patient.surname + ', ' + oc.patient.firstName + (oc.patient.middleInitial != null ? ' ' + oc.patient.middleInitial + '.' : '')}"></td>
-                                <td>
-                                    <span th:if="${oc.clinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${oc.clinician.fullName}"
-                                          th:data-email="${oc.clinician.email}"
-                                          th:data-student="${oc.clinician.studentNumber}"
-                                          th:data-year="${oc.clinician.yearLevel}"
-                                          th:data-clinician-id="${oc.clinician.id}"
-                                          th:data-patient-id="${oc.patient.originalPatient != null ? oc.patient.originalPatient.id : oc.patient.id}"
-                                          th:text="${oc.clinician.fullName}"
-                                          onclick="showClinicianModal(this)"></span>
-                                    <span th:if="${oc.clinician == null}">—</span>
-                                </td>
-                                <td><a th:href="@{/chartsview-faculty/{id}(id=${oc.patient.id})}" class="btn-view">Review</a></td>
-                            </tr>
-                            <tr th:each="oc : ${awaitingApprovalOperative6Charts}">
-                                <td th:text="${#strings.replace(oc.chartNo, '-RESTO10', '-RESTO6')}"></td>
-                                <td>Operative Dentistry - Caries Risk Assessment</td>
-                                <td th:text="${oc.patient.surname + ', ' + oc.patient.firstName + (oc.patient.middleInitial != null ? ' ' + oc.patient.middleInitial + '.' : '')}"></td>
-                                <td>
-                                    <span th:if="${oc.clinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${oc.clinician.fullName}"
-                                          th:data-email="${oc.clinician.email}"
-                                          th:data-student="${oc.clinician.studentNumber}"
-                                          th:data-year="${oc.clinician.yearLevel}"
-                                          th:data-clinician-id="${oc.clinician.id}"
-                                          th:data-patient-id="${oc.patient.originalPatient != null ? oc.patient.originalPatient.id : oc.patient.id}"
-                                          th:text="${oc.clinician.fullName}"
-                                          onclick="showClinicianModal(this)"></span>
-                                    <span th:if="${oc.clinician == null}">—</span>
-                                </td>
-                                <td><a th:href="@{/chartsview-faculty/{id}(id=${oc.patient.id})}" class="btn-view">Review</a></td>
-                            </tr>
-                            <tr th:each="pc : ${awaitingApprovalProsthoCharts}">
-                                <td th:text="${pc.chartNo}"></td>
-                                <td th:text="'Prosthodontics (' + ${pc.caseType} + ')'"></td>
-                                <td th:text="${pc.patient.surname + ', ' + pc.patient.firstName + (pc.patient.middleInitial != null ? ' ' + pc.patient.middleInitial + '.' : '')}"></td>
-                                <td>
-                                    <span th:if="${pc.clinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${pc.clinician.fullName}"
-                                          th:data-email="${pc.clinician.email}"
-                                          th:data-student="${pc.clinician.studentNumber}"
-                                          th:data-year="${pc.clinician.yearLevel}"
-                                          th:data-clinician-id="${pc.clinician.id}"
-                                          th:data-patient-id="${pc.patient.originalPatient != null ? pc.patient.originalPatient.id : pc.patient.id}"
-                                          th:text="${pc.clinician.fullName}"
-                                          onclick="showClinicianModal(this)"></span>
-                                    <span th:if="${pc.clinician == null}">—</span>
-                                </td>
-                                <td><a th:href="@{/chartsview-faculty/{id}(id=${pc.patient.id})}" class="btn-view">Review</a></td>
-                            </tr>
-                            <tr th:if="${#lists.isEmpty(awaitingApprovalCharts) and #lists.isEmpty(awaitingApprovalEndoCharts) and #lists.isEmpty(awaitingApprovalEndo2Charts) and #lists.isEmpty(awaitingApprovalPerioCharts) and #lists.isEmpty(awaitingApprovalPerio2Charts) and #lists.isEmpty(awaitingApprovalOperative10Charts) and #lists.isEmpty(awaitingApprovalOperative6Charts) and #lists.isEmpty(awaitingApprovalProsthoCharts)}">
-                                <td colspan="5" style="text-align:center; color:#888;">No charts awaiting approval.</td>
+                            <tr th:if="${#lists.isEmpty(reviewRows)}" class="empty-row">
+                                <td colspan="6">&#10003; You're all caught up. Nothing is waiting for your review.</td>
                             </tr>
                         </tbody>
                     </table>
+                    <button type="button" class="show-all" style="display:none;"></button>
                 </div>
             </section>
 
-            <!-- Patient List Preview -->
+            <!-- To Assign: pick the clinician right here -->
             <section class="section">
-                <div class="section-header">
-                    <h2>Patient List</h2>
+                <div class="section-header section-header-row">
+                    <h2 id="to-assign">To Assign
+                        <span class="new-count" th:if="${!#lists.isEmpty(toAssign)}" th:text="${#lists.size(toAssign)}">1</span></h2>
+                    <a href="/faculty-assign" class="view-all">Open Assign Patients &rsaquo;</a>
                 </div>
                 <div class="table-container">
-                    <table>
+                    <table class="dash-table" data-limit="5">
                         <thead>
-                            <tr>
-                                <th>Chart No.</th>
-                                <th>Chart Type</th>
-                                <th>Patient Name</th>
-                                <th>Contact Number</th>
-                                <th>Email</th>
-                                <th>Assigned Clinician</th>
-                                <th>Action</th>
-                            </tr>
+                            <tr><th>Chart No.</th><th>Patient</th><th>Service</th><th>Admitted</th><th>Assign Clinician</th><th>Chart</th></tr>
                         </thead>
                         <tbody>
-                            <tr th:each="pc : ${prosthoCharts}">
-                                <td th:text="${pc.chartNo}"></td>
-                                <td th:text="'Prosthodontics (' + ${pc.caseType} + ')'"></td>
-                                <td th:text="${pc.patient.surname + ', ' + pc.patient.firstName + (pc.patient.middleInitial != null ? ' ' + pc.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${pc.patient.contactNumber}"></td>
-                                <td th:text="${pc.patient.email}"></td>
-                                <td>
-                                    <span th:if="${pc.clinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${pc.clinician.fullName}"
-                                          th:data-email="${pc.clinician.email}"
-                                          th:data-student="${pc.clinician.studentNumber}"
-                                          th:data-year="${pc.clinician.yearLevel}"
-                                          th:data-clinician-id="${pc.clinician.id}"
-                                          th:data-patient-id="${pc.patient.originalPatient != null ? pc.patient.originalPatient.id : pc.patient.id}"
-                                          th:text="${pc.clinician.fullName}"
-                                          onclick="showClinicianModal(this)"></span>
-                                    <span th:if="${pc.clinician == null}">—</span>
-                                </td>
-                                <td><a th:href="@{/chartsview-faculty/{id}(id=${pc.patient.id})}" class="btn-view">View Chart</a></td>
-                            </tr>
-                            <tr th:each="osc : ${osCharts}">
-                                <td th:text="${osc.chartNo}"></td>
-                                <td th:text="${osc.chartType != null ? osc.chartType.displayName : '—'}"></td>
-                                <td th:text="${osc.patient.surname + ', ' + osc.patient.firstName + (osc.patient.middleInitial != null ? ' ' + osc.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${osc.patient.contactNumber}"></td>
-                                <td th:text="${osc.patient.email}"></td>
-                                <td>
-                                    <span th:if="${osc.clinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${osc.clinician.fullName}"
-                                          th:data-email="${osc.clinician.email}"
-                                          th:data-student="${osc.clinician.studentNumber}"
-                                          th:data-year="${osc.clinician.yearLevel}"
-                                          th:data-clinician-id="${osc.clinician.id}"
-                                          th:data-patient-id="${osc.patient.originalPatient != null ? osc.patient.originalPatient.id : osc.patient.id}"
-                                          th:text="${osc.clinician.fullName}"
-                                          onclick="showClinicianModal(this)"></span>
-                                    <span th:if="${osc.clinician == null}">—</span>
-                                </td>
-                                <td><a th:href="@{/chartsview-faculty/{id}(id=${osc.patient.id})}" class="btn-view">View Chart</a></td>
-                            </tr>
-                            <tr th:each="ec : ${endoCharts}">
-                                <td th:text="${ec.chartNo}"></td>
-                                <td>Endodontics - Patient Workup</td>
-                                <td th:text="${ec.patient.surname + ', ' + ec.patient.firstName + (ec.patient.middleInitial != null ? ' ' + ec.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${ec.patient.contactNumber}"></td>
-                                <td th:text="${ec.patient.email}"></td>
-                                <td>
-                                    <span th:if="${ec.clinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${ec.clinician.fullName}"
-                                          th:data-email="${ec.clinician.email}"
-                                          th:data-student="${ec.clinician.studentNumber}"
-                                          th:data-year="${ec.clinician.yearLevel}"
-                                          th:data-clinician-id="${ec.clinician.id}"
-                                          th:data-patient-id="${ec.patient.originalPatient != null ? ec.patient.originalPatient.id : ec.patient.id}"
-                                          th:text="${ec.clinician.fullName}"
-                                          onclick="showClinicianModal(this)"></span>
-                                    <span th:if="${ec.clinician == null}">—</span>
-                                </td>
-                                <td><a th:href="@{/chartsview-faculty/{id}(id=${ec.patient.id})}" class="btn-view">View Chart</a></td>
-                            </tr>
-                            <tr th:each="ec : ${endoCharts}">
-                                <td th:text="${#strings.replace(ec.chartNo, '-ENDO1', '-ENDO2')}"></td>
-                                <td>Endodontics - Endodontic Evaluation &amp; Treatment Planning</td>
-                                <td th:text="${ec.patient.surname + ', ' + ec.patient.firstName + (ec.patient.middleInitial != null ? ' ' + ec.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${ec.patient.contactNumber}"></td>
-                                <td th:text="${ec.patient.email}"></td>
-                                <td>
-                                    <span th:if="${ec.clinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${ec.clinician.fullName}"
-                                          th:data-email="${ec.clinician.email}"
-                                          th:data-student="${ec.clinician.studentNumber}"
-                                          th:data-year="${ec.clinician.yearLevel}"
-                                          th:data-clinician-id="${ec.clinician.id}"
-                                          th:data-patient-id="${ec.patient.originalPatient != null ? ec.patient.originalPatient.id : ec.patient.id}"
-                                          th:text="${ec.clinician.fullName}"
-                                          onclick="showClinicianModal(this)"></span>
-                                    <span th:if="${ec.clinician == null}">—</span>
-                                </td>
-                                <td><a th:href="@{/chartsview-faculty/{id}(id=${ec.patient.id})}" class="btn-view">View Chart</a></td>
-                            </tr>
-                            <tr th:each="pc : ${perioCharts}">
-                                <td th:text="${pc.chartNo}"></td>
-                                <td>Periodontics - Periodontal Chart</td>
-                                <td th:text="${pc.patient.surname + ', ' + pc.patient.firstName + (pc.patient.middleInitial != null ? ' ' + pc.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${pc.patient.contactNumber}"></td>
-                                <td th:text="${pc.patient.email}"></td>
-                                <td>
-                                    <span th:if="${pc.clinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${pc.clinician.fullName}"
-                                          th:data-email="${pc.clinician.email}"
-                                          th:data-student="${pc.clinician.studentNumber}"
-                                          th:data-year="${pc.clinician.yearLevel}"
-                                          th:data-clinician-id="${pc.clinician.id}"
-                                          th:data-patient-id="${pc.patient.originalPatient != null ? pc.patient.originalPatient.id : pc.patient.id}"
-                                          th:text="${pc.clinician.fullName}"
-                                          onclick="showClinicianModal(this)"></span>
-                                    <span th:if="${pc.clinician == null}">—</span>
-                                </td>
-                                <td><a th:href="@{/chartsview-faculty/{id}(id=${pc.patient.id})}" class="btn-view">View Chart</a></td>
-                            </tr>
-                            <tr th:each="pc : ${perioCharts}">
-                                <td th:text="${#strings.replace(pc.chartNo, '-PF1', '-PF2')}"></td>
-                                <td>Periodontics - PPD/CAL/BOP Chart</td>
-                                <td th:text="${pc.patient.surname + ', ' + pc.patient.firstName + (pc.patient.middleInitial != null ? ' ' + pc.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${pc.patient.contactNumber}"></td>
-                                <td th:text="${pc.patient.email}"></td>
-                                <td>
-                                    <span th:if="${pc.clinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${pc.clinician.fullName}"
-                                          th:data-email="${pc.clinician.email}"
-                                          th:data-student="${pc.clinician.studentNumber}"
-                                          th:data-year="${pc.clinician.yearLevel}"
-                                          th:data-clinician-id="${pc.clinician.id}"
-                                          th:data-patient-id="${pc.patient.originalPatient != null ? pc.patient.originalPatient.id : pc.patient.id}"
-                                          th:text="${pc.clinician.fullName}"
-                                          onclick="showClinicianModal(this)"></span>
-                                    <span th:if="${pc.clinician == null}">—</span>
-                                </td>
-                                <td><a th:href="@{/chartsview-faculty/{id}(id=${pc.patient.id})}" class="btn-view">View Chart</a></td>
-                            </tr>
-                            <tr th:each="pc : ${perioCharts}">
-                                <td th:text="${#strings.replace(pc.chartNo, '-PF1', '-PF3')}"></td>
-                                <td>Periodontics - Gingivitis Reevaluation Chart</td>
-                                <td th:text="${pc.patient.surname + ', ' + pc.patient.firstName + (pc.patient.middleInitial != null ? ' ' + pc.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${pc.patient.contactNumber}"></td>
-                                <td th:text="${pc.patient.email}"></td>
-                                <td>
-                                    <span th:if="${pc.clinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${pc.clinician.fullName}"
-                                          th:data-email="${pc.clinician.email}"
-                                          th:data-student="${pc.clinician.studentNumber}"
-                                          th:data-year="${pc.clinician.yearLevel}"
-                                          th:data-clinician-id="${pc.clinician.id}"
-                                          th:data-patient-id="${pc.patient.originalPatient != null ? pc.patient.originalPatient.id : pc.patient.id}"
-                                          th:text="${pc.clinician.fullName}"
-                                          onclick="showClinicianModal(this)"></span>
-                                    <span th:if="${pc.clinician == null}">—</span>
-                                </td>
-                                <td><a th:href="@{/chartsview-faculty/{id}(id=${pc.patient.id})}" class="btn-view">View Chart</a></td>
-                            </tr>
-                            <tr th:each="oc : ${operativeCharts}">
-                                <td th:text="${oc.chartNo}"></td>
-                                <td>Operative Dentistry - Assessment Form</td>
-                                <td th:text="${oc.patient.surname + ', ' + oc.patient.firstName + (oc.patient.middleInitial != null ? ' ' + oc.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${oc.patient.contactNumber}"></td>
-                                <td th:text="${oc.patient.email}"></td>
-                                <td>
-                                    <span th:if="${oc.clinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${oc.clinician.fullName}"
-                                          th:data-email="${oc.clinician.email}"
-                                          th:data-student="${oc.clinician.studentNumber}"
-                                          th:data-year="${oc.clinician.yearLevel}"
-                                          th:data-clinician-id="${oc.clinician.id}"
-                                          th:data-patient-id="${oc.patient.originalPatient != null ? oc.patient.originalPatient.id : oc.patient.id}"
-                                          th:text="${oc.clinician.fullName}"
-                                          onclick="showClinicianModal(this)"></span>
-                                    <span th:if="${oc.clinician == null}">—</span>
-                                </td>
-                                <td><a th:href="@{/chartsview-faculty/{id}(id=${oc.patient.id})}" class="btn-view">View Chart</a></td>
-                            </tr>
-                            <tr th:each="oc : ${operativeCharts}">
-                                <td th:text="${#strings.replace(oc.chartNo, '-RESTO10', '-RESTO6')}"></td>
-                                <td>Operative Dentistry - Caries Risk Assessment</td>
-                                <td th:text="${oc.patient.surname + ', ' + oc.patient.firstName + (oc.patient.middleInitial != null ? ' ' + oc.patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${oc.patient.contactNumber}"></td>
-                                <td th:text="${oc.patient.email}"></td>
-                                <td>
-                                    <span th:if="${oc.clinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${oc.clinician.fullName}"
-                                          th:data-email="${oc.clinician.email}"
-                                          th:data-student="${oc.clinician.studentNumber}"
-                                          th:data-year="${oc.clinician.yearLevel}"
-                                          th:data-clinician-id="${oc.clinician.id}"
-                                          th:data-patient-id="${oc.patient.originalPatient != null ? oc.patient.originalPatient.id : oc.patient.id}"
-                                          th:text="${oc.clinician.fullName}"
-                                          onclick="showClinicianModal(this)"></span>
-                                    <span th:if="${oc.clinician == null}">—</span>
-                                </td>
-                                <td><a th:href="@{/chartsview-faculty/{id}(id=${oc.patient.id})}" class="btn-view">View Chart</a></td>
-                            </tr>
-                            <tr th:if="${#lists.isEmpty(prosthoCharts) and #lists.isEmpty(osCharts) and #lists.isEmpty(endoCharts) and #lists.isEmpty(perioCharts) and #lists.isEmpty(operativeCharts)}">
-                                <td colspan="7" style="text-align:center; color:#888;">No assigned patients yet.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Assign Patients Preview -->
-            <section class="section">
-                <div class="section-header">
-                    <h2>Assign Patients</h2>
-                </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Chart No.</th>
-                                <th>Patient Name</th>
-                                <th>Contact Number</th>
-                                <th>Email</th>
-                                <th>Assign Clinician</th>
-                                <th>View Chart</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="patient : ${unassignedPatients}">
+                            <tr th:each="patient : ${toAssign}">
                                 <td th:text="${patient.chartNo}"></td>
                                 <td th:text="${patient.surname + ', ' + patient.firstName + (patient.middleInitial != null ? ' ' + patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${patient.contactNumber}"></td>
-                                <td th:text="${patient.email}"></td>
+                                <td th:text="${patient.serviceCode != null ? patient.serviceCode : '—'}"></td>
+                                <td th:text="${patient.registrationDate != null ? patient.registrationDate : '—'}"></td>
                                 <td>
-                                    <form th:action="@{/faculty-dashboard/{id}/assign-clinician(id=${patient.id})}" method="post" style="display:flex; gap:6px; align-items:center; justify-content:center;">
+                                    <form th:action="@{/faculty-dashboard/{id}/assign-clinician(id=${patient.id})}" method="post" class="assign-form">
                                         <input type="hidden" name="returnTo" value="faculty-dashboard">
-                                        <select name="clinicianId" style="font-size:13px; padding:4px 8px; border:1px solid #ccc; border-radius:4px;">
-                                            <option value="">Select Clinician</option>
-                                            <option th:each="c : ${clinicians}"
-                                                    th:value="${c.id}"
-                                                    th:text="${c.fullName}"></option>
+                                        <select name="clinicianId" required th:disabled="${#lists.isEmpty(advisees)}">
+                                            <option value="" th:text="${#lists.isEmpty(advisees) ? 'No advisees yet' : 'Select advisee'}">Select advisee</option>
+                                            <option th:each="o : ${advisees}" th:value="${o.user.id}" th:text="${o.label}"></option>
                                         </select>
-                                        <button type="submit" class="btn-accept">Assign</button>
+                                        <button type="submit" class="btn-assign" th:disabled="${#lists.isEmpty(advisees)}">Assign</button>
                                     </form>
                                 </td>
-                                <td><a th:href="@{/admitting-view-faculty/{id}(id=${patient.id})}" class="btn-view">View Chart</a></td>
+                                <td><a th:href="@{/admitting-view-faculty/{id}(id=${patient.id})}" class="btn-view-sm">View</a></td>
                             </tr>
-                            <tr th:if="${#lists.isEmpty(unassignedPatients)}">
-                                <td colspan="6" style="text-align:center; color:#888;">No unassigned patients.</td>
+                            <tr th:if="${#lists.isEmpty(toAssign)}" class="empty-row">
+                                <td colspan="6">No patients waiting for a clinician.</td>
                             </tr>
                         </tbody>
                     </table>
+                    <button type="button" class="show-all" style="display:none;"></button>
+                </div>
+            </section>
+
+            <!-- Recently Approved -->
+            <section class="section">
+                <div class="section-header section-header-row">
+                    <h2 id="recently-approved">Recently Approved</h2>
+                    <a href="/faculty-patientlist" class="view-all">Patient List &rsaquo;</a>
+                </div>
+                <div class="table-container">
+                    <table class="dash-table" data-limit="5">
+                        <thead>
+                            <tr><th>Form</th><th>Chart No.</th><th>Patient</th><th>Clinician</th><th>Last Updated</th><th>Action</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="r : ${approvedRows}">
+                                <td class="col-form" th:text="${r.form}"></td>
+                                <td th:text="${r.chartNo}"></td>
+                                <td th:text="${r.patient}"></td>
+                                <td th:text="${r.clinician}"></td>
+                                <td th:text="${r.when != null ? #temporals.format(r.when, 'MMM d, yyyy') : '—'}"></td>
+                                <td><a th:href="@{${r.url}}" class="btn-view-sm">View</a></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(approvedRows)}" class="empty-row">
+                                <td colspan="6">Nothing approved yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button type="button" class="show-all" style="display:none;"></button>
                 </div>
             </section>
 
@@ -595,6 +260,23 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 
 </script>
 
-<script src="/js/sidebar-hover.js"></script>
+<script>
+/* Each table shows its first 5 rows; "Show all" reveals the rest and turns into "Hide" */
+document.querySelectorAll('.dash-table').forEach(function (table) {
+    var limit = parseInt(table.dataset.limit || '5', 10);
+    var rows = Array.prototype.filter.call(table.tBodies[0].rows, function (r) { return !r.classList.contains('empty-row'); });
+    var btn = table.parentNode.querySelector('.show-all');
+    if (!btn || rows.length <= limit) return;
+    var open = false;
+    function render() {
+        rows.forEach(function (r, i) { r.style.display = open || i < limit ? '' : 'none'; });
+        btn.textContent = open ? 'Hide' : 'Show all (' + rows.length + ')';
+    }
+    btn.style.display = 'block';
+    btn.addEventListener('click', function () { open = !open; render(); });
+    render();
+});
+</script>
+<script src="/js/sidebar-hover.js?v=3"></script>
 </body>
 </html>

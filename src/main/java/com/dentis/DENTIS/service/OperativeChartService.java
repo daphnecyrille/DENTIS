@@ -35,12 +35,29 @@ public class OperativeChartService {
         return repo.findByPatientOrderByCreatedAtDesc(patient);
     }
 
+    /**
+     * The patient was reassigned to another faculty: their charts in this section go to that faculty too.
+     * Charts the former faculty already fully approved stay with them, as the record of who approved them.
+     */
+    public void reassignFaculty(Patient patient, User faculty) {
+        List<OperativeChart> charts = findAllByPatient(patient).stream()
+                .filter(c -> !(c.getStatus() == OperativeChartStatus.APPROVED && c.getForm2Status() == OperativeChartStatus.APPROVED))
+                .toList();
+        charts.forEach(c -> c.setFaculty(faculty));
+        repo.saveAll(charts);
+    }
+
     public List<OperativeChart> findByClinicianOrderByCreatedAtDesc(User clinician) {
         return repo.findByClinicianOrderByCreatedAtDesc(clinician);
     }
 
     public List<OperativeChart> findByFacultyOrderByCreatedAtDesc(User faculty) {
         return repo.findByFacultyOrderByCreatedAtDesc(faculty);
+    }
+
+    /** Every chart of this section (all faculty of the section can see all its patients). */
+    public List<OperativeChart> findAllOrderByCreatedAtDesc() {
+        return repo.findAllByOrderByCreatedAtDesc();
     }
 
     public List<OperativeChart> findForm1ActionNeededByClinician(User clinician) {

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Assign Patients - Faculty</title>
     <link rel="stylesheet" href="/css/dashboard-faculty.css">
+    <link rel="stylesheet" href="/css/patient-list.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 
@@ -78,46 +79,87 @@
 
         <!-- Main Content -->
         <main class="main-content">
+            <div th:if="${justAssigned != null}" class="assign-toast" role="status">
+                <span>&#10003;</span>
+                <span th:text="${justAssigned.surname + ', ' + justAssigned.firstName + ' assigned to ' + (justAssigned.assignedClinician != null ? justAssigned.assignedClinician.fullName : 'the clinician')}"></span>
+                <button type="button" onclick="this.parentNode.remove()">&times;</button>
+            </div>
+
             <section class="section">
-                <div class="section-header">
+                <div class="section-header pl-header">
                     <h2>Assign Patients</h2>
+                    <span class="pl-count" th:text="${#lists.size(patients) + (#lists.size(patients) == 1 ? ' patient waiting' : ' patients waiting')}">0 waiting</span>
                 </div>
+
+                <div class="assign-note" th:if="${#lists.isEmpty(advisees)}">
+                    You have no advisees for your section yet, so there's no one to assign to. Ask the clinic manager to assign advisees to you (Assign Advisers).
+                </div>
+
+                <div class="pl-toolbar" th:if="${#lists.size(patients) > 5}">
+                    <div class="pl-search">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#8a97a8" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="#8a97a8" stroke-width="2" stroke-linecap="round"/></svg>
+                        <input type="text" id="asSearch" placeholder="Search by patient name or chart number" autocomplete="off">
+                    </div>
+                </div>
+
                 <div class="table-container">
-                    <table>
+                    <table class="assign-table">
                         <thead>
                             <tr>
-                                <th>Chart No.</th>
-                                <th>Patient Name</th>
-                                <th>Contact Number</th>
-                                <th>Email</th>
-                                <th>Assign Clinician</th>
-                                <th>View Chart</th>
+                                <th>Patient</th>
+                                <th>Service</th>
+                                <th>Chief Complaint</th>
+                                <th>Proposed Treatment Plan</th>
+                                <th>Waiting</th>
+                                <th>Assign To</th>
+                                <th>Chart</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr th:each="patient : ${patients}">
-                                <td th:text="${patient.chartNo}"></td>
-                                <td th:text="${patient.surname + ', ' + patient.firstName + (patient.middleInitial != null ? ' ' + patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${patient.contactNumber}"></td>
-                                <td th:text="${patient.email}"></td>
+                        <tbody id="asBody">
+                            <tr th:each="patient : ${patients}" class="as-row">
+                                <td class="as-patient">
+                                    <span class="as-name" th:text="${patient.surname + ', ' + patient.firstName + (patient.middleInitial != null ? ' ' + patient.middleInitial + '.' : '')}"></span>
+                                    <span class="as-no" th:text="${patient.chartNo}"></span>
+                                </td>
+                                <td><span class="svc-tag" th:text="${patient.serviceCode != null ? patient.serviceCode : '—'}"></span></td>
+                                <td class="as-text" th:title="${patient.chiefComplaint}" th:text="${patient.chiefComplaint != null and !#strings.isEmpty(patient.chiefComplaint) ? patient.chiefComplaint : '—'}"></td>
+                                <td class="as-text" th:title="${patient.proposedTreatmentPlan}" th:text="${patient.proposedTreatmentPlan != null and !#strings.isEmpty(patient.proposedTreatmentPlan) ? patient.proposedTreatmentPlan : '—'}"></td>
+                                <td class="as-wait" th:attr="data-since=${patient.createdAt}" th:text="${patient.registrationDate != null ? patient.registrationDate : '—'}"></td>
                                 <td>
-                                    <form th:action="@{/faculty-dashboard/{id}/assign-clinician(id=${patient.id})}" method="post" style="display:flex; gap:6px; align-items:center; justify-content:center;">
+                                    <form th:action="@{/faculty-dashboard/{id}/assign-clinician(id=${patient.id})}" method="post" class="assign-form">
                                         <input type="hidden" name="returnTo" value="faculty-assign">
-                                        <select name="clinicianId" style="font-size:13px; padding:4px 8px; border:1px solid #ccc; border-radius:4px;">
-                                            <option value="">Select Clinician</option>
-                                            <option th:each="c : ${clinicians}"
-                                                    th:value="${c.id}"
-                                                    th:text="${c.fullName}"></option>
+                                        <select name="clinicianId" required th:disabled="${#lists.isEmpty(advisees)}">
+                                            <option value="" th:text="${#lists.isEmpty(advisees) ? 'No advisees yet' : 'Select advisee'}">Select advisee</option>
+                                            <option th:each="o : ${advisees}" th:value="${o.user.id}" th:text="${o.label}"></option>
                                         </select>
-                                        <button type="submit" class="btn-accept">Assign</button>
+                                        <button type="submit" class="btn-assign" th:disabled="${#lists.isEmpty(advisees)}">Assign</button>
                                     </form>
                                 </td>
-                                <td>
-                                    <a th:href="@{/admitting-view-faculty/{id}(id=${patient.id})}" class="btn-view">View Chart</a>
-                                </td>
+                                <td><a th:href="@{/admitting-view-faculty/{id}(id=${patient.id})}" class="btn-view-sm">View</a></td>
                             </tr>
-                            <tr th:if="${#lists.isEmpty(patients)}">
-                                <td colspan="6" style="text-align:center; color:#888;">No unassigned patients.</td>
+                            <tr id="asEmpty" style="display:none;"><td colspan="7" class="pl-empty">No patient matches.</td></tr>
+                            <tr th:if="${#lists.isEmpty(patients)}"><td colspan="7" class="pl-empty">&#10003; No patients waiting for a clinician.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Assigned recently: easy to spot a wrong pick -->
+            <section class="section" th:if="${!#lists.isEmpty(recentlyAssigned)}">
+                <div class="section-header"><h2>Assigned Recently <span class="pl-count">· last 7 days</span></h2></div>
+                <div class="table-container">
+                    <table class="assign-table">
+                        <thead><tr><th>Patient</th><th>Service</th><th>Assigned To</th><th>When</th><th>Charts</th></tr></thead>
+                        <tbody>
+                            <tr th:each="p : ${recentlyAssigned}">
+                                <td class="as-patient">
+                                    <span class="as-name" th:text="${p.surname + ', ' + p.firstName + (p.middleInitial != null ? ' ' + p.middleInitial + '.' : '')}"></span>
+                                    <span class="as-no" th:text="${p.chartNo}"></span>
+                                </td>
+                                <td><span class="svc-tag" th:text="${p.serviceCode != null ? p.serviceCode : '—'}"></span></td>
+                                <td th:text="${p.assignedClinician != null ? p.assignedClinician.fullName : '—'}"></td>
+                                <td th:text="${#temporals.format(p.clinicianAssignedAt, 'MMM d, h:mm a')}"></td>
+                                <td><a th:href="@{/chartsview-faculty/{id}(id=${p.id})}" class="btn-view-sm">View Charts</a></td>
                             </tr>
                         </tbody>
                     </table>
@@ -148,6 +190,29 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 
 </script>
 
-<script src="/js/sidebar-hover.js"></script>
+<script src="/js/sidebar-hover.js?v=3"></script>
+<script>
+/* "Waiting": admitted today / yesterday / n days ago; search by name or chart number */
+(function () {
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    document.querySelectorAll('.as-wait[data-since]').forEach(function (td) {
+        var raw = td.getAttribute('data-since'); if (!raw) return;
+        var d = new Date(raw); d.setHours(0, 0, 0, 0);
+        var n = Math.round((today - d) / 86400000);
+        td.title = 'Admitted ' + td.textContent;
+        td.textContent = n <= 0 ? 'Today' : n === 1 ? '1 day' : n + ' days';
+        if (n >= 3) td.classList.add('long');
+    });
+    var q = document.getElementById('asSearch');
+    if (q) q.addEventListener('input', function () {
+        var v = this.value.trim().toLowerCase(), shown = 0;
+        document.querySelectorAll('#asBody tr.as-row').forEach(function (tr) {
+            var ok = !v || tr.querySelector('.as-patient').textContent.toLowerCase().indexOf(v) >= 0;
+            tr.style.display = ok ? '' : 'none'; if (ok) shown++;
+        });
+        document.getElementById('asEmpty').style.display = shown ? 'none' : '';
+    });
+})();
+</script>
 </body>
 </html>

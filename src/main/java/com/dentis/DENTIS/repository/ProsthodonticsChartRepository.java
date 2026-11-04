@@ -16,4 +16,6 @@ public interface ProsthodonticsChartRepository extends JpaRepository<Prosthodont
     List<ProsthodonticsChart> findByFacultyOrderByCreatedAtDesc(User faculty);
     List<ProsthodonticsChart> findByClinicianAndStatusInOrderByCreatedAtDesc(User clinician, List<ProsthodonticsChartStatus> statuses);
     List<ProsthodonticsChart> findByFacultyAndStatusOrderByCreatedAtDesc(User faculty, ProsthodonticsChartStatus status);
+    List<ProsthodonticsChart> findAllByOrderByCreatedAtDesc();
+    List<ProsthodonticsChart> findByClinicianAndClearedAtIsNotNullOrderByClearedAtDesc(User clinician);
 }

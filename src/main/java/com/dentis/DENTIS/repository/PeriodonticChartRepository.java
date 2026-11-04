@@ -35,4 +35,5 @@ public interface PeriodonticChartRepository extends JpaRepository<PeriodonticCha
 
     List<PeriodonticChart> findByFacultyAndPf3StatusOrderByCreatedAtDesc(
             User faculty, PeriodonticChartStatus pf3Status);
+    List<PeriodonticChart> findAllByOrderByCreatedAtDesc();
 }

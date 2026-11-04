@@ -59,15 +59,32 @@ public class PatientController {
     }
 
     @GetMapping("/dashboard-clinicmanager")
-    public String dashboard(Model model) {
-        model.addAttribute("patients", patientService.getAllPatients().stream().limit(5).toList());
-        model.addAttribute("requests", chartRequestService.getPendingRequests().stream().limit(5).toList());
+    public String dashboard(Model model,
+                            @RequestParam(value = "facultyAssigned", required = false) Long facultyAssignedId) {
+        List<Patient> all = patientService.getAllPatients();   // every admission (originals and readmissions), newest first
+        // waiting for a faculty: oldest first, each with the faculty of its section
+        List<Patient> needsFaculty = new ArrayList<>(all.stream().filter(p -> p.getAssignedFaculty() == null).toList());
+        java.util.Collections.reverse(needsFaculty);
+        java.util.Map<Long, List<com.dentis.DENTIS.model.User>> facultyByAdmission = new java.util.HashMap<>();
+        for (Patient p : needsFaculty) facultyByAdmission.put(p.getId(), patientService.getFacultyBySection(p.getServiceCode()));
+        // requests: oldest first
+        List<com.dentis.DENTIS.model.ChartRequest> pending = new ArrayList<>(chartRequestService.getPendingRequests());
+        java.util.Collections.reverse(pending);
+        java.time.LocalDate today = java.time.LocalDate.now();
+        model.addAttribute("requests", pending);
+        model.addAttribute("needsFaculty", needsFaculty);
+        model.addAttribute("facultyByAdmission", facultyByAdmission);
+        model.addAttribute("recentAdmissions", all.stream().limit(10).toList());
+        model.addAttribute("statAdmittedToday", all.stream().filter(p -> today.equals(p.getRegistrationDate())
+                || (p.getCreatedAt() != null && today.equals(p.getCreatedAt().toLocalDate()))).count());
+        if (facultyAssignedId != null) model.addAttribute("justAssigned", patientService.getPatientById(facultyAssignedId));
         model.addAttribute("statTotalPatients", patientService.countAll());
         model.addAttribute("statOS", patientService.countBySection("OS"));
         model.addAttribute("statENDO", patientService.countBySection("ENDO"));
         model.addAttribute("statPERIO", patientService.countBySection("PERIO"));
         model.addAttribute("statRESTO", patientService.countBySection("Resto"));
-        model.addAttribute("statPROSTHO", patientService.countBySection("CD") + patientService.countBySection("RPD"));
+        model.addAttribute("statPROSTHO", patientService.countBySection("CD") + patientService.countBySection("RPD")
+                + patientService.countBySection("FPD"));
         model.addAttribute("statPendingRequests", chartRequestService.getPendingRequests().size());
         model.addAttribute("statClinicians", patientService.getAllClinicians().size());
         model.addAttribute("clinicianPatientCounts", patientService.getUniquePatientCountByClinician());
@@ -75,14 +92,43 @@ public class PatientController {
     }
 
     @GetMapping("/assign-clinicmanager")
-    public String assignClinicians(Model model) {
+    public String assignClinicians(Model model, @RequestParam(value = "saved", required = false) Integer saved) {
         model.addAttribute("assignmentRows", assignmentService.getAssignmentRows());
-        model.addAttribute("osFaculty", patientService.getFacultyBySection("OS"));
-        model.addAttribute("endoFaculty", patientService.getFacultyBySection("ENDO"));
-        model.addAttribute("perioFaculty", patientService.getFacultyBySection("PERIO"));
-        model.addAttribute("restoFaculty", patientService.getFacultyBySection("Resto"));
-        model.addAttribute("prosthoFaculty", patientService.getFacultyBySection("CD"));
+        String[][] secs = { {"OS", "OS", "osFaculty"}, {"ENDO", "ENDO", "endoFaculty"}, {"PERIO", "PERIO", "perioFaculty"},
+                            {"RESTO", "Resto", "restoFaculty"}, {"PROSTHO", "CD", "prosthoFaculty"} };
+        // how many advisees each faculty already has in their section (shown in the dropdowns to balance the load)
+        java.util.Map<Long, Integer> adviseeCounts = new java.util.HashMap<>();
+        java.util.Map<String, List<java.util.Map<String, Object>>> bulkFaculty = new java.util.HashMap<>();   // for the bulk picker
+        for (String[] sec : secs) {
+            List<User> fac = patientService.getFacultyBySection(sec[1]);
+            model.addAttribute(sec[2], fac);
+            for (User f : fac) adviseeCounts.put(f.getId(), assignmentService.getAdviseesForFaculty(f, sec[0]).size());
+            bulkFaculty.put(sec[0].toLowerCase(), fac.stream()
+                    .map(f -> java.util.Map.<String, Object>of("id", f.getId(), "name", f.getFullName())).toList());
+        }
+        model.addAttribute("bulkFaculty", bulkFaculty);
+        model.addAttribute("adviseeCounts", adviseeCounts);
+        model.addAttribute("saved", saved);
         return "assign-clinicmanager";
+    }
+
+    /** Save all changed rows at once: fields "os_<clinicianId>", "endo_…", "perio_…", "resto_…", "prostho_…" (empty = none). */
+    @PostMapping("/assign-clinicmanager/save-all")
+    public String saveAllAssignments(@RequestParam java.util.Map<String, String> form) {
+        java.util.Set<Long> ids = new java.util.LinkedHashSet<>();
+        for (String k : form.keySet()) {
+            int i = k.indexOf('_');
+            if (i > 0) try { ids.add(Long.parseLong(k.substring(i + 1))); } catch (NumberFormatException ignored) { }
+        }
+        for (Long id : ids) {
+            assignmentService.saveAssignment(id, idOf(form.get("os_" + id)), idOf(form.get("endo_" + id)),
+                    idOf(form.get("perio_" + id)), idOf(form.get("resto_" + id)), idOf(form.get("prostho_" + id)));
+        }
+        return "redirect:/assign-clinicmanager?saved=" + ids.size();
+    }
+
+    private static Long idOf(String v) {
+        try { return v == null || v.isBlank() ? null : Long.parseLong(v); } catch (NumberFormatException e) { return null; }
     }
 
     @PostMapping("/assign-clinicmanager/{clinicianId}")
@@ -121,7 +167,8 @@ public class PatientController {
         model.addAttribute("restoPatients", allPatients.stream()
                 .filter(p -> "Resto".equalsIgnoreCase(p.getServiceCode())).toList());
         model.addAttribute("prosthoPatients", allPatients.stream()
-                .filter(p -> "CD".equalsIgnoreCase(p.getServiceCode()) || "RPD".equalsIgnoreCase(p.getServiceCode())).toList());
+                .filter(p -> "CD".equalsIgnoreCase(p.getServiceCode()) || "RPD".equalsIgnoreCase(p.getServiceCode())
+                        || "FPD".equalsIgnoreCase(p.getServiceCode())).toList());
         model.addAttribute("allPatients", allPatients);
         return "clinician-profile-clinicmanager";
     }
@@ -140,9 +187,51 @@ public class PatientController {
 
     @GetMapping("/patientlist-clinicmanager")
     public String patientList(Model model) {
-        model.addAttribute("patients", patientService.getAllPatients());
         model.addAttribute("clinicianPatientCounts", patientService.getUniquePatientCountByClinician());
+        // chart status tags of every admission, from all charts
+        java.util.Map<Long, java.util.Map<String, Object>> chartRows = new java.util.HashMap<>();
+        for (var r : com.dentis.DENTIS.service.PatientRowBuilder.build(
+                oralSurgeryChartService.findAllOrderByCreatedAtDesc(), endodonticsChartService.findAllOrderByCreatedAtDesc(),
+                periodonticChartService.findAllOrderByCreatedAtDesc(), operativeChartService.findAllOrderByCreatedAtDesc(),
+                prosthodonticsChartService.findAllOrderByCreatedAtDesc())) {
+            chartRows.put(((Patient) r.get("patient")).getId(), r);
+        }
+        // one row per admission (original or readmission), newest first
+        List<java.util.Map<String, Object>> rows = new ArrayList<>();
+        for (Patient p : patientService.getAllPatients()) {
+            java.util.Map<String, Object> c = chartRows.get(p.getId());
+            java.util.Map<String, Object> r = new java.util.HashMap<>();
+            r.put("patient", p);
+            r.put("section", sectionLabel(p.getServiceCode()));
+            r.put("tags", c != null ? c.get("tags") : List.of());
+            r.put("lastUpdated", c != null && c.get("lastUpdated") != null ? c.get("lastUpdated") : p.getCreatedAt());
+            boolean needsFaculty = p.getAssignedFaculty() == null;
+            boolean needsClinician = !needsFaculty && p.getAssignedClinician() == null;
+            boolean done = c != null && Boolean.TRUE.equals(c.get("done"));
+            r.put("needsFaculty", needsFaculty);
+            r.put("needsClinician", needsClinician);
+            r.put("done", done);
+            r.put("inProgress", !needsFaculty && !needsClinician && !done);
+            r.put("readmission", p.getOriginalPatient() != null);
+            rows.add(r);
+        }
+        model.addAttribute("patientRows", rows);
         return "patientlist-clinicmanager";
+    }
+
+    /** Section of a service code, as used by the filters ("CD", "RPD", "FPD" are Prostho). */
+    private static String sectionLabel(String code) {
+        if (code == null) return "—";
+        return switch (code.toUpperCase()) {
+            case "CD", "RPD", "FPD" -> "Prostho";
+            case "RESTO" -> "Resto";
+            case "ENDO" -> "Endo";
+            case "PERIO" -> "Perio";
+            case "OS" -> "OS";
+            case "PEDO" -> "Pedo";
+            case "ORTHO" -> "Ortho";
+            default -> code;
+        };
     }
 
     @GetMapping("/chartsview-clinicmanager/{id}")
@@ -160,6 +249,14 @@ public class PatientController {
         model.addAttribute("rootPatient", root);
         model.addAttribute("isRecall", patient.getOriginalPatient() != null);
         model.addAttribute("siblingRecalls", siblingRecalls);
+
+        // Faculty choices for each admission row (each admission can be for a different section)
+        java.util.Map<Long, List<com.dentis.DENTIS.model.User>> facultyByAdmission = new java.util.HashMap<>();
+        List<Patient> admissions = new ArrayList<>(siblingRecalls);
+        admissions.add(patient);
+        if (patient.getOriginalPatient() != null) admissions.add(root);
+        for (Patient a : admissions) facultyByAdmission.put(a.getId(), patientService.getFacultyBySection(a.getServiceCode()));
+        model.addAttribute("facultyByAdmission", facultyByAdmission);
 
         // Merge sub-charts from the current patient + root + all sibling recalls
         List<OralSurgeryChart> osCharts = new ArrayList<>(oralSurgeryChartService.findAllByPatient(patient));
@@ -190,9 +287,13 @@ public class PatientController {
     }
 
     @PostMapping("/chartsview-clinicmanager/{id}/assign-faculty")
-    public String assignFaculty(@PathVariable Long id, @RequestParam Long facultyId) {
+    public String assignFaculty(@PathVariable Long id, @RequestParam Long facultyId,
+                                @RequestParam(required = false) Long returnTo,
+                                @RequestParam(required = false) String from) {
         patientService.assignFaculty(id, facultyId);
-        return "redirect:/chartsview-clinicmanager/" + id;
+        if ("dashboard".equals(from)) return "redirect:/dashboard-clinicmanager?facultyAssigned=" + id;
+        // stay on the charts view the clinic manager was on (it may list several admissions)
+        return "redirect:/chartsview-clinicmanager/" + (returnTo != null ? returnTo : id);
     }
 
     @GetMapping("/readmit-clinicmanager/{id}")

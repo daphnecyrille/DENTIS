@@ -67,7 +67,7 @@
                         <a href="/evaluations-clinician" class="nav-link" style="position:relative;">
                             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="14" height="17" rx="2" stroke="#333" stroke-width="2"/><path d="M9 4V3h6v1" stroke="#333" stroke-width="2" stroke-linecap="round"/><path d="M8.5 12.5l2.2 2.2 4.8-4.8" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             <span>Evaluations</span>
-                            <b th:if="${currentUser != null and @perioEvaluationService.unreadCount(currentUser) > 0}" th:text="${@perioEvaluationService.unreadCount(currentUser)}"
+                            <b th:if="${currentUser != null and @notificationService.newEvaluationCount(currentUser) > 0}" th:text="${@notificationService.newEvaluationCount(currentUser)}"
                                style="position:absolute; top:2px; right:6px; min-width:18px; height:18px; padding:0 5px; box-sizing:border-box; border-radius:9px; background:#c0392b; color:white; font-size:11px; font-weight:700; line-height:18px; text-align:center;">1</b>
                         </a>
                     </li>
@@ -78,7 +78,7 @@
         <!-- Main Content -->
         <main class="main-content">
             <!-- Summary cards: what needs attention at a glance. For Revision / In Progress filter the Needs Submission table -->
-            <div class="dash-cards" th:with="newEvalCount=${#lists.size(@perioEvaluationService.unreadForClinician(currentUser))}">
+            <div class="dash-cards" th:with="newEvalCount=${@notificationService.newEvaluationCount(currentUser)}">
                 <a href="#needs-submission" class="dash-card card-revise" data-filter="revise" title="Show only charts for revision" th:classappend="${dashCounts['revise'] > 0} ? 'has-items'">
                     <span class="dash-card-num" th:text="${dashCounts['revise']}">0</span>
                     <span class="dash-card-label">For Revision</span>
@@ -103,10 +103,10 @@
             </div>
 
             <!-- New Evaluations: sent by the faculty, not opened yet (disappears once all are read) -->
-            <th:block th:with="newEvals=${@perioEvaluationService.unreadForClinician(currentUser)}">
-            <section class="section new-evals" th:if="${!#lists.isEmpty(newEvals)}">
+            <th:block th:with="newEvals=${@perioEvaluationService.unreadForClinician(currentUser)}, newCleared=${@prosthodonticsChartService.newClearedForClinician(currentUser)}">
+            <section class="section new-evals" th:if="${!#lists.isEmpty(newEvals) or !#lists.isEmpty(newCleared)}">
                 <div class="section-header">
-                    <h2 id="new-evaluations">New Evaluations <span class="new-count" th:text="${#lists.size(newEvals)}">1</span></h2>
+                    <h2 id="new-evaluations">New Evaluations <span class="new-count" th:text="${#lists.size(newEvals) + #lists.size(newCleared)}">1</span></h2>
                 </div>
                 <div class="table-container">
                     <table class="patient-table">
@@ -130,6 +130,17 @@
                                 <td th:text="${ev.perioChart.faculty != null ? ev.perioChart.faculty.fullName : '—'}"></td>
                                 <td th:text="${ev.sentAt != null ? #temporals.format(ev.sentAt, 'MMM d, yyyy') : '—'}"></td>
                                 <td><a th:href="@{/perio-eval-view/{id}(id=${ev.id})}" class="btn-view-chart">View</a></td>
+                            </tr>
+                            <!-- Prostho case cleared by the faculty: the grade is ready -->
+                            <tr th:each="pr : ${newCleared}">
+                                <td>
+                                    <span class="new-tag">New</span>
+                                    <strong>Prosthodontics</strong> &ndash; Case Cleared <span th:text="${'(' + pr.caseType + ') · Grade ' + pr.grade}"></span>
+                                </td>
+                                <td th:text="${pr.patient.surname + ', ' + pr.patient.firstName + (pr.patient.middleInitial != null ? ' ' + pr.patient.middleInitial + '.' : '')}"></td>
+                                <td th:text="${pr.clearedBy != null ? pr.clearedBy : '—'}"></td>
+                                <td th:text="${#temporals.format(pr.clearedAt, 'MMM d, yyyy')}"></td>
+                                <td><a th:href="@{/prosthodontics-clinician/{id}/view(id=${pr.id})}" class="btn-view-chart">View</a></td>
                             </tr>
                         </tbody>
                     </table>
@@ -381,6 +392,6 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
     apply();
 })();
 </script>
-<script src="/js/sidebar-hover.js"></script>
+<script src="/js/sidebar-hover.js?v=3"></script>
 </body>
 </html>

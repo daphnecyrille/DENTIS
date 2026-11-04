@@ -208,13 +208,19 @@ public class OperativeController {
     // ── Faculty: Approve / Revise Form 10 ───────────────────────────────────
 
     @PostMapping("/operative-faculty/{id}/approve")
-    public String approveForm1(@PathVariable Long id) {
+    public String approveForm1(@PathVariable Long id, Authentication authentication) {
+        OperativeChart owned = operativeChartService.getById(id);   // only the faculty assigned to this chart can approve / revise it
+        if (!isAssignedFaculty(owned.getFaculty(), authentication))
+            return "redirect:/chartsview-faculty/" + owned.getPatient().getId() + "?notAssigned";
         OperativeChart chart = operativeChartService.approveForm1(id);
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 
     @PostMapping("/operative-faculty/{id}/revise")
-    public String reviseForm1(@PathVariable Long id, @RequestParam String revisionReason) {
+    public String reviseForm1(@PathVariable Long id, @RequestParam String revisionReason, Authentication authentication) {
+        OperativeChart owned = operativeChartService.getById(id);   // only the faculty assigned to this chart can approve / revise it
+        if (!isAssignedFaculty(owned.getFaculty(), authentication))
+            return "redirect:/chartsview-faculty/" + owned.getPatient().getId() + "?notAssigned";
         OperativeChart chart = operativeChartService.reviseForm1(id, revisionReason);
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
@@ -222,14 +228,26 @@ public class OperativeController {
     // ── Faculty: Approve / Revise Form 6 ────────────────────────────────────
 
     @PostMapping("/operative2-faculty/{id}/approve")
-    public String approveForm2(@PathVariable Long id) {
+    public String approveForm2(@PathVariable Long id, Authentication authentication) {
+        OperativeChart owned = operativeChartService.getById(id);   // only the faculty assigned to this chart can approve / revise it
+        if (!isAssignedFaculty(owned.getFaculty(), authentication))
+            return "redirect:/chartsview-faculty/" + owned.getPatient().getId() + "?notAssigned";
         OperativeChart chart = operativeChartService.approveForm2(id);
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 
     @PostMapping("/operative2-faculty/{id}/revise")
-    public String reviseForm2(@PathVariable Long id, @RequestParam String revisionReason) {
+    public String reviseForm2(@PathVariable Long id, @RequestParam String revisionReason, Authentication authentication) {
+        OperativeChart owned = operativeChartService.getById(id);   // only the faculty assigned to this chart can approve / revise it
+        if (!isAssignedFaculty(owned.getFaculty(), authentication))
+            return "redirect:/chartsview-faculty/" + owned.getPatient().getId() + "?notAssigned";
         OperativeChart chart = operativeChartService.reviseForm2(id, revisionReason);
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
+    }
+
+    /** True when the logged-in user is the faculty assigned to the chart. */
+    private boolean isAssignedFaculty(User chartFaculty, Authentication authentication) {
+        User me = getCurrentUser(authentication);
+        return me != null && chartFaculty != null && chartFaculty.getId().equals(me.getId());
     }
 }

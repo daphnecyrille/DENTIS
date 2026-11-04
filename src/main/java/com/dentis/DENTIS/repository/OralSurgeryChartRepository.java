@@ -19,4 +19,5 @@ public interface OralSurgeryChartRepository extends JpaRepository<OralSurgeryCha
     List<OralSurgeryChart> findByClinicianAndStatusInOrderByCreatedAtDesc(User clinician, List<OralSurgeryChartStatus> statuses);
     List<OralSurgeryChart> findByFacultyAndStatusOrderByCreatedAtDesc(User faculty, OralSurgeryChartStatus status);
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+    List<OralSurgeryChart> findAllByOrderByCreatedAtDesc();
 }

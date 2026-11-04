@@ -73,163 +73,161 @@
 
         <!-- Main Content -->
         <main class="main-content">
-
-            <!-- Statistics -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon blue">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                            <circle cx="9" cy="7" r="4"/>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <div class="stat-value" th:text="${statTotalPatients}">0</div>
-                        <div class="stat-label">Total Patients</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon amber">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                            <line x1="16" y1="13" x2="8" y2="13"/>
-                            <line x1="16" y1="17" x2="8" y2="17"/>
-                            <polyline points="10 9 9 9 8 9"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <div class="stat-value" th:text="${statPendingRequests}">0</div>
-                        <div class="stat-label">Pending Requests</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon green">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                            <circle cx="12" cy="7" r="4"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <div class="stat-value" th:text="${statClinicians}">0</div>
-                        <div class="stat-label">Active Clinicians</div>
-                    </div>
-                </div>
-                <div class="stat-card stat-section">
-                    <div class="stat-label" style="margin-bottom:8px; font-weight:600;">Patients by Section</div>
-                    <div class="stat-section-row"><span>OS</span><span th:text="${statOS}">0</span></div>
-                    <div class="stat-section-row"><span>ENDO</span><span th:text="${statENDO}">0</span></div>
-                    <div class="stat-section-row"><span>PERIO</span><span th:text="${statPERIO}">0</span></div>
-                    <div class="stat-section-row"><span>RESTO</span><span th:text="${statRESTO}">0</span></div>
-                    <div class="stat-section-row"><span>PROSTHO</span><span th:text="${statPROSTHO}">0</span></div>
-                </div>
+            <div th:if="${justAssigned != null}" class="assign-toast" role="status">
+                <span>&#10003;</span>
+                <span th:text="${justAssigned.surname + ', ' + justAssigned.firstName + ' assigned to ' + (justAssigned.assignedFaculty != null ? justAssigned.assignedFaculty.fullName : 'the faculty')}"></span>
+                <button type="button" onclick="this.parentNode.remove()">&times;</button>
             </div>
 
-            <!-- Patient List -->
-            <section class="section">
-                <div class="section-header">
-                    <h2>Patient List</h2>
+            <div class="dash-top">
+                <!-- Summary cards: what needs the clinic manager -->
+                <div class="dash-cards">
+                    <a href="#requests" class="dash-card card-requests" th:classappend="${!#lists.isEmpty(requests)} ? 'has-items'" title="Chart requests waiting for you">
+                        <span class="dash-card-num" th:text="${#lists.size(requests)}">0</span>
+                        <span class="dash-card-label">Pending Requests</span>
+                    </a>
+                    <a href="#needs-faculty" class="dash-card card-assign" th:classappend="${!#lists.isEmpty(needsFaculty)} ? 'has-items'" title="Admissions without a faculty yet">
+                        <span class="dash-card-num" th:text="${#lists.size(needsFaculty)}">0</span>
+                        <span class="dash-card-label">Needs a Faculty</span>
+                    </a>
+                    <a href="#recent-admissions" class="dash-card card-today" title="Patients admitted today">
+                        <span class="dash-card-num" th:text="${statAdmittedToday}">0</span>
+                        <span class="dash-card-label">Admitted Today</span>
+                    </a>
+                    <a href="/patientlist-clinicmanager" class="dash-card card-total" title="All patients (original admissions)">
+                        <span class="dash-card-num" th:text="${statTotalPatients}">0</span>
+                        <span class="dash-card-label">Total Patients</span>
+                    </a>
                 </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Chart Number</th>
-                                <th>Patient Name</th>
-                                <th>Contact Number</th>
-                                <th>Email</th>
-                                <th>Assigned Clinician</th>
-                                <th>Patient Charts</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="patient : ${patients}">
-                                <td th:text="${patient.chartNo}"></td>
-                                <td th:text="${patient.surname + ', ' + patient.firstName + (patient.middleInitial != null ? ' ' + patient.middleInitial + '.' : '')}"></td>
-                                <td th:text="${patient.contactNumber}"></td>
-                                <td th:text="${patient.email}"></td>
-                                <td>
-                                    <span th:if="${patient.assignedClinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${patient.assignedClinician.fullName}"
-                                          th:data-email="${patient.assignedClinician.email}"
-                                          th:data-student="${patient.assignedClinician.studentNumber}"
-                                          th:data-year="${patient.assignedClinician.yearLevel}"
-                                          th:data-clinician-id="${patient.assignedClinician.id}"
-                                          th:data-patient-id="${patient.originalPatient != null ? patient.originalPatient.id : patient.id}"
-                                          th:text="${patient.assignedClinician.fullName}"
-                                          onclick="showClinicianModal(this)">
-                                    </span>
-                                    <span th:if="${patient.assignedClinician == null}">—</span>
-                                </td>
-                                <td><a th:href="@{/chartsview-clinicmanager/{id}(id=${patient.id})}" class="btn-view">View Chart</a></td>
-                            </tr>
-                            <tr th:if="${#lists.isEmpty(patients)}">
-                                <td colspan="6" style="text-align:center; color:#888;">No patients registered yet.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
+                <a href="/admitting-clinicmanager" class="btn-admit">+ Admit Patient</a>
+            </div>
 
-            <!-- Request List (Clinician chart access requests) -->
+            <!-- Patients by section -->
+            <div class="section-strip">
+                <span class="strip-label">Patients by section</span>
+                <span class="strip-item"><b th:text="${statOS}">0</b> OS</span>
+                <span class="strip-item"><b th:text="${statENDO}">0</b> Endo</span>
+                <span class="strip-item"><b th:text="${statPERIO}">0</b> Perio</span>
+                <span class="strip-item"><b th:text="${statRESTO}">0</b> Resto</span>
+                <span class="strip-item"><b th:text="${statPROSTHO}">0</b> Prostho</span>
+                <span class="strip-item muted"><b th:text="${statClinicians}">0</b> clinicians</span>
+            </div>
+
+            <!-- Pending chart requests: oldest first, accept / deny right here -->
             <section class="section">
-                <div class="section-header">
-                    <h2>Request List</h2>
+                <div class="section-header section-header-row">
+                    <h2 id="requests">Pending Requests
+                        <span class="new-count" th:if="${!#lists.isEmpty(requests)}" th:text="${#lists.size(requests)}">1</span></h2>
+                    <a href="/requestlist-clinicmanager" class="view-all">Request List &rsaquo;</a>
                 </div>
                 <div class="table-container">
-                    <table>
+                    <table class="dash-table" data-limit="5">
                         <thead>
-                            <tr>
-                                <th>Clinician</th>
-                                <th>Date Requested</th>
-                                <th>Requested Chart No.</th>
-                                <th>Patient Name</th>
-                                <th>Purpose</th>
-                                <th>Action</th>
-                            </tr>
+                            <tr><th>Clinician</th><th>Requested</th><th>Chart No.</th><th>Patient</th><th>Section</th><th>Purpose</th><th>Action</th></tr>
                         </thead>
                         <tbody>
                             <tr th:each="req : ${requests}">
                                 <td>
-                                    <span th:if="${req.clinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${req.clinician.fullName}"
-                                          th:data-email="${req.clinician.email}"
-                                          th:data-student="${req.clinician.studentNumber}"
-                                          th:data-year="${req.clinician.yearLevel}"
-                                          th:data-clinician-id="${req.clinician.id}"
-                                          th:text="${req.clinician.fullName}"
-                                          onclick="showClinicianModal(this)">
-                                    </span>
+                                    <span th:if="${req.clinician != null}" class="clinician-link"
+                                          th:data-name="${req.clinician.fullName}" th:data-email="${req.clinician.email}"
+                                          th:data-student="${req.clinician.studentNumber}" th:data-year="${req.clinician.yearLevel}"
+                                          th:data-clinician-id="${req.clinician.id}" th:text="${req.clinician.fullName}"
+                                          onclick="showClinicianModal(this)"></span>
                                     <span th:if="${req.clinician == null}">—</span>
                                 </td>
-                                <td th:text="${req.requestDate}"></td>
+                                <td class="when" th:attr="data-since=${req.createdAt}" th:text="${req.requestDate != null ? req.requestDate : '—'}"></td>
                                 <td th:text="${req.chartNo}"></td>
                                 <td th:text="${req.patientName}"></td>
-                                <td th:text="${req.purpose}"></td>
+                                <td><span class="svc-tag" th:text="${req.section != null ? req.section : '—'}"></span></td>
+                                <td class="as-text" th:title="${req.purpose}" th:text="${req.purpose != null and !#strings.isEmpty(req.purpose) ? req.purpose : '—'}"></td>
                                 <td class="action-cell">
                                     <form th:action="@{/requestlist-clinicmanager/{id}/approve(id=${req.id})}" method="post" style="display:inline;">
-                                        <button type="submit" class="btn-accept"
-                                                th:disabled="${req.status.name() != 'PENDING'}">Accept</button>
+                                        <input type="hidden" name="from" value="dashboard">
+                                        <button type="submit" class="btn-accept">Accept</button>
                                     </form>
                                     <form th:action="@{/requestlist-clinicmanager/{id}/deny(id=${req.id})}" method="post" style="display:inline;">
-                                        <button type="submit" class="btn-deny"
-                                                th:disabled="${req.status.name() != 'PENDING'}">Deny</button>
+                                        <input type="hidden" name="from" value="dashboard">
+                                        <button type="submit" class="btn-deny">Deny</button>
                                     </form>
                                 </td>
                             </tr>
-                            <tr th:if="${#lists.isEmpty(requests)}">
-                                <td colspan="6" style="text-align:center; color:#888;">No requests yet.</td>
-                            </tr>
+                            <tr th:if="${#lists.isEmpty(requests)}" class="empty-row"><td colspan="7">&#10003; No pending requests.</td></tr>
                         </tbody>
                     </table>
+                    <button type="button" class="show-all" style="display:none;"></button>
                 </div>
             </section>
 
+            <!-- Admissions without a faculty: pick one of the section's faculty right here -->
+            <section class="section">
+                <div class="section-header">
+                    <h2 id="needs-faculty">Needs a Faculty
+                        <span class="new-count blue" th:if="${!#lists.isEmpty(needsFaculty)}" th:text="${#lists.size(needsFaculty)}">1</span></h2>
+                </div>
+                <div class="table-container">
+                    <table class="dash-table" data-limit="5">
+                        <thead>
+                            <tr><th>Patient</th><th>Service</th><th>Chief Complaint</th><th>Waiting</th><th>Assign Faculty</th><th>Charts</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p : ${needsFaculty}">
+                                <td class="as-patient"><span class="as-name" th:text="${p.surname + ', ' + p.firstName + (p.middleInitial != null ? ' ' + p.middleInitial + '.' : '')}"></span><span class="as-no" th:text="${p.chartNo}"></span></td>
+                                <td><span class="svc-tag" th:text="${p.serviceCode != null ? p.serviceCode : '—'}"></span></td>
+                                <td class="as-text" th:title="${p.chiefComplaint}" th:text="${p.chiefComplaint != null and !#strings.isEmpty(p.chiefComplaint) ? p.chiefComplaint : '—'}"></td>
+                                <td class="when" th:attr="data-since=${p.createdAt}" th:text="${p.registrationDate != null ? p.registrationDate : '—'}"></td>
+                                <td>
+                                    <form th:action="@{/chartsview-clinicmanager/{id}/assign-faculty(id=${p.id})}" method="post" class="assign-form">
+                                        <input type="hidden" name="from" value="dashboard">
+                                        <select name="facultyId" required>
+                                            <option value="">Select faculty</option>
+                                            <option th:each="f : ${facultyByAdmission[p.id]}" th:value="${f.id}" th:text="${f.fullName}"></option>
+                                        </select>
+                                        <button type="submit" class="btn-assign">Assign</button>
+                                    </form>
+                                </td>
+                                <td><a th:href="@{/chartsview-clinicmanager/{id}(id=${p.id})}" class="btn-view-sm">View</a></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(needsFaculty)}" class="empty-row"><td colspan="6">&#10003; Every patient has a faculty.</td></tr>
+                        </tbody>
+                    </table>
+                    <button type="button" class="show-all" style="display:none;"></button>
+                </div>
+            </section>
 
+            <!-- Recently admitted -->
+            <section class="section">
+                <div class="section-header section-header-row">
+                    <h2 id="recent-admissions">Recently Admitted</h2>
+                    <a href="/patientlist-clinicmanager" class="view-all">Patient List &rsaquo;</a>
+                </div>
+                <div class="table-container">
+                    <table class="dash-table" data-limit="5">
+                        <thead>
+                            <tr><th>Patient</th><th>Service</th><th>Admitted</th><th>Faculty</th><th>Clinician</th><th>Charts</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p : ${recentAdmissions}">
+                                <td class="as-patient"><span class="as-name" th:text="${p.surname + ', ' + p.firstName + (p.middleInitial != null ? ' ' + p.middleInitial + '.' : '')}"></span>
+                                    <span class="as-no" th:text="${p.chartNo + (p.originalPatient != null ? ' · readmission' : '')}"></span></td>
+                                <td><span class="svc-tag" th:text="${p.serviceCode != null ? p.serviceCode : '—'}"></span></td>
+                                <td th:text="${p.registrationDate != null ? #temporals.format(p.registrationDate, 'MMM d, yyyy') : '—'}"></td>
+                                <td th:text="${p.assignedFaculty != null ? p.assignedFaculty.fullName : 'Not yet assigned'}" th:classappend="${p.assignedFaculty == null} ? 'missing'"></td>
+                                <td>
+                                    <span th:if="${p.assignedClinician != null}" class="clinician-link"
+                                          th:data-name="${p.assignedClinician.fullName}" th:data-email="${p.assignedClinician.email}"
+                                          th:data-student="${p.assignedClinician.studentNumber}" th:data-year="${p.assignedClinician.yearLevel}"
+                                          th:data-clinician-id="${p.assignedClinician.id}" th:text="${p.assignedClinician.fullName}"
+                                          onclick="showClinicianModal(this)"></span>
+                                    <span th:if="${p.assignedClinician == null}" class="missing">Not yet assigned</span>
+                                </td>
+                                <td><a th:href="@{/chartsview-clinicmanager/{id}(id=${p.id})}" class="btn-view-sm">View</a></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(recentAdmissions)}" class="empty-row"><td colspan="6">No patients admitted yet.</td></tr>
+                        </tbody>
+                    </table>
+                    <button type="button" class="show-all" style="display:none;"></button>
+                </div>
+            </section>
         </main>
     </div>
 </div>
@@ -288,6 +286,34 @@ function closeModal() {
 }
 </script>
 
-<script src="/js/sidebar-hover.js"></script>
+<script src="/js/sidebar-hover.js?v=3"></script>
+<script>
+/* Tables show 5 rows with Show all / Hide; "Waiting" and request times read as Today / 1 day / n days */
+document.querySelectorAll('.dash-table').forEach(function (table) {
+    var limit = parseInt(table.dataset.limit || '5', 10);
+    var rows = Array.prototype.filter.call(table.tBodies[0].rows, function (r) { return !r.classList.contains('empty-row'); });
+    var btn = table.parentNode.querySelector('.show-all');
+    if (!btn || rows.length <= limit) return;
+    var open = false;
+    function render() {
+        rows.forEach(function (r, i) { r.style.display = open || i < limit ? '' : 'none'; });
+        btn.textContent = open ? 'Hide' : 'Show all (' + rows.length + ')';
+    }
+    btn.style.display = 'block';
+    btn.addEventListener('click', function () { open = !open; render(); });
+    render();
+});
+(function () {
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    document.querySelectorAll('.when[data-since]').forEach(function (td) {
+        var raw = td.getAttribute('data-since'); if (!raw) return;
+        var d = new Date(raw); d.setHours(0, 0, 0, 0);
+        var n = Math.round((today - d) / 86400000);
+        td.title = td.textContent;
+        td.textContent = n <= 0 ? 'Today' : n === 1 ? '1 day' : n + ' days';
+        if (n >= 3) td.classList.add('long');
+    });
+})();
+</script>
 </body>
 </html>

@@ -119,26 +119,44 @@ public class EndodonticsController {
     }
 
     @PostMapping("/endodontics-faculty/{id}/approve")
-    public String approveChart(@PathVariable Long id) {
+    public String approveChart(@PathVariable Long id, Authentication authentication) {
+        EndodonticsChart owned = endodonticsChartService.getById(id);   // only the faculty assigned to this chart can approve / revise it
+        if (!isAssignedFaculty(owned.getFaculty(), authentication))
+            return "redirect:/chartsview-faculty/" + owned.getPatient().getId() + "?notAssigned";
         EndodonticsChart chart = endodonticsChartService.approve(id);
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 
     @PostMapping("/endodontics-faculty/{id}/revise")
-    public String reviseChart(@PathVariable Long id, @RequestParam String revisionReason) {
+    public String reviseChart(@PathVariable Long id, @RequestParam String revisionReason, Authentication authentication) {
+        EndodonticsChart owned = endodonticsChartService.getById(id);   // only the faculty assigned to this chart can approve / revise it
+        if (!isAssignedFaculty(owned.getFaculty(), authentication))
+            return "redirect:/chartsview-faculty/" + owned.getPatient().getId() + "?notAssigned";
         EndodonticsChart chart = endodonticsChartService.revise(id, revisionReason);
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 
     @PostMapping("/endodontics2-faculty/{id}/approve")
-    public String approveForm2(@PathVariable Long id) {
+    public String approveForm2(@PathVariable Long id, Authentication authentication) {
+        EndodonticsChart owned = endodonticsChartService.getById(id);   // only the faculty assigned to this chart can approve / revise it
+        if (!isAssignedFaculty(owned.getFaculty(), authentication))
+            return "redirect:/chartsview-faculty/" + owned.getPatient().getId() + "?notAssigned";
         EndodonticsChart chart = endodonticsChartService.approveForm2(id);
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 
     @PostMapping("/endodontics2-faculty/{id}/revise")
-    public String reviseForm2(@PathVariable Long id, @RequestParam String revisionReason) {
+    public String reviseForm2(@PathVariable Long id, @RequestParam String revisionReason, Authentication authentication) {
+        EndodonticsChart owned = endodonticsChartService.getById(id);   // only the faculty assigned to this chart can approve / revise it
+        if (!isAssignedFaculty(owned.getFaculty(), authentication))
+            return "redirect:/chartsview-faculty/" + owned.getPatient().getId() + "?notAssigned";
         EndodonticsChart chart = endodonticsChartService.reviseForm2(id, revisionReason);
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
+    }
+
+    /** True when the logged-in user is the faculty assigned to the chart. */
+    private boolean isAssignedFaculty(User chartFaculty, Authentication authentication) {
+        User me = getCurrentUser(authentication);
+        return me != null && chartFaculty != null && chartFaculty.getId().equals(me.getId());
     }
 }
