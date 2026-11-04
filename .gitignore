@@ -41,3 +41,6 @@ application-local.yml
 .env
 .env.*
 !.env.example
+
+# files uploaded through the app (patient documents)
+src/main/resources/static/uploads/
