@@ -121,7 +121,7 @@
                         <a href="/evaluations-clinician" class="nav-link" style="position:relative;">
                             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="14" height="17" rx="2" stroke="#333" stroke-width="2"/><path d="M9 4V3h6v1" stroke="#333" stroke-width="2" stroke-linecap="round"/><path d="M8.5 12.5l2.2 2.2 4.8-4.8" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             <span>Evaluations</span>
-                            <b th:if="${currentUser != null and @perioEvaluationService.unreadCount(currentUser) > 0}" th:text="${@perioEvaluationService.unreadCount(currentUser)}"
+                            <b th:if="${currentUser != null and @notificationService.newEvaluationCount(currentUser) > 0}" th:text="${@notificationService.newEvaluationCount(currentUser)}"
                                style="position:absolute; top:2px; right:6px; min-width:18px; height:18px; padding:0 5px; box-sizing:border-box; border-radius:9px; background:#c0392b; color:white; font-size:11px; font-weight:700; line-height:18px; text-align:center;">1</b>
                         </a>
                     </li>
@@ -204,32 +204,32 @@
 
                     <div class="form-group">
                         <label>Periodontal Chief Complaint</label>
-                        <textarea th:field="*{chiefComplaint}" placeholder="Value" rows="3"></textarea>
+                        <textarea th:field="*{chiefComplaint}" rows="3"></textarea>
                     </div>
 
                     <div class="form-group">
                         <label>History of Chief Complaint</label>
-                        <textarea th:field="*{historyOfChiefComplaint}" placeholder="Value" rows="3"></textarea>
+                        <textarea th:field="*{historyOfChiefComplaint}" rows="3"></textarea>
                     </div>
 
                     <div class="form-group">
                         <label>E-cigarette Use <span class="label-hint">(year started, number of cartridges/day, year stopped)</span></label>
-                        <input type="text" th:field="*{ecigaretteUse}" placeholder="Value">
+                        <input type="text" th:field="*{ecigaretteUse}">
                     </div>
 
                     <div class="form-group">
                         <label>Modifying Factors</label>
-                        <input type="text" th:field="*{modifyingFactors}" placeholder="Value">
+                        <input type="text" th:field="*{modifyingFactors}">
                     </div>
 
                     <div class="form-group">
                         <label>Predisposing Factors</label>
-                        <input type="text" th:field="*{predisposingFactors}" placeholder="Value">
+                        <input type="text" th:field="*{predisposingFactors}">
                     </div>
 
                     <div class="form-group">
                         <label>Risk Factors</label>
-                        <input type="text" th:field="*{riskFactors}" placeholder="Value">
+                        <input type="text" th:field="*{riskFactors}">
                     </div>
 
                     <div class="chart-group">
@@ -238,11 +238,10 @@
 
                         <!-- ── UPPER ARCH ── -->
                         <div class="perio-grid-row tooth-num-row" id="upperToothRow">
-                            <div class="grid-label empty-row-controls"><button type="button" class="btn-pm" onclick="addUpperRow()">+</button><button type="button" class="btn-pm" onclick="removeUpperRow()">&#8722;</button></div>
+                            <div class="grid-label"></div>
                             <div class="grid-num-cell">18</div><div class="grid-num-cell">17</div><div class="grid-num-cell">16</div><div class="grid-num-cell">15</div><div class="grid-num-cell">14</div><div class="grid-num-cell">13</div><div class="grid-num-cell">12</div><div class="grid-num-cell">11</div><div class="grid-num-cell">21</div><div class="grid-num-cell">22</div><div class="grid-num-cell">23</div><div class="grid-num-cell">24</div><div class="grid-num-cell">25</div><div class="grid-num-cell">26</div><div class="grid-num-cell">27</div><div class="grid-num-cell">28</div>
                         </div>
 
-                        <div id="upperExtraRows"></div>
 
                         <!-- Empty row -->
                         <div class="perio-grid-row" id="upperEmptyRow">
@@ -296,10 +295,9 @@
                             <div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div><div class="grid-input-cell"><input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1"></div>
                         </div>
 
-                        <div id="lowerExtraRows"></div>
 
                         <div class="perio-grid-row tooth-num-row">
-                            <div class="grid-label empty-row-controls"><button type="button" class="btn-pm" onclick="addLowerRow()">+</button><button type="button" class="btn-pm" onclick="removeLowerRow()">&#8722;</button></div>
+                            <div class="grid-label"></div>
                             <div class="grid-num-cell">48</div><div class="grid-num-cell">47</div><div class="grid-num-cell">46</div><div class="grid-num-cell">45</div><div class="grid-num-cell">44</div><div class="grid-num-cell">43</div><div class="grid-num-cell">42</div><div class="grid-num-cell">41</div><div class="grid-num-cell">31</div><div class="grid-num-cell">32</div><div class="grid-num-cell">33</div><div class="grid-num-cell">34</div><div class="grid-num-cell">35</div><div class="grid-num-cell">36</div><div class="grid-num-cell">37</div><div class="grid-num-cell">38</div>
                         </div>
 
@@ -323,16 +321,20 @@
                             </div>
                         </div>
                     </div>
+                    <div class="form-group chart-notes">
+                        <label>Notes</label>
+                        <textarea th:field="*{perioChartNotes}" rows="3"></textarea>
+                    </div>
                     </div><!-- end chart-group -->
 
                     <div class="form-group">
                         <label>Diagnosis</label>
-                        <textarea th:field="*{diagnosis}" placeholder="Value" rows="3"></textarea>
+                        <textarea th:field="*{diagnosis}" rows="3"></textarea>
                     </div>
 
                     <div class="form-group">
                         <label>Treatment Plan</label>
-                        <textarea th:field="*{treatmentPlan}" placeholder="Value" rows="10" style="min-height: 220px;"></textarea>
+                        <textarea th:field="*{treatmentPlan}" rows="10" style="min-height: 220px;"></textarea>
                     </div>
 
                     <!-- Signatures (drawn on screen): patient signs here; faculty signs when approving in the charts view -->
@@ -369,11 +371,11 @@
                                 <div class="occ-col-header">Buccal</div>
                                 <div class="occ-col-header">Lingual</div>
                             </div>
-                            <div class="occlular-row"><div class="occ-tag">Color</div><textarea th:field="*{occColorBuccal}" placeholder="Value"></textarea><textarea th:field="*{occColorLingual}" placeholder="Value"></textarea></div>
-                            <div class="occlular-row"><div class="occ-tag">Texture</div><textarea th:field="*{occTextureBuccal}" placeholder="Value"></textarea><textarea th:field="*{occTextureLingual}" placeholder="Value"></textarea></div>
-                            <div class="occlular-row"><div class="occ-tag">Adaptation</div><textarea th:field="*{occAdaptationBuccal}" placeholder="Value"></textarea><textarea th:field="*{occAdaptationLingual}" placeholder="Value"></textarea></div>
-                            <div class="occlular-row"><div class="occ-tag">Consistency</div><textarea th:field="*{occConsistencyBuccal}" placeholder="Value"></textarea><textarea th:field="*{occConsistencyLingual}" placeholder="Value"></textarea></div>
-                            <div class="occlular-row"><div class="occ-tag">Form</div><textarea th:field="*{occFormBuccal}" placeholder="Value"></textarea><textarea th:field="*{occFormLingual}" placeholder="Value"></textarea></div>
+                            <div class="occlular-row"><div class="occ-tag">Color</div><textarea th:field="*{occColorBuccal}"></textarea><textarea th:field="*{occColorLingual}"></textarea></div>
+                            <div class="occlular-row"><div class="occ-tag">Texture</div><textarea th:field="*{occTextureBuccal}"></textarea><textarea th:field="*{occTextureLingual}"></textarea></div>
+                            <div class="occlular-row"><div class="occ-tag">Adaptation</div><textarea th:field="*{occAdaptationBuccal}"></textarea><textarea th:field="*{occAdaptationLingual}"></textarea></div>
+                            <div class="occlular-row"><div class="occ-tag">Consistency</div><textarea th:field="*{occConsistencyBuccal}"></textarea><textarea th:field="*{occConsistencyLingual}"></textarea></div>
+                            <div class="occlular-row"><div class="occ-tag">Form</div><textarea th:field="*{occFormBuccal}"></textarea><textarea th:field="*{occFormLingual}"></textarea></div>
                         </div>
                     </div>
 
@@ -411,37 +413,6 @@ function deserializeRow(rowEl, data) {
     });
 }
 
-function makeExtraRow(values) {
-    var row = document.createElement('div');
-    row.className = 'extra-perio-row';
-    var lbl = document.createElement('div');
-    lbl.className = 'grid-label';
-    row.appendChild(lbl);
-    for (var i = 0; i < 16; i++) {
-        var cell = document.createElement('div');
-        cell.className = 'grid-input-cell';
-        for (var j = 0; j < 3; j++) {
-            var inp = document.createElement('input');
-            inp.type = 'text'; inp.maxLength = 1;
-            if (values && values[i] && values[i][j]) inp.value = values[i][j];
-            cell.appendChild(inp);
-        }
-        row.appendChild(cell);
-    }
-    return row;
-}
-
-function addUpperRow()    { var r = makeExtraRow(); document.getElementById('upperExtraRows').appendChild(r); applyMissingToRow(r, 'upper'); }
-function removeUpperRow() {
-    var c = document.getElementById('upperExtraRows');
-    if (c.lastElementChild) c.removeChild(c.lastElementChild);
-}
-function addLowerRow()    { var r = makeExtraRow(); document.getElementById('lowerExtraRows').appendChild(r); applyMissingToRow(r, 'lower'); }
-function removeLowerRow() {
-    var c = document.getElementById('lowerExtraRows');
-    if (c.lastElementChild) c.removeChild(c.lastElementChild);
-}
-
 /* ── Missing tooth: tooth-number button marks every site of that tooth X, draws an X on the picture,
       and locks the sites (same as PF1 page 2, PF2 and PF3) ── */
 var TOOTH_CENTERS = {   /* centre of each tooth in perio-chart.png, fraction of picture width (tooth-number order) */
@@ -450,8 +421,8 @@ var TOOTH_CENTERS = {   /* centre of each tooth in perio-chart.png, fraction of 
 };
 var ARCH_Y = { upper: { cy: 0.23, hh: 0.17 }, lower: { cy: 0.72, hh: 0.20 } };
 var ARCH_ROWS = {
-    upper: '#upperExtraRows .extra-perio-row, #upperEmptyRow, #upperBRow, #upperLRow',
-    lower: '#lowerLRow, #lowerBRow, #lowerEmptyRow, #lowerExtraRows .extra-perio-row'
+    upper: '#upperEmptyRow, #upperBRow, #upperLRow',
+    lower: '#lowerLRow, #lowerBRow, #lowerEmptyRow'
 };
 
 function toothInputs(arch, col) {
@@ -636,19 +607,11 @@ var annotations = [];
             deserializeRow(document.getElementById('upperEmptyRow'), g.upper.empty);
             deserializeRow(document.getElementById('upperBRow'), g.upper.B);
             deserializeRow(document.getElementById('upperLRow'), g.upper.L);
-            if (g.upper.extra) {
-                var uc = document.getElementById('upperExtraRows');
-                g.upper.extra.forEach(function(rowData) { uc.appendChild(makeExtraRow(rowData)); });
-            }
         }
         if (g.lower) {
             deserializeRow(document.getElementById('lowerLRow'), g.lower.L);
             deserializeRow(document.getElementById('lowerBRow'), g.lower.B);
             deserializeRow(document.getElementById('lowerEmptyRow'), g.lower.empty);
-            if (g.lower.extra) {
-                var lc = document.getElementById('lowerExtraRows');
-                g.lower.extra.forEach(function(rowData) { lc.appendChild(makeExtraRow(rowData)); });
-            }
         }
     } catch(e) {}
 })();
@@ -656,23 +619,16 @@ var annotations = [];
 /* ── Serialize grid + canvas before submit ── */
 document.getElementById('formA').addEventListener('submit', function() {
     // Grid
-    function serializeExtraRows(containerId) {
-        return Array.from(document.getElementById(containerId).children).map(function(row) {
-            return serializeRow(row);
-        });
-    }
     var grid = {
         upper: {
             empty: serializeRow(document.getElementById('upperEmptyRow')),
             B:     serializeRow(document.getElementById('upperBRow')),
-            L:     serializeRow(document.getElementById('upperLRow')),
-            extra: serializeExtraRows('upperExtraRows')
+            L:     serializeRow(document.getElementById('upperLRow'))
         },
         lower: {
             L:     serializeRow(document.getElementById('lowerLRow')),
             B:     serializeRow(document.getElementById('lowerBRow')),
-            empty: serializeRow(document.getElementById('lowerEmptyRow')),
-            extra: serializeExtraRows('lowerExtraRows')
+            empty: serializeRow(document.getElementById('lowerEmptyRow'))
         }
     };
     document.getElementById('formAGridJsonInput').value = JSON.stringify(grid);
@@ -726,7 +682,7 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 </script>
 
 <script src="/js/textarea-min-size.js"></script>
-<script src="/js/sidebar-hover.js"></script>
+<script src="/js/sidebar-hover.js?v=3"></script>
 <script src="/js/signature-pad.js"></script>
 <script>
 /* PF1 patient signature: draw -> Done puts the drawing in the form (saved with Save/Next); Sign again redraws */

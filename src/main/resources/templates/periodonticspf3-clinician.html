@@ -92,7 +92,7 @@
                         <a href="/evaluations-clinician" class="nav-link" style="position:relative;">
                             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="14" height="17" rx="2" stroke="#333" stroke-width="2"/><path d="M9 4V3h6v1" stroke="#333" stroke-width="2" stroke-linecap="round"/><path d="M8.5 12.5l2.2 2.2 4.8-4.8" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             <span>Evaluations</span>
-                            <b th:if="${currentUser != null and @perioEvaluationService.unreadCount(currentUser) > 0}" th:text="${@perioEvaluationService.unreadCount(currentUser)}"
+                            <b th:if="${currentUser != null and @notificationService.newEvaluationCount(currentUser) > 0}" th:text="${@notificationService.newEvaluationCount(currentUser)}"
                                style="position:absolute; top:2px; right:6px; min-width:18px; height:18px; padding:0 5px; box-sizing:border-box; border-radius:9px; background:#c0392b; color:white; font-size:11px; font-weight:700; line-height:18px; text-align:center;">1</b>
                         </a>
                     </li>
@@ -211,9 +211,9 @@
                     <div class="recall-section" th:classappend="${chart.pf3Recall1Locked} ? 'recall-locked'">
                         <h3 class="recall-title"><em>Recall 1</em></h3>
                         <div class="form-group recall-date"><label>Date</label><input type="date" th:field="*{recall1Date}" th:readonly="${chart.pf3Recall1Locked}"></div>
-                        <div class="form-group"><label>Diagnosis</label><textarea rows="3" th:field="*{recall1Diagnosis}" th:readonly="${chart.pf3Recall1Locked}" placeholder="Value"></textarea></div>
-                        <div class="form-group"><label>Relevant Findings</label><textarea rows="3" th:field="*{recall1Findings}" th:readonly="${chart.pf3Recall1Locked}" placeholder="Value"></textarea></div>
-                        <div class="form-group"><label>Recommendation</label><textarea rows="3" th:field="*{recall1Recommendation}" th:readonly="${chart.pf3Recall1Locked}" placeholder="Value"></textarea></div>
+                        <div class="form-group"><label>Diagnosis</label><textarea rows="3" th:field="*{recall1Diagnosis}" th:readonly="${chart.pf3Recall1Locked}"></textarea></div>
+                        <div class="form-group"><label>Relevant Findings</label><textarea rows="3" th:field="*{recall1Findings}" th:readonly="${chart.pf3Recall1Locked}"></textarea></div>
+                        <div class="form-group"><label>Recommendation</label><textarea rows="3" th:field="*{recall1Recommendation}" th:readonly="${chart.pf3Recall1Locked}"></textarea></div>
                         <div class="sig-row recall-sig">
                             <div class="sig-box">
                                 <span class="sig-label">Faculty Signature</span>
@@ -231,9 +231,9 @@
                         <h3 class="recall-title"><em>Recall 2</em></h3>
                         <p class="recall-lock-note" th:if="${!chart.pf3Recall1Locked}">Opens after the faculty approves Recall 1.</p>
                         <div class="form-group recall-date"><label>Date</label><input type="date" th:field="*{recall2Date}" th:readonly="${!chart.pf3Recall1Locked}"></div>
-                        <div class="form-group"><label>Diagnosis</label><textarea rows="3" th:field="*{recall2Diagnosis}" th:readonly="${!chart.pf3Recall1Locked}" placeholder="Value"></textarea></div>
-                        <div class="form-group"><label>Relevant Findings</label><textarea rows="3" th:field="*{recall2Findings}" th:readonly="${!chart.pf3Recall1Locked}" placeholder="Value"></textarea></div>
-                        <div class="form-group"><label>Recommendation</label><textarea rows="3" th:field="*{recall2Recommendation}" th:readonly="${!chart.pf3Recall1Locked}" placeholder="Value"></textarea></div>
+                        <div class="form-group"><label>Diagnosis</label><textarea rows="3" th:field="*{recall2Diagnosis}" th:readonly="${!chart.pf3Recall1Locked}"></textarea></div>
+                        <div class="form-group"><label>Relevant Findings</label><textarea rows="3" th:field="*{recall2Findings}" th:readonly="${!chart.pf3Recall1Locked}"></textarea></div>
+                        <div class="form-group"><label>Recommendation</label><textarea rows="3" th:field="*{recall2Recommendation}" th:readonly="${!chart.pf3Recall1Locked}"></textarea></div>
                         <div class="sig-row recall-sig">
                             <div class="sig-box">
                                 <span class="sig-label">Faculty Signature</span>
@@ -251,7 +251,7 @@
                     <!-- Navigation -->
                     <div class="form-actions">
                         <button th:if="${!viewOnly}" type="submit" class="btn-submit">Save</button>
-                        <th:block th:if="${currentUser != null and currentUser.role.name() == 'FACULTY' and chart.pf3Status.name() == 'SUBMITTED'}">
+                        <th:block th:if="${currentUser != null and currentUser.role.name() == 'FACULTY' and chart.faculty != null and chart.faculty.id == currentUser.id and chart.pf3Status.name() == 'SUBMITTED'}">
                             <button type="button" class="btn-revise"
                                     th:data-action="@{/periodontics3-faculty/{id}/revise(id=${chart.id})}"
                                     onclick="openReviseModal(this)">Revise</button>
@@ -410,7 +410,7 @@ document.getElementById('pf3Chart').addEventListener('click', function(e) {
         } else {
             var states = ['', '+', '-'];
             var idx = states.indexOf(site.dataset.val || '');
-            setSite(site, states[(idx + 1) % states.length]);
+            setSite(site, states[ (idx + 1) % states.length]);
         }
         return;
     }
@@ -574,7 +574,7 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 </script>
 
 <script src="/js/textarea-min-size.js"></script>
-<script src="/js/sidebar-hover.js"></script>
+<script src="/js/sidebar-hover.js?v=3"></script>
 <th:block th:replace="~{fragments/faculty-review :: modals}"></th:block>
 </body>
 </html>

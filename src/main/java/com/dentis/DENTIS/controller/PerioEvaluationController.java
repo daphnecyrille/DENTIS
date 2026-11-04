@@ -26,13 +26,19 @@ public class PerioEvaluationController {
     private final PerioEvaluationService evalService;
     private final PeriodonticChartService chartService;
     private final UserRepository userRepository;
+    private final com.dentis.DENTIS.service.ProsthodonticsChartService prosthodonticsChartService;
+    private final com.dentis.DENTIS.service.NotificationService notificationService;
 
     public PerioEvaluationController(PerioEvaluationService evalService,
                                      PeriodonticChartService chartService,
-                                     UserRepository userRepository) {
+                                     UserRepository userRepository,
+                                     com.dentis.DENTIS.service.ProsthodonticsChartService prosthodonticsChartService,
+                                     com.dentis.DENTIS.service.NotificationService notificationService) {
         this.evalService = evalService;
         this.chartService = chartService;
         this.userRepository = userRepository;
+        this.prosthodonticsChartService = prosthodonticsChartService;
+        this.notificationService = notificationService;
     }
 
     private User getCurrentUser(Authentication authentication) {
@@ -122,7 +128,8 @@ public class PerioEvaluationController {
         User user = getCurrentUser(authentication);
         model.addAttribute("currentUser", user);
         model.addAttribute("evals", evalService.sentForClinician(user));
-        model.addAttribute("unreadCount", evalService.unreadCount(user));
+        model.addAttribute("prosthoCleared", prosthodonticsChartService.clearedForClinician(user));
+        model.addAttribute("unreadCount", notificationService.newEvaluationCount(user));
         return "evaluations-clinician";
     }
 

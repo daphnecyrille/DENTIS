@@ -812,3 +812,8 @@ body { height: 100vh; overflow: hidden; }
 .grid-num-cell { border-left: 2px solid #c3cbd6; }
 .box-spot { border-right: 1px dotted #b8b8b8; }
 .box-spot:last-child { border-right: none; }
+
+/* Notes and Plaque Index sit close under the plaque chart (the panel's 32px gap is for separate blocks) */
+.chart-panel .chart-notes { margin-top: -14px; }
+.chart-panel .plaque-formula-row { margin-top: -14px; }
+.chart-panel .plaque-formula { margin-top: 0; }

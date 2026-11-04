@@ -120,7 +120,7 @@
                         <a href="/evaluations-clinician" class="nav-link" style="position:relative;">
                             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="14" height="17" rx="2" stroke="#333" stroke-width="2"/><path d="M9 4V3h6v1" stroke="#333" stroke-width="2" stroke-linecap="round"/><path d="M8.5 12.5l2.2 2.2 4.8-4.8" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             <span>Evaluations</span>
-                            <b th:if="${currentUser != null and @perioEvaluationService.unreadCount(currentUser) > 0}" th:text="${@perioEvaluationService.unreadCount(currentUser)}"
+                            <b th:if="${currentUser != null and @notificationService.newEvaluationCount(currentUser) > 0}" th:text="${@notificationService.newEvaluationCount(currentUser)}"
                                style="position:absolute; top:2px; right:6px; min-width:18px; height:18px; padding:0 5px; box-sizing:border-box; border-radius:9px; background:#c0392b; color:white; font-size:11px; font-weight:700; line-height:18px; text-align:center;">1</b>
                         </a>
                     </li>
@@ -413,7 +413,7 @@
                     <!-- Notes -->
                     <div class="form-group chart-notes">
                         <label>Notes</label>
-                        <textarea rows="4" th:field="*{formCNotes}" placeholder="Value"></textarea>
+                        <textarea rows="4" th:field="*{formCNotes}"></textarea>
                     </div>
 
                     <!-- Bottom section -->
@@ -430,9 +430,9 @@
                         </div>
                         <div class="check-section">
                             <span class="check-label">Check if:</span>
-                            <label class="check-option"><input type="checkbox" th:field="*{isInitialExamination}"> Initial Examination</label>
-                            <label class="check-option"><input type="checkbox" th:field="*{isReevaluation}"> Reevaluation</label>
-                            <label class="check-option"><input type="checkbox" th:field="*{isMaintenanceVisit}"> Maintenance Visit</label>
+                            <label class="check-option"><input type="checkbox" class="visit-type" th:field="*{isInitialExamination}"> Initial Examination</label>
+                            <label class="check-option"><input type="checkbox" class="visit-type" th:field="*{isReevaluation}"> Reevaluation</label>
+                            <label class="check-option"><input type="checkbox" class="visit-type" th:field="*{isMaintenanceVisit}"> Maintenance Visit</label>
                         </div>
                     </div>
 
@@ -440,7 +440,7 @@
 
                     <div class="form-actions">
                         <button th:if="${!viewOnly}" type="submit" class="btn-submit">Save</button>
-                        <th:block th:if="${currentUser != null and currentUser.role.name() == 'FACULTY' and chart.formCStatus.name() == 'SUBMITTED'}">
+                        <th:block th:if="${currentUser != null and currentUser.role.name() == 'FACULTY' and chart.faculty != null and chart.faculty.id == currentUser.id and chart.formCStatus.name() == 'SUBMITTED'}">
                             <button type="button" class="btn-revise"
                                     th:data-action="@{/periodontics2-faculty/{id}/revise(id=${chart.id})}"
                                     onclick="openReviseModal(this)">Revise</button>
@@ -768,7 +768,7 @@ document.querySelectorAll('.pi-input').forEach(function(inp) {
         if (VIEW_ONLY) return;
         if (this.value === 'X') return;   /* missing tooth: locked */
         var states = ['', '+', '-'];
-        var next = states[(states.indexOf(this.value) + 1) % states.length];
+        var next = states[ (states.indexOf(this.value) + 1) % states.length];
         this.value = next;
         this.classList.toggle('x-marked', false);
     });
@@ -1123,7 +1123,7 @@ document.querySelectorAll('.c-grid-row .c-cell input').forEach(function(inp) {
         var i = btns.indexOf(document.activeElement);
         if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
             e.preventDefault();
-            btns[(i + (e.key === 'ArrowRight' ? 1 : btns.length - 1)) % btns.length].focus();
+            btns[ (i + (e.key === 'ArrowRight' ? 1 : btns.length - 1)) % btns.length].focus();
         } else if (e.key === 'Escape') {
             bopPicker.style.display = 'none';
             if (bopActiveInput) bopActiveInput.focus();
@@ -1183,8 +1183,17 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 })();
 </script>
 
+<script>
+/* "Check if": only one visit type can be ticked at a time */
+document.querySelectorAll('.visit-type').forEach(function (box) {
+    box.addEventListener('change', function () {
+        if (!box.checked) return;
+        document.querySelectorAll('.visit-type').forEach(function (other) { if (other !== box) other.checked = false; });
+    });
+});
+</script>
 <script src="/js/textarea-min-size.js"></script>
-<script src="/js/sidebar-hover.js"></script>
+<script src="/js/sidebar-hover.js?v=3"></script>
 <th:block th:replace="~{fragments/faculty-review :: modals}"></th:block>
 </body>
 </html>

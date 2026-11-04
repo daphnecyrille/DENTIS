@@ -35,12 +35,29 @@ public class PeriodonticChartService {
         return repo.findByPatientOrderByCreatedAtDesc(patient);
     }
 
+    /**
+     * The patient was reassigned to another faculty: their charts in this section go to that faculty too.
+     * Charts the former faculty already fully approved stay with them, as the record of who approved them.
+     */
+    public void reassignFaculty(Patient patient, User faculty) {
+        List<PeriodonticChart> charts = findAllByPatient(patient).stream()
+                .filter(c -> !(c.getStatus() == PeriodonticChartStatus.APPROVED && c.getFormCStatus() == PeriodonticChartStatus.APPROVED && c.getPf3Status() == PeriodonticChartStatus.APPROVED))
+                .toList();
+        charts.forEach(c -> c.setFaculty(faculty));
+        repo.saveAll(charts);
+    }
+
     public List<PeriodonticChart> findByClinicianOrderByCreatedAtDesc(User clinician) {
         return repo.findByClinicianOrderByCreatedAtDesc(clinician);
     }
 
     public List<PeriodonticChart> findByFacultyOrderByCreatedAtDesc(User faculty) {
         return repo.findByFacultyOrderByCreatedAtDesc(faculty);
+    }
+
+    /** Every chart of this section (all faculty of the section can see all its patients). */
+    public List<PeriodonticChart> findAllOrderByCreatedAtDesc() {
+        return repo.findAllByOrderByCreatedAtDesc();
     }
 
     /** Charts where Form A/B (PF1) still needs submission. */
@@ -96,6 +113,7 @@ public class PeriodonticChartService {
         chart.setPredisposingFactors(updated.getPredisposingFactors());
         chart.setRiskFactors(updated.getRiskFactors());
         chart.setFormAGridJson(updated.getFormAGridJson());
+        chart.setPerioChartNotes(updated.getPerioChartNotes());
         chart.setFormACanvasJson(updated.getFormACanvasJson());
         chart.setOccColorBuccal(updated.getOccColorBuccal());
         chart.setOccColorLingual(updated.getOccColorLingual());
@@ -131,6 +149,7 @@ public class PeriodonticChartService {
     public PeriodonticChart saveFormB(Long id, PeriodonticChart updated) {
         PeriodonticChart chart = repo.findById(id).orElseThrow();
         chart.setPlaqueScorePercent(updated.getPlaqueScorePercent());
+        chart.setPlaqueChartNotes(updated.getPlaqueChartNotes());
         chart.setFormBGridJson(updated.getFormBGridJson());
         chart.setFormBCanvasJson(updated.getFormBCanvasJson());
         chart.setFormBRecallChartsJson(updated.getFormBRecallChartsJson());

@@ -633,3 +633,4 @@ a.btn-next { text-decoration: none; display: inline-block; }
 
 /* Picker "Clear": same look as the Clear in PF2 */
 .sym-clear { font-size: 12px; }
+.perio-legend .legend-col span { font-weight: 600; }

@@ -72,6 +72,9 @@ public class PeriodonticChart {
     @Column(columnDefinition = "TEXT")
     private String formAGridJson;
 
+    /** PF1 page 1: notes under the periodontal chart (replaces the old added rows). */
+    @Column(columnDefinition = "TEXT") private String perioChartNotes;
+
     /** JSON: canvas annotation positions+symbols for Form A. */
     @Column(columnDefinition = "TEXT")
     private String formACanvasJson;
@@ -103,6 +106,9 @@ public class PeriodonticChart {
     // ── Form B: Plaque / Bleeding Chart ──────────────────────────────────────
 
     private String plaqueScorePercent;
+
+    /** PF1 page 2: notes under the first plaque chart (added charts keep theirs in formBRecallChartsJson). */
+    @Column(columnDefinition = "TEXT") private String plaqueChartNotes;
 
     /** JSON: box-spot states (+/-/X/blank) for upper+lower grid. */
     @Column(columnDefinition = "TEXT")

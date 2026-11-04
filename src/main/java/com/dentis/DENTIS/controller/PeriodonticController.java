@@ -198,6 +198,9 @@ public class PeriodonticController {
     public String approveFormAB(@PathVariable Long id,
                                 @RequestParam(value = "signature", required = false) String signature,
                                 Authentication authentication) {
+        PeriodonticChart owned = periodonticChartService.getById(id);   // only the faculty assigned to this chart can approve / revise it
+        if (!isAssignedFaculty(owned.getFaculty(), authentication))
+            return "redirect:/chartsview-faculty/" + owned.getPatient().getId() + "?notAssigned";
         PeriodonticChart chart = periodonticChartService.getById(id);
         if (!PeriodonticChartService.isSignature(signature)) {
             // approving PF1 needs the faculty's drawn signature: back to page 2, where Approve is
@@ -208,7 +211,10 @@ public class PeriodonticController {
     }
 
     @PostMapping("/periodontics-faculty/{id}/revise")
-    public String reviseFormAB(@PathVariable Long id, @RequestParam String revisionReason) {
+    public String reviseFormAB(@PathVariable Long id, @RequestParam String revisionReason, Authentication authentication) {
+        PeriodonticChart owned = periodonticChartService.getById(id);   // only the faculty assigned to this chart can approve / revise it
+        if (!isAssignedFaculty(owned.getFaculty(), authentication))
+            return "redirect:/chartsview-faculty/" + owned.getPatient().getId() + "?notAssigned";
         PeriodonticChart chart = periodonticChartService.reviseFormAB(id, revisionReason);
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
@@ -216,13 +222,19 @@ public class PeriodonticController {
     // ── Faculty: Approve / Revise PF2 (Form C) ──────────────────────────────
 
     @PostMapping("/periodontics2-faculty/{id}/approve")
-    public String approveFormC(@PathVariable Long id) {
+    public String approveFormC(@PathVariable Long id, Authentication authentication) {
+        PeriodonticChart owned = periodonticChartService.getById(id);   // only the faculty assigned to this chart can approve / revise it
+        if (!isAssignedFaculty(owned.getFaculty(), authentication))
+            return "redirect:/chartsview-faculty/" + owned.getPatient().getId() + "?notAssigned";
         PeriodonticChart chart = periodonticChartService.approveFormC(id);
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 
     @PostMapping("/periodontics2-faculty/{id}/revise")
-    public String reviseFormC(@PathVariable Long id, @RequestParam String revisionReason) {
+    public String reviseFormC(@PathVariable Long id, @RequestParam String revisionReason, Authentication authentication) {
+        PeriodonticChart owned = periodonticChartService.getById(id);   // only the faculty assigned to this chart can approve / revise it
+        if (!isAssignedFaculty(owned.getFaculty(), authentication))
+            return "redirect:/chartsview-faculty/" + owned.getPatient().getId() + "?notAssigned";
         PeriodonticChart chart = periodonticChartService.reviseFormC(id, revisionReason);
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
@@ -241,6 +253,9 @@ public class PeriodonticController {
     public String approvePf3(@PathVariable Long id,
                              @RequestParam(value = "signature", required = false) String signature,
                              Authentication authentication) {
+        PeriodonticChart owned = periodonticChartService.getById(id);   // only the faculty assigned to this chart can approve / revise it
+        if (!isAssignedFaculty(owned.getFaculty(), authentication))
+            return "redirect:/chartsview-faculty/" + owned.getPatient().getId() + "?notAssigned";
         if (!PeriodonticChartService.isSignature(signature)) {
             // each PF3 recall is approved with the faculty's drawn signature
             return "redirect:/periodontics-pf3/" + id + "/view?signRequired";
@@ -250,8 +265,17 @@ public class PeriodonticController {
     }
 
     @PostMapping("/periodontics3-faculty/{id}/revise")
-    public String revisePf3(@PathVariable Long id, @RequestParam String revisionReason) {
+    public String revisePf3(@PathVariable Long id, @RequestParam String revisionReason, Authentication authentication) {
+        PeriodonticChart owned = periodonticChartService.getById(id);   // only the faculty assigned to this chart can approve / revise it
+        if (!isAssignedFaculty(owned.getFaculty(), authentication))
+            return "redirect:/chartsview-faculty/" + owned.getPatient().getId() + "?notAssigned";
         PeriodonticChart chart = periodonticChartService.revisePf3(id, revisionReason);
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
+    }
+
+    /** True when the logged-in user is the faculty assigned to the chart. */
+    private boolean isAssignedFaculty(User chartFaculty, Authentication authentication) {
+        User me = getCurrentUser(authentication);
+        return me != null && chartFaculty != null && chartFaculty.getId().equals(me.getId());
     }
 }
