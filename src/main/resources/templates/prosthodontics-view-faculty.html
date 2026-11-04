@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Prosthodontics - DentIS</title>
     <link rel="stylesheet" href="/css/prosthodontics-clinician.css">
+    <link rel="stylesheet" href="/css/form-common.css">
+    <link rel="stylesheet" href="/css/prostho-booklet.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 
@@ -57,155 +59,62 @@
         <main class="main-content">
             <h2 class="page-title">Prosthodontics</h2>
 
-            <!-- Grade saved confirmation -->
-            <div th:if="${param.graded}" style="background:#d4edda; border-left:5px solid #28a745; padding:12px 20px; margin:0 0 20px 0; border-radius:6px; font-size:13px; color:#155724;">
-                Grade saved successfully.
+            <div th:if="${chart.status.name() == 'REVISE' and chart.revisionReason != null and !#strings.isEmpty(chart.revisionReason)}" class="booklet-note">
+                <b>Sent back for revision</b><span th:text="${chart.revisionReason}"></span>
             </div>
+            <div th:if="${param.gradeRequired != null}" class="review-toast">Please enter the grade before clearing the case.
+                <button type="button" onclick="this.parentNode.remove()">&times;</button></div>
 
             <div class="form-card">
+                <a th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}" th:href="@{/chartsview-clinicmanager/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <a th:if="${currentUser != null and currentUser.role.name() == 'FACULTY'}" th:href="@{/chartsview-faculty/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
                 <div class="form-banner">Evaluation of Clinical Competencies in Prosthodontics</div>
                 <div class="form-body">
 
-                    <!-- Case Info -->
-                    <div class="case-type-box">
-                        <div style="display:flex; gap:32px; flex-wrap:wrap; margin-bottom:14px;">
-                            <div>
-                                <strong style="font-size:13px;">Case Type:</strong>
-                                <span style="font-size:14px; font-weight:600; color:#7a4e2d; margin-left:8px;" th:text="${chart.caseType}">CD</span>
-                            </div>
-                            <div><strong style="font-size:13px;">Case:</strong> <span th:text="${chart.caseNumber}">—</span></div>
-                            <div><strong style="font-size:13px;">Status:</strong>
-                                <span th:text="${chart.status.displayName}"
-                                      th:classappend="${chart.status.name() == 'APPROVED' ? 'status approved' : (chart.status.name() == 'SUBMITTED' ? 'status submitted' : (chart.status.name() == 'REVISE' ? 'status denied' : 'status pending'))}"
-                                      style="margin-left:6px; padding:2px 10px; border-radius:12px; font-size:12px;">—</span>
-                            </div>
-                        </div>
-                        <div th:if="${chart.caseType == 'RPD'}">
-                            <div class="rpd-options">
-                                <label><input type="checkbox" th:checked="${chart.rpdMxWithFramework}" disabled> Mx w/ Framework</label>
-                                <label><input type="checkbox" th:checked="${chart.rpdMxWithout}" disabled> Mx w/o Framework</label>
-                                <label><input type="checkbox" th:checked="${chart.rpdMdWithFramework}" disabled> Md w/ Framework</label>
-                                <label><input type="checkbox" th:checked="${chart.rpdMdWithout}" disabled> Md w/o Framework</label>
-                            </div>
-                        </div>
-                        <div class="cover-grid" style="margin-top:14px;">
-                            <div><label style="font-size:12px; font-weight:500;">Started</label><div th:text="${chart.startedDate}">—</div></div>
-                            <div><label style="font-size:12px; font-weight:500;">Finished</label><div th:text="${chart.finishedDate}">—</div></div>
-                            <div>
-                                <label style="font-size:12px; font-weight:500;">Grade</label>
-                                <input type="text" name="grade" form="gradeForm" th:value="${chart.grade}" placeholder="—"
-                                       style="width:70px; padding:4px 8px; border:1px solid #ccc; border-radius:4px; font-size:12px; font-family:'Poppins',sans-serif; pointer-events:auto;">
-                            </div>
-                            <div><label style="font-size:12px; font-weight:500;">Cleared by</label><div th:text="${chart.clearedBy}">—</div></div>
-                            <div><label style="font-size:12px; font-weight:500;">Cleared Date</label><div th:text="${chart.clearedDate}">—</div></div>
-                        </div>
+                    <!-- Cover (laid out like the paper booklet) -->
+                    <div class="booklet-cover" style="margin-bottom:12px;">
+                        <div><strong>Clinician:</strong> <span th:text="${chart.clinician != null ? chart.clinician.fullName : '—'}">—</span></div>
+                        <div><strong>Chart No.:</strong> <span th:text="${chart.chartNo}">—</span></div>
+                    </div>
+                    <th:block th:replace="~{fragments/prostho-cover :: cover(editable=false, clearing=${currentUser != null and currentUser.role.name() == 'FACULTY' and chart.faculty != null and chart.faculty.id == currentUser.id and chart.status.name() == 'SUBMITTED'})}"></th:block>
+
+                    <!-- Progress -->
+                    <div class="booklet-progress"
+                         th:with="done=${chart.stepsDone}, total=${chart.stepsApplicable}">
+                        <span th:text="${done + ' of ' + total + ' steps done' + (chart.stepsNotApplicable > 0 ? ' · ' + chart.stepsNotApplicable + ' not applicable' : '')}">0 of 0 steps done</span>
+                        <div class="booklet-bar"><span th:style="'width:' + ${total > 0 ? (done * 100 / total) : 0} + '%'"></span></div>
                     </div>
 
-                    <!-- Procedure Table (view-only) -->
+                    <!-- Procedure Records (the booklet) -->
                     <div class="section-header">Procedure Records</div>
                     <div style="overflow-x:auto;">
-                    <table class="upload-table">
-                        <thead>
-                            <tr><th>Procedure</th><th>Date</th><th>Document / Photo</th></tr>
-                        </thead>
+                    <table class="upload-table booklet-table">
+                        <thead><tr><th>Procedure</th><th>Date</th><th>Document / Photo</th></tr></thead>
                         <tbody>
-                            <tr><td>Patient Consent</td><td>—</td><td>
-                                <a th:if="${chart.patientConsentFilePath != null}" th:href="${chart.patientConsentFilePath}" target="_blank">View file</a>
-                                <span th:unless="${chart.patientConsentFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
-                            </td></tr>
-                            <tr><td>Patient Workup</td><td th:text="${chart.patientWorkupDate}">—</td><td>
-                                <a th:if="${chart.patientWorkupFilePath != null}" th:href="${chart.patientWorkupFilePath}" target="_blank">View file</a>
-                                <span th:unless="${chart.patientWorkupFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
-                            </td></tr>
-                            <tr><td>Primary Impression and Diagnostic Cast</td><td th:text="${chart.primaryImpressionDate}">—</td><td>
-                                <a th:if="${chart.primaryImpressionFilePath != null}" th:href="${chart.primaryImpressionFilePath}" target="_blank">View file</a>
-                                <span th:unless="${chart.primaryImpressionFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
-                            </td></tr>
-                            <tr><td>Individual Tray <span th:if="${chart.individualTrayNotApplicable}" style="font-size:11px; color:#888;">(N/A)</span></td><td th:text="${chart.individualTrayDate}">—</td><td>
-                                <a th:if="${chart.individualTrayFilePath != null}" th:href="${chart.individualTrayFilePath}" target="_blank">View file</a>
-                                <span th:unless="${chart.individualTrayFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
-                            </td></tr>
-                            <tr><td>Mouth Preparations <span th:if="${chart.mouthPreparationsNotApplicable}" style="font-size:11px; color:#888;">(N/A)</span></td><td th:text="${chart.mouthPreparationsDate}">—</td><td>
-                                <span th:if="${chart.mouthPreparationsList != null}" th:text="${chart.mouthPreparationsList}" style="font-size:12px; white-space:pre-wrap;"></span>
-                            </td></tr>
-                            <tr><td>Final Impression and Master Cast</td><td th:text="${chart.finalImpressionDate}">—</td><td>
-                                <a th:if="${chart.finalImpressionFilePath != null}" th:href="${chart.finalImpressionFilePath}" target="_blank">View file</a>
-                                <span th:unless="${chart.finalImpressionFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
-                            </td></tr>
-                            <tr><td>Inspection of Wax Pattern from Laboratory <span th:if="${chart.waxPatternLabNotApplicable}" style="font-size:11px; color:#888;">(N/A)</span></td><td th:text="${chart.waxPatternLabDate}">—</td><td>
-                                <a th:if="${chart.waxPatternLabFilePath != null}" th:href="${chart.waxPatternLabFilePath}" target="_blank">View file</a>
-                                <span th:unless="${chart.waxPatternLabFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
-                            </td></tr>
-                            <tr><td>Wax Pattern on Diagnostic Cast <span th:if="${chart.waxPatternDiagNotApplicable}" style="font-size:11px; color:#888;">(N/A)</span></td><td th:text="${chart.waxPatternDiagDate}">—</td><td>
-                                <a th:if="${chart.waxPatternDiagFilePath != null}" th:href="${chart.waxPatternDiagFilePath}" target="_blank">View file</a>
-                                <span th:unless="${chart.waxPatternDiagFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
-                            </td></tr>
-                            <tr><td>Inspection and Fitting of Metal Framework <span th:if="${chart.metalFrameworkNotApplicable}" style="font-size:11px; color:#888;">(N/A)</span></td><td th:text="${chart.metalFrameworkDate}">—</td><td>
-                                <a th:if="${chart.metalFrameworkFilePath != null}" th:href="${chart.metalFrameworkFilePath}" target="_blank">View file</a>
-                                <span th:unless="${chart.metalFrameworkFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
-                            </td></tr>
-                            <tr><td>Trial Denture Base <span th:if="${chart.trialDentureBaseNotApplicable}" style="font-size:11px; color:#888;">(N/A)</span></td><td th:text="${chart.trialDentureBaseDate}">—</td><td>
-                                <a th:if="${chart.trialDentureBaseFilePath != null}" th:href="${chart.trialDentureBaseFilePath}" target="_blank">View file</a>
-                                <span th:unless="${chart.trialDentureBaseFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
-                            </td></tr>
-                            <tr><td>Development of Maxillary and Mandibular OCR</td><td th:text="${chart.ocrDate}">—</td><td>
-                                <a th:if="${chart.ocrFilePath != null}" th:href="${chart.ocrFilePath}" target="_blank">View file</a>
-                                <span th:unless="${chart.ocrFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
-                            </td></tr>
-                            <tr><td>Positional Relations</td><td th:text="${chart.positionalRelationsDate}">—</td><td>
-                                <a th:if="${chart.positionalRelationsFilePath != null}" th:href="${chart.positionalRelationsFilePath}" target="_blank">View file</a>
-                                <span th:unless="${chart.positionalRelationsFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
-                            </td></tr>
-                            <tr><td>Mounting</td><td th:text="${chart.mountingDate}">—</td><td>
-                                <a th:if="${chart.mountingFilePath != null}" th:href="${chart.mountingFilePath}" target="_blank">View file</a>
-                                <span th:unless="${chart.mountingFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
-                            </td></tr>
-                            <tr><td>Anterior Setup <span th:if="${chart.anteriorSetupNotApplicable}" style="font-size:11px; color:#888;">(N/A)</span></td><td th:text="${chart.anteriorSetupDate}">—</td><td>
-                                <div style="font-size:12px;">Mould: <span th:text="${chart.anteriorSetupMould}">—</span> &nbsp; Shade: <span th:text="${chart.anteriorSetupShade}">—</span></div>
-                                <a th:if="${chart.anteriorSetupFilePath != null}" th:href="${chart.anteriorSetupFilePath}" target="_blank">View file</a>
-                                <span th:unless="${chart.anteriorSetupFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
-                            </td></tr>
-                            <tr><td>Anterior Try-in <span th:if="${chart.anteriorTryInNotApplicable}" style="font-size:11px; color:#888;">(N/A)</span></td><td th:text="${chart.anteriorTryInDate}">—</td><td>
-                                <a th:if="${chart.anteriorTryInFilePath != null}" th:href="${chart.anteriorTryInFilePath}" target="_blank">View file</a>
-                                <span th:unless="${chart.anteriorTryInFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
-                                <div th:if="${chart.anteriorTryInSignaturePath != null}" style="margin-top:4px;"><a th:href="${chart.anteriorTryInSignaturePath}" target="_blank" style="font-size:12px;">View patient signature</a></div>
-                            </td></tr>
-                            <tr><td>Protrusive Records Taking <span th:if="${chart.protrusiveRecordsNotApplicable}" style="font-size:11px; color:#888;">(N/A)</span></td><td th:text="${chart.protrusiveRecordsDate}">—</td><td>
-                                <div style="font-size:12px;">HCA — Right: <span th:text="${chart.hcaRight}">—</span> &nbsp; Left: <span th:text="${chart.hcaLeft}">—</span></div>
-                                <div style="font-size:12px;">LCA — Right: <span th:text="${chart.lcaRight}">—</span> &nbsp; Left: <span th:text="${chart.lcaLeft}">—</span></div>
-                            </td></tr>
-                            <tr><td>Posterior Setup</td><td th:text="${chart.posteriorSetupDate}">—</td><td>
-                                <div style="font-size:12px;">Mould: <span th:text="${chart.posteriorSetupMould}">—</span> &nbsp; Shade: <span th:text="${chart.posteriorSetupShade}">—</span></div>
-                                <a th:if="${chart.posteriorSetupFilePath != null}" th:href="${chart.posteriorSetupFilePath}" target="_blank">View file</a>
-                                <span th:unless="${chart.posteriorSetupFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
-                            </td></tr>
-                            <tr><td>Posterior Try-in</td><td th:text="${chart.posteriorTryInDate}">—</td><td>
-                                <a th:if="${chart.posteriorTryInFilePath != null}" th:href="${chart.posteriorTryInFilePath}" target="_blank">View file</a>
-                                <span th:unless="${chart.posteriorTryInFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
-                                <div th:if="${chart.posteriorTryInSignaturePath != null}" style="margin-top:4px;"><a th:href="${chart.posteriorTryInSignaturePath}" target="_blank" style="font-size:12px;">View patient signature</a></div>
-                            </td></tr>
-                            <tr><td>Wax-up and Festooning</td><td th:text="${chart.waxUpDate}">—</td><td>
-                                <a th:if="${chart.waxUpFilePath != null}" th:href="${chart.waxUpFilePath}" target="_blank">View file</a>
-                                <span th:unless="${chart.waxUpFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
-                            </td></tr>
-                            <tr><td>Processing</td><td th:text="${chart.processingDate}">—</td><td>
-                                <a th:if="${chart.processingFilePath != null}" th:href="${chart.processingFilePath}" target="_blank">View file</a>
-                                <span th:unless="${chart.processingFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
-                            </td></tr>
-                            <tr><td>CEF, Trimming and Polishing</td><td th:text="${chart.cefDate}">—</td><td>
-                                <a th:if="${chart.cefFilePath != null}" th:href="${chart.cefFilePath}" target="_blank">View file</a>
-                                <span th:unless="${chart.cefFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
-                            </td></tr>
-                            <tr><td>Installation</td><td th:text="${chart.installationDate}">—</td><td>
-                                <a th:if="${chart.installationFilePath != null}" th:href="${chart.installationFilePath}" target="_blank">View file</a>
-                                <span th:unless="${chart.installationFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
-                                <div th:if="${chart.installationSignaturePath != null}" style="margin-top:4px;"><a th:href="${chart.installationSignaturePath}" target="_blank" style="font-size:12px;">View patient signature</a></div>
-                            </td></tr>
-                            <tr><td>Post-installation Recall</td><td th:text="${chart.postInstallationDate}">—</td><td>
-                                <a th:if="${chart.postInstallationFilePath != null}" th:href="${chart.postInstallationFilePath}" target="_blank">View file</a>
-                                <span th:unless="${chart.postInstallationFilePath != null}" style="color:#999; font-size:12px;">Not uploaded</span>
-                                <div th:if="${chart.postInstallationSignaturePath != null}" style="margin-top:4px;"><a th:href="${chart.postInstallationSignaturePath}" target="_blank" style="font-size:12px;">View patient signature</a></div>
-                            </td></tr>
+                            <tr th:each="st : ${chart.steps}"
+                                th:class="${st.notApplicable ? 'row-na' : (st.done ? 'row-done' : 'row-missing')}">
+                                <td><div class="step-name">
+                                    <span th:if="${st.done}" class="tick done" title="Done">&#10003;</span>
+                                    <span th:if="${st.notApplicable}" class="tick na" title="Not applicable">N/A</span>
+                                    <span th:if="${!st.done and !st.notApplicable}" class="tick todo" th:title="${'Missing: ' + st.missing}"></span>
+                                    <span th:text="${st.name}">Step</span>
+                                </div></td>
+                                <td th:text="${st.notApplicable or st.date == null ? '—' : st.date}">—</td>
+                                <td>
+                                    <span th:if="${st.notApplicable}" class="muted">Not applicable</span>
+                                    <th:block th:unless="${st.notApplicable}">
+                                        <div th:if="${st.extra != null}" class="step-extra" th:text="${st.extra}"></div>
+                                        <a th:if="${st.file != null and !st.pdf}" th:href="${st.file}" target="_blank" class="thumb" title="Open full size">
+                                            <img th:src="${st.file}" alt="Uploaded page"></a>
+                                        <a th:if="${st.file != null and st.pdf}" th:href="${st.file}" target="_blank" class="thumb thumb-pdf" title="Open PDF">
+                                            <iframe th:src="${st.file + '#toolbar=0&navpanes=0&scrollbar=0&view=Fit'}" tabindex="-1" aria-hidden="true" loading="lazy"></iframe>
+                                            <span class="thumb-tag">PDF</span></a>
+                                        <span th:if="${st.file == null and st.needsFile}" class="muted">No photo yet</span>
+                                        <div th:if="${st.patientSignature != null}" class="psig">Patient signature:
+                                            <a th:href="${st.patientSignature}" target="_blank"><img th:src="${st.patientSignature}" alt="Patient signature"></a></div>
+                                    </th:block>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     </div>
@@ -213,24 +122,20 @@
                     <!-- Remarks -->
                     <div style="margin-top:20px;" th:if="${chart.remarks != null and !#strings.isEmpty(chart.remarks)}">
                         <strong style="font-size:13px; color:#5a3e28;">Remarks:</strong>
-                        <p style="font-size:13px; margin:6px 0 0 0;" th:text="${chart.remarks}"></p>
+                        <p style="font-size:13px; margin:6px 0 0 0; white-space:pre-wrap;" th:text="${chart.remarks}"></p>
                     </div>
 
-                </div>
 
-                <!-- Faculty Actions -->
-                <div class="form-actions review-actions" style="pointer-events:auto; width:100%; padding:0 45px 20px 45px; box-sizing:border-box;">
-                    <form id="gradeForm" th:action="@{/prosthodontics-faculty/{id}/grade(id=${chart.id})}" method="post" style="display:none;"></form>
-                    <button type="submit" form="gradeForm" class="btn-save">Save Grade</button>
-
-                    <th:block th:if="${currentUser != null and currentUser.role.name() == 'FACULTY' and chart.status.name() == 'SUBMITTED'}">
+                    <div class="form-actions review-actions" th:if="${currentUser != null and currentUser.role.name() == 'FACULTY' and chart.faculty != null and chart.faculty.id == currentUser.id and chart.status.name() == 'SUBMITTED'}">
                         <button type="button" class="btn-revise"
                                 th:data-action="@{/prosthodontics-faculty/{id}/revise(id=${chart.id})}"
                                 onclick="openReviseModal(this)">Revise</button>
-                        <button type="button" class="btn-approve"
+                        <button type="button" class="btn-approve" data-sign="true"
+                                data-title="Clear this case?"
+                                data-sign-text="Sign below to clear the case. Your signature goes in Cleared (SGN) on the cover, and today's date is filled in."
                                 th:data-action="@{/prosthodontics-faculty/{id}/approve(id=${chart.id})}"
-                                onclick="openApproveModal(this)">Approve</button>
-                    </th:block>
+                                onclick="if (checkGrade()) openApproveModal(this)">Clear Case</button>
+                    </div>
                 </div>
             </div>
         </main>
@@ -253,7 +158,19 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 </script>
 
 <script src="/js/textarea-min-size.js"></script>
-<script src="/js/sidebar-hover.js"></script>
+<script src="/js/sidebar-hover.js?v=3"></script>
 <th:block th:replace="~{fragments/faculty-review :: modals}"></th:block>
+<script>
+/* The grade is typed in the Case Clearance box and sent with the Clear Case signature */
+function checkGrade() {
+    var g = document.getElementById('clearGrade');
+    if (g && !g.value.trim()) { g.classList.add('invalid'); g.focus(); return false; }
+    return true;
+}
+(function () {
+    var g = document.getElementById('clearGrade');
+    if (g) g.addEventListener('input', function () { g.classList.remove('invalid'); });
+})();
+</script>
 </body>
 </html>

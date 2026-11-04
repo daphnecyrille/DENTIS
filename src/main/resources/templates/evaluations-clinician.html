@@ -67,7 +67,7 @@
                         <a href="/evaluations-clinician" class="nav-link" style="position:relative;">
                             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="14" height="17" rx="2" stroke="#333" stroke-width="2"/><path d="M9 4V3h6v1" stroke="#333" stroke-width="2" stroke-linecap="round"/><path d="M8.5 12.5l2.2 2.2 4.8-4.8" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             <span>Evaluations</span>
-                            <b th:if="${currentUser != null and @perioEvaluationService.unreadCount(currentUser) > 0}" th:text="${@perioEvaluationService.unreadCount(currentUser)}"
+                            <b th:if="${currentUser != null and @notificationService.newEvaluationCount(currentUser) > 0}" th:text="${@notificationService.newEvaluationCount(currentUser)}"
                                style="position:absolute; top:2px; right:6px; min-width:18px; height:18px; padding:0 5px; box-sizing:border-box; border-radius:9px; background:#c0392b; color:white; font-size:11px; font-weight:700; line-height:18px; text-align:center;">1</b>
                         </a>
                     </li>
@@ -80,7 +80,7 @@
             <h1 class="ev-title">My Evaluations</h1>
 
             <div class="ev-cards">
-                <div class="ev-card"><b th:text="${#lists.size(evals)}">0</b><span>Evaluations received</span></div>
+                <div class="ev-card"><b th:text="${#lists.size(evals) + #lists.size(prosthoCleared)}">0</b><span>Evaluations received</span></div>
                 <div class="ev-card ev-new" th:classappend="${unreadCount > 0} ? 'has-items'"><b th:text="${unreadCount}">0</b><span>New (not opened yet)</span></div>
             </div>
 
@@ -129,8 +129,22 @@
                                 <td class="ev-score" th:text="${ev.totalScore != null ? ev.totalScore : '—'}"></td>
                                 <td><a th:href="@{/perio-eval-view/{id}(id=${ev.id})}" class="btn-view-chart">View</a></td>
                             </tr>
+                            <!-- Prostho: the case grade, given when the faculty clears the booklet -->
+                            <tr th:each="pr : ${prosthoCleared}" class="ev-row" data-section="Prostho"
+                                th:classappend="${pr.clearedViewedAt == null} ? 'unread'">
+                                <td class="ev-form-col">
+                                    <span th:if="${pr.clearedViewedAt == null}" class="new-tag">New</span>
+                                    <strong>Prosthodontics</strong> &ndash; Case Cleared <span th:text="${'(' + pr.caseType + ')'}"></span>
+                                </td>
+                                <td class="ev-search" th:text="${pr.patient.surname + ', ' + pr.patient.firstName + (pr.patient.middleInitial != null ? ' ' + pr.patient.middleInitial + '.' : '')}"></td>
+                                <td class="ev-search" th:text="${pr.chartNo}"></td>
+                                <td class="ev-search" th:text="${pr.clearedBy != null ? pr.clearedBy : '—'}"></td>
+                                <td th:text="${#temporals.format(pr.clearedAt, 'MMM d, yyyy')}"></td>
+                                <td class="ev-score" th:text="${pr.grade != null ? pr.grade : '—'}"></td>
+                                <td><a th:href="@{/prosthodontics-clinician/{id}/view(id=${pr.id})}" class="btn-view-chart">View</a></td>
+                            </tr>
                             <tr id="evEmpty" style="display:none;"><td colspan="7" class="pl-empty">No evaluations match. Try a different search or section.</td></tr>
-                            <tr th:if="${#lists.isEmpty(evals)}"><td colspan="7" class="pl-empty">No evaluations yet. They appear here once your faculty sends them.</td></tr>
+                            <tr th:if="${#lists.isEmpty(evals) and #lists.isEmpty(prosthoCleared)}"><td colspan="7" class="pl-empty">No evaluations yet. They appear here once your faculty sends them.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -171,6 +185,6 @@ document.addEventListener('click', function () {
     render();
 })();
 </script>
-<script src="/js/sidebar-hover.js"></script>
+<script src="/js/sidebar-hover.js?v=3"></script>
 </body>
 </html>

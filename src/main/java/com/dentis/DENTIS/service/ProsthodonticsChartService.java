@@ -53,12 +53,29 @@ public class ProsthodonticsChartService {
         return repo.findByPatientOrderByCreatedAtDesc(patient);
     }
 
+    /**
+     * The patient was reassigned to another faculty: their charts in this section go to that faculty too.
+     * Charts the former faculty already fully approved stay with them, as the record of who approved them.
+     */
+    public void reassignFaculty(Patient patient, User faculty) {
+        List<ProsthodonticsChart> charts = findAllByPatient(patient).stream()
+                .filter(c -> !(c.getStatus() == ProsthodonticsChartStatus.APPROVED))
+                .toList();
+        charts.forEach(c -> c.setFaculty(faculty));
+        repo.saveAll(charts);
+    }
+
     public List<ProsthodonticsChart> findByClinicianOrderByCreatedAtDesc(User clinician) {
         return repo.findByClinicianOrderByCreatedAtDesc(clinician);
     }
 
     public List<ProsthodonticsChart> findByFacultyOrderByCreatedAtDesc(User faculty) {
         return repo.findByFacultyOrderByCreatedAtDesc(faculty);
+    }
+
+    /** Every chart of this section (all faculty of the section can see all its patients). */
+    public List<ProsthodonticsChart> findAllOrderByCreatedAtDesc() {
+        return repo.findAllByOrderByCreatedAtDesc();
     }
 
     public List<ProsthodonticsChart> findActionNeededByClinician(User clinician) {
@@ -114,15 +131,22 @@ public class ProsthodonticsChartService {
         ProsthodonticsChart chart = repo.findById(id).orElseThrow();
 
         chart.setCaseNumber(updated.getCaseNumber());
-        chart.setRpdMxWithFramework(updated.getRpdMxWithFramework());
-        chart.setRpdMxWithout(updated.getRpdMxWithout());
-        chart.setRpdMdWithFramework(updated.getRpdMdWithFramework());
-        chart.setRpdMdWithout(updated.getRpdMdWithout());
+        if (updated.getCaseType() != null && java.util.List.of("CD", "SD", "RPD").contains(updated.getCaseType()))
+            chart.setCaseType(updated.getCaseType());
+        boolean sd = "SD".equals(chart.getCaseType()), rpd = "RPD".equals(chart.getCaseType());
+        chart.setSdMx(sd && Boolean.TRUE.equals(updated.getSdMx()));
+        chart.setSdMd(sd && Boolean.TRUE.equals(updated.getSdMd()));
+        chart.setRpdMx(rpd && Boolean.TRUE.equals(updated.getRpdMx()));
+        chart.setRpdMd(rpd && Boolean.TRUE.equals(updated.getRpdMd()));
+        chart.setRpdMxWithFramework(rpd && Boolean.TRUE.equals(updated.getRpdMxWithFramework()));
+        chart.setRpdMxWithout(rpd && Boolean.TRUE.equals(updated.getRpdMxWithout()));
+        chart.setRpdMdWithFramework(rpd && Boolean.TRUE.equals(updated.getRpdMdWithFramework()));
+        chart.setRpdMdWithout(rpd && Boolean.TRUE.equals(updated.getRpdMdWithout()));
         chart.setStartedDate(updated.getStartedDate());
         chart.setFinishedDate(updated.getFinishedDate());
-        chart.setClearedBy(updated.getClearedBy());
-        chart.setClearedDate(updated.getClearedDate());
+        // Grade / Cleared by / Cleared Date are set by the faculty when they clear the case
 
+        chart.setPatientConsentDate(updated.getPatientConsentDate());
         chart.setPatientWorkupDate(updated.getPatientWorkupDate());
         chart.setPrimaryImpressionDate(updated.getPrimaryImpressionDate());
         chart.setIndividualTrayNotApplicable(updated.getIndividualTrayNotApplicable());
@@ -224,15 +248,79 @@ public class ProsthodonticsChartService {
         return repo.save(chart);
     }
 
+    /** Clears uploaded files the clinician removed (field names as in the form, e.g. "patientWorkup", "anteriorTryInSignature"). */
+    public void removeFiles(Long id, List<String> fields) {
+        if (fields == null || fields.isEmpty()) return;
+        ProsthodonticsChart c = repo.findById(id).orElseThrow();
+        if (c.getStatus() == ProsthodonticsChartStatus.APPROVED) return;
+        for (String f : fields) {
+            switch (f) {
+                case "patientConsent" -> c.setPatientConsentFilePath(null);
+                case "patientWorkup" -> c.setPatientWorkupFilePath(null);
+                case "primaryImpression" -> c.setPrimaryImpressionFilePath(null);
+                case "individualTray" -> c.setIndividualTrayFilePath(null);
+                case "finalImpression" -> c.setFinalImpressionFilePath(null);
+                case "waxPatternLab" -> c.setWaxPatternLabFilePath(null);
+                case "waxPatternDiag" -> c.setWaxPatternDiagFilePath(null);
+                case "metalFramework" -> c.setMetalFrameworkFilePath(null);
+                case "trialDentureBase" -> c.setTrialDentureBaseFilePath(null);
+                case "ocr" -> c.setOcrFilePath(null);
+                case "positionalRelations" -> c.setPositionalRelationsFilePath(null);
+                case "mounting" -> c.setMountingFilePath(null);
+                case "anteriorSetup" -> c.setAnteriorSetupFilePath(null);
+                case "anteriorTryIn" -> c.setAnteriorTryInFilePath(null);
+                case "anteriorTryInSignature" -> c.setAnteriorTryInSignaturePath(null);
+                case "posteriorSetup" -> c.setPosteriorSetupFilePath(null);
+                case "posteriorTryIn" -> c.setPosteriorTryInFilePath(null);
+                case "posteriorTryInSignature" -> c.setPosteriorTryInSignaturePath(null);
+                case "waxUp" -> c.setWaxUpFilePath(null);
+                case "processing" -> c.setProcessingFilePath(null);
+                case "cef" -> c.setCefFilePath(null);
+                case "installation" -> c.setInstallationFilePath(null);
+                case "postInstallation" -> c.setPostInstallationFilePath(null);
+                default -> { }
+            }
+        }
+        repo.save(c);
+    }
+
+    // ── Clinician: cleared cases (the grade) show with their evaluations ─────
+
+    public List<ProsthodonticsChart> clearedForClinician(User clinician) {
+        if (clinician == null) return List.of();
+        return repo.findByClinicianAndClearedAtIsNotNullOrderByClearedAtDesc(clinician).stream()
+                .filter(c -> c.getStatus() == ProsthodonticsChartStatus.APPROVED).toList();
+    }
+
+    public List<ProsthodonticsChart> newClearedForClinician(User clinician) {
+        return clearedForClinician(clinician).stream().filter(c -> c.getClearedViewedAt() == null).toList();
+    }
+
+    /** The clinician opened their cleared case: no longer "New". */
+    public void markClearedViewed(ProsthodonticsChart chart, User viewer) {
+        if (chart.getClearedAt() == null || chart.getClearedViewedAt() != null) return;
+        if (viewer == null || chart.getClinician() == null || !chart.getClinician().getId().equals(viewer.getId())) return;
+        chart.setClearedViewedAt(java.time.LocalDateTime.now());
+        repo.save(chart);
+    }
+
     public ProsthodonticsChart submit(Long id) {
         ProsthodonticsChart chart = repo.findById(id).orElseThrow();
         chart.setStatus(ProsthodonticsChartStatus.SUBMITTED);
         return repo.save(chart);
     }
 
-    public ProsthodonticsChart approve(Long id) {
+    /** Clears the case: the faculty gives the grade and signs "Cleared by (SGN)"; the date is filled in. */
+    public ProsthodonticsChart clear(Long id, String grade, String signature, User faculty) {
         ProsthodonticsChart chart = repo.findById(id).orElseThrow();
         if (chart.getStatus() != ProsthodonticsChartStatus.SUBMITTED) return chart;   // only a submitted chart can be reviewed
+        if (grade == null || grade.isBlank() || !PeriodonticChartService.isSignature(signature))
+            throw new IllegalArgumentException("A grade and a drawn signature are required to clear the case.");
+        chart.setGrade(grade.trim());
+        chart.setClearedSignature(signature);
+        chart.setClearedAt(java.time.LocalDateTime.now());
+        chart.setClearedDate(java.time.LocalDate.now().toString());
+        chart.setClearedBy(faculty != null ? faculty.getFullName() : null);
         chart.setStatus(ProsthodonticsChartStatus.APPROVED);
         return repo.save(chart);
     }
@@ -242,12 +330,6 @@ public class ProsthodonticsChartService {
         if (chart.getStatus() != ProsthodonticsChartStatus.SUBMITTED) return chart;   // only a submitted chart can be reviewed
         chart.setStatus(ProsthodonticsChartStatus.REVISE);
         chart.setRevisionReason(reason);
-        return repo.save(chart);
-    }
-
-    public ProsthodonticsChart saveGrade(Long id, String grade) {
-        ProsthodonticsChart chart = repo.findById(id).orElseThrow();
-        chart.setGrade(grade);
         return repo.save(chart);
     }
 }

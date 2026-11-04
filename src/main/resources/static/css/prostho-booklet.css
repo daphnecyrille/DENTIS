@@ -1,0 +1,119 @@
+/* Prosthodontics booklet: progress, row status, thumbnails, Case Clearance */
+.booklet-cover { display: flex; flex-wrap: wrap; gap: 10px 32px; font-size: 13px; }
+.booklet-cover strong { font-weight: 600; }
+.booklet-cover .case-type { font-size: 14px; font-weight: 600; color: #7a4e2d; }
+
+.booklet-progress { display: flex; align-items: center; gap: 14px; margin: 18px 0 4px; font-size: 13px; font-weight: 600; color: #2d4a6b; }
+.booklet-progress > span { white-space: nowrap; }
+.booklet-bar { flex: 1; height: 8px; background: #e1e7ef; border-radius: 6px; overflow: hidden; }
+.booklet-bar span { display: block; height: 100%; background: #2e7d32; border-radius: 6px; }
+
+.booklet-table td:first-child { width: 30%; }
+.booklet-table td:nth-child(2) { width: 13%; white-space: nowrap; }
+.step-name { display: flex; gap: 8px; align-items: flex-start; }
+.tick { flex: none; width: 18px; height: 18px; border-radius: 50%; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; margin-top: 1px; box-sizing: border-box; }
+.tick.done { background: #2e7d32; color: white; }
+.tick.todo { border: 1.5px dashed #b6c2cf; }
+.tick.na { background: #d5dbe2; color: #6b7a8c; font-size: 8px; font-weight: 600; }
+.booklet-table tr.row-na td { background: #f4f6f8; color: #9aa5b1; }
+.booklet-table tr.row-missing td:first-child { box-shadow: inset 3px 0 0 #e0a800; }
+.muted { color: #9aa5b1; font-size: 12px; }
+.step-extra { font-size: 12px; color: #444; margin-bottom: 6px; white-space: pre-wrap; }
+.thumb { display: inline-flex; width: 96px; height: 72px; border-radius: 6px; border: 1px solid #cfd6df; overflow: hidden; background: #eef1f5; cursor: zoom-in; vertical-align: top; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; }
+.thumb-pdf { position: relative; width: 84px; height: 108px; background: #fff; text-decoration: none; cursor: zoom-in; }
+.thumb-pdf iframe { position: absolute; top: 0; left: 0; width: 336px; height: 432px; border: 0; transform: scale(0.25); transform-origin: 0 0; pointer-events: none; background: #fff; }
+.thumb-tag { position: absolute; right: 4px; bottom: 4px; background: #8B0000; color: #fff; font-size: 9px; font-weight: 600; padding: 1px 5px; border-radius: 3px; }
+.psig { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-size: 12px; color: #444; }
+.psig img { height: 38px; max-width: 160px; object-fit: contain; border: 1px solid #b7dfba; border-radius: 5px; background: #fff; padding: 2px 6px; }
+
+.booklet-note { background: #fff3cd; border-left: 5px solid #e6a817; padding: 12px 20px; margin: 0 0 20px; border-radius: 6px; font-size: 13px; color: #533f03; }
+.booklet-note b { display: block; color: #856404; margin-bottom: 2px; }
+
+
+/* Cover laid out like the paper booklet */
+.pcover { display: flex; gap: 24px; align-items: flex-start; }
+.pcover-main { flex: 1; display: flex; flex-direction: column; gap: 14px; font-size: 13px; }
+.pcover-case { display: flex; align-items: center; gap: 16px; }
+.pcover-case strong { font-weight: 600; }
+.pcover-types { display: flex; flex-direction: column; gap: 10px; }
+.ptype-row { display: flex; align-items: flex-start; gap: 18px; }
+.ptype-row.off .pbox-label:not(.ptype) { opacity: 0.4; }
+.ptype { min-width: 70px; font-weight: 600; }
+.parch-rows { display: flex; flex-direction: column; gap: 8px; }
+.parch { display: flex; gap: 18px; }
+.parch .pbox-label:first-child { min-width: 56px; }
+.pbox-label { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; }
+.pcover.readonly .pbox-label { cursor: default; }
+/* square boxes like the paper, for both radios and checkboxes */
+.pcover input.pbox { appearance: none; -webkit-appearance: none; accent-color: auto; width: 20px; height: 20px; min-width: 20px; padding: 0; box-shadow: none; margin: 0; border: 1.5px solid #6b7a8c; border-radius: 3px; background: #fff;
+        display: inline-grid; place-content: center; cursor: inherit; }
+.pcover input.pbox::after { content: ''; position: static; left: auto; top: auto; width: 10px; height: 6px; border: 0; border-left: 2.5px solid #fff; border-bottom: 2.5px solid #fff; transform: rotate(-45deg) translate(1px, -1px); opacity: 0; }
+.pcover input.pbox:checked { background: #2d4a6b; border-color: #2d4a6b; }
+.pcover input.pbox:checked::after { opacity: 1; }
+.pcover input.pbox:disabled:not(:checked) { background: #f3f5f8; }
+.pcover-dates { display: flex; flex-wrap: wrap; gap: 10px 28px; }
+.pdate { display: flex; align-items: center; gap: 8px; }
+.pdate label { font-weight: 600; }
+.pdate input { width: 160px; }
+.pdays { min-width: 40px; font-weight: 600; color: #061F40; }
+.pcover-grade { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; }
+.pgrade-box { width: 110px; height: 90px; border: 1.5px solid #6b7a8c; border-radius: 4px; background: #fff;
+              display: flex; align-items: center; justify-content: center; font-size: 26px; color: #061F40; }
+@media (max-width: 760px) { .pcover { flex-direction: column; } }
+
+/* Clinician form: upload cells */
+.upl { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.upl-shown { display: flex; align-items: center; }
+.upl-actions { display: flex; gap: 8px; align-items: center; }
+.upl-input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.upl-note { flex-basis: 100%; font-size: 11.5px; color: #6b7a8c; }
+.upl-note:empty { display: none; }
+.upl-note.pending { color: #a87700; }
+.upl-note.removed { color: #8B0000; }
+.upl-btn { font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; border-radius: 6px; padding: 6px 14px; cursor: pointer;
+           background: white; color: #2d4a6b; border: 1.5px solid #2d4a6b; }
+.upl-btn.primary { background: #2d4a6b; color: white; }
+.upl-btn.danger { color: #8B0000; border-color: #c9a0a0; }
+.upl-btn.danger:hover { background: #8B0000; color: white; border-color: #8B0000; }
+.thumb.is-new { outline: 2px solid #e0a800; outline-offset: 1px; }
+.thumb.is-removed { opacity: 0.35; filter: grayscale(1); }
+.booklet-table td.step-cell { position: relative; padding-left: 38px; }
+.booklet-table td.step-cell > .tick { position: absolute; left: 12px; top: 11px; }
+.booklet-table tr.row-na td:not(:first-child) { opacity: 0.45; pointer-events: none; }
+
+/* Cleared (SGN) and Date on the cover, under the dates (like the paper) */
+.pcover-cleared { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 28px; padding-top: 12px; border-top: 1px dashed #c8d8ed; }
+.pcleared-sgn { display: flex; align-items: center; gap: 10px; }
+.pcleared-sgn label { font-weight: 600; }
+.pcleared-sig { display: inline-flex; align-items: center; gap: 10px; }
+.pcleared-sig img { height: 44px; max-width: 200px; object-fit: contain; background: #fff; border: 1px solid #b7dfba; border-radius: 6px; padding: 2px 8px; }
+.pcleared-wait { color: #8a97a8; font-size: 12px; font-style: italic; }
+.pgrade-input { font-family: 'Poppins', sans-serif; text-align: center; padding: 0; box-sizing: border-box; outline: none; }
+.pgrade-input:focus { border-color: #2d4a6b; box-shadow: 0 0 0 3px rgba(45,74,107,0.15); }
+.pgrade-input.invalid { border-color: #c00; box-shadow: 0 0 0 3px rgba(204,0,0,0.15); }
+
+/* Text boxes: one look for every field in the booklet (same height, border and focus as the date boxes) */
+.booklet-table .date-picker,
+.pinput {
+    width: 100%; box-sizing: border-box; height: 36px; padding: 6px 10px;
+    border: 1px solid #c8d1dc; border-radius: 6px; background: #fff;
+    font-family: 'Poppins', sans-serif; font-size: 13px; color: #222;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+textarea.pinput { height: auto; min-height: 76px; line-height: 1.45; resize: vertical; }
+.booklet-table .date-picker:focus,
+.pinput:focus { outline: none; border-color: #2d4a6b; box-shadow: 0 0 0 3px rgba(45, 74, 107, 0.15); }
+.pinput[readonly], .booklet-table .date-picker[readonly] { background: #f7f9fb; }
+.pfields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pfield.psub > label { font-weight: 500; color: #6b7a8c; }
+.pfield { display: flex; flex-direction: column; gap: 4px; }
+.pfield > label, .psig-label, .pangle-head, .pangle-label { font-size: 11.5px; font-weight: 600; color: #4a5a6d; }
+.premarks-label { font-size: 13px !important; color: #5a3e28 !important; }
+.psig-label { display: block; margin: 4px 0 6px; }
+.pangle-grid { display: grid; grid-template-columns: minmax(150px, 1fr) 110px 110px; gap: 8px 12px; align-items: center; }
+.pangle-head { text-align: center; }
+.punit { position: relative; display: block; }
+.punit .pinput { padding-right: 24px; }
+.punit > span { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #6b7a8c; font-size: 13px; pointer-events: none; }
+@media (max-width: 760px) { .pangle-grid { grid-template-columns: 1fr 90px 90px; } }

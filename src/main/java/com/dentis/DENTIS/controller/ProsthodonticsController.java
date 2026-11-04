@@ -4,6 +4,7 @@ import com.dentis.DENTIS.model.ProsthodonticsChart;
 import com.dentis.DENTIS.model.ProsthodonticsChartStatus;
 import com.dentis.DENTIS.model.User;
 import com.dentis.DENTIS.repository.UserRepository;
+import com.dentis.DENTIS.service.PeriodonticChartService;
 import com.dentis.DENTIS.service.ProsthodonticsChartService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -39,7 +40,9 @@ public class ProsthodonticsController {
     @GetMapping("/prosthodontics-clinician/{id}")
     public String form(@PathVariable Long id, Model model, Authentication authentication) {
         ProsthodonticsChart chart = chartService.getById(id);
-        model.addAttribute("currentUser", getCurrentUser(authentication));
+        User me = getCurrentUser(authentication);
+        chartService.markClearedViewed(chart, me);   // the grade has been seen
+        model.addAttribute("currentUser", me);
         model.addAttribute("chart", chart);
         model.addAttribute("viewOnly", chart.getStatus() == ProsthodonticsChartStatus.APPROVED);
         return "prosthodontics-clinician";
@@ -47,8 +50,11 @@ public class ProsthodonticsController {
 
     @GetMapping("/prosthodontics-clinician/{id}/view")
     public String viewForm(@PathVariable Long id, Model model, Authentication authentication) {
-        model.addAttribute("currentUser", getCurrentUser(authentication));
-        model.addAttribute("chart", chartService.getById(id));
+        User me = getCurrentUser(authentication);
+        ProsthodonticsChart chart = chartService.getById(id);
+        chartService.markClearedViewed(chart, me);   // the grade has been seen
+        model.addAttribute("currentUser", me);
+        model.addAttribute("chart", chart);
         model.addAttribute("viewOnly", true);
         return "prosthodontics-clinician";
     }
@@ -81,8 +87,10 @@ public class ProsthodonticsController {
                        @RequestParam(required = false) MultipartFile installationSignatureFile,
                        @RequestParam(required = false) MultipartFile postInstallationFile,
                        @RequestParam(required = false) MultipartFile postInstallationSignatureFile,
+                       @RequestParam(required = false) java.util.List<String> removeFiles,
                        @RequestParam(required = false, defaultValue = "save") String action) throws IOException {
 
+        chartService.removeFiles(id, removeFiles);   // files removed with the Remove button (a new upload in the same row still wins)
         ProsthodonticsChart chart = chartService.save(id, updated,
                 patientConsentFile, patientWorkupFile, primaryImpressionFile,
                 individualTrayFile, finalImpressionFile, waxPatternLabFile,
@@ -126,21 +134,33 @@ public class ProsthodonticsController {
         return "prosthodontics-view-faculty";
     }
 
+    /** Clear Case: grade + the faculty's drawn signature in "Cleared by (SGN)". */
     @PostMapping("/prosthodontics-faculty/{id}/approve")
-    public String approve(@PathVariable Long id) {
-        ProsthodonticsChart chart = chartService.approve(id);
+    public String approve(@PathVariable Long id,
+                          @RequestParam(value = "grade", required = false) String grade,
+                          @RequestParam(value = "signature", required = false) String signature,
+                          Authentication authentication) {
+        ProsthodonticsChart owned = chartService.getById(id);   // only the faculty assigned to this chart can approve / revise it
+        if (!isAssignedFaculty(owned.getFaculty(), authentication))
+            return "redirect:/chartsview-faculty/" + owned.getPatient().getId() + "?notAssigned";
+        if (grade == null || grade.isBlank()) return "redirect:/prosthodontics-faculty/" + id + "?gradeRequired";
+        if (!PeriodonticChartService.isSignature(signature)) return "redirect:/prosthodontics-faculty/" + id + "?signRequired";
+        ProsthodonticsChart chart = chartService.clear(id, grade, signature, getCurrentUser(authentication));
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 
     @PostMapping("/prosthodontics-faculty/{id}/revise")
-    public String revise(@PathVariable Long id, @RequestParam String revisionReason) {
+    public String revise(@PathVariable Long id, @RequestParam String revisionReason, Authentication authentication) {
+        ProsthodonticsChart owned = chartService.getById(id);   // only the faculty assigned to this chart can approve / revise it
+        if (!isAssignedFaculty(owned.getFaculty(), authentication))
+            return "redirect:/chartsview-faculty/" + owned.getPatient().getId() + "?notAssigned";
         ProsthodonticsChart chart = chartService.revise(id, revisionReason);
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 
-    @PostMapping("/prosthodontics-faculty/{id}/grade")
-    public String saveGrade(@PathVariable Long id, @RequestParam String grade) {
-        chartService.saveGrade(id, grade);
-        return "redirect:/prosthodontics-faculty/" + id + "?graded=true";
+    /** True when the logged-in user is the faculty assigned to the chart. */
+    private boolean isAssignedFaculty(User chartFaculty, Authentication authentication) {
+        User me = getCurrentUser(authentication);
+        return me != null && chartFaculty != null && chartFaculty.getId().equals(me.getId());
     }
 }

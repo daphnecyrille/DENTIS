@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Prosthodontics cover, laid out like the paper booklet: Case, CD / SD / RPD boxes, Started, Finished, No. of Days,
+     GRADE, Cleared (SGN) and Date.
+     editable = clinician editing the form; clearing = faculty clearing a submitted case (types the grade here;
+     it is sent with the Clear Case signature). Otherwise every box is shown read-only. -->
+<div th:fragment="cover(editable, clearing)" class="case-type-box pcover" th:classappend="${editable} ? '' : 'readonly'">
+    <div class="pcover-main">
+        <div class="pcover-case">
+            <strong>Case:</strong>
+            <label th:each="n : ${ {1, 2, 3} }" class="pbox-label">
+                <input type="radio" name="caseNumber" th:value="${n}" th:checked="${chart.caseNumber == n}" th:disabled="${!editable}" class="pbox"> <span th:text="${n}">1</span>
+            </label>
+        </div>
+
+        <div class="pcover-types">
+            <!-- CD -->
+            <div class="ptype-row">
+                <label class="pbox-label ptype"><input type="radio" name="caseType" value="CD" th:checked="${chart.caseType == 'CD'}" th:disabled="${!editable}" class="pbox"> CD</label>
+            </div>
+            <!-- SD -->
+            <div class="ptype-row" data-type="SD">
+                <label class="pbox-label ptype"><input type="radio" name="caseType" value="SD" th:checked="${chart.caseType == 'SD'}" th:disabled="${!editable}" class="pbox"> SD</label>
+                <label class="pbox-label"><input type="checkbox" name="sdMx" value="true" th:checked="${chart.sdMx}" th:disabled="${!editable}" class="pbox sub"> Mx</label>
+                <label class="pbox-label"><input type="checkbox" name="sdMd" value="true" th:checked="${chart.sdMd}" th:disabled="${!editable}" class="pbox sub"> Md</label>
+            </div>
+            <!-- RPD -->
+            <div class="ptype-row" data-type="RPD">
+                <label class="pbox-label ptype"><input type="radio" name="caseType" value="RPD" th:checked="${chart.caseType == 'RPD'}" th:disabled="${!editable}" class="pbox"> RPD</label>
+                <div class="parch-rows">
+                    <div class="parch" data-arch="mx">
+                        <label class="pbox-label"><input type="checkbox" name="rpdMx" value="true" th:checked="${chart.rpdMx == true or chart.rpdMxWithFramework == true or chart.rpdMxWithout == true}" th:disabled="${!editable}" class="pbox sub arch"> Mx</label>
+                        <label class="pbox-label"><input type="checkbox" name="rpdMxWithFramework" value="true" th:checked="${chart.rpdMxWithFramework}" th:disabled="${!editable}" class="pbox sub fw"> w/Framework</label>
+                        <label class="pbox-label"><input type="checkbox" name="rpdMxWithout" value="true" th:checked="${chart.rpdMxWithout}" th:disabled="${!editable}" class="pbox sub fw"> w/o</label>
+                    </div>
+                    <div class="parch" data-arch="md">
+                        <label class="pbox-label"><input type="checkbox" name="rpdMd" value="true" th:checked="${chart.rpdMd == true or chart.rpdMdWithFramework == true or chart.rpdMdWithout == true}" th:disabled="${!editable}" class="pbox sub arch"> Md</label>
+                        <label class="pbox-label"><input type="checkbox" name="rpdMdWithFramework" value="true" th:checked="${chart.rpdMdWithFramework}" th:disabled="${!editable}" class="pbox sub fw"> w/Framework</label>
+                        <label class="pbox-label"><input type="checkbox" name="rpdMdWithout" value="true" th:checked="${chart.rpdMdWithout}" th:disabled="${!editable}" class="pbox sub fw"> w/o</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pcover-dates">
+            <div class="pdate"><label>Started:</label>
+                <input th:if="${editable}" type="date" name="startedDate" th:value="${chart.startedDate}" class="date-picker" id="pStarted">
+                <span th:unless="${editable}" th:text="${chart.startedDate != null and !#strings.isEmpty(chart.startedDate) ? chart.startedDate : '—'}"></span></div>
+            <div class="pdate"><label>Finished:</label>
+                <input th:if="${editable}" type="date" name="finishedDate" th:value="${chart.finishedDate}" class="date-picker" id="pFinished">
+                <span th:unless="${editable}" th:text="${chart.finishedDate != null and !#strings.isEmpty(chart.finishedDate) ? chart.finishedDate : '—'}"></span></div>
+            <div class="pdate"><label>No. of Days:</label>
+                <span id="pDays" class="pdays" th:text="${chart.numberOfDays != null ? chart.numberOfDays : '—'}">—</span></div>
+        </div>
+
+        <div class="pcover-cleared">
+            <div class="pcleared-sgn"><label>Cleared (SGN):</label>
+                <span th:if="${chart.clearedSignature != null}" class="pcleared-sig">
+                    <img th:src="${chart.clearedSignature}" alt="Faculty signature">
+                    <span class="sig-meta" th:text="${'✓ ' + (chart.clearedBy != null ? chart.clearedBy : 'faculty')}"></span>
+                </span>
+                <span th:if="${chart.clearedSignature == null}" class="pcleared-wait"
+                      th:text="${clearing ? 'You sign when you press Clear Case' : 'Waiting for faculty'}">Waiting for faculty</span>
+            </div>
+            <div class="pdate"><label>Date:</label>
+                <span th:text="${chart.clearedAt != null ? #temporals.format(chart.clearedAt, 'MMM d, yyyy, h:mm a') : '—'}">—</span></div>
+        </div>
+    </div>
+
+    <div class="pcover-grade">
+        <label for="clearGrade">GRADE:</label>
+        <input th:if="${clearing}" type="text" id="clearGrade" name="grade" form="approveForm" class="pgrade-box pgrade-input" placeholder="—" autocomplete="off">
+        <div th:unless="${clearing}" class="pgrade-box" th:text="${chart.grade != null and !#strings.isEmpty(chart.grade) ? chart.grade : ''}"></div>
+    </div>
+
+    <script th:if="${editable}">
+    (function () {
+        var cover = document.currentScript.closest('.pcover');
+        function sync() {
+            var type = (cover.querySelector('input[name="caseType"]:checked') || {}).value;
+            cover.querySelectorAll('.ptype-row[data-type]').forEach(function (row) {
+                var on = row.dataset.type === type;
+                row.classList.toggle('off', !on);
+                row.querySelectorAll('.sub').forEach(function (b) { b.disabled = !on; if (!on) b.checked = false; });
+            });
+        }
+        cover.querySelectorAll('input[name="caseType"]').forEach(function (r) { r.addEventListener('change', sync); });
+        /* RPD: per arch, w/Framework or w/o (one only); picking one also ticks the arch; unticking the arch clears both */
+        cover.querySelectorAll('.parch').forEach(function (arch) {
+            var a = arch.querySelector('.arch'), fws = arch.querySelectorAll('.fw');
+            fws.forEach(function (fw) {
+                fw.addEventListener('change', function () {
+                    if (fw.checked) { fws.forEach(function (o) { if (o !== fw) o.checked = false; }); a.checked = true; }
+                });
+            });
+            a.addEventListener('change', function () { if (!a.checked) fws.forEach(function (o) { o.checked = false; }); });
+        });
+        /* No. of Days follows Started / Finished */
+        var s = document.getElementById('pStarted'), f = document.getElementById('pFinished'), d = document.getElementById('pDays');
+        function days() {
+            if (!s.value || !f.value) { d.textContent = '\u2014'; return; }
+            var n = Math.round((new Date(f.value) - new Date(s.value)) / 86400000);
+            d.textContent = n >= 0 ? n : '\u2014';
+        }
+        s.addEventListener('change', days); f.addEventListener('change', days);
+        sync();
+    })();
+    </script>
+</div>
+</body>
+</html>

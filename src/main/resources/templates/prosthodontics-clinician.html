@@ -6,6 +6,8 @@
     <link rel="stylesheet" href="/css/prosthodontics-clinician.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/form-common.css">
+    <link rel="stylesheet" href="/css/signature.css">
+    <link rel="stylesheet" href="/css/prostho-booklet.css">
 </head>
 
 <body>
@@ -63,7 +65,7 @@
                         <a href="/evaluations-clinician" class="nav-link" style="position:relative;">
                             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="14" height="17" rx="2" stroke="#333" stroke-width="2"/><path d="M9 4V3h6v1" stroke="#333" stroke-width="2" stroke-linecap="round"/><path d="M8.5 12.5l2.2 2.2 4.8-4.8" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             <span>Evaluations</span>
-                            <b th:if="${currentUser != null and @perioEvaluationService.unreadCount(currentUser) > 0}" th:text="${@perioEvaluationService.unreadCount(currentUser)}"
+                            <b th:if="${currentUser != null and @notificationService.newEvaluationCount(currentUser) > 0}" th:text="${@notificationService.newEvaluationCount(currentUser)}"
                                style="position:absolute; top:2px; right:6px; min-width:18px; height:18px; padding:0 5px; box-sizing:border-box; border-radius:9px; background:#c0392b; color:white; font-size:11px; font-weight:700; line-height:18px; text-align:center;">1</b>
                         </a>
                     </li>
@@ -100,59 +102,8 @@
                 <div class="form-body">
                 <div th:style="${viewOnly} ? 'pointer-events:none;' : ''">
 
-                    <!-- Case Type & Cover Info -->
-                    <div class="case-type-box">
-                        <div style="display:flex; gap:32px; flex-wrap:wrap; margin-bottom:14px;">
-                            <div>
-                                <strong style="font-size:13px;">Case Type:</strong>
-                                <span style="font-size:14px; font-weight:600; color:#7a4e2d; margin-left:8px;"
-                                      th:text="${chart.caseType}">CD</span>
-                            </div>
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <label style="font-size:13px;">Case:</label>
-                                <select th:field="*{caseNumber}" style="padding:4px 8px; border:1px solid #ccc; border-radius:4px; font-size:13px;">
-                                    <option value="">—</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- RPD sub-options (only shown for RPD) -->
-                        <div th:if="${chart.caseType == 'RPD'}">
-                            <strong style="font-size:13px; display:block; margin-bottom:6px;">RPD Options:</strong>
-                            <div class="rpd-options">
-                                <label><input type="checkbox" th:field="*{rpdMxWithFramework}"> Mx w/ Framework</label>
-                                <label><input type="checkbox" th:field="*{rpdMxWithout}"> Mx w/o Framework</label>
-                                <label><input type="checkbox" th:field="*{rpdMdWithFramework}"> Md w/ Framework</label>
-                                <label><input type="checkbox" th:field="*{rpdMdWithout}"> Md w/o Framework</label>
-                            </div>
-                        </div>
-
-                        <div class="cover-grid" style="margin-top:14px;">
-                            <div>
-                                <label style="font-size:12px; font-weight:500;">Started</label>
-                                <input type="date" th:field="*{startedDate}" class="date-picker" th:readonly="${viewOnly}">
-                            </div>
-                            <div>
-                                <label style="font-size:12px; font-weight:500;">Finished</label>
-                                <input type="date" th:field="*{finishedDate}" class="date-picker" th:readonly="${viewOnly}">
-                            </div>
-                            <div>
-                                <label style="font-size:12px; font-weight:500;">Grade</label>
-                                <input type="text" th:field="*{grade}" class="text-input-small" readonly style="background:#f5f5f5;">
-                            </div>
-                            <div>
-                                <label style="font-size:12px; font-weight:500;">Cleared by (SGN)</label>
-                                <input type="text" th:field="*{clearedBy}" class="text-input-small" th:readonly="${viewOnly}">
-                            </div>
-                            <div>
-                                <label style="font-size:12px; font-weight:500;">Cleared Date</label>
-                                <input type="date" th:field="*{clearedDate}" class="date-picker" th:readonly="${viewOnly}">
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Cover (laid out like the paper booklet) -->
+                    <th:block th:replace="~{fragments/prostho-cover :: cover(editable=${!viewOnly}, clearing=false)}"></th:block>
 
                     <!-- Procedure Record Table -->
                     <div class="section-header">Procedure Records</div>
@@ -170,7 +121,7 @@
                             <!-- 1. Patient Consent -->
                             <tr>
                                 <td>Patient Consent</td>
-                                <td>—</td>
+                                <td><input type="date" th:field="*{patientConsentDate}" class="date-picker" th:readonly="${viewOnly}"></td>
                                 <td>
                                     <div th:if="${chart.patientConsentFilePath != null}">
                                         <div class="file-preview">
@@ -236,9 +187,8 @@
                                 </td>
                                 <td><input type="date" th:field="*{mouthPreparationsDate}" class="date-picker" th:readonly="${viewOnly}"></td>
                                 <td>
-                                    <label style="font-size:12px;">List of Mouth Preparations done:</label>
-                                    <textarea th:field="*{mouthPreparationsList}" class="text-input-small" rows="3"
-                                              style="resize:vertical;" th:readonly="${viewOnly}"></textarea>
+                                    <div class="pfield"><label>List of Mouth Preparations done</label>
+                                    <textarea th:field="*{mouthPreparationsList}" class="pinput" rows="3" th:readonly="${viewOnly}"></textarea></div>
                                 </td>
                             </tr>
 
@@ -374,15 +324,11 @@
                                 </td>
                                 <td><input type="date" th:field="*{anteriorSetupDate}" class="date-picker" th:readonly="${viewOnly}"></td>
                                 <td>
-                                    <div class="row-group" style="margin-bottom:8px;">
-                                        <div>
-                                            <label>Mould:</label>
-                                            <input type="text" th:field="*{anteriorSetupMould}" class="text-input-small" style="width:100px;" th:readonly="${viewOnly}">
-                                        </div>
-                                        <div>
-                                            <label>Shade:</label>
-                                            <input type="text" th:field="*{anteriorSetupShade}" class="text-input-small" style="width:100px;" th:readonly="${viewOnly}">
-                                        </div>
+                                    <div class="pfields" style="margin-bottom:10px;">
+                                        <div class="pfield"><label>Mould</label>
+                                            <input type="text" th:field="*{anteriorSetupMould}" class="pinput" th:readonly="${viewOnly}"></div>
+                                        <div class="pfield"><label>Shade</label>
+                                            <input type="text" th:field="*{anteriorSetupShade}" class="pinput" th:readonly="${viewOnly}"></div>
                                     </div>
                                     <div th:if="${chart.anteriorSetupFilePath != null}">
                                         <div class="file-preview">
@@ -408,7 +354,7 @@
                                     </div>
                                     <input type="file" name="anteriorTryInFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
                                     <div style="margin-top:8px;">
-                                        <label style="font-size:12px;">Patient Signature:</label>
+                                        <label class="psig-label">Patient Signature</label>
                                         <div th:if="${chart.anteriorTryInSignaturePath != null}">
                                             <a th:href="${chart.anteriorTryInSignaturePath}" target="_blank"><img th:src="${chart.anteriorTryInSignaturePath}" alt="Signature" class="img-preview"></a>
                                         </div>
@@ -425,16 +371,10 @@
                                 </td>
                                 <td><input type="date" th:field="*{protrusiveRecordsDate}" class="date-picker" th:readonly="${viewOnly}"></td>
                                 <td>
-                                    <div style="font-size:12px; margin-bottom:6px;"><strong>Horizontal Condylar Guidance Angle:</strong></div>
-                                    <div class="row-group" style="margin-bottom:8px;">
-                                        <div><label>Right:</label> <input type="text" th:field="*{hcaRight}" class="text-input-small" style="width:80px;" th:readonly="${viewOnly}"></div>
-                                        <div><label>Left:</label> <input type="text" th:field="*{hcaLeft}" class="text-input-small" style="width:80px;" th:readonly="${viewOnly}"></div>
-                                    </div>
-                                    <div style="font-size:12px; margin-bottom:6px;"><strong>Lateral Condylar Guidance Angle:</strong></div>
-                                    <div class="row-group">
-                                        <div><label>Right:</label> <input type="text" th:field="*{lcaRight}" class="text-input-small" style="width:80px;" th:readonly="${viewOnly}"></div>
-                                        <div><label>Left:</label> <input type="text" th:field="*{lcaLeft}" class="text-input-small" style="width:80px;" th:readonly="${viewOnly}"></div>
-                                    </div>
+                                    <div class="pfield" style="margin-bottom:10px;"><label>Horizontal Condylar Guidance Angle</label>
+                                        <div class="pfields"><div class="pfield psub"><label>Right</label><span class="punit"><input type="text" th:field="*{hcaRight}" class="pinput" inputmode="decimal" th:readonly="${viewOnly}"><span>&deg;</span></span></div><div class="pfield psub"><label>Left</label><span class="punit"><input type="text" th:field="*{hcaLeft}" class="pinput" inputmode="decimal" th:readonly="${viewOnly}"><span>&deg;</span></span></div></div></div>
+                                    <div class="pfield"><label>Lateral Condylar Guidance Angle</label>
+                                        <div class="pfields"><div class="pfield psub"><label>Right</label><span class="punit"><input type="text" th:field="*{lcaRight}" class="pinput" inputmode="decimal" th:readonly="${viewOnly}"><span>&deg;</span></span></div><div class="pfield psub"><label>Left</label><span class="punit"><input type="text" th:field="*{lcaLeft}" class="pinput" inputmode="decimal" th:readonly="${viewOnly}"><span>&deg;</span></span></div></div></div>
                                 </td>
                             </tr>
 
@@ -443,15 +383,11 @@
                                 <td>Posterior Setup</td>
                                 <td><input type="date" th:field="*{posteriorSetupDate}" class="date-picker" th:readonly="${viewOnly}"></td>
                                 <td>
-                                    <div class="row-group" style="margin-bottom:8px;">
-                                        <div>
-                                            <label>Mould:</label>
-                                            <input type="text" th:field="*{posteriorSetupMould}" class="text-input-small" style="width:100px;" th:readonly="${viewOnly}">
-                                        </div>
-                                        <div>
-                                            <label>Shade:</label>
-                                            <input type="text" th:field="*{posteriorSetupShade}" class="text-input-small" style="width:100px;" th:readonly="${viewOnly}">
-                                        </div>
+                                    <div class="pfields" style="margin-bottom:10px;">
+                                        <div class="pfield"><label>Mould</label>
+                                            <input type="text" th:field="*{posteriorSetupMould}" class="pinput" th:readonly="${viewOnly}"></div>
+                                        <div class="pfield"><label>Shade</label>
+                                            <input type="text" th:field="*{posteriorSetupShade}" class="pinput" th:readonly="${viewOnly}"></div>
                                     </div>
                                     <div th:if="${chart.posteriorSetupFilePath != null}">
                                         <div class="file-preview">
@@ -474,7 +410,7 @@
                                     </div>
                                     <input type="file" name="posteriorTryInFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
                                     <div style="margin-top:8px;">
-                                        <label style="font-size:12px;">Patient Signature:</label>
+                                        <label class="psig-label">Patient Signature</label>
                                         <div th:if="${chart.posteriorTryInSignaturePath != null}">
                                             <a th:href="${chart.posteriorTryInSignaturePath}" target="_blank"><img th:src="${chart.posteriorTryInSignaturePath}" alt="Signature" class="img-preview"></a>
                                         </div>
@@ -536,13 +472,6 @@
                                         </div>
                                     </div>
                                     <input type="file" name="installationFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
-                                    <div style="margin-top:8px;">
-                                        <label style="font-size:12px;">Patient Signature:</label>
-                                        <div th:if="${chart.installationSignaturePath != null}">
-                                            <a th:href="${chart.installationSignaturePath}" target="_blank"><img th:src="${chart.installationSignaturePath}" alt="Signature" class="img-preview"></a>
-                                        </div>
-                                        <input type="file" name="installationSignatureFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
-                                    </div>
                                 </td>
                             </tr>
 
@@ -557,13 +486,6 @@
                                         </div>
                                     </div>
                                     <input type="file" name="postInstallationFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
-                                    <div style="margin-top:8px;">
-                                        <label style="font-size:12px;">Patient Signature:</label>
-                                        <div th:if="${chart.postInstallationSignaturePath != null}">
-                                            <a th:href="${chart.postInstallationSignaturePath}" target="_blank"><img th:src="${chart.postInstallationSignaturePath}" alt="Signature" class="img-preview"></a>
-                                        </div>
-                                        <input type="file" name="postInstallationSignatureFile" class="upload-input" accept="image/png,image/jpeg,application/pdf">
-                                    </div>
                                 </td>
                             </tr>
 
@@ -573,9 +495,8 @@
 
                     <!-- Remarks -->
                     <div style="margin-top:20px;">
-                        <label style="font-size:13px; font-weight:600; color:#5a3e28;">Remarks:</label>
-                        <textarea th:field="*{remarks}" class="text-input-small" rows="4"
-                                  style="margin-top:6px; resize:vertical;" th:readonly="${viewOnly}"></textarea>
+                        <div class="pfield"><label class="premarks-label">Remarks</label>
+                        <textarea th:field="*{remarks}" class="pinput" rows="4" th:readonly="${viewOnly}"></textarea></div>
                     </div>
 
                 </div>
@@ -611,15 +532,6 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
     e.stopPropagation();
 });
 
-const rpdBoxes = document.querySelectorAll('.rpd-options input[type="checkbox"]');
-rpdBoxes.forEach(function(cb) {
-    cb.addEventListener('change', function() {
-        if (this.checked) {
-            rpdBoxes.forEach(function(other) { if (other !== cb) other.checked = false; });
-        }
-    });
-});
-
 // Disable file inputs that have no file chosen before submitting
 // so empty file parts are not sent as multipart parts.
 document.querySelector('form').addEventListener('submit', function() {
@@ -627,18 +539,6 @@ document.querySelector('form').addEventListener('submit', function() {
         if (!input.files || input.files.length === 0) {
             input.disabled = true;
         }
-    });
-});
-
-// Replace broken <img> previews (e.g. PDFs) with a plain "View file" link.
-document.querySelectorAll('.img-preview').forEach(function(img) {
-    img.addEventListener('error', function() {
-        const a = document.createElement('a');
-        a.href = this.src;
-        a.target = '_blank';
-        a.textContent = '📄 View file';
-        a.style.cssText = 'font-size:12px;color:#3b5ea6;text-decoration:underline;';
-        this.parentNode.replaceChild(a, this);
     });
 });
 </script>
@@ -672,7 +572,9 @@ document.querySelectorAll('.img-preview').forEach(function(img) {
     });
 })();
 </script>
+<script th:inline="javascript">window.PROSTHO_VIEW_ONLY = /*[[${viewOnly}]]*/ false;</script>
+<script src="/js/prostho-uploads.js"></script>
 <script src="/js/textarea-min-size.js"></script>
-<script src="/js/sidebar-hover.js"></script>
+<script src="/js/sidebar-hover.js?v=3"></script>
 </body>
 </html>
