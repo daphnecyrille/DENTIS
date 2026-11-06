@@ -27,8 +27,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(activityLogInterceptor);   // writes the activity log after important actions
     }
 
-    private static final String UPLOAD_FS_PATH =
-            System.getProperty("user.dir") + "/src/main/resources/static/uploads/";
+    // DENTIS_UPLOAD_DIR is set on the hosted server (Vercel), where only /tmp is writable.
+    public static final String UPLOAD_FS_PATH = System.getenv().getOrDefault(
+            "DENTIS_UPLOAD_DIR", System.getProperty("user.dir") + "/src/main/resources/static/uploads/");
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

@@ -1,0 +1,19 @@
+# Builds and runs DENTIS on Vercel (Vercel picks up this file automatically).
+
+# 1) Build the app
+FROM maven:3.9-eclipse-temurin-17 AS build
+WORKDIR /src
+COPY pom.xml .
+RUN mvn -q -B dependency:go-offline
+COPY src ./src
+RUN mvn -q -B -DskipTests package
+
+# 2) Run it
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=build /src/target/DENTIS-0.0.1-SNAPSHOT.jar app.jar
+# Only /tmp is writable on Vercel. Uploaded files are lost when the server restarts.
+ENV DENTIS_UPLOAD_DIR=/tmp/uploads/
+ENV PORT=8080
+EXPOSE 8080
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75", "-XX:TieredStopAtLevel=1", "-jar", "app.jar"]

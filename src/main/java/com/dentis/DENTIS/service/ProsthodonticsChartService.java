@@ -25,7 +25,7 @@ public class ProsthodonticsChartService {
     // Files are stored outside the classpath static folder and served via a
     // custom resource handler configured in WebMvcConfig.
     private static final String UPLOAD_DIR =
-            System.getProperty("user.dir") + "/src/main/resources/static/uploads/prosthodontics/";
+            com.dentis.DENTIS.config.WebMvcConfig.UPLOAD_FS_PATH + "prosthodontics/";
 
     public ProsthodonticsChartService(ProsthodonticsChartRepository repo) {
         this.repo = repo;
