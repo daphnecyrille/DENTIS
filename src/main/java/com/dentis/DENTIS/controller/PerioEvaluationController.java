@@ -28,17 +28,23 @@ public class PerioEvaluationController {
     private final UserRepository userRepository;
     private final com.dentis.DENTIS.service.ProsthodonticsChartService prosthodonticsChartService;
     private final com.dentis.DENTIS.service.NotificationService notificationService;
+    private final com.dentis.DENTIS.service.EndoEvaluationService endoEvaluationService;
+    private final com.dentis.DENTIS.service.RestoEvaluationService restoEvaluationService;
 
     public PerioEvaluationController(PerioEvaluationService evalService,
                                      PeriodonticChartService chartService,
                                      UserRepository userRepository,
                                      com.dentis.DENTIS.service.ProsthodonticsChartService prosthodonticsChartService,
-                                     com.dentis.DENTIS.service.NotificationService notificationService) {
+                                     com.dentis.DENTIS.service.NotificationService notificationService,
+                                     com.dentis.DENTIS.service.EndoEvaluationService endoEvaluationService,
+                                     com.dentis.DENTIS.service.RestoEvaluationService restoEvaluationService) {
         this.evalService = evalService;
         this.chartService = chartService;
         this.userRepository = userRepository;
         this.prosthodonticsChartService = prosthodonticsChartService;
         this.notificationService = notificationService;
+        this.endoEvaluationService = endoEvaluationService;
+        this.restoEvaluationService = restoEvaluationService;
     }
 
     private User getCurrentUser(Authentication authentication) {
@@ -129,6 +135,8 @@ public class PerioEvaluationController {
         model.addAttribute("currentUser", user);
         model.addAttribute("evals", evalService.sentForClinician(user));
         model.addAttribute("prosthoCleared", prosthodonticsChartService.clearedForClinician(user));
+        model.addAttribute("endoGraded", user != null ? endoEvaluationService.sentForClinician(user) : java.util.List.of());
+        model.addAttribute("restoGraded", restoEvaluationService.sentForClinician(user));
         model.addAttribute("unreadCount", notificationService.newEvaluationCount(user));
         return "evaluations-clinician";
     }

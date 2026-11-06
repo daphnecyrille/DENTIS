@@ -90,3 +90,17 @@
 @keyframes toastIn  { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes toastOut { to { transform: translateX(120%); opacity: 0; visibility: hidden; } }
 
+
+/* ─── Same width and side margins on every form ───
+   Some sections centered the form inside the card, so it shrank to its content and left
+   wide empty strips on both sides. Every form now fills the card with the same side margins. */
+.form-card { align-items: stretch; width: 100%; box-sizing: border-box; }
+.form-card > form,
+.form-card > .form-body,
+.form-card > form > .form-body { width: 100%; box-sizing: border-box; }
+.form-body { padding-left: 45px; padding-right: 45px; box-sizing: border-box; }
+.form-body.form-body-wide { padding-left: 20px; padding-right: 20px; }   /* PF2: the wide PPD/CAL/BOP chart needs the room */
+
+/* Date / time fields open their picker from anywhere in the box */
+input[type="date"]:not([readonly]):not([disabled]),
+input[type="time"]:not([readonly]):not([disabled]) { cursor: pointer; }

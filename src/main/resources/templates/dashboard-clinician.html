@@ -179,12 +179,13 @@
                                 <td th:class="'status ' + ${ec.status.cssClass}" th:text="${ec.status.displayName}"></td>
                                 <td><a th:href="@{${'/endodontics-clinician/' + ec.id}}" class="btn-view-chart" th:classappend="${ec.status.name() == 'REVISE'} ? 'btn-revise'" th:text="${ec.status.name() == 'REVISE' ? 'Edit Chart' : (ec.status.name() == 'CREATED' ? 'Start' : 'Continue')}">Continue</a></td>
                             </tr>
-                            <tr th:each="ec : ${endoForm2ActionNeededCharts}" th:attr="data-revise=${ec.form2Status.name() == 'REVISE'}" th:classappend="${ec.form2Status.name() == 'REVISE'} ? 'row-revise'">
-                                <td th:text="${#strings.replace(ec.chartNo, '-ENDO1', '-ENDO2')}"></td>
-                                <td>Endodontics - Endodontic Evaluation &amp; Treatment Planning</td>
+                            <tr th:each="ec : ${endoForm4ActionNeededCharts}" th:attr="data-revise=${ec.form4Status.name() == 'REVISE'}" th:classappend="${ec.form4Status.name() == 'REVISE'} ? 'row-revise'">
+                                <td th:text="${#strings.replace(ec.chartNo, '-ENDO1', '-ENDO4')}"></td>
+                                <td>Endodontics - Informed Consent</td>
                                 <td th:text="${ec.patient.surname + ', ' + ec.patient.firstName + (ec.patient.middleInitial != null ? ' ' + ec.patient.middleInitial + '.' : '')}"></td>
-                                <td th:class="'status ' + ${ec.form2Status.cssClass}" th:text="${ec.form2Status.displayName}"></td>
-                                <td><a th:href="@{${'/endodontics2-clinician/' + ec.id}}" class="btn-view-chart" th:classappend="${ec.form2Status.name() == 'REVISE'} ? 'btn-revise'" th:text="${ec.form2Status.name() == 'REVISE' ? 'Edit Chart' : (ec.form2Status.name() == 'CREATED' ? 'Start' : 'Continue')}">Continue</a></td>
+                                <td th:class="'status ' + ${ec.form4Css}" th:text="${ec.form4Label}"></td>
+                                <td><a th:href="@{${'/endodontics4-clinician/' + ec.id}}" class="btn-view-chart" th:classappend="${ec.form4Status.name() == 'REVISE'} ? 'btn-revise'"
+                                       th:text="${ec.form4Status.name() == 'CREATED' ? 'Start' : 'Continue'}">Continue</a></td>
                             </tr>
                             <tr th:each="pc : ${perioActionNeededCharts}" th:attr="data-revise=${pc.status.name() == 'REVISE'}" th:classappend="${pc.status.name() == 'REVISE'} ? 'row-revise'">
                                 <td th:text="${pc.chartNo}"></td>
@@ -209,7 +210,7 @@
                             </tr>
                             <tr th:each="oc : ${operativeActionNeededCharts}" th:attr="data-revise=${oc.status.name() == 'REVISE'}" th:classappend="${oc.status.name() == 'REVISE'} ? 'row-revise'">
                                 <td th:text="${oc.chartNo}"></td>
-                                <td>Operative Dentistry - Assessment Form</td>
+                                <td>Operative Dentistry - Assessment Form for Carious Lesions</td>
                                 <td th:text="${oc.patient.surname + ', ' + oc.patient.firstName + (oc.patient.middleInitial != null ? ' ' + oc.patient.middleInitial + '.' : '')}"></td>
                                 <td th:class="'status ' + ${oc.status.cssClass}" th:text="${oc.status.displayName}"></td>
                                 <td><a th:href="@{${'/operative-b/' + oc.id}}" class="btn-view-chart" th:classappend="${oc.status.name() == 'REVISE'} ? 'btn-revise'" th:text="${oc.status.name() == 'REVISE' ? 'Edit Chart' : (oc.status.name() == 'CREATED' ? 'Start' : 'Continue')}">Continue</a></td>
@@ -228,7 +229,7 @@
                                 <td th:class="'status ' + ${pc.status.cssClass}" th:text="${pc.status.displayName}"></td>
                                 <td><a th:href="@{${'/prosthodontics-clinician/' + pc.id}}" class="btn-view-chart" th:classappend="${pc.status.name() == 'REVISE'} ? 'btn-revise'" th:text="${pc.status.name() == 'REVISE' ? 'Edit Chart' : (pc.status.name() == 'CREATED' ? 'Start' : 'Continue')}">Continue</a></td>
                             </tr>
-                            <tr th:if="${#lists.isEmpty(actionNeededCharts) and #lists.isEmpty(endoActionNeededCharts) and #lists.isEmpty(endoForm2ActionNeededCharts) and #lists.isEmpty(perioActionNeededCharts) and #lists.isEmpty(periocActionNeededCharts) and #lists.isEmpty(operativeActionNeededCharts) and #lists.isEmpty(operative6ActionNeededCharts) and #lists.isEmpty(prosthoActionNeededCharts)}">
+                            <tr th:if="${#lists.isEmpty(actionNeededCharts) and #lists.isEmpty(endoActionNeededCharts) and #lists.isEmpty(endoForm4ActionNeededCharts) and #lists.isEmpty(perioActionNeededCharts) and #lists.isEmpty(periocActionNeededCharts) and #lists.isEmpty(operativeActionNeededCharts) and #lists.isEmpty(operative6ActionNeededCharts) and #lists.isEmpty(prosthoActionNeededCharts)}">
                                 <td colspan="5" style="text-align:center; color:#888;">All charts have been submitted.</td>
                             </tr>
                         </tbody>
@@ -393,5 +394,6 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 })();
 </script>
 <script src="/js/sidebar-hover.js?v=3"></script>
+<script src="/js/date-click.js"></script>
 </body>
 </html>

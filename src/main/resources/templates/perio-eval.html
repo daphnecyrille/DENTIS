@@ -5,7 +5,7 @@
     <title th:text="${form.code + ' Evaluation - DentIS'}">Evaluation - DentIS</title>
     <link rel="stylesheet" href="/css/periodonticsb-clinician.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/form-common.css">
+    <link rel="stylesheet" href="/css/form-common.css?v=3">
     <link rel="stylesheet" href="/css/perio-eval.css">
 </head>
 
@@ -95,7 +95,7 @@
                 <div class="eval-code-row">
                     <span class="eval-code" th:text="${form.courses == '' ? form.code : form.code + ' · ' + form.courses}">PF4</span>
                     <span th:if="${facultyMode and eval.status.name() == 'DRAFT'}" class="eval-status draft">&#9679; Draft</span>
-                    <span th:if="${facultyMode and eval.status.name() == 'GRADED'}" class="eval-status sent">&#9679; Sent</span>
+                    <span th:if="${facultyMode and eval.status.name() == 'GRADED'}" class="eval-status sent">&#9679; Sent to clinician</span>
                 </div>
 
                 <form th:action="@{/perio-eval-faculty/{id}(id=${eval.id})}" method="post" id="evalForm">
@@ -337,5 +337,6 @@ document.addEventListener('click', function() {
 
 <script src="/js/textarea-min-size.js"></script>
 <script src="/js/sidebar-hover.js?v=3"></script>
+<script src="/js/date-click.js"></script>
 </body>
 </html>

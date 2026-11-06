@@ -66,7 +66,7 @@ public final class PatientRowBuilder {
         for (var c : endo) {
             var t = touched(c.getUpdatedAt(), c.getCreatedAt());
             a.add(c.getPatient(), "Endo", t, tag("ENDO1", "Endodontics \u2013 Patient Workup", c.getStatus().getDisplayName(), c.getStatus().getCssClass()), c.getStatus().name(), c.getClinician(), c.getFaculty());
-            a.add(c.getPatient(), "Endo", t, tag("ENDO2", "Endodontics \u2013 Evaluation & Treatment Planning", c.getForm2Status().getDisplayName(), c.getForm2Status().getCssClass()), c.getForm2Status().name(), c.getClinician(), c.getFaculty());
+            a.add(c.getPatient(), "Endo", t, tag("ENDO4", "Endodontics \u2013 Informed Consent", c.getForm4Label(), c.getForm4Css()), c.getForm4Status().name(), c.getClinician(), c.getFaculty());
         }
         for (var c : perio) {
             var t = touched(c.getUpdatedAt(), c.getCreatedAt());
@@ -76,7 +76,7 @@ public final class PatientRowBuilder {
         }
         for (var c : operative) {
             var t = touched(c.getUpdatedAt(), c.getCreatedAt());
-            a.add(c.getPatient(), "Resto", t, tag("RESTO10", "Operative \u2013 Assessment Form", c.getStatus().getDisplayName(), c.getStatus().getCssClass()), c.getStatus().name(), c.getClinician(), c.getFaculty());
+            a.add(c.getPatient(), "Resto", t, tag("RESTO10", "Operative \u2013 Assessment Form for Carious Lesions", c.getStatus().getDisplayName(), c.getStatus().getCssClass()), c.getStatus().name(), c.getClinician(), c.getFaculty());
             a.add(c.getPatient(), "Resto", t, tag("RESTO6", "Operative \u2013 Caries Risk Assessment", c.getForm2Status().getDisplayName(), c.getForm2Status().getCssClass()), c.getForm2Status().name(), c.getClinician(), c.getFaculty());
         }
         for (var c : prostho) {

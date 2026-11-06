@@ -37,14 +37,17 @@ public class ActivityLogInterceptor implements HandlerInterceptor {
     private final PatientService patients;
     private final ChartRequestService requests;
     private final PerioEvaluationService evals;
+    private final com.dentis.DENTIS.service.EndoEvaluationService endoEvals;
+    private final com.dentis.DENTIS.service.RestoEvaluationService restoEvals;
     private final List<Rule> rules;
 
     public ActivityLogInterceptor(ActivityLogService activity, UserRepository users, PeriodonticChartService perio,
                                   EndodonticsChartService endo, OperativeChartService operative, OralSurgeryChartService os,
                                   ProsthodonticsChartService prostho, PatientService patients, ChartRequestService requests,
-                                  PerioEvaluationService evals) {
+                                  PerioEvaluationService evals, com.dentis.DENTIS.service.EndoEvaluationService endoEvals,
+                                  com.dentis.DENTIS.service.RestoEvaluationService restoEvals) {
         this.activity = activity; this.users = users; this.perio = perio; this.endo = endo; this.operative = operative;
-        this.os = os; this.prostho = prostho; this.patients = patients; this.requests = requests; this.evals = evals;
+        this.os = os; this.prostho = prostho; this.patients = patients; this.requests = requests; this.evals = evals; this.endoEvals = endoEvals; this.restoEvals = restoEvals;
         this.rules = List.of(
             // faculty: approve / revise
             rule("/periodontics-faculty/(\\d+)/approve", "APPROVE", "Approved PF1 (signed)", (id, r) -> perioT(id, "-PF1")),
@@ -55,8 +58,8 @@ public class ActivityLogInterceptor implements HandlerInterceptor {
             rule("/periodontics3-faculty/(\\d+)/revise", "REVISE", "Sent PF3 back for revision", (id, r) -> perioT(id, "-PF3")),
             rule("/endodontics-faculty/(\\d+)/approve", "APPROVE", "Approved Endo Patient Workup", (id, r) -> endoT(id, false)),
             rule("/endodontics-faculty/(\\d+)/revise", "REVISE", "Sent Endo Patient Workup back for revision", (id, r) -> endoT(id, false)),
-            rule("/endodontics2-faculty/(\\d+)/approve", "APPROVE", "Approved Endo Evaluation & Treatment Planning", (id, r) -> endoT(id, true)),
-            rule("/endodontics2-faculty/(\\d+)/revise", "REVISE", "Sent Endo Evaluation back for revision", (id, r) -> endoT(id, true)),
+            rule("/endodontics4-faculty/(\\d+)/approve", "APPROVE", "Approved Endo Informed Consent (signed)", (id, r) -> endoT(id, false).replace("-ENDO1", "-ENDO4")),
+            rule("/endodontics4-faculty/(\\d+)/revise", "REVISE", "Sent Endo Informed Consent back for revision", (id, r) -> endoT(id, false).replace("-ENDO1", "-ENDO4")),
             rule("/operative-faculty/(\\d+)/approve", "APPROVE", "Approved RESTO10", (id, r) -> opT(id, false)),
             rule("/operative-faculty/(\\d+)/revise", "REVISE", "Sent RESTO10 back for revision", (id, r) -> opT(id, false)),
             rule("/operative2-faculty/(\\d+)/approve", "APPROVE", "Approved RESTO6", (id, r) -> opT(id, true)),
@@ -70,13 +73,15 @@ public class ActivityLogInterceptor implements HandlerInterceptor {
             rule("/periodontics-c/(\\d+)/submit", "SUBMIT", "Submitted PF2", (id, r) -> perioT(id, "-PF2")),
             rule("/periodontics-pf3/(\\d+)/submit", "SUBMIT", "Submitted PF3", (id, r) -> perioT(id, "-PF3")),
             rule("/endodontics-clinician/(\\d+)/submit", "SUBMIT", "Submitted Endo Patient Workup", (id, r) -> endoT(id, false)),
-            rule("/endodontics2-clinician/(\\d+)/submit", "SUBMIT", "Submitted Endo Evaluation", (id, r) -> endoT(id, true)),
+            rule("/endodontics4-clinician/(\\d+)/submit", "SUBMIT", "Submitted Endo Informed Consent", (id, r) -> endoT(id, false).replace("-ENDO1", "-ENDO4")),
             rule("/operative-c/(\\d+)/submit", "SUBMIT", "Submitted RESTO10", (id, r) -> opT(id, false)),
             rule("/operative-a/(\\d+)/submit", "SUBMIT", "Submitted RESTO6", (id, r) -> opT(id, true)),
             rule("/oralsurgery-clinician/(\\d+)/submit", "SUBMIT", "Submitted Oral Surgery chart", (id, r) -> osT(id)),
             rule("/prosthodontics-clinician/(\\d+)/submit", "SUBMIT", "Submitted Prostho booklet for clearance", (id, r) -> prosthoT(id)),
             // evaluations
             rule("/perio-eval-faculty/(\\d+)", "EVALUATION", null, (id, r) -> evalT(id)),
+            rule("/endo-eval-faculty/(\\d+)", "EVALUATION", null, (id, r) -> endoEvalT(id)),
+            rule("/resto-eval-faculty/(\\d+)", "EVALUATION", null, (id, r) -> restoEvalT(id)),
             // assignments and requests
             rule("/chartsview-clinicmanager/(\\d+)/assign-faculty", "ASSIGN", "Assigned faculty", (id, r) -> patientT(id) + " → " + userName(r.getParameter("facultyId"))),
             rule("/faculty-dashboard/(\\d+)/assign-clinician", "ASSIGN", "Assigned clinician", (id, r) -> patientT(id) + " → " + userName(r.getParameter("clinicianId"))),
@@ -156,6 +161,14 @@ public class ActivityLogInterceptor implements HandlerInterceptor {
     private String evalT(Long id) {
         var e = evals.getById(id);
         return e.getFormType().name() + " · " + e.getPerioChart().getChartNo().replace("-PF1", "") + " · " + name(e.getPerioChart().getPatient());
+    }
+    private String endoEvalT(Long id) {
+        var e = endoEvals.getById(id);
+        return e.getFormNo() + " · " + name(e.getEndoChart().getPatient());
+    }
+    private String restoEvalT(Long id) {
+        var e = restoEvals.getById(id);
+        return e.getFormNo() + " · " + name(e.getOperativeChart().getPatient());
     }
     private String userName(String id) {
         try { return users.findById(Long.valueOf(id)).map(User::getFullName).orElse("—"); } catch (Exception e) { return "—"; }

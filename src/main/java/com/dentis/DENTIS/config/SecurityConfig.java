@@ -40,12 +40,12 @@ public class SecurityConfig {
                     "/perio-eval-faculty/**",
                     "/periodontics-faculty/**", "/periodontics2-faculty/**", "/periodontics3-faculty/**",
                     "/periodontics-view-faculty/**",
-                    "/oralsurgery-faculty/**", "/endodontics-faculty/**", "/endodontics2-faculty/**",
+                    "/oralsurgery-faculty/**", "/endodontics-faculty/**", "/endodontics4-faculty/**", "/endo-eval-faculty/**", "/resto-eval-faculty/**",
                     "/operative-view2-faculty/**", "/prosthodontics-faculty/**"
                 ).hasRole("FACULTY")
                 .requestMatchers(
                     "/oralsurgery-view-faculty/**", "/oralsurgery2-view-faculty/**",
-                    "/endodontics-view-faculty/**", "/endodontics2-view-faculty/**",
+                    "/endodontics-view-faculty/**", "/endodontics4-view-faculty/**",
                     "/periodontics-ab-view/**", "/periodontics-c-view/**",
                     "/operative-view/**", "/operative2-view/**",
                     "/prosthodontics-view/**",
@@ -66,7 +66,7 @@ public class SecurityConfig {
                     "/clinician-dashboard", "/chartsview-clinician/**", "/chartrequest-clinician",
                     "/patientlist-clinician", "/admitting-edit-clinician/**",
                     "/admitting-view-clinician/**", "/oralsurgery-clinician/**", "/oralsurgery2-clinician/**",
-                    "/endodontics-clinician/**", "/endodontics2-clinician/**", "/periodonticsa-clinician/**", "/periodonticsb-clinician/**", "/evaluations-clinician"
+                    "/endodontics-clinician/**", "/endodontics4-clinician/**", "/periodonticsa-clinician/**", "/periodonticsb-clinician/**", "/evaluations-clinician"
                 ).hasRole("CLINICIAN")
                 .requestMatchers("/complete-profile").authenticated()
                 .anyRequest().authenticated()

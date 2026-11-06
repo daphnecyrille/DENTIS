@@ -74,6 +74,11 @@
         <!-- Main Content -->
         <main class="main-content">
             <!-- Patient Information Section -->
+            <div th:if="${requestedOnly}" class="req-banner" role="note">
+                <b>View only</b>
+                <span>You have access to this patient through a chart request. These charts belong to
+                    <strong th:text="${patient.assignedClinician != null ? patient.assignedClinician.fullName : 'another clinician'}">another clinician</strong>.</span>
+            </div>
             <section class="section">
                 <div class="section-header">
                     <h2>Patient Information</h2>
@@ -175,7 +180,7 @@
                                 <td>—</td>
                                 <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
                             </tr>
-                            <tr th:each="osc : ${osCharts}">
+                            <tr th:with="mine=${osc.clinician != null and currentUser != null and osc.clinician.id == currentUser.id}" th:each="osc : ${osCharts}">
                                 <td th:text="${osc.chartNo}"></td>
                                 <td th:text="${osc.chartType != null ? osc.chartType.displayName : 'Oral Surgery Chart'}"></td>
                                 <td th:class="'status ' + ${osc.status.cssClass}"
@@ -190,23 +195,23 @@
                                        class="btn-action btn-view">View</a>
                                 </td>
                                 <td>
-                                    <a th:if="${osc.chartType != null and osc.chartType.name() == 'OSF2' and osc.status.name() != 'APPROVED'}"
+                                    <a th:if="${mine and (osc.chartType != null and osc.chartType.name() == 'OSF2' and osc.status.name() != 'APPROVED')}"
                                        th:href="@{/oralsurgery2-clinician/{id}(id=${osc.id})}"
                                        class="btn-action btn-edit">Edit</a>
-                                    <a th:if="${(osc.chartType == null or osc.chartType.name() == 'OSF1') and osc.status.name() != 'APPROVED'}"
+                                    <a th:if="${mine and ((osc.chartType == null or osc.chartType.name() == 'OSF1') and osc.status.name() != 'APPROVED')}"
                                        th:href="@{/oralsurgery-clinician/{id}(id=${osc.id})}"
                                        class="btn-action btn-edit">Edit</a>
-                                    <span th:if="${osc.status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
+                                    <span th:if="${!mine or (osc.status.name() == 'APPROVED')}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td>
-                                    <form th:if="${osc.status.name() != 'APPROVED' and osc.status.name() != 'SUBMITTED'}" th:action="@{/oralsurgery-clinician/{id}/submit(id=${osc.id})}" method="post" style="display:inline;">
+                                    <form th:if="${mine and (osc.status.name() != 'APPROVED' and osc.status.name() != 'SUBMITTED')}" th:action="@{/oralsurgery-clinician/{id}/submit(id=${osc.id})}" method="post" style="display:inline;">
                                         <button type="submit" class="btn-action btn-submit">Submit</button>
                                     </form>
-                                    <span th:if="${osc.status.name() == 'SUBMITTED' or osc.status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
+                                    <span th:if="${!mine or (osc.status.name() == 'SUBMITTED' or osc.status.name() == 'APPROVED')}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
                             </tr>
-                            <tr th:each="ec : ${endoCharts}">
+                            <tr th:with="mine=${ec.clinician != null and currentUser != null and ec.clinician.id == currentUser.id}" th:each="ec : ${endoCharts}">
                                 <td th:text="${ec.chartNo}"></td>
                                 <td>Endodontics - Patient Workup</td>
                                 <td th:class="'status ' + ${ec.status.cssClass}"
@@ -214,38 +219,39 @@
                                 <td th:text="${ec.createdAt.toLocalDate()}"></td>
                                 <td><a th:href="@{/endodontics-clinician/{id}/view(id=${ec.id})}" class="btn-action btn-view">View</a></td>
                                 <td>
-                                    <a th:if="${ec.status.name() != 'APPROVED'}" th:href="@{/endodontics-clinician/{id}(id=${ec.id})}" class="btn-action btn-edit">Edit</a>
-                                    <span th:if="${ec.status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
+                                    <a th:if="${mine and (ec.status.name() != 'APPROVED')}" th:href="@{/endodontics-clinician/{id}(id=${ec.id})}" class="btn-action btn-edit">Edit</a>
+                                    <span th:if="${!mine or (ec.status.name() == 'APPROVED')}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td>
-                                    <form th:if="${ec.status.name() != 'APPROVED' and ec.status.name() != 'SUBMITTED'}" th:action="@{/endodontics-clinician/{id}/submit(id=${ec.id})}" method="post" style="display:inline;">
+                                    <form th:if="${mine and (ec.status.name() != 'APPROVED' and ec.status.name() != 'SUBMITTED')}" th:action="@{/endodontics-clinician/{id}/submit(id=${ec.id})}" method="post" style="display:inline;">
                                         <button type="submit" class="btn-action btn-submit">Submit</button>
                                     </form>
-                                    <span th:if="${ec.status.name() == 'SUBMITTED' or ec.status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
+                                    <span th:if="${!mine or (ec.status.name() == 'SUBMITTED' or ec.status.name() == 'APPROVED')}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
                             </tr>
-                            <tr th:each="ec : ${endoCharts}">
-                                <td th:text="${#strings.replace(ec.chartNo, '-ENDO1', '-ENDO2')}"></td>
-                                <td>Endodontics - Endodontic Evaluation &amp; Treatment Planning</td>
-                                <td th:class="'status ' + ${ec.form2Status.cssClass}"
-                                    th:text="${ec.form2Status.displayName}"></td>
+                            <!-- Endo Form 4: Informed Consent (patient + clinician sign, faculty signs on approval) -->
+                            <tr th:with="mine=${ec.clinician != null and currentUser != null and ec.clinician.id == currentUser.id}" th:each="ec : ${endoCharts}">
+                                <td th:text="${#strings.replace(ec.chartNo, '-ENDO1', '-ENDO4')}"></td>
+                                <td>Endodontics - Informed Consent</td>
+                                <td th:class="'status ' + ${ec.form4Css}" th:text="${ec.form4Label}"></td>
                                 <td th:text="${ec.createdAt.toLocalDate()}"></td>
-                                <td><a th:href="@{/endodontics2-clinician/{id}/view(id=${ec.id})}" class="btn-action btn-view">View</a></td>
+                                <td><a th:href="@{/endodontics4-clinician/{id}/view(id=${ec.id})}" class="btn-action btn-view">View</a></td>
                                 <td>
-                                    <a th:if="${ec.form2Status.name() != 'APPROVED'}" th:href="@{/endodontics2-clinician/{id}(id=${ec.id})}" class="btn-action btn-edit">Edit</a>
-                                    <span th:if="${ec.form2Status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
+                                    <a th:if="${mine and (ec.consentEditable)}" th:href="@{/endodontics4-clinician/{id}(id=${ec.id})}" class="btn-action btn-edit"
+                                       th:text="${ec.consentPatientSigned and !ec.consentClinicianSigned ? 'Sign' : 'Edit'}">Edit</a>
+                                    <span th:if="${!mine or !(ec.consentEditable)}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td>
-                                    <form th:if="${ec.form2Status.name() != 'APPROVED' and ec.form2Status.name() != 'SUBMITTED'}" th:action="@{/endodontics2-clinician/{id}/submit(id=${ec.id})}" method="post" style="display:inline;">
+                                    <form th:if="${mine and (ec.consentEditable and ec.consentPatientSigned and ec.consentClinicianSigned)}" th:action="@{/endodontics4-clinician/{id}/submit(id=${ec.id})}" method="post" style="display:inline;">
                                         <button type="submit" class="btn-action btn-submit">Submit</button>
                                     </form>
-                                    <span th:if="${ec.form2Status.name() == 'SUBMITTED' or ec.form2Status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
+                                    <span th:if="${!mine or !(ec.consentEditable and ec.consentPatientSigned and ec.consentClinicianSigned)}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
                             </tr>
                             <!-- Periodontics PF1 (Forms A+B) -->
-                            <tr th:each="pc : ${perioCharts}">
+                            <tr th:with="mine=${pc.clinician != null and currentUser != null and pc.clinician.id == currentUser.id}" th:each="pc : ${perioCharts}">
                                 <td th:text="${pc.chartNo}"></td>
                                 <td>Periodontics - Periodontal Chart</td>
                                 <td th:class="'status ' + ${pc.status.cssClass}"
@@ -253,19 +259,19 @@
                                 <td th:text="${pc.createdAt.toLocalDate()}"></td>
                                 <td><a th:href="@{/periodontics-a/{id}/view(id=${pc.id})}" class="btn-action btn-view">View</a></td>
                                 <td>
-                                    <a th:if="${pc.status.name() != 'APPROVED'}" th:href="@{/periodontics-a/{id}(id=${pc.id})}" class="btn-action btn-edit">Edit</a>
-                                    <span th:if="${pc.status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
+                                    <a th:if="${mine and (pc.status.name() != 'APPROVED')}" th:href="@{/periodontics-a/{id}(id=${pc.id})}" class="btn-action btn-edit">Edit</a>
+                                    <span th:if="${!mine or (pc.status.name() == 'APPROVED')}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td>
-                                    <form th:if="${pc.status.name() != 'APPROVED' and pc.status.name() != 'SUBMITTED'}" th:action="@{/periodontics-ab/{id}/submit(id=${pc.id})}" method="post" style="display:inline;">
+                                    <form th:if="${mine and (pc.status.name() != 'APPROVED' and pc.status.name() != 'SUBMITTED')}" th:action="@{/periodontics-ab/{id}/submit(id=${pc.id})}" method="post" style="display:inline;">
                                         <button type="submit" class="btn-action btn-submit">Submit</button>
                                     </form>
-                                    <span th:if="${pc.status.name() == 'SUBMITTED' or pc.status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
+                                    <span th:if="${!mine or (pc.status.name() == 'SUBMITTED' or pc.status.name() == 'APPROVED')}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
                             </tr>
                             <!-- Periodontics PF2 (Form C) -->
-                            <tr th:each="pc : ${perioCharts}">
+                            <tr th:with="mine=${pc.clinician != null and currentUser != null and pc.clinician.id == currentUser.id}" th:each="pc : ${perioCharts}">
                                 <td th:text="${#strings.replace(pc.chartNo, '-PF1', '-PF2')}"></td>
                                 <td>Periodontics - PPD/CAL/BOP Chart</td>
                                 <td th:class="'status ' + ${pc.formCStatus.cssClass}"
@@ -273,19 +279,19 @@
                                 <td th:text="${pc.createdAt.toLocalDate()}"></td>
                                 <td><a th:href="@{/periodontics-c/{id}/view(id=${pc.id})}" class="btn-action btn-view">View</a></td>
                                 <td>
-                                    <a th:if="${pc.formCStatus.name() != 'APPROVED'}" th:href="@{/periodontics-c/{id}(id=${pc.id})}" class="btn-action btn-edit">Edit</a>
-                                    <span th:if="${pc.formCStatus.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
+                                    <a th:if="${mine and (pc.formCStatus.name() != 'APPROVED')}" th:href="@{/periodontics-c/{id}(id=${pc.id})}" class="btn-action btn-edit">Edit</a>
+                                    <span th:if="${!mine or (pc.formCStatus.name() == 'APPROVED')}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td>
-                                    <form th:if="${pc.formCStatus.name() != 'APPROVED' and pc.formCStatus.name() != 'SUBMITTED'}" th:action="@{/periodontics-c/{id}/submit(id=${pc.id})}" method="post" style="display:inline;">
+                                    <form th:if="${mine and (pc.formCStatus.name() != 'APPROVED' and pc.formCStatus.name() != 'SUBMITTED')}" th:action="@{/periodontics-c/{id}/submit(id=${pc.id})}" method="post" style="display:inline;">
                                         <button type="submit" class="btn-action btn-submit">Submit</button>
                                     </form>
-                                    <span th:if="${pc.formCStatus.name() == 'SUBMITTED' or pc.formCStatus.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
+                                    <span th:if="${!mine or (pc.formCStatus.name() == 'SUBMITTED' or pc.formCStatus.name() == 'APPROVED')}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
                             </tr>
                             <!-- Periodontics PF3 (Gingivitis Reevaluation Chart) -->
-                            <tr th:each="pc : ${perioCharts}">
+                            <tr th:with="mine=${pc.clinician != null and currentUser != null and pc.clinician.id == currentUser.id}" th:each="pc : ${perioCharts}">
                                 <td th:text="${#strings.replace(pc.chartNo, '-PF1', '-PF3')}"></td>
                                 <td>Periodontics - Gingivitis Reevaluation Chart</td>
                                 <td th:class="'status ' + ${pc.pf3Status.cssClass}"
@@ -293,39 +299,39 @@
                                 <td th:text="${pc.createdAt.toLocalDate()}"></td>
                                 <td><a th:href="@{/periodontics-pf3/{id}/view(id=${pc.id})}" class="btn-action btn-view">View</a></td>
                                 <td>
-                                    <a th:if="${pc.pf3Status.name() != 'APPROVED'}" th:href="@{/periodontics-pf3/{id}(id=${pc.id})}" class="btn-action btn-edit">Edit</a>
-                                    <span th:if="${pc.pf3Status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
+                                    <a th:if="${mine and (pc.pf3Status.name() != 'APPROVED')}" th:href="@{/periodontics-pf3/{id}(id=${pc.id})}" class="btn-action btn-edit">Edit</a>
+                                    <span th:if="${!mine or (pc.pf3Status.name() == 'APPROVED')}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td>
-                                    <form th:if="${pc.pf3Status.name() != 'APPROVED' and pc.pf3Status.name() != 'SUBMITTED'}" th:action="@{/periodontics-pf3/{id}/submit(id=${pc.id})}" method="post" style="display:inline;">
+                                    <form th:if="${mine and (pc.pf3Status.name() != 'APPROVED' and pc.pf3Status.name() != 'SUBMITTED')}" th:action="@{/periodontics-pf3/{id}/submit(id=${pc.id})}" method="post" style="display:inline;">
                                         <button type="submit" class="btn-action btn-submit">Submit</button>
                                     </form>
-                                    <span th:if="${pc.pf3Status.name() == 'SUBMITTED' or pc.pf3Status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
+                                    <span th:if="${!mine or (pc.pf3Status.name() == 'SUBMITTED' or pc.pf3Status.name() == 'APPROVED')}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
                             </tr>
                             <!-- RESTO10 Page 1 (operativeb - Assessment Form) -->
-                            <tr th:each="oc : ${operativeCharts}">
+                            <tr th:with="mine=${oc.clinician != null and currentUser != null and oc.clinician.id == currentUser.id}" th:each="oc : ${operativeCharts}">
                                 <td th:text="${oc.chartNo}"></td>
-                                <td>Operative Dentistry - Assessment Form</td>
+                                <td>Operative Dentistry - Assessment Form for Carious Lesions</td>
                                 <td th:class="'status ' + ${oc.status.cssClass}"
                                     th:text="${oc.status.displayName}"></td>
                                 <td th:text="${oc.createdAt.toLocalDate()}"></td>
                                 <td><a th:href="@{/operative-b/{id}/view(id=${oc.id})}" class="btn-action btn-view">View</a></td>
                                 <td>
-                                    <a th:if="${oc.status.name() != 'APPROVED'}" th:href="@{/operative-b/{id}(id=${oc.id})}" class="btn-action btn-edit">Edit</a>
-                                    <span th:if="${oc.status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
+                                    <a th:if="${mine and (oc.status.name() != 'APPROVED')}" th:href="@{/operative-b/{id}(id=${oc.id})}" class="btn-action btn-edit">Edit</a>
+                                    <span th:if="${!mine or (oc.status.name() == 'APPROVED')}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td>
-                                    <form th:if="${oc.status.name() != 'APPROVED' and oc.status.name() != 'SUBMITTED'}" th:action="@{/operative-c/{id}/submit(id=${oc.id})}" method="post" style="display:inline;">
+                                    <form th:if="${mine and (oc.status.name() != 'APPROVED' and oc.status.name() != 'SUBMITTED')}" th:action="@{/operative-c/{id}/submit(id=${oc.id})}" method="post" style="display:inline;">
                                         <button type="submit" class="btn-action btn-submit">Submit</button>
                                     </form>
-                                    <span th:if="${oc.status.name() == 'SUBMITTED' or oc.status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
+                                    <span th:if="${!mine or (oc.status.name() == 'SUBMITTED' or oc.status.name() == 'APPROVED')}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
                             </tr>
                             <!-- RESTO6 (operativea - Caries Risk Assessment) -->
-                            <tr th:each="oc : ${operativeCharts}">
+                            <tr th:with="mine=${oc.clinician != null and currentUser != null and oc.clinician.id == currentUser.id}" th:each="oc : ${operativeCharts}">
                                 <td th:text="${#strings.replace(oc.chartNo, '-RESTO10', '-RESTO6')}"></td>
                                 <td>Operative Dentistry - Caries Risk Assessment</td>
                                 <td th:class="'status ' + ${oc.form2Status.cssClass}"
@@ -333,19 +339,19 @@
                                 <td th:text="${oc.createdAt.toLocalDate()}"></td>
                                 <td><a th:href="@{/operative-a/{id}/view(id=${oc.id})}" class="btn-action btn-view">View</a></td>
                                 <td>
-                                    <a th:if="${oc.form2Status.name() != 'APPROVED'}" th:href="@{/operative-a/{id}(id=${oc.id})}" class="btn-action btn-edit">Edit</a>
-                                    <span th:if="${oc.form2Status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
+                                    <a th:if="${mine and (oc.form2Status.name() != 'APPROVED')}" th:href="@{/operative-a/{id}(id=${oc.id})}" class="btn-action btn-edit">Edit</a>
+                                    <span th:if="${!mine or (oc.form2Status.name() == 'APPROVED')}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td>
-                                    <form th:if="${oc.form2Status.name() != 'APPROVED' and oc.form2Status.name() != 'SUBMITTED'}" th:action="@{/operative-a/{id}/submit(id=${oc.id})}" method="post" style="display:inline;">
+                                    <form th:if="${mine and (oc.form2Status.name() != 'APPROVED' and oc.form2Status.name() != 'SUBMITTED')}" th:action="@{/operative-a/{id}/submit(id=${oc.id})}" method="post" style="display:inline;">
                                         <button type="submit" class="btn-action btn-submit">Submit</button>
                                     </form>
-                                    <span th:if="${oc.form2Status.name() == 'SUBMITTED' or oc.form2Status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
+                                    <span th:if="${!mine or (oc.form2Status.name() == 'SUBMITTED' or oc.form2Status.name() == 'APPROVED')}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td th:text="${patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—'}"></td>
                             </tr>
                             <!-- Prosthodontics -->
-                            <tr th:each="pc : ${prosthoCharts}">
+                            <tr th:with="mine=${pc.clinician != null and currentUser != null and pc.clinician.id == currentUser.id}" th:each="pc : ${prosthoCharts}">
                                 <td th:text="${pc.chartNo}"></td>
                                 <td th:text="'Prosthodontics (' + ${pc.caseType} + ')'"></td>
                                 <td th:class="'status ' + ${pc.status.cssClass}"
@@ -353,16 +359,16 @@
                                 <td th:text="${pc.createdAt.toLocalDate()}"></td>
                                 <td><a th:href="@{/prosthodontics-clinician/{id}/view(id=${pc.id})}" class="btn-action btn-view">View</a></td>
                                 <td>
-                                    <a th:if="${pc.status.name() != 'APPROVED'}" th:href="@{/prosthodontics-clinician/{id}(id=${pc.id})}" class="btn-action btn-edit">Edit</a>
-                                    <span th:if="${pc.status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
+                                    <a th:if="${mine and (pc.status.name() != 'APPROVED')}" th:href="@{/prosthodontics-clinician/{id}(id=${pc.id})}" class="btn-action btn-edit">Edit</a>
+                                    <span th:if="${!mine or (pc.status.name() == 'APPROVED')}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td>
-                                    <form th:if="${pc.status.name() != 'APPROVED' and pc.status.name() != 'SUBMITTED'}" th:action="@{/prosthodontics-clinician/{id}/submit(id=${pc.id})}" method="post" style="display:inline;">
+                                    <form th:if="${mine and (pc.status.name() != 'APPROVED' and pc.status.name() != 'SUBMITTED')}" th:action="@{/prosthodontics-clinician/{id}/submit(id=${pc.id})}" method="post" style="display:inline;">
                                         <button type="submit" class="btn-action btn-submit"
                                                 th:data-missing="${#strings.listJoin(pc.missingSteps, '|')}"
                                                 onclick="return confirmProsthoSubmit(this)">Submit</button>
                                     </form>
-                                    <span th:if="${pc.status.name() == 'SUBMITTED' or pc.status.name() == 'APPROVED'}" style="color:#888; font-size:12px;">—</span>
+                                    <span th:if="${!mine or (pc.status.name() == 'SUBMITTED' or pc.status.name() == 'APPROVED')}" style="color:#888; font-size:12px;">—</span>
                                 </td>
                                 <td th:text="${pc.faculty != null ? pc.faculty.fullName : '—'}"></td>
                             </tr>
@@ -372,7 +378,7 @@
             </section>
 
             <!-- Evaluation Forms: only the ones the faculty has sent -->
-            <section class="section" th:if="${!#lists.isEmpty(perioCharts) and @perioEvaluationService.countSentForCharts(perioCharts) > 0}">
+            <section class="section" th:if="${(!#lists.isEmpty(perioCharts) and @perioEvaluationService.countSentForCharts(perioCharts) > 0) or @endoEvaluationService.countSentForCharts(endoCharts) > 0 or @restoEvaluationService.countSentForCharts(operativeCharts) > 0}">
                 <div class="section-header">
                     <h2>Evaluation Forms</h2>
                 </div>
@@ -405,6 +411,34 @@
                                 <td th:text="${pc.faculty != null ? pc.faculty.fullName : (patient.assignedFaculty != null ? patient.assignedFaculty.fullName : '—')}"></td>
                             </tr>
                             </th:block>
+                            <th:block th:each="ec : ${endoCharts}">
+                            <tr th:each="en : ${@endoEvaluationService.listSentForChart(ec)}">
+                                <td>
+                                    <span th:if="${en.viewedAt == null}" class="new-tag">New</span>
+                                    <strong>ENDO2</strong> &ndash; Endodontic Evaluation &amp; Treatment Planning
+                                    <span th:if="${en.toothNumber != null}" th:text="${'· Tooth ' + en.toothNumber}"></span>
+                                </td>
+                                <td th:text="${en.formNo}"></td>
+                                <td th:text="${en.evalDate}"></td>
+                                <td th:text="${en.total != null ? en.total : '—'}"></td>
+                                <td><a th:href="@{/endo-eval-view/{id}(id=${en.id})}" class="btn-action btn-view">View</a></td>
+                                <td th:text="${ec.faculty != null ? ec.faculty.fullName : '—'}"></td>
+                            </tr>
+                            </th:block>
+                            <th:block th:each="oc : ${operativeCharts}">
+                            <tr th:each="re : ${@restoEvaluationService.listSentForChart(oc)}">
+                                <td>
+                                    <span th:if="${re.viewedAt == null}" class="new-tag">New</span>
+                                    <strong th:text="${re.formType.code}">RESTO1</strong> &ndash; <span th:text="${re.formType.displayName}"></span>
+                                    <span th:if="${re.toothSurface != null}" th:text="${'· Tooth ' + re.toothSurface}"></span>
+                                </td>
+                                <td th:text="${re.formNo}"></td>
+                                <td th:text="${re.evalDate}"></td>
+                                <td th:text="${re.totalLabel != null ? re.totalLabel : '—'}"></td>
+                                <td><a th:href="@{/resto-eval-view/{id}(id=${re.id})}" class="btn-action btn-view">View</a></td>
+                                <td th:text="${re.sentBy != null ? re.sentBy : (oc.faculty != null ? oc.faculty.fullName : '—')}"></td>
+                            </tr>
+                            </th:block>
                         </tbody>
                     </table>
                 </div>
@@ -434,6 +468,7 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 </script>
 
 <script src="/js/sidebar-hover.js?v=3"></script>
+<script src="/js/date-click.js"></script>
 
 <!-- Prosthodontics: reminder before submitting a booklet with steps still missing a date or photo -->
 <div id="prosthoMissingModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:2000; align-items:center; justify-content:center;">
@@ -467,5 +502,10 @@ function confirmProsthoSubmit(btn) {
     return false;
 }
 </script>
+<div th:if="${param.viewOnly != null}" role="status" onclick="this.remove()"
+     style="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#2d4a6b;color:#fff;font-family:'Poppins',sans-serif;font-size:13px;padding:12px 20px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.18);z-index:500;max-width:90vw;cursor:pointer">
+    This chart belongs to another clinician. You can view it, but only its clinician can edit it.</div>
+<style>.req-banner{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;background:#fff8e1;border:1px solid #f0d27a;border-left:5px solid #e0a800;border-radius:8px;padding:12px 18px;margin:0 0 18px;font-family:'Poppins',sans-serif;font-size:13px;color:#4a3a00}.req-banner b{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#8a6d00}
+.vo-tag{display:inline-block;font-size:11px;color:#6b7a8c;background:#eef2f6;border-radius:10px;padding:2px 8px;white-space:nowrap}</style>
 </body>
 </html>

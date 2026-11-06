@@ -244,12 +244,11 @@
                                     <a th:if="${(ec.status.name() != 'SUBMITTED' or ec.faculty == null or ec.faculty.id != currentUser.id)}" th:href="@{/endodontics-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-view">View</a>
                                 </td>
                             </tr>
-                            <!-- Endo Row 2: Endodontic Evaluation & Treatment Planning (Form 2) -->
+                            <!-- Endo Form 4: Informed Consent -->
                             <tr th:each="ec : ${endoCharts}">
-                                <td th:text="${#strings.replace(ec.chartNo, '-ENDO1', '-ENDO2')}"></td>
-                                <td>Endodontics - Endodontic Evaluation &amp; Treatment Planning</td>
-                                <td th:class="'status ' + ${ec.form2Status.cssClass}"
-                                    th:text="${ec.form2Status.displayName}"></td>
+                                <td th:text="${#strings.replace(ec.chartNo, '-ENDO1', '-ENDO4')}"></td>
+                                <td>Endodontics - Informed Consent</td>
+                                <td th:class="'status ' + ${ec.form4Css}" th:text="${ec.form4Label}"></td>
                                 <td th:text="${ec.createdAt.toLocalDate()}"></td>
                                 <td>
                                     <span th:if="${ec.clinician != null}"
@@ -265,8 +264,8 @@
                                     <span th:if="${ec.clinician == null}">—</span>
                                 </td>
                                 <td>
-                                    <a th:if="${(ec.form2Status.name() == 'SUBMITTED') and ec.faculty != null and ec.faculty.id == currentUser.id}" th:href="@{/endodontics2-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-accept">Review</a>
-                                    <a th:if="${(ec.form2Status.name() != 'SUBMITTED' or ec.faculty == null or ec.faculty.id != currentUser.id)}" th:href="@{/endodontics2-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-view">View</a>
+                                    <a th:if="${ec.form4Status.name() == 'SUBMITTED' and ec.faculty != null and ec.faculty.id == currentUser.id}" th:href="@{/endodontics4-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-accept">Review</a>
+                                    <a th:if="${ec.form4Status.name() != 'SUBMITTED' or ec.faculty == null or ec.faculty.id != currentUser.id}" th:href="@{/endodontics4-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-view">View</a>
                                 </td>
                             </tr>
                             <!-- Periodontics PF1 (Forms A+B) -->
@@ -346,7 +345,7 @@
                             <!-- RESTO10 (operativeb/c - Assessment Form) -->
                             <tr th:each="oc : ${operativeCharts}">
                                 <td th:text="${oc.chartNo}"></td>
-                                <td>Operative Dentistry - Assessment Form</td>
+                                <td>Operative Dentistry - Assessment Form for Carious Lesions</td>
                                 <td th:class="'status ' + ${oc.status.cssClass}"
                                     th:text="${oc.status.displayName}"></td>
                                 <td th:text="${oc.createdAt.toLocalDate()}"></td>
@@ -423,8 +422,8 @@
                 </div>
             </section>
 
-            <!-- Evaluation Forms (periodontics): added by the faculty; the clinician sees a form once it is sent -->
-            <section class="section eval-section" th:if="${!#lists.isEmpty(perioCharts)}">
+            <!-- Evaluation Forms (Perio PF4-PF17, Endo ENDO2): added by the faculty; the clinician sees a form once it is sent -->
+            <section class="section eval-section" th:if="${!#lists.isEmpty(perioCharts) or !#lists.isEmpty(endoCharts) or !#lists.isEmpty(operativeCharts)}">
                 <div class="section-header eval-section-header">
                     <h2>Evaluation Forms</h2>
                     <div class="eval-add">
@@ -438,6 +437,29 @@
                                     <button type="submit" class="eval-menu-item">
                                         <strong th:text="${ft.name()}">PF4</strong>
                                         <span th:text="${ft.displayName}"></span>
+                                    </button>
+                                </form>
+                            </th:block>
+                            <!-- Resto: RESTO FORM 1 / 2 and NOC, any number; only the faculty assigned to the Operative chart can add them -->
+                            <th:block th:each="oc : ${operativeCharts}">
+                                <th:block th:if="${oc.faculty != null and oc.faculty.id == currentUser.id}">
+                                    <form th:each="ft : ${@restoEvaluationService.offeredForms()}"
+                                          th:action="@{/resto-eval-faculty/chart/{id}/add(id=${oc.id})}" method="post">
+                                        <input type="hidden" name="form" th:value="${ft.name()}">
+                                        <button type="submit" class="eval-menu-item">
+                                            <strong th:text="${ft.code}">RESTO1</strong>
+                                            <span th:text="${ft.displayName + (#lists.size(operativeCharts) > 1 ? ' (' + oc.chartNo + ')' : '')}"></span>
+                                        </button>
+                                    </form>
+                                </th:block>
+                            </th:block>
+                            <!-- Endo: ENDO2, one per tooth checked; only the faculty assigned to the Endo chart can add it -->
+                            <th:block th:each="ec : ${endoCharts}">
+                                <form th:if="${ec.faculty != null and ec.faculty.id == currentUser.id}"
+                                      th:action="@{/endo-eval-faculty/chart/{id}/add(id=${ec.id})}" method="post">
+                                    <button type="submit" class="eval-menu-item">
+                                        <strong>ENDO2</strong>
+                                        <span th:text="${'Endodontic Evaluation & Treatment Planning' + (#lists.size(endoCharts) > 1 ? ' (' + ec.chartNo + ')' : '')}"></span>
                                     </button>
                                 </form>
                             </th:block>
@@ -468,7 +490,19 @@
                                 </td>
                                 <td th:text="${#strings.replace(pc.chartNo, '-PF1', '-' + ev.formType.name())}"></td>
                                 <td th:text="${ev.date}"></td>
-                                <td th:text="${pc.clinician != null ? pc.clinician.fullName : '—'}"></td>
+                                <td>
+                                    <span th:if="${pc.clinician != null}"
+                                          class="clinician-link"
+                                          th:data-name="${pc.clinician.fullName}"
+                                          th:data-email="${pc.clinician.email}"
+                                          th:data-student="${pc.clinician.studentNumber}"
+                                          th:data-year="${pc.clinician.yearLevel}"
+                                          th:data-clinician-id="${pc.clinician.id}"
+                                          th:data-patient-id="${patient.originalPatient != null ? patient.originalPatient.id : patient.id}"
+                                          th:text="${pc.clinician.fullName}"
+                                          onclick="showClinicianModal(this)"></span>
+                                    <span th:if="${pc.clinician == null}">—</span>
+                                </td>
                                 <td th:if="${ev.status.name() == 'DRAFT'}" class="status in-progress">Draft</td>
                                 <td th:if="${ev.status.name() == 'GRADED'}" class="status approved">Sent to clinician</td>
                                 <td th:text="${ev.totalScore != null ? ev.totalScore : '—'}"></td>
@@ -485,7 +519,78 @@
                                 </td>
                             </tr>
                             </th:block>
-                            <tr th:if="${@perioEvaluationService.countForCharts(perioCharts) == 0}">
+                            <th:block th:each="ec : ${endoCharts}">
+                            <tr th:each="en : ${@endoEvaluationService.listForChart(ec)}" th:with="mine=${ec.faculty != null and ec.faculty.id == currentUser.id}">
+                                <td>
+                                    <strong>ENDO2</strong> &ndash; Endodontic Evaluation &amp; Treatment Planning
+                                    <span th:if="${en.visitNo != null and en.visitNo > 1}" th:text="${'(#' + en.visitNo + ')'}"></span>
+                                    <span th:if="${en.toothNumber != null}" th:text="${'· Tooth ' + en.toothNumber}"></span>
+                                </td>
+                                <td th:text="${en.formNo}"></td>
+                                <td th:text="${en.evalDate}"></td>
+                                <td>
+                                    <span th:if="${ec.clinician != null}"
+                                          class="clinician-link"
+                                          th:data-name="${ec.clinician.fullName}"
+                                          th:data-email="${ec.clinician.email}"
+                                          th:data-student="${ec.clinician.studentNumber}"
+                                          th:data-year="${ec.clinician.yearLevel}"
+                                          th:data-clinician-id="${ec.clinician.id}"
+                                          th:data-patient-id="${patient.originalPatient != null ? patient.originalPatient.id : patient.id}"
+                                          th:text="${ec.clinician.fullName}"
+                                          onclick="showClinicianModal(this)"></span>
+                                    <span th:if="${ec.clinician == null}">—</span>
+                                </td>
+                                <td th:if="${!en.sent}" class="status in-progress">Draft</td>
+                                <td th:if="${en.sent}" class="status approved">Sent to clinician</td>
+                                <td th:text="${en.total != null ? en.total : '—'}"></td>
+                                <td>
+                                    <span style="display:flex; gap:6px; justify-content:center;">
+                                        <a th:href="@{/endo-eval-faculty/{id}(id=${en.id})}" class="btn-action btn-view"
+                                           th:text="${!en.sent and mine ? 'Edit' : 'Open'}">Edit</a>
+                                        <button th:if="${mine}" type="button" class="btn-action btn-eval-delete"
+                                                th:data-action="@{/endo-eval-faculty/{id}/delete(id=${en.id})}"
+                                                th:data-name="${'ENDO2' + (en.visitNo != null and en.visitNo > 1 ? ' (#' + en.visitNo + ')' : '')}"
+                                                th:data-sent="${en.sent}"
+                                                onclick="openDeleteEvalModal(this)">Delete</button>
+                                    </span>
+                                </td>
+                            </tr>
+                            </th:block>
+                            <th:block th:each="oc : ${operativeCharts}">
+                            <tr th:each="re : ${@restoEvaluationService.listForChart(oc)}" th:with="mine=${oc.faculty != null and oc.faculty.id == currentUser.id}">
+                                <td>
+                                    <strong th:text="${re.formType.code}">RESTO1</strong> &ndash; <span th:text="${re.formType.displayName}"></span>
+                                    <span th:if="${re.visitNo != null and re.visitNo > 1}" th:text="${'(#' + re.visitNo + ')'}"></span>
+                                    <span th:if="${re.toothSurface != null}" th:text="${'· Tooth ' + re.toothSurface}"></span>
+                                </td>
+                                <td th:text="${re.formNo}"></td>
+                                <td th:text="${re.evalDate}"></td>
+                                <td>
+                                    <span th:if="${oc.clinician != null}" class="clinician-link"
+                                          th:data-name="${oc.clinician.fullName}" th:data-email="${oc.clinician.email}"
+                                          th:data-student="${oc.clinician.studentNumber}" th:data-year="${oc.clinician.yearLevel}"
+                                          th:data-clinician-id="${oc.clinician.id}"
+                                          th:data-patient-id="${patient.originalPatient != null ? patient.originalPatient.id : patient.id}"
+                                          th:text="${oc.clinician.fullName}" onclick="showClinicianModal(this)"></span>
+                                    <span th:if="${oc.clinician == null}">—</span>
+                                </td>
+                                <td th:if="${!re.sent}" class="status in-progress">Draft</td>
+                                <td th:if="${re.sent}" class="status approved">Sent to clinician</td>
+                                <td th:text="${re.totalLabel != null ? re.totalLabel : '—'}"></td>
+                                <td>
+                                    <span style="display:flex; gap:6px; justify-content:center;">
+                                        <a th:href="@{/resto-eval-faculty/{id}(id=${re.id})}" class="btn-action btn-view"
+                                           th:text="${!re.sent and mine ? 'Edit' : 'Open'}">Edit</a>
+                                        <button th:if="${mine}" type="button" class="btn-action btn-eval-delete"
+                                                th:data-action="@{/resto-eval-faculty/{id}/delete(id=${re.id})}"
+                                                th:data-name="${re.formType.code + (re.visitNo != null and re.visitNo > 1 ? ' (#' + re.visitNo + ')' : '')}"
+                                                th:data-sent="${re.sent}" onclick="openDeleteEvalModal(this)">Delete</button>
+                                    </span>
+                                </td>
+                            </tr>
+                            </th:block>
+                            <tr th:if="${@perioEvaluationService.countForCharts(perioCharts) == 0 and @endoEvaluationService.countForCharts(endoCharts) == 0 and @restoEvaluationService.countForCharts(operativeCharts) == 0}">
                                 <td colspan="7" class="eval-empty">No evaluation forms yet. Use <strong>+ Add Evaluation</strong> to start one.</td>
                             </tr>
                         </tbody>
@@ -596,5 +701,6 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 
 <script src="/js/textarea-min-size.js"></script>
 <script src="/js/sidebar-hover.js?v=3"></script>
+<script src="/js/date-click.js"></script>
 </body>
 </html>

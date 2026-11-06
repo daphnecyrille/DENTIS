@@ -278,26 +278,15 @@
                                     <span th:if="${ec.clinician == null}">—</span>
                                 </td>
                             </tr>
-                            <!-- Endodontics Form 2 -->
+                            <!-- Endo Form 4: Informed Consent -->
                             <tr th:each="ec : ${endoCharts}">
-                                <td th:text="${#strings.replace(ec.chartNo, '-ENDO1', '-ENDO2')}"></td>
-                                <td>Endodontics - Evaluation &amp; Treatment Planning</td>
-                                <td th:class="'status ' + ${ec.form2Status.cssClass}" th:text="${ec.form2Status.displayName}"></td>
+                                <td th:text="${#strings.replace(ec.chartNo, '-ENDO1', '-ENDO4')}"></td>
+                                <td>Endodontics - Informed Consent</td>
+                                <td th:class="'status ' + ${ec.form4Css}" th:text="${ec.form4Label}"></td>
                                 <td th:text="${ec.createdAt.toLocalDate()}"></td>
-                                <td><a th:href="@{/endodontics2-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-view">View</a></td>
+                                <td><a th:href="@{/endodontics4-view-faculty/{id}(id=${ec.id})}" class="btn-action btn-view">View</a></td>
                                 <td th:text="${ec.faculty != null ? ec.faculty.fullName : '—'}"></td>
-                                <td>
-                                    <span th:if="${ec.clinician != null}"
-                                          class="clinician-link"
-                                          th:data-name="${ec.clinician.fullName}"
-                                          th:data-email="${ec.clinician.email}"
-                                          th:data-student="${ec.clinician.studentNumber}"
-                                          th:data-year="${ec.clinician.yearLevel}"
-                                          th:data-patient-id="${patient.originalPatient != null ? patient.originalPatient.id : patient.id}"
-                                          th:text="${ec.clinician.fullName}"
-                                          onclick="showClinicianModal(this)"></span>
-                                    <span th:if="${ec.clinician == null}">—</span>
-                                </td>
+                                <td th:text="${ec.clinician != null ? ec.clinician.fullName : '—'}"></td>
                             </tr>
                             <!-- Periodontics PF1 (Forms A+B) -->
                             <tr th:each="pc : ${perioCharts}">
@@ -364,7 +353,7 @@
                             <!-- Operative Dentistry - RESTO10 (Assessment Form) -->
                             <tr th:each="oc : ${operativeCharts}">
                                 <td th:text="${oc.chartNo}"></td>
-                                <td>Operative Dentistry - Assessment Form</td>
+                                <td>Operative Dentistry - Assessment Form for Carious Lesions</td>
                                 <td th:class="'status ' + ${oc.status.cssClass}" th:text="${oc.status.displayName}"></td>
                                 <td th:text="${oc.createdAt.toLocalDate()}"></td>
                                 <td><a th:href="@{/operative-view/{id}(id=${oc.id})}" class="btn-action btn-view">View</a></td>
@@ -487,5 +476,6 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 </script>
 
 <script src="/js/sidebar-hover.js?v=3"></script>
+<script src="/js/date-click.js"></script>
 </body>
 </html>

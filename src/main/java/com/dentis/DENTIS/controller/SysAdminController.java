@@ -344,7 +344,7 @@ public class SysAdminController {
                     un.apply(c.getClinician()), un.apply(c.getFaculty()), ui.apply(c.getFaculty()), c.getStatus().name(), c.getUpdatedAt()));
         for (var c : endoService.findAllOrderByCreatedAtDesc()) {
             out.add(new Form("Endo – Patient Workup", c.getChartNo(), nm.apply(c.getPatient()), un.apply(c.getClinician()), un.apply(c.getFaculty()), ui.apply(c.getFaculty()), c.getStatus().name(), c.getUpdatedAt()));
-            out.add(new Form("Endo – Evaluation & Tx Planning", c.getChartNo() != null ? c.getChartNo().replace("-ENDO1", "-ENDO2") : null, nm.apply(c.getPatient()), un.apply(c.getClinician()), un.apply(c.getFaculty()), ui.apply(c.getFaculty()), c.getForm2Status().name(), c.getUpdatedAt()));
+            out.add(new Form("Endo – Informed Consent", c.getChartNo() != null ? c.getChartNo().replace("-ENDO1", "-ENDO4") : null, nm.apply(c.getPatient()), un.apply(c.getClinician()), un.apply(c.getFaculty()), ui.apply(c.getFaculty()), c.getForm4Status().name(), c.getUpdatedAt()));
         }
         for (var c : perioService.findAllOrderByCreatedAtDesc()) {
             String no = c.getChartNo() != null ? c.getChartNo() : "";
@@ -354,7 +354,7 @@ public class SysAdminController {
         }
         for (var c : operativeService.findAllOrderByCreatedAtDesc()) {
             String no = c.getChartNo() != null ? c.getChartNo() : "";
-            out.add(new Form("Operative – RESTO10", no, nm.apply(c.getPatient()), un.apply(c.getClinician()), un.apply(c.getFaculty()), ui.apply(c.getFaculty()), c.getStatus().name(), c.getUpdatedAt()));
+            out.add(new Form("Operative – Assessment Form for Carious Lesions (RESTO10)", no, nm.apply(c.getPatient()), un.apply(c.getClinician()), un.apply(c.getFaculty()), ui.apply(c.getFaculty()), c.getStatus().name(), c.getUpdatedAt()));
             out.add(new Form("Operative – RESTO6", no.replace("-RESTO10", "-RESTO6"), nm.apply(c.getPatient()), un.apply(c.getClinician()), un.apply(c.getFaculty()), ui.apply(c.getFaculty()), c.getForm2Status().name(), c.getUpdatedAt()));
         }
         for (var c : prosthoService.findAllOrderByCreatedAtDesc())

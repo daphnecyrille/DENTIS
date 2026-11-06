@@ -80,7 +80,7 @@
             <h1 class="ev-title">My Evaluations</h1>
 
             <div class="ev-cards">
-                <div class="ev-card"><b th:text="${#lists.size(evals) + #lists.size(prosthoCleared)}">0</b><span>Evaluations received</span></div>
+                <div class="ev-card"><b th:text="${#lists.size(evals) + #lists.size(prosthoCleared) + #lists.size(endoGraded) + #lists.size(restoGraded)}">0</b><span>Evaluations received</span></div>
                 <div class="ev-card ev-new" th:classappend="${unreadCount > 0} ? 'has-items'"><b th:text="${unreadCount}">0</b><span>New (not opened yet)</span></div>
             </div>
 
@@ -143,8 +143,38 @@
                                 <td class="ev-score" th:text="${pr.grade != null ? pr.grade : '—'}"></td>
                                 <td><a th:href="@{/prosthodontics-clinician/{id}/view(id=${pr.id})}" class="btn-view-chart">View</a></td>
                             </tr>
+                            <!-- Endo: Evaluation & Treatment Planning (ENDO2), graded by the faculty -->
+                            <tr th:each="en : ${endoGraded}" class="ev-row" data-section="Endo"
+                                th:classappend="${en.viewedAt == null} ? 'unread'">
+                                <td class="ev-form-col">
+                                    <span th:if="${en.viewedAt == null}" class="new-tag">New</span>
+                                    <strong>ENDO2</strong> &ndash; Endodontic Evaluation &amp; Treatment Planning
+                                    <span th:if="${en.toothNumber != null}" th:text="${'(Tooth ' + en.toothNumber + ')'}"></span>
+                                </td>
+                                <td class="ev-search" th:with="pt=${en.endoChart.patient}" th:text="${pt.surname + ', ' + pt.firstName + (pt.middleInitial != null ? ' ' + pt.middleInitial + '.' : '')}"></td>
+                                <td class="ev-search" th:text="${en.formNo}"></td>
+                                <td class="ev-search" th:text="${en.endoChart.faculty != null ? en.endoChart.faculty.fullName : '—'}"></td>
+                                <td th:text="${#temporals.format(en.sentAt, 'MMM d, yyyy')}"></td>
+                                <td class="ev-score" th:text="${en.total != null ? en.total : '—'}"></td>
+                                <td><a th:href="@{/endo-eval-view/{id}(id=${en.id})}" class="btn-view-chart">View</a></td>
+                            </tr>
+                            <!-- Resto: RESTO FORM 1 / 2 and the NOC sealant form -->
+                            <tr th:each="re : ${restoGraded}" class="ev-row" data-section="Resto"
+                                th:classappend="${re.viewedAt == null} ? 'unread'">
+                                <td class="ev-form-col">
+                                    <span th:if="${re.viewedAt == null}" class="new-tag">New</span>
+                                    <strong th:text="${re.formType.code}">RESTO1</strong> &ndash; <span th:text="${re.formType.displayName}"></span>
+                                    <span th:if="${re.toothSurface != null}" th:text="${'(Tooth ' + re.toothSurface + ')'}"></span>
+                                </td>
+                                <td class="ev-search" th:with="pt=${re.operativeChart.patient}" th:text="${pt.surname + ', ' + pt.firstName + (pt.middleInitial != null ? ' ' + pt.middleInitial + '.' : '')}"></td>
+                                <td class="ev-search" th:text="${re.formNo}"></td>
+                                <td class="ev-search" th:text="${re.sentBy != null ? re.sentBy : (re.operativeChart.faculty != null ? re.operativeChart.faculty.fullName : '—')}"></td>
+                                <td th:text="${#temporals.format(re.sentAt, 'MMM d, yyyy')}"></td>
+                                <td class="ev-score" th:text="${re.totalLabel != null ? re.totalLabel : '—'}"></td>
+                                <td><a th:href="@{/resto-eval-view/{id}(id=${re.id})}" class="btn-view-chart">View</a></td>
+                            </tr>
                             <tr id="evEmpty" style="display:none;"><td colspan="7" class="pl-empty">No evaluations match. Try a different search or section.</td></tr>
-                            <tr th:if="${#lists.isEmpty(evals) and #lists.isEmpty(prosthoCleared)}"><td colspan="7" class="pl-empty">No evaluations yet. They appear here once your faculty sends them.</td></tr>
+                            <tr th:if="${#lists.isEmpty(evals) and #lists.isEmpty(prosthoCleared) and #lists.isEmpty(endoGraded) and #lists.isEmpty(restoGraded)}"><td colspan="7" class="pl-empty">No evaluations yet. They appear here once your faculty sends them.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -186,5 +216,6 @@ document.addEventListener('click', function () {
 })();
 </script>
 <script src="/js/sidebar-hover.js?v=3"></script>
+<script src="/js/date-click.js"></script>
 </body>
 </html>

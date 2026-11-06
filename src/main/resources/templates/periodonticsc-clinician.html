@@ -5,7 +5,7 @@
     <title>Clinical Periodontics - DentIS</title>
     <link rel="stylesheet" href="/css/periodonticsc-clinician.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/form-common.css">
+    <link rel="stylesheet" href="/css/form-common.css?v=3">
 </head>
 
 <body>
@@ -150,7 +150,7 @@
 
                 <form th:action="@{/periodontics-c/{id}(id=${chart.id})}" method="post" th:object="${chart}" id="formC">
 
-                <div class="form-body">
+                <div class="form-body form-body-wide">
 
                     <!-- Hidden JSON inputs for grid and canvas serialization -->
                     <input type="hidden" id="formCLeftGridJsonInput"   th:field="*{formCLeftGridJson}">
@@ -1194,6 +1194,7 @@ document.querySelectorAll('.visit-type').forEach(function (box) {
 </script>
 <script src="/js/textarea-min-size.js"></script>
 <script src="/js/sidebar-hover.js?v=3"></script>
+<script src="/js/date-click.js"></script>
 <th:block th:replace="~{fragments/faculty-review :: modals}"></th:block>
 </body>
 </html>
