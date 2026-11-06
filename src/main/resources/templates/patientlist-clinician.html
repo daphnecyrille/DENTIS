@@ -90,6 +90,10 @@
                         <input type="text" id="plSearch" placeholder="Search by patient name or chart number" autocomplete="off">
                     </div>
                     <div class="pl-filters">
+                        <div class="pl-fgroup pl-owner" id="plOwner" th:if="${requestedCount > 0}">
+                            <button type="button" class="pl-chip on" data-owner="mine">My Patients <span class="n"></span></button>
+                            <button type="button" class="pl-chip" data-owner="requested">Requested Charts <span class="n"></span></button>
+                        </div>
                         <div class="pl-fgroup" id="plStatus">
                             <span class="pl-flabel">Status</span>
                             <button type="button" class="pl-chip on" data-status="all">All <span class="n"></span></button>
@@ -115,7 +119,7 @@
                         <thead>
                             <tr>
                                 <th>Chart No.</th>
-                                <th>Patient Name</th>
+                                <th id="plSortName" class="th-sort">Patient Name<span class="sort-ind"></span></th>
                                 <th>Charts</th>
                                 <th>Last Updated</th>
                                 <th>Action</th>
@@ -124,7 +128,7 @@
                         <tbody id="plBody">
                             <tr th:each="row : ${patientRows}" th:with="pt=${row['patient']}" class="pl-row"
                                 th:classappend="${row['revise']} ? 'has-revise'"
-                                th:attr="data-revise=${row['revise']},data-to-submit=${row['toSubmit']},data-awaiting=${row['awaiting']},data-done=${row['done']},data-sections=${row['sections']},data-updated=${row['lastUpdated'] != null ? row['lastUpdated'] : ''}">
+                                th:attr="data-sortname=${pt.surname + ', ' + pt.firstName},data-requested=${row['requested']},data-revise=${row['revise']},data-to-submit=${row['toSubmit']},data-awaiting=${row['awaiting']},data-done=${row['done']},data-sections=${row['sections']},data-updated=${row['lastUpdated'] != null ? row['lastUpdated'] : ''}">
                                 <td class="pl-no" th:text="${pt.chartNo != null ? pt.chartNo : '—'}"></td>
                                 <td class="pl-name" th:text="${pt.surname + ', ' + pt.firstName + (pt.middleInitial != null ? ' ' + pt.middleInitial + '.' : '')}"></td>
                                 <td class="chart-tags">
@@ -183,6 +187,7 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 </script>
 
 <script src="/js/sidebar-hover.js?v=3"></script>
+<script src="/js/date-click.js"></script>
 <script>
 /* Patient List: search + status + section filters, "Today / Yesterday / n days ago", 10 per page */
 (function () {
@@ -208,6 +213,8 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
     rows.forEach(function (tr) { tr._name = tr._name || tr.querySelector('.pl-name').textContent; tr._no = tr._no || tr.querySelector('.pl-no').textContent; });
 
     function flag(tr, key) { return tr.dataset[key === 'toSubmit' ? 'toSubmit' : key] === 'true'; }
+    var hasOwner = !!document.getElementById('plOwner'), owner = 'mine';
+    function matchOwner(tr, o) { return !hasOwner || (o === 'requested') === (tr.dataset.requested === 'true'); }
     function matchStatus(tr, s) { return s === 'all' || flag(tr, s); }
     function matchSection(tr) { return section === 'all' || (' ' + tr.dataset.sections + ' ').indexOf(' ' + section + ' ') >= 0; }
     function matchSearch(tr) {
@@ -228,12 +235,17 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
         /* counts on the status chips follow the section filter and search */
         document.querySelectorAll('#plStatus .pl-chip').forEach(function (c) {
             var s = c.dataset.status;
-            c.querySelector('.n').textContent = rows.filter(function (tr) { return matchStatus(tr, s) && matchSection(tr) && matchSearch(tr); }).length;
+            c.querySelector('.n').textContent = rows.filter(function (tr) { return matchOwner(tr, owner) && matchStatus(tr, s) && matchSection(tr) && matchSearch(tr); }).length;
             c.classList.toggle('on', s === status);
         });
         document.querySelectorAll('#plSection .pl-chip').forEach(function (c) { c.classList.toggle('on', c.dataset.section === section); });
 
-        var list = rows.filter(function (tr) { return matchStatus(tr, status) && matchSection(tr) && matchSearch(tr); });
+        document.querySelectorAll('#plOwner .pl-chip').forEach(function (c) {
+            c.querySelector('.n').textContent = rows.filter(function (tr) { return matchOwner(tr, c.dataset.owner); }).length;
+            c.classList.toggle('on', c.dataset.owner === owner);
+        });
+        document.getElementById('plStatus').style.display = owner === 'requested' ? 'none' : '';   /* no status work on requested charts */
+        var list = rows.filter(function (tr) { return matchOwner(tr, owner) && matchStatus(tr, owner === 'requested' ? 'all' : status) && matchSection(tr) && matchSearch(tr); });
         var pages = Math.max(1, Math.ceil(list.length / PER));
         if (page > pages) page = pages;
         var from = (page - 1) * PER, to = page * PER;
@@ -264,9 +276,41 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 
     document.getElementById('plSearch').addEventListener('input', function () { q = this.value.trim().toLowerCase(); page = 1; render(); });
     document.querySelectorAll('#plStatus .pl-chip').forEach(function (c) { c.addEventListener('click', function () { status = c.dataset.status; page = 1; render(); }); });
+    document.querySelectorAll('#plOwner .pl-chip').forEach(function (c) { c.addEventListener('click', function () { owner = c.dataset.owner; page = 1; render(); }); });
     document.querySelectorAll('#plSection .pl-chip').forEach(function (c) { c.addEventListener('click', function () { section = c.dataset.section; page = 1; render(); }); });
+    /* Patient Name header: default order -> A-Z -> Z-A -> default */
+    (function () {
+        var th = document.getElementById('plSortName'); if (!th) return;
+        var original = rows.slice(), mode = 0, ind = th.querySelector('.sort-ind');
+        var tips = ['Sort by name (A\u2013Z)', 'Sort by name (Z\u2013A)', 'Back to the default order'];
+        th.title = tips[0];
+        th.addEventListener('click', function () {
+            mode = (mode + 1) % 3;
+            var sorted = mode === 0 ? original.slice() : original.slice().sort(function (a, b) {
+                var r = a.dataset.sortname.localeCompare(b.dataset.sortname, undefined, { sensitivity: 'base' });
+                return mode === 1 ? r : -r;
+            });
+            rows.length = 0; Array.prototype.push.apply(rows, sorted);
+            var empty = document.getElementById('plEmpty');
+            rows.forEach(function (tr) { empty.parentNode.insertBefore(tr, empty); });
+            ind.textContent = ['', ' A\u2013Z', ' Z\u2013A'][mode];
+            th.classList.toggle('on', mode !== 0);
+            th.title = tips[mode];
+            page = 1; render();
+        });
+    })();
     render();
 })();
 </script>
+<style>
+.pl-owner { border-right: 1px solid #e1e7ef; padding-right: 12px; margin-right: 4px; }
+</style>
+<style>
+.th-sort { cursor: pointer; user-select: none; white-space: nowrap; }
+.th-sort:hover { text-decoration: underline; }
+.th-sort .sort-ind { font-size: 11px; font-weight: 600; color: #2d6cb5; }
+.th-sort::after { content: ' \2195'; font-size: 11px; color: #9aa5b1; }
+.th-sort.on::after { content: ''; }
+</style>
 </body>
 </html>

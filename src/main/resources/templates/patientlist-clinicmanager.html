@@ -115,7 +115,7 @@
                         <thead>
                             <tr>
                                 <th>Chart No.</th>
-                                <th>Patient</th>
+                                <th id="plSortName" class="th-sort">Patient<span class="sort-ind"></span></th>
                                 <th>Service</th>
                                 <th>Faculty</th>
                                 <th>Clinician</th>
@@ -126,7 +126,7 @@
                         </thead>
                         <tbody id="plBody">
                             <tr th:each="row : ${patientRows}" th:with="pt=${row['patient']}" class="pl-row"
-                                th:attr="data-status-needs-faculty=${row['needsFaculty']},data-status-needs-clinician=${row['needsClinician']},data-status-in-progress=${row['inProgress']},data-status-done=${row['done']},data-sections=${row['section']},data-updated=${row['lastUpdated'] != null ? row['lastUpdated'] : ''}">
+                                th:attr="data-sortname=${pt.surname + ', ' + pt.firstName},data-status-needs-faculty=${row['needsFaculty']},data-status-needs-clinician=${row['needsClinician']},data-status-in-progress=${row['inProgress']},data-status-done=${row['done']},data-sections=${row['section']},data-updated=${row['lastUpdated'] != null ? row['lastUpdated'] : ''}">
                                 <td class="pl-no">
                                     <span class="pl-no-text" th:text="${pt.chartNo != null ? pt.chartNo : '—'}"></span>
                                     <span th:if="${row['readmission']}" class="readmit-tag">Readmission</span>
@@ -283,10 +283,39 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
     document.getElementById('plSearch').addEventListener('input', function () { q = this.value.trim().toLowerCase(); page = 1; render(); });
     document.querySelectorAll('#plStatus .pl-chip').forEach(function (c) { c.addEventListener('click', function () { status = c.dataset.status; page = 1; render(); }); });
     document.querySelectorAll('#plSection .pl-chip').forEach(function (c) { c.addEventListener('click', function () { section = c.dataset.section; page = 1; render(); }); });
+    /* Patient Name header: default order -> A-Z -> Z-A -> default */
+    (function () {
+        var th = document.getElementById('plSortName'); if (!th) return;
+        var original = rows.slice(), mode = 0, ind = th.querySelector('.sort-ind');
+        var tips = ['Sort by name (A\u2013Z)', 'Sort by name (Z\u2013A)', 'Back to the default order'];
+        th.title = tips[0];
+        th.addEventListener('click', function () {
+            mode = (mode + 1) % 3;
+            var sorted = mode === 0 ? original.slice() : original.slice().sort(function (a, b) {
+                var r = a.dataset.sortname.localeCompare(b.dataset.sortname, undefined, { sensitivity: 'base' });
+                return mode === 1 ? r : -r;
+            });
+            rows.length = 0; Array.prototype.push.apply(rows, sorted);
+            var empty = document.getElementById('plEmpty');
+            rows.forEach(function (tr) { empty.parentNode.insertBefore(tr, empty); });
+            ind.textContent = ['', ' A\u2013Z', ' Z\u2013A'][mode];
+            th.classList.toggle('on', mode !== 0);
+            th.title = tips[mode];
+            page = 1; render();
+        });
+    })();
     render();
 })();
 </script>
 
 <script src="/js/sidebar-hover.js?v=3"></script>
+<script src="/js/date-click.js"></script>
+<style>
+.th-sort { cursor: pointer; user-select: none; white-space: nowrap; }
+.th-sort:hover { text-decoration: underline; }
+.th-sort .sort-ind { font-size: 11px; font-weight: 600; color: #2d6cb5; }
+.th-sort::after { content: ' \2195'; font-size: 11px; color: #9aa5b1; }
+.th-sort.on::after { content: ''; }
+</style>
 </body>
 </html>

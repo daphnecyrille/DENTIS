@@ -65,6 +65,18 @@ public class ProsthodonticsChartService {
         repo.saveAll(charts);
     }
 
+    /** True once the clinician has saved any form of this patient's charts. */
+    public boolean hasStartedForms(Patient patient) {
+        return findAllByPatient(patient).stream().anyMatch(c -> c.getStatus() != ProsthodonticsChartStatus.CREATED);
+    }
+
+    /** Moves the patient's (not yet started) charts to a newly assigned clinician. */
+    public void reassignClinician(Patient patient, User clinician) {
+        List<ProsthodonticsChart> charts = findAllByPatient(patient);
+        charts.forEach(c -> c.setClinician(clinician));
+        repo.saveAll(charts);
+    }
+
     public List<ProsthodonticsChart> findByClinicianOrderByCreatedAtDesc(User clinician) {
         return repo.findByClinicianOrderByCreatedAtDesc(clinician);
     }

@@ -82,14 +82,32 @@ public class PatientService {
         return patientRepository.findByAssignedFacultyAndAssignedClinicianIsNullOrderByCreatedAtDesc(faculty);
     }
 
-    public void assignClinician(Long patientId, Long clinicianId, User faculty) {
+    /** True once the assigned clinician has started any of the patient's forms (then they can't be reassigned). */
+    public boolean hasStartedForms(Patient patient) {
+        return oralSurgeryChartService.hasStartedForms(patient) || endodonticsChartService.hasStartedForms(patient)
+                || periodonticChartService.hasStartedForms(patient) || operativeChartService.hasStartedForms(patient)
+                || prosthodonticsChartService.hasStartedForms(patient);
+    }
+
+    /** Assigns the clinician. Returns false (nothing changed) when reassigning a patient whose forms are already started. */
+    public boolean assignClinician(Long patientId, Long clinicianId, User faculty) {
         Patient patient = patientRepository.findById(patientId).orElseThrow();
         User clinician = userRepository.findById(clinicianId).orElseThrow();
+        boolean reassigned = patient.getAssignedClinician() != null && !patient.getAssignedClinician().getId().equals(clinician.getId());
+        if (reassigned && hasStartedForms(patient)) return false;   // two clinicians can't share one patient's forms
         patient.setAssignedClinician(clinician);
         patient.setClinicianAssignedAt(java.time.LocalDateTime.now());
         patientRepository.save(patient);
 
         String code = patient.getServiceCode() != null ? patient.getServiceCode().toUpperCase() : "";
+
+        if (reassigned) {   // nothing started yet: the empty charts follow the patient to the new clinician
+            oralSurgeryChartService.reassignClinician(patient, clinician);
+            endodonticsChartService.reassignClinician(patient, clinician);
+            periodonticChartService.reassignClinician(patient, clinician);
+            operativeChartService.reassignClinician(patient, clinician);
+            prosthodonticsChartService.reassignClinician(patient, clinician);
+        }
 
         if ("OS".equals(code)) {
             if (oralSurgeryChartService.findByPatientAndType(patient, OralSurgeryChartType.OSF1).isEmpty()) {
@@ -115,6 +133,7 @@ public class PatientService {
                 prosthodonticsChartService.createForPatient(patient, clinician, faculty);
             }
         }
+        return true;
     }
 
     public List<Patient> getAssignedPatientsForFaculty(User faculty) {

@@ -278,5 +278,9 @@ document.querySelectorAll('.dash-table').forEach(function (table) {
 });
 </script>
 <script src="/js/sidebar-hover.js?v=3"></script>
+<script src="/js/date-click.js"></script>
+<div th:if="${param.alreadyStarted != null}" role="alert" onclick="this.remove()"
+     style="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#8a1f17;color:#fff;font-family:'Poppins',sans-serif;font-size:13px;padding:12px 20px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.18);z-index:500;max-width:90vw;cursor:pointer">
+    This patient can&rsquo;t be reassigned: their clinician has already started their forms.</div>
 </body>
 </html>

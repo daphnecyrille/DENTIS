@@ -88,8 +88,8 @@ public class ChartRequestController {
         model.addAttribute("endoActionNeededCharts", clinician != null
                 ? endodonticsChartService.findActionNeededByClinician(clinician)
                 : List.of());
-        model.addAttribute("endoForm2ActionNeededCharts", clinician != null
-                ? endodonticsChartService.findForm2ActionNeededByClinician(clinician)
+        model.addAttribute("endoForm4ActionNeededCharts", clinician != null
+                ? endodonticsChartService.findForm4ActionNeededByClinician(clinician)
                 : List.of());
         model.addAttribute("perioActionNeededCharts", clinician != null
                 ? periodonticChartService.findFormABActionNeededByClinician(clinician)
@@ -156,7 +156,7 @@ public class ChartRequestController {
         if (clinician == null) return counts;
         List<Enum<?>> statuses = new java.util.ArrayList<>();
         oralSurgeryChartService.findByClinicianOrderByCreatedAtDesc(clinician).forEach(c -> statuses.add(c.getStatus()));
-        endodonticsChartService.findByClinicianOrderByCreatedAtDesc(clinician).forEach(c -> { statuses.add(c.getStatus()); statuses.add(c.getForm2Status()); });
+        endodonticsChartService.findByClinicianOrderByCreatedAtDesc(clinician).forEach(c -> { statuses.add(c.getStatus()); statuses.add(c.getForm4Status()); });   // ENDO2 is graded by the faculty
         periodonticChartService.findByClinicianOrderByCreatedAtDesc(clinician).forEach(c -> { statuses.add(c.getStatus()); statuses.add(c.getFormCStatus()); statuses.add(c.getPf3Status()); });
         operativeChartService.findByClinicianOrderByCreatedAtDesc(clinician).forEach(c -> { statuses.add(c.getStatus()); statuses.add(c.getForm2Status()); });
         prosthodonticsChartService.findByClinicianOrderByCreatedAtDesc(clinician).forEach(c -> statuses.add(c.getStatus()));
@@ -319,6 +319,14 @@ public class ChartRequestController {
                 ? new java.util.ArrayList<>(prosthodonticsChartService.findByClinicianOrderByCreatedAtDesc(clinician))
                 : new java.util.ArrayList<>();
 
+        // patients whose charts are this clinician's own (anything added below comes from an accepted chart request)
+        java.util.Set<Long> ownPatientIds = new java.util.HashSet<>();
+        osCharts.forEach(c -> ownPatientIds.add(c.getPatient().getId()));
+        endoCharts.forEach(c -> ownPatientIds.add(c.getPatient().getId()));
+        perioCharts.forEach(c -> ownPatientIds.add(c.getPatient().getId()));
+        operativeCharts.forEach(c -> ownPatientIds.add(c.getPatient().getId()));
+        prosthoCharts.forEach(c -> ownPatientIds.add(c.getPatient().getId()));
+
         if (clinician != null) {
             for (ChartRequest req : chartRequestService.getApprovedRequestsForClinician(clinician)) {
                 Patient rp = req.getPatient();
@@ -347,7 +355,18 @@ public class ChartRequestController {
             }
         }
 
-        model.addAttribute("patientRows", patientRows(osCharts, endoCharts, perioCharts, operativeCharts, prosthoCharts));
+        List<Map<String, Object>> rows = patientRows(osCharts, endoCharts, perioCharts, operativeCharts, prosthoCharts);
+        long requestedCount = 0;
+        for (Map<String, Object> r : rows) {
+            boolean requested = !ownPatientIds.contains(((Patient) r.get("patient")).getId());
+            r.put("requested", requested);
+            if (requested) {   // view only: none of the status work is theirs
+                requestedCount++;
+                r.put("revise", false); r.put("toSubmit", false); r.put("awaiting", false); r.put("done", false);
+            }
+        }
+        model.addAttribute("patientRows", rows);
+        model.addAttribute("requestedCount", requestedCount);
         return "patientlist-clinician";
     }
 
@@ -357,12 +376,25 @@ public class ChartRequestController {
         return "admitting-view-clinician";
     }
 
+    /** True when the patient is assigned to this clinician or any of the patient's charts is theirs. */
+    private boolean isOwnPatient(Patient p, User clinician) {
+        Long me = clinician.getId();
+        if (p.getAssignedClinician() != null && p.getAssignedClinician().getId().equals(me)) return true;
+        java.util.function.Predicate<User> mine = u -> u != null && u.getId().equals(me);
+        return oralSurgeryChartService.findAllByPatient(p).stream().anyMatch(c -> mine.test(c.getClinician()))
+                || endodonticsChartService.findAllByPatient(p).stream().anyMatch(c -> mine.test(c.getClinician()))
+                || periodonticChartService.findAllByPatient(p).stream().anyMatch(c -> mine.test(c.getClinician()))
+                || operativeChartService.findAllByPatient(p).stream().anyMatch(c -> mine.test(c.getClinician()))
+                || prosthodonticsChartService.findAllByPatient(p).stream().anyMatch(c -> mine.test(c.getClinician()));
+    }
+
     @GetMapping("/chartsview-clinician/{id}")
     public String chartsViewClinician(@PathVariable Long id, Model model, Authentication authentication) {
         User clinician = getCurrentUser(authentication);
         Patient patient = patientService.getPatientById(id);
         model.addAttribute("currentUser", clinician);
         model.addAttribute("patient", patient);
+        model.addAttribute("requestedOnly", clinician != null && !isOwnPatient(patient, clinician));
         model.addAttribute("approvedCharts", clinician != null
                 ? chartRequestService.getApprovedRequestsForClinicianAndPatient(clinician, id)
                 : List.of());

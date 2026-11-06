@@ -14,13 +14,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebMvcConfig implements WebMvcConfigurer {
 
     private final ActivityLogInterceptor activityLogInterceptor;
+    private final ChartOwnerInterceptor chartOwnerInterceptor;
 
-    public WebMvcConfig(ActivityLogInterceptor activityLogInterceptor) {
+    public WebMvcConfig(ActivityLogInterceptor activityLogInterceptor, ChartOwnerInterceptor chartOwnerInterceptor) {
         this.activityLogInterceptor = activityLogInterceptor;
+        this.chartOwnerInterceptor = chartOwnerInterceptor;
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(chartOwnerInterceptor);    // charts from a chart request are read-only
         registry.addInterceptor(activityLogInterceptor);   // writes the activity log after important actions
     }
 

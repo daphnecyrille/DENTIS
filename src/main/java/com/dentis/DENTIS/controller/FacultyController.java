@@ -123,8 +123,8 @@ public class FacultyController {
         for (var c : endodonticsChartService.findByFacultyOrderByCreatedAtDesc(faculty)) {
             out.add(new DashRow("Endodontics – Patient Workup", c.getChartNo(), c.getPatient(), c.getClinician(), c.getStatus(),
                     c.getUpdatedAt(), "/endodontics-view-faculty/" + c.getId()));
-            out.add(new DashRow("Endodontics – Evaluation & Treatment Planning", c.getChartNo() != null ? c.getChartNo().replace("-ENDO1", "-ENDO2") : null,
-                    c.getPatient(), c.getClinician(), c.getForm2Status(), c.getUpdatedAt(), "/endodontics2-view-faculty/" + c.getId()));
+            out.add(new DashRow("Endodontics – Informed Consent", c.getChartNo() != null ? c.getChartNo().replace("-ENDO1", "-ENDO4") : null,
+                    c.getPatient(), c.getClinician(), c.getForm4Status(), c.getUpdatedAt(), "/endodontics4-view-faculty/" + c.getId()));
         }
         for (var c : periodonticChartService.findByFacultyOrderByCreatedAtDesc(faculty)) {
             String no = c.getChartNo() != null ? c.getChartNo() : "";
@@ -138,7 +138,7 @@ public class FacultyController {
         }
         for (var c : operativeChartService.findByFacultyOrderByCreatedAtDesc(faculty)) {
             String no = c.getChartNo() != null ? c.getChartNo() : "";
-            out.add(new DashRow("Operative – Assessment Form (RESTO10)", no, c.getPatient(), c.getClinician(), c.getStatus(),
+            out.add(new DashRow("Operative – Assessment Form for Carious Lesions (RESTO10)", no, c.getPatient(), c.getClinician(), c.getStatus(),
                     c.getUpdatedAt(), "/operative-view-faculty/" + c.getId()));
             out.add(new DashRow("Operative – Caries Risk Assessment (RESTO6)", no.replace("-RESTO10", "-RESTO6"), c.getPatient(), c.getClinician(), c.getForm2Status(),
                     c.getUpdatedAt(), "/operative2-view-faculty/" + c.getId()));
@@ -188,6 +188,34 @@ public class FacultyController {
             @SuppressWarnings("unchecked") java.util.Set<Long> ids = (java.util.Set<Long>) r.get("facultyIds");
             r.put("mine", faculty != null && ids.contains(faculty.getId()));
         }
+        // Patients with a faculty but no clinician yet have no charts: list them too, as waiting for a clinician
+        if (faculty != null && !section.isEmpty()) {
+            java.util.Set<Long> listed = new java.util.HashSet<>();
+            rows.forEach(r -> listed.add(((com.dentis.DENTIS.model.Patient) r.get("patient")).getId()));
+            for (User f : patientService.getFacultyBySection(faculty.getSection())) {
+                for (com.dentis.DENTIS.model.Patient p : patientService.getUnassignedPatientsForFaculty(f)) {
+                    if (!listed.add(p.getId())) continue;
+                    java.util.Map<String, Object> r = new java.util.HashMap<>();
+                    r.put("patient", p);
+                    r.put("tags", List.of(java.util.Map.of("code", "Waiting for clinician", "css", "created",
+                            "title", "No clinician assigned yet. Assign one in Assign Patients.")));
+                    r.put("clinicians", "");
+                    r.put("faculty", f.getFullName());
+                    r.put("facultyIds", java.util.Set.of(f.getId()));
+                    r.put("mine", f.getId().equals(faculty.getId()));
+                    r.put("waiting", true);
+                    r.put("revise", false); r.put("toSubmit", false); r.put("awaiting", false); r.put("done", false);
+                    r.put("lastUpdated", p.getCreatedAt());
+                    rows.add(r);
+                }
+            }
+        }
+        // same order as the other lists: revisions first, finished ones last, then most recently updated
+        rows.sort(java.util.Comparator
+                .comparing((java.util.Map<String, Object> r) -> !(Boolean) r.get("revise"))
+                .thenComparing(r -> (Boolean) r.get("done"))
+                .thenComparing(r -> (java.time.LocalDateTime) r.get("lastUpdated"),
+                        java.util.Comparator.nullsLast(java.util.Comparator.<java.time.LocalDateTime>reverseOrder())));
         model.addAttribute("patientRows", rows);
         return "patientlist-faculty";
     }
@@ -331,11 +359,13 @@ public class FacultyController {
     }
 
     @PostMapping("/oralsurgery-faculty/{id}/approve")
-    public String approveChart(@PathVariable Long id, Authentication authentication) {
+    public String approveChart(@PathVariable Long id,
+                               @RequestParam(value = "signature", required = false) String signature,
+                               Authentication authentication) {
         OralSurgeryChart owned = oralSurgeryChartService.getById(id);   // only the faculty assigned to this chart can approve / revise it
         if (!isAssignedFaculty(owned.getFaculty(), authentication))
             return "redirect:/chartsview-faculty/" + owned.getPatient().getId() + "?notAssigned";
-        OralSurgeryChart chart = oralSurgeryChartService.approve(id);
+        OralSurgeryChart chart = oralSurgeryChartService.approve(id, signature, getCurrentUser(authentication));
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 
@@ -354,9 +384,9 @@ public class FacultyController {
                                   @RequestParam(required = false, defaultValue = "faculty-assign") String returnTo,
                                   Authentication authentication) {
         User faculty = getCurrentUser(authentication);
-        patientService.assignClinician(id, clinicianId, faculty);
+        boolean ok = patientService.assignClinician(id, clinicianId, faculty);
         String back = "faculty-dashboard".equals(returnTo) ? "faculty-dashboard" : "faculty-assign";   // only our own pages
-        return "redirect:/" + back + "?assigned=" + id;
+        return "redirect:/" + back + (ok ? "?assigned=" + id : "?alreadyStarted");
     }
 
     /** True when the logged-in user is the faculty assigned to the chart. */

@@ -12,8 +12,10 @@ import java.util.List;
 public class PeriodonticChartService {
 
     private final PeriodonticChartRepository repo;
+    private final com.dentis.DENTIS.repository.PerioEvaluationRepository evalRepo;
 
-    public PeriodonticChartService(PeriodonticChartRepository repo) {
+    public PeriodonticChartService(PeriodonticChartRepository repo, com.dentis.DENTIS.repository.PerioEvaluationRepository evalRepo) {
+        this.evalRepo = evalRepo;
         this.repo = repo;
     }
 
@@ -44,6 +46,18 @@ public class PeriodonticChartService {
                 .filter(c -> !(c.getStatus() == PeriodonticChartStatus.APPROVED && c.getFormCStatus() == PeriodonticChartStatus.APPROVED && c.getPf3Status() == PeriodonticChartStatus.APPROVED))
                 .toList();
         charts.forEach(c -> c.setFaculty(faculty));
+        repo.saveAll(charts);
+    }
+
+    /** True once the clinician has saved any form of this patient's charts. */
+    public boolean hasStartedForms(Patient patient) {
+        return findAllByPatient(patient).stream().anyMatch(c -> evalRepo.existsByPerioChart(c) || c.getStatus() != PeriodonticChartStatus.CREATED || c.getFormCStatus() != PeriodonticChartStatus.CREATED || c.getPf3Status() != PeriodonticChartStatus.CREATED);
+    }
+
+    /** Moves the patient's (not yet started) charts to a newly assigned clinician. */
+    public void reassignClinician(Patient patient, User clinician) {
+        List<PeriodonticChart> charts = findAllByPatient(patient);
+        charts.forEach(c -> c.setClinician(clinician));
         repo.saveAll(charts);
     }
 
