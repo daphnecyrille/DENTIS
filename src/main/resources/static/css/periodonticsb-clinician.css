@@ -5,12 +5,12 @@
     font-family: 'Poppins', sans-serif;
 }
 
-body { height: 100vh; overflow: hidden; }
+body { height: 100vh; height: 100dvh; overflow: hidden; }
 
 .perio-page {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: 100vh; height: 100dvh;
 }
 
 .background {
@@ -64,7 +64,7 @@ body { height: 100vh; overflow: hidden; }
 .dropdown-item:hover { background-color: #f5f5f5; }
 
 /* LAYOUT */
-.main-container { display: flex; height: calc(100vh - 77px); /* fill the space below the 77px header so the last rows can be scrolled into view */ }
+.main-container { display: flex; height: calc(100vh - 77px); height: calc(100dvh - 77px); /* fill the space below the 77px header so the last rows can be scrolled into view */ }
 
 .main-content {
     flex: 1;
@@ -72,13 +72,13 @@ body { height: 100vh; overflow: hidden; }
     overflow-y: auto;
     margin-left: 70px;
     transition: margin-left 0.3s ease;
-    height: calc(100vh - 77px);
+    height: calc(100vh - 77px); height: calc(100dvh - 77px);
 }
 
 /* SIDEBAR */
 .sidebar {
     position: fixed; left: 0; top: 77px;
-    width: 70px; height: calc(100vh - 77px);
+    width: 70px; height: calc(100vh - 77px); height: calc(100dvh - 77px);
     background: #FFFFFF; display: flex;
     justify-content: center; padding-top: 20px;
     border-right: 1px solid #ccc;

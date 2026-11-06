@@ -6,7 +6,7 @@
 }
 
 body {
-    min-height: 100vh;
+    min-height: 100vh; min-height: 100dvh;
 }
 
 .background {
@@ -22,7 +22,7 @@ body {
 .clinicmanager-dashboard {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    min-height: 100vh; min-height: 100dvh;
 }
 
 /* HEADER */
@@ -142,7 +142,7 @@ body {
     left: 0;
     top: 77px;
     width: 70px;
-    height: calc(100vh - 77px);
+    height: calc(100vh - 77px); height: calc(100dvh - 77px);
     background: #FFFFFF;
     display: flex;
     justify-content: center;
@@ -489,5 +489,5 @@ td:last-child { border-right: none; }
 
 /* Keep the header (and sidebar) in place: the page scrolls inside the content area, like the other dashboards */
 .header { position: sticky; top: 0; z-index: 100; }
-.main-container { height: calc(100vh - 77px); }
+.main-container { height: calc(100vh - 77px); height: calc(100dvh - 77px); }
 .main-content { overflow-y: auto; }

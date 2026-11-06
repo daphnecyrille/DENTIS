@@ -6,7 +6,7 @@
 }
 
 body {
-    min-height: 100vh;
+    min-height: 100vh; min-height: 100dvh;
 }
 
 .background {
@@ -22,7 +22,7 @@ body {
 .clinicmanager-assign {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    min-height: 100vh; min-height: 100dvh;
 }
 
 /* HEADER */
@@ -104,7 +104,7 @@ body {
     left: 0;
     top: 77px;
     width: 70px;
-    height: calc(100vh - 77px);
+    height: calc(100vh - 77px); height: calc(100dvh - 77px);
     background: #FFFFFF;
     display: flex;
     justify-content: center;

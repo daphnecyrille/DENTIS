@@ -1,6 +1,6 @@
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
-body { min-height: 100vh; }
+body { min-height: 100vh; min-height: 100dvh; }
 
 .background {
     position: fixed; width: 100%; height: 100%;
@@ -9,7 +9,7 @@ body { min-height: 100vh; }
     z-index: -1;
 }
 
-.faculty-advisees { display: flex; flex-direction: column; min-height: 100vh; }
+.faculty-advisees { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
 
 /* HEADER */
 .header {
@@ -41,7 +41,7 @@ body { min-height: 100vh; }
 /* SIDEBAR */
 .sidebar {
     position: fixed; left: 0; top: 69px; width: 70px;
-    height: calc(100vh - 69px); background: #fff;
+    height: calc(100vh - 69px); height: calc(100dvh - 69px); background: #fff;
     display: flex; justify-content: center; padding-top: 20px;
     border-right: 1px solid #ccc; transition: width 0.3s ease; z-index: 100;
 }
@@ -89,7 +89,7 @@ body { min-height: 100vh; }
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     overflow-y: auto;
-    max-height: calc(100vh - 180px);
+    max-height: calc(100vh - 180px); max-height: calc(100dvh - 180px);
 }
 
 .advisee-list-header {
@@ -193,7 +193,7 @@ td:last-child { border-right: none; }
 .adv-search svg { position: absolute; left: 24px; top: 50%; transform: translateY(-50%); }
 .adv-search input { width: 100%; box-sizing: border-box; padding: 9px 12px 9px 34px; border: 1px solid #c8d1dc; border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 13px; outline: none; }
 .adv-search input:focus { border-color: #2d4a6b; box-shadow: 0 0 0 3px rgba(45,74,107,0.15); }
-.adv-items { max-height: calc(100vh - 230px); overflow-y: auto; }
+.adv-items { max-height: calc(100vh - 230px); max-height: calc(100dvh - 230px); overflow-y: auto; }
 .adv-item { display: flex; gap: 12px; align-items: flex-start; width: 100%; text-align: left; padding: 12px 14px; border: none; border-bottom: 1px solid #eef1f5;
             background: transparent; cursor: pointer; font-family: 'Poppins', sans-serif; border-left: 4px solid transparent; }
 .adv-item:hover { background: #f5f8fb; }

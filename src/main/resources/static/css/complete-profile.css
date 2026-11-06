@@ -1,6 +1,6 @@
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
-body { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+body { min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; justify-content: center; }
 
 .background {
     position: fixed; width: 100%; height: 100%;

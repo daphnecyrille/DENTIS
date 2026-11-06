@@ -5,7 +5,7 @@
     font-family: 'Poppins', sans-serif;
 }
 
-body { height: 100vh; overflow: hidden; }
+body { height: 100vh; height: 100dvh; overflow: hidden; }
 
 .background {
     position: fixed;
@@ -17,7 +17,7 @@ body { height: 100vh; overflow: hidden; }
     z-index: -1;
 }
 
-.admitting-view { display: flex; flex-direction: column; height: 100vh; }
+.admitting-view { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 
 /* HEADER */
 .header {
@@ -100,7 +100,7 @@ body { height: 100vh; overflow: hidden; }
     left: 0;
     top: 77px;
     width: 70px;
-    height: calc(100vh - 77px);
+    height: calc(100vh - 77px); height: calc(100dvh - 77px);
     background: #FFFFFF;
     display: flex;
     justify-content: center;
