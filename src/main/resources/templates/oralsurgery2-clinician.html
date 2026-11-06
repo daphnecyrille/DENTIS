@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Clinical Oral Surgery - Odontectomy - DentIS</title>
-    <link rel="stylesheet" href="/css/oralsurgery2-clinician.css?v=3">
+    <link rel="stylesheet" href="/css/oralsurgery2-clinician.css?v=4">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/form-common.css?v=3">
+    <link rel="stylesheet" href="/css/workup.css?v=2">
 </head>
 
 <body>
@@ -41,25 +42,19 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <nav class="nav-menu">
-                <ul>
-                    <li class="nav-item">
-                        <a href="/clinician-dashboard" class="nav-link">
-                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
-                            <span>Home</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/chartrequest-clinician" class="nav-link">
-                            <img src="/images/request-icon.png" alt="Chart" class="nav-icon2">
-                            <span>Chart Request</span>
-                        </a>
-                    </li>
-                    <li class="nav-item active">
-                        <a href="/patientlist-clinician" class="nav-link">
-                            <img src="/images/patient-icon.png" alt="Patient" class="nav-icon">
-                            <span>Patient List</span>
-                        </a>
-                    </li>
+                <ul th:if="${currentUser != null and currentUser.role.name() == 'FACULTY'}">
+                    <li class="nav-item"><a href="/faculty-dashboard" class="nav-link"><img src="/images/home-icon.png" alt="Home" class="nav-icon"><span>Home</span></a></li>
+                    <li class="nav-item active"><a href="/faculty-patientlist" class="nav-link"><img src="/images/patient-icon.png" alt="Patient List" class="nav-icon"><span>Patient List</span></a></li>
+                    <li class="nav-item"><a href="/faculty-advisees" class="nav-link"><img src="/images/chart-icon.png" alt="My Advisees" class="nav-icon"><span>My Advisees</span></a></li>
+                </ul>
+                <ul th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
+                    <li class="nav-item"><a href="/dashboard-clinicmanager" class="nav-link"><img src="/images/home-icon.png" alt="Home" class="nav-icon"><span>Home</span></a></li>
+                    <li class="nav-item active"><a href="/patientlist-clinicmanager" class="nav-link"><img src="/images/patient-icon.png" alt="Patient List" class="nav-icon"><span>Patient List</span></a></li>
+                </ul>
+                <ul th:if="${currentUser == null or currentUser.role.name() == 'CLINICIAN'}">
+                    <li class="nav-item"><a href="/clinician-dashboard" class="nav-link"><img src="/images/home-icon.png" alt="Home" class="nav-icon"><span>Home</span></a></li>
+                    <li class="nav-item"><a href="/chartrequest-clinician" class="nav-link"><img src="/images/request-icon.png" alt="Chart" class="nav-icon2"><span>Chart Request</span></a></li>
+                    <li class="nav-item active"><a href="/patientlist-clinician" class="nav-link"><img src="/images/patient-icon.png" alt="Patient" class="nav-icon"><span>Patient List</span></a></li>
                     <li class="nav-item">
                         <a href="/evaluations-clinician" class="nav-link" style="position:relative;">
                             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="14" height="17" rx="2" stroke="#333" stroke-width="2"/><path d="M9 4V3h6v1" stroke="#333" stroke-width="2" stroke-linecap="round"/><path d="M8.5 12.5l2.2 2.2 4.8-4.8" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -98,118 +93,57 @@
                 <form th:action="@{/oralsurgery2-clinician/{id}(id=${chart.id})}" th:object="${chart}" method="post">
                 <div class="form-body">
 
-                    <!-- Chart No. -->
-                    <div class="form-group">
-                        <label>Chart No.</label>
-                        <input type="text" th:value="${chart.chartNo}" class="input-medium" readonly>
+                    <!-- Clinician / Date, then patient details (as on the paper) -->
+                    <div class="e1-head">
+                        <div class="form-group e1-wide"><label>Clinician</label>
+                            <input type="text" readonly th:value="${chart.clinician != null ? chart.clinician.fullName : ''}"></div>
+                        <div class="form-group e1-span3"><label>Date</label>
+                            <input type="date" th:field="*{odontectomyDate}" th:readonly="${viewOnly}"></div>
+                        <div class="form-group e1-wide"><label>Patient&rsquo;s Name</label>
+                            <input type="text" readonly th:value="${chart.patient.surname + ', ' + chart.patient.firstName + (chart.patient.middleInitial != null and !#strings.isEmpty(chart.patient.middleInitial) ? ' ' + chart.patient.middleInitial + '.' : '')}"></div>
+                        <div class="form-group"><label>Age</label><input type="text" readonly th:value="${chart.patient.age}"></div>
+                        <div class="form-group"><label>Sex</label><input type="text" readonly th:value="${chart.patient.sex}"></div>
+                        <div class="form-group"><label>Chart #</label><input type="text" readonly th:value="${chart.chartNo}"></div>
                     </div>
 
-                    <!-- Clinician + Date -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Clinician</label>
-                            <input type="text" th:value="${chart.clinician != null ? chart.clinician.fullName : ''}" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Date</label>
-                            <input type="date" th:field="*{odontectomyDate}" class="date-picker" th:readonly="${viewOnly}">
-                        </div>
-                    </div>
+                    <div class="form-group"><label>Chief Complaint</label><textarea rows="3" th:field="*{chiefComplaint}" th:readonly="${viewOnly}"></textarea></div>
+                    <div class="form-group"><label>History of Present Illness</label><textarea rows="3" th:field="*{historyOfPresentIllness}" th:readonly="${viewOnly}"></textarea></div>
 
-                    <!-- Patient Name -->
-                    <div class="form-group">
-                        <label>Patient Name</label>
-                        <div class="split-input">
-                            <input type="text" th:value="${chart.patient.surname}" readonly>
-                            <input type="text" th:value="${chart.patient.firstName}" class="input-wide" readonly>
-                            <input type="text" th:value="${chart.patient.middleInitial}" class="input-narrow" readonly>
-                        </div>
+                    <div class="e1-section">Findings</div>
+                    <div class="form-group"><label>Clinical Findings</label><textarea rows="3" th:field="*{clinicalFindings}" th:readonly="${viewOnly}"></textarea></div>
+                    <div class="e1-grid2">
+                        <div class="form-group"><label>Radiographic Findings</label><textarea rows="4" th:field="*{odontectomyRadiographicFindings}" th:readonly="${viewOnly}"></textarea></div>
+                        <div class="form-group"><label>Classification of Impaction</label><textarea rows="4" th:field="*{classificationOfImpaction}" th:readonly="${viewOnly}"></textarea></div>
                     </div>
+                    <div class="form-group"><label>Diagnosis &amp; Treatment Plan</label><textarea rows="4" th:field="*{diagnosisTreatmentPlan}" th:readonly="${viewOnly}"></textarea></div>
 
-                    <!-- Age, Sex -->
-                    <div class="form-row row-small">
-                        <div class="form-group">
-                            <label>Age</label>
-                            <input type="text" th:value="${chart.patient.age}" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Sex</label>
-                            <input type="text" th:value="${chart.patient.sex}" readonly>
-                        </div>
-                    </div>
-
-                    <!-- Chief Complaint -->
-                    <div class="form-group">
-                        <label>Chief Complaint</label>
-                        <textarea th:field="*{chiefComplaint}" rows="2" th:readonly="${viewOnly}"></textarea>
-                    </div>
-
-                    <!-- History of Present Illness -->
-                    <div class="form-group">
-                        <label>History of Present Illness</label>
-                        <textarea th:field="*{historyOfPresentIllness}" rows="2" th:readonly="${viewOnly}"></textarea>
-                    </div>
-
-                    <!-- Clinical Findings -->
-                    <div class="form-group">
-                        <label>Clinical Findings</label>
-                        <textarea th:field="*{clinicalFindings}" rows="2" th:readonly="${viewOnly}"></textarea>
-                    </div>
-
-                    <!-- Radiographic Findings + Classification of Impaction -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Radiographic Findings</label>
-                            <textarea th:field="*{odontectomyRadiographicFindings}" rows="3" th:readonly="${viewOnly}"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Classification of Impaction</label>
-                            <textarea th:field="*{classificationOfImpaction}" rows="3" th:readonly="${viewOnly}"></textarea>
-                        </div>
-                    </div>
-
-                    <!-- Diagnosis & Treatment Plan -->
-                    <div class="form-group">
-                        <label>Diagnosis &amp; Treatment Plan</label>
-                        <textarea th:field="*{diagnosisTreatmentPlan}" rows="4" th:readonly="${viewOnly}"></textarea>
-                    </div>
-
-                    <!-- Patient Workup Checklist -->
-                    <div class="checklist-section">
-                        <h3 class="checklist-title">Patient Workup Checklist</h3>
-                        <div class="checklist-grid">
-                            <label class="checkbox-label"><input type="checkbox" th:field="*{hasAsChart}" th:disabled="${viewOnly}"> AS Chart</label>
-                            <div></div>
-                            <label class="checkbox-label"><input type="checkbox" th:field="*{hasIntraoralPhoto}" th:disabled="${viewOnly}"> Intraoral Photo/s</label>
-                            <div></div>
-                            <div class="checklist-inline">
-                                <label class="checkbox-label"><input type="checkbox" th:field="*{hasRadiograph}" th:disabled="${viewOnly}"> Radiograph</label>
-                                <input type="text" th:field="*{radiographType}" class="input-inline" placeholder="Indicate what type" th:readonly="${viewOnly}">
-                            </div>
-                            <div></div>
-                            <label class="checkbox-label"><input type="checkbox" th:field="*{hasImpression}" th:disabled="${viewOnly}"> Impression/Diagnostic Cast</label>
-                            <div></div>
-                            <div class="checklist-inline">
-                                <label class="checkbox-label"><input type="checkbox" th:field="*{hasOtherDiagnosticAids}" th:disabled="${viewOnly}"> Other supplemental diagnostic aids</label>
-                                <input type="text" th:field="*{otherDiagnosticAids}" class="input-inline" th:readonly="${viewOnly}">
-                            </div>
-                            <div></div>
-                        </div>
+                    <div class="e1-section">I. Patient Workup Checklist <small>tick what was done</small></div>
+                    <div class="e1-box os2-list">
+                        <div class="os2-item"><div class="e1-chips"><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" th:field="*{hasAsChart}" th:disabled="${viewOnly}" data-toggles="hasAsChart"><span>AS Chart</span></label></div></div>
+                        <div class="os2-item"><div class="e1-chips"><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" th:field="*{hasIntraoralPhoto}" th:disabled="${viewOnly}" data-toggles="hasIntraoralPhoto"><span>Intraoral Photo/s</span></label></div></div>
+                        <div class="os2-item"><div class="e1-chips"><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" th:field="*{hasRadiograph}" th:disabled="${viewOnly}" data-toggles="hasRadiograph"><span>Radiograph</span></label></div><input type="text" class="e1-other" data-shown-by="hasRadiograph" th:field="*{radiographType}" th:readonly="${viewOnly}" placeholder="Indicate what type"></div>
+                        <div class="os2-item"><div class="e1-chips"><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" th:field="*{hasImpression}" th:disabled="${viewOnly}" data-toggles="hasImpression"><span>Impression/Diagnostic Cast</span></label></div></div>
+                        <div class="os2-item"><div class="e1-chips"><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" th:field="*{hasOtherDiagnosticAids}" th:disabled="${viewOnly}" data-toggles="hasOtherDiagnosticAids"><span>Other supplemental diagnostic aids</span></label></div><input type="text" class="e1-other" data-shown-by="hasOtherDiagnosticAids" th:field="*{otherDiagnosticAids}" th:readonly="${viewOnly}" placeholder="Specify"></div>
                     </div>
 
                     <!-- Patient Workup Checked By (Clinical OS Faculty): the approving faculty's name, filled in on approval -->
                     <div class="form-group os2-checked">
-                        <label>Patient Workup Checked By <span class="os2-sub">(Clinical OS Faculty)</span></label>
+                        <label>Patient Workup Checked By <span class="e1-unit">(Clinical OS Faculty)</span></label>
                         <input type="text" readonly
                                th:value="${chart.facultySignedBy != null ? chart.facultySignedBy + (chart.facultySignedAt != null ? ' · ' + #temporals.format(chart.facultySignedAt, 'MMM d, yyyy') : '') : ''}"
                                th:placeholder="${chart.status.name() == 'SUBMITTED' and currentUser != null and currentUser.role.name() == 'FACULTY' and chart.faculty != null and chart.faculty.id == currentUser.id ? 'Your name is filled in when you approve' : 'Filled in when the faculty approves'}">
                     </div>
 
-                    <!-- Save -->
-                    <div class="form-actions" th:if="${!viewOnly}">
-                        <button type="submit" class="btn-submit">Save</button>
+                    <div class="form-actions" th:unless="${viewOnly}">
+                        <button type="submit" class="btn-next">Save</button>
                     </div>
-
+                    <div class="form-actions" th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
+                        <a th:href="@{/chartsview-clinicmanager/{id}(id=${chart.patient.id})}" class="btn-next">Back to Charts View</a>
+                    </div>
+                    <div class="form-actions review-actions" th:if="${currentUser != null and currentUser.role.name() == 'FACULTY' and chart.faculty != null and chart.faculty.id == currentUser.id and chart.status.name() == 'SUBMITTED'}">
+                        <button type="button" class="btn-revise" th:data-action="@{/oralsurgery-faculty/{id}/revise(id=${chart.id})}" onclick="openReviseModal(this)">Revise</button>
+                        <button type="button" class="btn-approve" th:data-action="@{/oralsurgery-faculty/{id}/approve(id=${chart.id})}" onclick="openApproveModal(this)">Approve</button>
+                    </div>
                 </div>
                 </form>
             </div>
@@ -283,5 +217,18 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 <script src="/js/textarea-min-size.js"></script>
 <script src="/js/sidebar-hover.js?v=3"></script>
 <script src="/js/date-click.js"></script>
+<script th:inline="none">
+/* Checklist: "indicate what type" / "specify" show while their box is ticked, and are emptied when it is unticked */
+(function () {
+    document.querySelectorAll('[data-shown-by]').forEach(function (inp) {
+        var cb = document.querySelector('input[type="checkbox"][data-toggles="' + inp.dataset.shownBy + '"]');
+        if (!cb) return;
+        function show() { inp.classList.toggle('on', cb.checked); }
+        cb.addEventListener('change', function () { if (!cb.checked && !inp.readOnly) inp.value = ''; show(); });
+        show();
+    });
+})();
+</script>
+<th:block th:replace="~{fragments/faculty-review :: modals}"></th:block>
 </body>
 </html>

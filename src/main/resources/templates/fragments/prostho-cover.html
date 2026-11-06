@@ -22,8 +22,10 @@
             <!-- SD -->
             <div class="ptype-row" data-type="SD">
                 <label class="pbox-label ptype"><input type="radio" name="caseType" value="SD" th:checked="${chart.caseType == 'SD'}" th:disabled="${!editable}" class="pbox"> SD</label>
-                <label class="pbox-label"><input type="checkbox" name="sdMx" value="true" th:checked="${chart.sdMx}" th:disabled="${!editable}" class="pbox sub"> Mx</label>
-                <label class="pbox-label"><input type="checkbox" name="sdMd" value="true" th:checked="${chart.sdMd}" th:disabled="${!editable}" class="pbox sub"> Md</label>
+                <div class="parch-rows">
+                    <div class="parch" data-arch="mx"><label class="pbox-label"><input type="checkbox" name="sdMx" value="true" th:checked="${chart.sdMx}" th:disabled="${!editable}" class="pbox sub"> Mx</label></div>
+                    <div class="parch" data-arch="md"><label class="pbox-label"><input type="checkbox" name="sdMd" value="true" th:checked="${chart.sdMd}" th:disabled="${!editable}" class="pbox sub"> Md</label></div>
+                </div>
             </div>
             <!-- RPD -->
             <div class="ptype-row" data-type="RPD">
@@ -89,6 +91,7 @@
         /* RPD: per arch, w/Framework or w/o (one only); picking one also ticks the arch; unticking the arch clears both */
         cover.querySelectorAll('.parch').forEach(function (arch) {
             var a = arch.querySelector('.arch'), fws = arch.querySelectorAll('.fw');
+            if (!a) return;   /* SD rows have no framework boxes */
             fws.forEach(function (fw) {
                 fw.addEventListener('change', function () {
                     if (fw.checked) { fws.forEach(function (o) { if (o !== fw) o.checked = false; }); a.checked = true; }

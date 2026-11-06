@@ -60,6 +60,10 @@ public class EndodonticsChart {
     private String toothNumber;
 
     private String referredBy;
+
+
+    /** "PAIN SYMPTOMS: TOOTH #" */
+    private String painToothNumber;
     private String clinicianContactNumber;
 
     @Column(columnDefinition = "TEXT")
@@ -150,7 +154,12 @@ public class EndodonticsChart {
     private String pretreatment;
 
     private String anesthesiaType;
-    private String anesthesiaDetail;
+    private String anesthesiaDetail;   // old single "details" box (kept for existing charts)
+
+    // Anesthesia: infiltration / block / supplemental can each be ticked, each with its own location
+    private String anesthesiaInfiltrationLocation;
+    private String anesthesiaBlockLocation;
+    private String anesthesiaSupplementalLocation;
 
     @Column(columnDefinition = "TEXT")
     private String proposedRestoration;

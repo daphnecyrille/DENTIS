@@ -74,7 +74,8 @@ public class EndodonticsController {
         EndodonticsChart chart = endodonticsChartService.getById(id);
         model.addAttribute("currentUser", getCurrentUser(authentication));
         model.addAttribute("chart", chart);
-        return "endodontics-view-faculty";
+        model.addAttribute("viewOnly", true);
+        return "endodontics-clinician";   // same page as the clinician's, read-only, with Approve / Revise
     }
 
     @PostMapping("/endodontics-faculty/{id}/approve")

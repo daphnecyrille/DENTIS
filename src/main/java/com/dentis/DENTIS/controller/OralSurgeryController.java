@@ -110,7 +110,8 @@ public class OralSurgeryController {
         OralSurgeryChart chart = oralSurgeryChartService.getById(id);
         model.addAttribute("currentUser", getCurrentUser(authentication));
         model.addAttribute("chart", chart);
-        return "oralsurgery-view-faculty";
+        model.addAttribute("viewOnly", true);
+        return "oralsurgery-clinician";   // same page as the clinician's, read-only, with Approve / Revise
     }
 
     @GetMapping("/oralsurgery2-view-faculty/{id}")
@@ -118,6 +119,7 @@ public class OralSurgeryController {
         OralSurgeryChart chart = oralSurgeryChartService.getById(id);
         model.addAttribute("currentUser", getCurrentUser(authentication));
         model.addAttribute("chart", chart);
-        return "oralsurgery2-view-faculty";
+        model.addAttribute("viewOnly", true);
+        return "oralsurgery2-clinician";   // same page as the clinician's, read-only, with Approve / Revise
     }
 }

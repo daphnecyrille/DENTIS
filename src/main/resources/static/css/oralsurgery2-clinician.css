@@ -309,3 +309,9 @@ body {
 .checklist-inline .input-inline { min-width: 220px; }
 .os2-checked input { max-width: 460px; }
 .os2-checked input::placeholder { color: #9aa5b1; font-style: italic; }
+/* checklist rows (redesign) */
+.os2-list { padding: 6px 16px; }
+.os2-item { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 8px 0; border-bottom: 1px solid #eef2f6; }
+.os2-item:last-child { border-bottom: none; }
+.os2-item .e1-other { flex: 1 1 260px; max-width: 420px; }
+.os2-checked input { max-width: 460px; width: 100%; box-sizing: border-box; }

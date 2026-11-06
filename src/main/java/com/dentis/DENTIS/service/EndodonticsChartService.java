@@ -93,6 +93,7 @@ public class EndodonticsChartService {
         chart.setVisitDate(updated.getVisitDate());
         chart.setToothNumber(updated.getToothNumber());
         chart.setReferredBy(updated.getReferredBy());
+        chart.setPainToothNumber(updated.getPainToothNumber());
         chart.setClinicianContactNumber(updated.getClinicianContactNumber());
         chart.setChiefComplaint(updated.getChiefComplaint());
         chart.setHistoryOfPresentIllness(updated.getHistoryOfPresentIllness());
@@ -144,7 +145,10 @@ public class EndodonticsChartService {
         chart.setEmergencyTreatment(updated.getEmergencyTreatment());
         chart.setPretreatment(updated.getPretreatment());
         chart.setAnesthesiaType(updated.getAnesthesiaType());
-        chart.setAnesthesiaDetail(updated.getAnesthesiaDetail());
+        chart.setAnesthesiaInfiltrationLocation(updated.getAnesthesiaInfiltrationLocation());
+        chart.setAnesthesiaBlockLocation(updated.getAnesthesiaBlockLocation());
+        chart.setAnesthesiaSupplementalLocation(updated.getAnesthesiaSupplementalLocation());
+        chart.setAnesthesiaDetail(null);   // the old single box now lives in the per-type locations
         chart.setProposedRestoration(updated.getProposedRestoration());
         chart.setConsultationsDone(updated.getConsultationsDone());
         chart.setStatus(EndodonticsChartStatus.IN_PROGRESS);

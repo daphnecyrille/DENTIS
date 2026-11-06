@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Clinical Endodontics - DentIS</title>
-    <link rel="stylesheet" href="/css/endodontics-clinician.css?v=2">
+    <link rel="stylesheet" href="/css/endodontics-clinician.css?v=4">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/form-common.css?v=3">
 </head>
@@ -41,25 +41,19 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <nav class="nav-menu">
-                <ul>
-                    <li class="nav-item">
-                        <a href="/clinician-dashboard" class="nav-link">
-                            <img src="/images/home-icon.png" alt="Home" class="nav-icon">
-                            <span>Home</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/chartrequest-clinician" class="nav-link">
-                            <img src="/images/request-icon.png" alt="Chart" class="nav-icon2">
-                            <span>Chart Request</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/patientlist-clinician" class="nav-link">
-                            <img src="/images/patient-icon.png" alt="Patient" class="nav-icon">
-                            <span>Patient List</span>
-                        </a>
-                    </li>
+                <ul th:if="${currentUser != null and currentUser.role.name() == 'FACULTY'}">
+                    <li class="nav-item"><a href="/faculty-dashboard" class="nav-link"><img src="/images/home-icon.png" alt="Home" class="nav-icon"><span>Home</span></a></li>
+                    <li class="nav-item active"><a href="/faculty-patientlist" class="nav-link"><img src="/images/patient-icon.png" alt="Patient List" class="nav-icon"><span>Patient List</span></a></li>
+                    <li class="nav-item"><a href="/faculty-advisees" class="nav-link"><img src="/images/chart-icon.png" alt="My Advisees" class="nav-icon"><span>My Advisees</span></a></li>
+                </ul>
+                <ul th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
+                    <li class="nav-item"><a href="/dashboard-clinicmanager" class="nav-link"><img src="/images/home-icon.png" alt="Home" class="nav-icon"><span>Home</span></a></li>
+                    <li class="nav-item active"><a href="/patientlist-clinicmanager" class="nav-link"><img src="/images/patient-icon.png" alt="Patient List" class="nav-icon"><span>Patient List</span></a></li>
+                </ul>
+                <ul th:if="${currentUser == null or currentUser.role.name() == 'CLINICIAN'}">
+                    <li class="nav-item"><a href="/clinician-dashboard" class="nav-link"><img src="/images/home-icon.png" alt="Home" class="nav-icon"><span>Home</span></a></li>
+                    <li class="nav-item"><a href="/chartrequest-clinician" class="nav-link"><img src="/images/request-icon.png" alt="Chart" class="nav-icon2"><span>Chart Request</span></a></li>
+                    <li class="nav-item active"><a href="/patientlist-clinician" class="nav-link"><img src="/images/patient-icon.png" alt="Patient" class="nav-icon"><span>Patient List</span></a></li>
                     <li class="nav-item">
                         <a href="/evaluations-clinician" class="nav-link" style="position:relative;">
                             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="14" height="17" rx="2" stroke="#333" stroke-width="2"/><path d="M9 4V3h6v1" stroke="#333" stroke-width="2" stroke-linecap="round"/><path d="M8.5 12.5l2.2 2.2 4.8-4.8" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -97,255 +91,66 @@
                 <!-- Patient Workup Form Banner -->
                 <div class="form-banner">Patient Workup Form</div>
 
-                <form th:action="@{/endodontics-clinician/{id}(id=${chart.id})}" th:object="${chart}" method="post">
+                <form th:action="@{/endodontics-clinician/{id}(id=${chart.id})}" th:object="${chart}" method="post" id="e1Form">
                 <div class="form-body">
 
-                    <!-- Clinician, Chart No., Date -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Clinician</label>
-                            <input type="text" th:value="${chart.clinician != null ? chart.clinician.fullName : ''}" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Chart No.</label>
-                            <input type="text" th:value="${chart.chartNo}" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Date</label>
-                            <input type="date" class="date-picker" th:field="*{visitDate}" th:readonly="${viewOnly}">
-                        </div>
+                    <!-- Patient and clinician details: even two-row grid -->
+                    <div class="e1-head">
+                        <div class="form-group e1-wide"><label>Patient</label>
+                            <input type="text" readonly th:value="${chart.patient.surname + ', ' + chart.patient.firstName + (chart.patient.middleInitial != null and !#strings.isEmpty(chart.patient.middleInitial) ? ' ' + chart.patient.middleInitial + '.' : '')}"></div>
+                        <div class="form-group"><label>Age</label><input type="text" readonly th:value="${chart.patient.age}"></div>
+                        <div class="form-group"><label>Sex</label><input type="text" readonly th:value="${chart.patient.sex}"></div>
+                        <div class="form-group"><label>Chart No.</label><input type="text" readonly th:value="${chart.chartNo}"></div>
+                        <div class="form-group e1-wide"><label>Clinician</label>
+                            <input type="text" readonly th:value="${chart.clinician != null ? chart.clinician.fullName : ''}"></div>
+                        <div class="form-group e1-span2"><label>Date</label>
+                            <input type="date" th:field="*{visitDate}" th:readonly="${viewOnly}"></div>
+                        <div class="form-group"><label>Tooth #</label>
+                            <select class="e1-select" th:field="*{toothNumber}" th:disabled="${viewOnly}"><option value="">Select</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="31">31</option><option value="32">32</option><option value="33">33</option><option value="34">34</option><option value="35">35</option><option value="36">36</option><option value="37">37</option><option value="38">38</option><option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option><option value="45">45</option><option value="46">46</option><option value="47">47</option><option value="48">48</option></select></div>
                     </div>
 
-                    <!-- Patient Name -->
-                    <div class="form-group">
-                        <label>Patient Name</label>
-                        <div class="split-input">
-                            <input type="text" th:value="${chart.patient?.surname}" readonly>
-                            <input type="text" class="input-wide" th:value="${chart.patient?.firstName}" readonly>
-                            <input type="text" class="input-narrow" th:value="${chart.patient?.middleInitial}" readonly>
-                        </div>
+                    <div class="e1-section">Address &amp; Contact</div>
+                    <div class="form-group"><label>Address</label><input type="text" readonly th:value="${chart.patient?.address}"></div>
+                    <div class="e1-grid2">
+                        <div class="form-group"><label>Contact Number</label><input type="text" readonly th:value="${chart.patient?.contactNumber}"></div>
+                        <div class="form-group"><label>Occupation</label><input type="text" readonly th:value="${chart.patient?.occupation}"></div>
+                    </div>
+                    <div class="e1-grid2">
+                        <div class="form-group"><label>Referred By</label><input type="text" th:field="*{referredBy}" th:readonly="${viewOnly}"></div>
+                        <div class="form-group"><label>Clinician&rsquo;s Contact Number</label><input type="text" th:field="*{clinicianContactNumber}" th:readonly="${viewOnly}" inputmode="tel"></div>
                     </div>
 
-                    <!-- Age, Sex, Tooth# -->
-                    <div class="form-row row-small">
-                        <div class="form-group">
-                            <label>Age</label>
-                            <input type="text" th:value="${chart.patient?.age}" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Sex</label>
-                            <input type="text" th:value="${chart.patient?.sex}" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Tooth#</label>
-                            <select class="select-input" th:field="*{toothNumber}" th:disabled="${viewOnly}">
-                                <option value="">Select Tooth#</option>
-                                <option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="31">31</option><option value="32">32</option><option value="33">33</option><option value="34">34</option><option value="35">35</option><option value="36">36</option><option value="37">37</option><option value="38">38</option><option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option><option value="45">45</option><option value="46">46</option><option value="47">47</option><option value="48">48</option>
-                            </select>
-                        </div>
+                    <div class="form-group"><label>Chief Complaint</label><textarea rows="3" th:field="*{chiefComplaint}" th:readonly="${viewOnly}"></textarea></div>
+                    <div class="form-group"><label>History of Present Illness</label><textarea rows="3" th:field="*{historyOfPresentIllness}" th:readonly="${viewOnly}"></textarea></div>
+                    <div class="form-group"><label>Medical History</label><textarea rows="3" th:field="*{medicalHistory}" th:readonly="${viewOnly}"></textarea></div>
+                    <div class="form-group"><label>Dental History</label><textarea rows="3" th:field="*{dentalHistory}" th:readonly="${viewOnly}"></textarea></div>
+
+                    <div class="e1-section e1-section-tooth"><span>Pain Symptoms</span>
+                        <span class="e1-tooth-pick">Tooth #
+                            <select class="e1-select" th:field="*{painToothNumber}" th:disabled="${viewOnly}"><option value="">Select</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="31">31</option><option value="32">32</option><option value="33">33</option><option value="34">34</option><option value="35">35</option><option value="36">36</option><option value="37">37</option><option value="38">38</option><option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option><option value="45">45</option><option value="46">46</option><option value="47">47</option><option value="48">48</option></select></span></div>
+                    <div class="e1-box">
+                        <div class="e1-row"><span class="e1-rl">Quality</span><div class="e1-rv"><div class="e1-chips"><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{painQuality}" th:value="'Sharp'" th:disabled="${viewOnly}"><span>Sharp</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{painQuality}" th:value="'Dull'" th:disabled="${viewOnly}"><span>Dull</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{painQuality}" th:value="'Throbbing'" th:disabled="${viewOnly}"><span>Throbbing</span></label></div></div></div>
+                        <div class="e1-row"><span class="e1-rl">Location</span><div class="e1-rv"><div class="e1-chips"><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{painLocation}" th:value="'Localized'" th:disabled="${viewOnly}"><span>Localized</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{painLocation}" th:value="'Diffused'" th:disabled="${viewOnly}"><span>Diffused</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{painLocation}" th:value="'Referred'" th:disabled="${viewOnly}"><span>Referred</span></label></div></div></div>
+                        <div class="e1-row"><span class="e1-rl">Course / frequency</span><div class="e1-rv"><div class="e1-chips"><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{painCourseFrequency}" th:value="'Constant'" th:disabled="${viewOnly}"><span>Constant</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{painCourseFrequency}" th:value="'Momentary'" th:disabled="${viewOnly}"><span>Momentary</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{painCourseFrequency}" th:value="'Intermittent'" th:disabled="${viewOnly}"><span>Intermittent</span></label></div></div></div>
+                        <div class="e1-row"><span class="e1-rl">Onset</span><div class="e1-rv"><div class="e1-chips"><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{painOnset}" th:value="'Spontaneous'" th:disabled="${viewOnly}"><span>Spontaneous</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{painOnset}" th:value="'Provoked'" th:disabled="${viewOnly}"><span>Provoked</span></label></div></div></div>
+                        <div class="e1-row"><span class="e1-rl">Affected by <small>tick all that apply</small></span><div class="e1-rv"><input type="hidden" th:field="*{painAffectedBy}" class="multi-store" data-group="painAffectedBy"><div class="e1-chips"><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="painAffectedBy" value="Heat (relieved)" th:disabled="${viewOnly}"><span>Heat (relieved)</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="painAffectedBy" value="Heat (increased)" th:disabled="${viewOnly}"><span>Heat (increased)</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="painAffectedBy" value="Cold (relieved)" th:disabled="${viewOnly}"><span>Cold (relieved)</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="painAffectedBy" value="Cold (increased)" th:disabled="${viewOnly}"><span>Cold (increased)</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="painAffectedBy" value="Chewing/Biting" th:disabled="${viewOnly}"><span>Chewing/Biting</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="painAffectedBy" value="Patient's Position" th:disabled="${viewOnly}"><span>Patient's Position</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="painAffectedBy" value="Palpation" th:disabled="${viewOnly}"><span>Palpation</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="painAffectedBy" value="Time of day" th:disabled="${viewOnly}"><span>Time of day</span></label></div></div></div>
+                        <div class="e1-row"><span class="e1-rl">Level of intensity <small>1 (mild) to 10 (severe)</small></span><div class="e1-rv"><div class="e1-chips e1-num"><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{levelOfIntensity}" th:value="'1'" th:disabled="${viewOnly}"><span>1</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{levelOfIntensity}" th:value="'2'" th:disabled="${viewOnly}"><span>2</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{levelOfIntensity}" th:value="'3'" th:disabled="${viewOnly}"><span>3</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{levelOfIntensity}" th:value="'4'" th:disabled="${viewOnly}"><span>4</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{levelOfIntensity}" th:value="'5'" th:disabled="${viewOnly}"><span>5</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{levelOfIntensity}" th:value="'6'" th:disabled="${viewOnly}"><span>6</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{levelOfIntensity}" th:value="'7'" th:disabled="${viewOnly}"><span>7</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{levelOfIntensity}" th:value="'8'" th:disabled="${viewOnly}"><span>8</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{levelOfIntensity}" th:value="'9'" th:disabled="${viewOnly}"><span>9</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{levelOfIntensity}" th:value="'10'" th:disabled="${viewOnly}"><span>10</span></label></div></div></div>
                     </div>
 
-                    <!-- Address -->
-                    <div class="form-group">
-                        <label>Address</label>
-                        <input type="text" th:value="${chart.patient?.address}" readonly>
+                    <div class="e1-section">Examination <small>tick all that apply</small></div>
+                    <div class="e1-box">
+                        <div class="e1-row"><span class="e1-rl">Radiographic examination of tooth</span><div class="e1-rv"><input type="hidden" th:field="*{radiographicExamination}" class="multi-store" data-group="radiographicExamination"><div class="e1-chips"><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="radiographicExamination" value="WNL/caries" th:disabled="${viewOnly}"><span>WNL/caries</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="radiographicExamination" value="Restoration" th:disabled="${viewOnly}"><span>Restoration</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="radiographicExamination" value="Prior RCT" th:disabled="${viewOnly}"><span>Prior RCT</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="radiographicExamination" value="Post/build up" th:disabled="${viewOnly}"><span>Post/build up</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="radiographicExamination" value="Int./ext. resorption" th:disabled="${viewOnly}"><span>Int./ext. resorption</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="radiographicExamination" value="Calcification" th:disabled="${viewOnly}"><span>Calcification</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="radiographicExamination" value="Open apex/extra canal" th:disabled="${viewOnly}"><span>Open apex/extra canal</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="radiographicExamination" value="Broken instrument" th:disabled="${viewOnly}"><span>Broken instrument</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="radiographicExamination" value="Others" th:disabled="${viewOnly}"><span>Others</span></label></div><input type="text" class="e1-other" data-other-for="radiographicExamination" data-other-value="Others" th:field="*{radiographicExaminationOthers}" th:readonly="${viewOnly}" placeholder="Others (specify)"></div></div>
+                        <div class="e1-row"><span class="e1-rl">Attachment apparatus</span><div class="e1-rv"><input type="hidden" th:field="*{attachmentApparatus}" class="multi-store" data-group="attachmentApparatus"><div class="e1-chips"><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="attachmentApparatus" value="PDL normal" th:disabled="${viewOnly}"><span>PDL normal</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="attachmentApparatus" value="PDL thickened" th:disabled="${viewOnly}"><span>PDL thickened</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="attachmentApparatus" value="Hypercementosis" th:disabled="${viewOnly}"><span>Hypercementosis</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="attachmentApparatus" value="Alv. bone normal" th:disabled="${viewOnly}"><span>Alv. bone normal</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="attachmentApparatus" value="Radiolucency" th:disabled="${viewOnly}"><span>Radiolucency</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="attachmentApparatus" value="Others" th:disabled="${viewOnly}"><span>Others</span></label></div><input type="text" class="e1-other" data-other-for="attachmentApparatus" data-other-value="Others" th:field="*{attachmentApparatusOthers}" th:readonly="${viewOnly}" placeholder="Others (specify)"></div></div>
+                        <div class="e1-row"><span class="e1-rl">Clinical condition of the tooth</span><div class="e1-rv"><input type="hidden" th:field="*{clinicalConditionOfTooth}" class="multi-store" data-group="clinicalConditionOfTooth"><div class="e1-chips"><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="clinicalConditionOfTooth" value="WNL" th:disabled="${viewOnly}"><span>WNL</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="clinicalConditionOfTooth" value="Discoloration" th:disabled="${viewOnly}"><span>Discoloration</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="clinicalConditionOfTooth" value="Caries" th:disabled="${viewOnly}"><span>Caries</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="clinicalConditionOfTooth" value="Pulp exposure" th:disabled="${viewOnly}"><span>Pulp exposure</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="clinicalConditionOfTooth" value="Prior access" th:disabled="${viewOnly}"><span>Prior access</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="clinicalConditionOfTooth" value="Restoration" th:disabled="${viewOnly}"><span>Restoration</span></label></div><input type="text" class="e1-other" data-other-for="clinicalConditionOfTooth" data-other-value="Restoration" th:field="*{clinicalConditionOthers}" th:readonly="${viewOnly}" placeholder="Restoration (specify)"></div></div>
+                        <div class="e1-row"><span class="e1-rl">Soft tissue examination</span><div class="e1-rv"><input type="hidden" th:field="*{softTissueExamination}" class="multi-store" data-group="softTissueExamination"><div class="e1-chips"><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="softTissueExamination" value="WNL" th:disabled="${viewOnly}"><span>WNL</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="softTissueExamination" value="Swelling" th:disabled="${viewOnly}"><span>Swelling</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="softTissueExamination" value="Sinus Tract" th:disabled="${viewOnly}"><span>Sinus Tract</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="softTissueExamination" value="Lymphadenopathy" th:disabled="${viewOnly}"><span>Lymphadenopathy</span></label></div></div></div>
                     </div>
 
-                    <!-- Occupation, Contact Number -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Occupation</label>
-                            <input type="text" th:value="${chart.patient?.occupation}" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Contact Number</label>
-                            <input type="text" th:value="${chart.patient?.contactNumber}" readonly>
-                        </div>
-                    </div>
-
-                    <!-- Referred By, Clinician's Contact Number -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Referred By:</label>
-                            <input type="text" th:field="*{referredBy}" th:readonly="${viewOnly}">
-                        </div>
-                        <div class="form-group">
-                            <label>Clinician's Contact Number</label>
-                            <input type="text" th:field="*{clinicianContactNumber}" th:readonly="${viewOnly}">
-                        </div>
-                    </div>
-
-                    <!-- Chief Complaint -->
-                    <div class="form-group">
-                        <label>Chief Complaint</label>
-                        <textarea rows="3" th:field="*{chiefComplaint}" th:readonly="${viewOnly}"></textarea>
-                    </div>
-
-                    <!-- History of Present Illness -->
-                    <div class="form-group">
-                        <label>History of Present Illness</label>
-                        <textarea rows="3" th:field="*{historyOfPresentIllness}" th:readonly="${viewOnly}"></textarea>
-                    </div>
-
-                    <!-- Medical History -->
-                    <div class="form-group">
-                        <label>Medical History</label>
-                        <textarea rows="3" th:field="*{medicalHistory}" th:readonly="${viewOnly}"></textarea>
-                    </div>
-
-                    <!-- Dental History -->
-                    <div class="form-group">
-                        <label>Dental History</label>
-                        <textarea rows="3" th:field="*{dentalHistory}" th:readonly="${viewOnly}"></textarea>
-                    </div>
-
-                    <!-- Pain Symptoms -->
-                    <div class="symptom-section">
-                        <h3 class="symptom-title">Pain Symptoms:</h3>
-
-                        <div class="pain-row">
-                            <div class="pain-tag">Quality</div>
-                            <select class="select-input pain-select" th:field="*{painQuality}" th:disabled="${viewOnly}">
-                                <option value="">Select</option>
-                                <option value="Sharp">Sharp</option>
-                                <option value="Dull">Dull</option>
-                                <option value="Throbbing">Throbbing</option>
-                            </select>
-                        </div>
-
-                        <div class="pain-row">
-                            <div class="pain-tag">Location</div>
-                            <select class="select-input pain-select" th:field="*{painLocation}" th:disabled="${viewOnly}">
-                                <option value="">Select</option>
-                                <option value="Localized">Localized</option>
-                                <option value="Diffused">Diffused</option>
-                                <option value="Referred">Referred</option>
-                            </select>
-                        </div>
-
-                        <div class="pain-row">
-                            <div class="pain-tag">Course/<br>Frequency</div>
-                            <select class="select-input pain-select" th:field="*{painCourseFrequency}" th:disabled="${viewOnly}">
-                                <option value="">Select</option>
-                                <option value="Constant">Constant</option>
-                                <option value="Momentary">Momentary</option>
-                                <option value="Intermittent">Intermittent</option>
-                            </select>
-                        </div>
-
-                        <div class="pain-row">
-                            <div class="pain-tag">Onset</div>
-                            <select class="select-input pain-select" th:field="*{painOnset}" th:disabled="${viewOnly}">
-                                <option value="">Select</option>
-                                <option value="Spontaneous">Spontaneous</option>
-                                <option value="Provoked">Provoked</option>
-                            </select>
-                        </div>
-
-                        <div class="pain-row">
-                            <div class="pain-tag">Affected by</div>
-                            <select class="select-input pain-select" th:field="*{painAffectedBy}" th:disabled="${viewOnly}">
-                                <option value="">Select</option>
-                                <option value="Heat [relieved, increased]">Heat [relieved, increased]</option>
-                                <option value="Palpation">Palpation</option>
-                                <option value="Cold [relieved, increased]">Cold [relieved, increased]</option>
-                                <option value="Time of day">Time of day</option>
-                                <option value="Chewing/Biting">Chewing/Biting</option>
-                                <option value="Patient's Position">Patient's Position</option>
-                            </select>
-                        </div>
-
-                        <!-- Level of Intensity -->
-                        <div class="intensity-row">
-                            <span class="intensity-label">Level of Intensity - scale of 1 (mild) to 10 (severe):</span>
-                            <select class="select-input intensity-select" th:field="*{levelOfIntensity}" th:disabled="${viewOnly}">
-                                <option value="">Value</option>
-                                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
-                                <option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Radiographic Examination -->
-                    <div class="exam-section">
-                        <h3 class="exam-title">Radiographic Examination of the Tooth:</h3>
-                        <div class="exam-select-group">
-                            <select id="radiographicExamSelect" class="select-input exam-select" th:field="*{radiographicExamination}" th:disabled="${viewOnly}">
-                                <option value="">Select finding</option>
-                                <option value="WNL/caries">WNL/caries</option>
-                                <option value="Restoration">Restoration</option>
-                                <option value="Prior RCT">Prior RCT</option>
-                                <option value="Post/build up">Post/build up</option>
-                                <option value="Int./ext. resorption">Int./ext. resorption</option>
-                                <option value="Calcification">Calcification</option>
-                                <option value="Open apex/extra canal">Open apex/extra canal</option>
-                                <option value="Broken instrument">Broken instrument</option>
-                                <option value="Others">Others</option>
-                            </select>
-                            <input type="text" id="radiographicOthersInput" placeholder="Others (specify)" class="others-text"
-                                   th:field="*{radiographicExaminationOthers}" th:readonly="${viewOnly}"
-                                   th:style="${chart.radiographicExamination == 'Others'} ? '' : 'display:none'">
-                        </div>
-                    </div>
-
-                    <!-- Attachment Apparatus -->
-                    <div class="exam-section">
-                        <h3 class="exam-title">Attachment Apparatus:</h3>
-                        <div class="exam-select-group">
-                            <select id="attachmentApparatusSelect" class="select-input exam-select" th:field="*{attachmentApparatus}" th:disabled="${viewOnly}">
-                                <option value="">Select finding</option>
-                                <option value="PDL normal">PDL normal</option>
-                                <option value="PDL thickened">PDL thickened</option>
-                                <option value="Hypercementosis">Hypercementosis</option>
-                                <option value="Alv. bone normal">Alv. bone normal</option>
-                                <option value="Radiolucency">Radiolucency</option>
-                                <option value="Others">Others</option>
-                            </select>
-                            <input type="text" id="attachmentOthersInput" placeholder="Others (specify)" class="others-text"
-                                   th:field="*{attachmentApparatusOthers}" th:readonly="${viewOnly}"
-                                   th:style="${chart.attachmentApparatus == 'Others'} ? '' : 'display:none'">
-                        </div>
-                    </div>
-
-                    <!-- Clinical Condition of the Tooth -->
-                    <div class="exam-section">
-                        <h3 class="exam-title">Clinical Condition of the Tooth:</h3>
-                        <div class="exam-select-group">
-                            <select id="clinicalConditionSelect" class="select-input exam-select" th:field="*{clinicalConditionOfTooth}" th:disabled="${viewOnly}">
-                                <option value="">Select condition</option>
-                                <option value="WNL">WNL</option>
-                                <option value="Discoloration">Discoloration</option>
-                                <option value="Caries">Caries</option>
-                                <option value="Pulp exposure">Pulp exposure</option>
-                                <option value="Prior access">Prior access</option>
-                                <option value="Restoration">Restoration</option>
-                            </select>
-                            <input type="text" id="clinicalConditionOthersInput" placeholder="Restoration (specify)" class="others-text"
-                                   th:field="*{clinicalConditionOthers}" th:readonly="${viewOnly}"
-                                   th:style="${chart.clinicalConditionOfTooth == 'Restoration'} ? '' : 'display:none'">
-                        </div>
-                    </div>
-
-                    <!-- Soft Tissue Examination -->
-                    <div class="exam-section">
-                        <h3 class="exam-title">Soft Tissue Examination:</h3>
-                        <div class="exam-select-group">
-                            <select class="select-input exam-select" th:field="*{softTissueExamination}" th:disabled="${viewOnly}">
-                                <option value="">Select finding</option>
-                                <option value="WNL">WNL</option>
-                                <option value="Swelling">Swelling</option>
-                                <option value="Sinus Tract">Sinus Tract</option>
-                                <option value="Lymphadenopathy">Lymphadenopathy</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Diagnostic Tests Table -->
+                    <div class="e1-section">Diagnostic Tests</div>
                     <div class="diag-table-wrapper">
                         <table class="diag-table">
                             <thead>
                                 <tr>
-                                    <th class="diag-header-main">DIAGNOSTIC TESTS<br><span>Indicate tooth number &#8594;</span></th>
+                                    <th class="diag-header-main">Test</th>
                                     <th>Suspected</th>
                                     <th>Adjacent</th>
                                     <th>Contralateral</th>
@@ -392,89 +197,42 @@
                         </table>
                     </div>
 
-                    <!-- Diagnosis -->
-                    <div class="diagnosis-section">
-                        <h3 class="exam-title">Diagnosis:</h3>
-
-                        <div class="diag-row">
-                            <div class="diag-tag">PULPAL</div>
-                            <select class="select-input pain-select" th:field="*{pulpalDiagnosis}" th:disabled="${viewOnly}">
-                                <option value="">Select diagnosis</option>
-                                <option value="Normal Pulp">Normal Pulp</option>
-                                <option value="Previously treated">Previously treated</option>
-                                <option value="Reversible Pulpitis">Reversible Pulpitis</option>
-                                <option value="Previously initiated therapy">Previously initiated therapy</option>
-                                <option value="Symptomatic Irreversible Pulpitis">Symptomatic Irreversible Pulpitis</option>
-                                <option value="Asymptomatic Irreversible Pulpitis">Asymptomatic Irreversible Pulpitis</option>
-                                <option value="Necrosis">Necrosis</option>
-                            </select>
-                        </div>
-
-                        <div class="diag-row">
-                            <div class="diag-tag">PERIAPICAL</div>
-                            <select class="select-input pain-select" th:field="*{periapicalDiagnosis}" th:disabled="${viewOnly}">
-                                <option value="">Select diagnosis</option>
-                                <option value="Normal periapical tissues">Normal periapical tissues</option>
-                                <option value="Symptomatic Apical Periodontitis">Symptomatic Apical Periodontitis</option>
-                                <option value="Asymptomatic Apical Periodontitis">Asymptomatic Apical Periodontitis</option>
-                                <option value="Acute Apical Abscess">Acute Apical Abscess</option>
-                                <option value="Chronic Apical Abscess">Chronic Apical Abscess</option>
-                                <option value="Condensing Osteitis">Condensing Osteitis</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group" style="margin-top: 8px;">
-                            <label>Recommended Treatment:</label>
-                            <input type="text" th:field="*{recommendedTreatment}" th:readonly="${viewOnly}">
-                        </div>
+                    <div class="e1-section">Diagnosis</div>
+                    <div class="e1-box">
+                        <div class="e1-row"><span class="e1-rl">Pulpal</span><div class="e1-rv"><div class="e1-chips"><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{pulpalDiagnosis}" th:value="'Normal Pulp'" th:disabled="${viewOnly}"><span>Normal Pulp</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{pulpalDiagnosis}" th:value="'Reversible Pulpitis'" th:disabled="${viewOnly}"><span>Reversible Pulpitis</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{pulpalDiagnosis}" th:value="'Symptomatic Irreversible Pulpitis'" th:disabled="${viewOnly}"><span>Symptomatic Irreversible Pulpitis</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{pulpalDiagnosis}" th:value="'Asymptomatic Irreversible Pulpitis'" th:disabled="${viewOnly}"><span>Asymptomatic Irreversible Pulpitis</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{pulpalDiagnosis}" th:value="'Necrosis'" th:disabled="${viewOnly}"><span>Necrosis</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{pulpalDiagnosis}" th:value="'Previously treated'" th:disabled="${viewOnly}"><span>Previously treated</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{pulpalDiagnosis}" th:value="'Previously initiated therapy'" th:disabled="${viewOnly}"><span>Previously initiated therapy</span></label></div></div></div>
+                        <div class="e1-row"><span class="e1-rl">Periapical</span><div class="e1-rv"><div class="e1-chips"><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{periapicalDiagnosis}" th:value="'Normal periapical tissues'" th:disabled="${viewOnly}"><span>Normal periapical tissues</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{periapicalDiagnosis}" th:value="'Symptomatic Apical Periodontitis'" th:disabled="${viewOnly}"><span>Symptomatic Apical Periodontitis</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{periapicalDiagnosis}" th:value="'Asymptomatic Apical Periodontitis'" th:disabled="${viewOnly}"><span>Asymptomatic Apical Periodontitis</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{periapicalDiagnosis}" th:value="'Acute Apical Abscess'" th:disabled="${viewOnly}"><span>Acute Apical Abscess</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{periapicalDiagnosis}" th:value="'Chronic Apical Abscess'" th:disabled="${viewOnly}"><span>Chronic Apical Abscess</span></label><label th:classappend="${viewOnly} ? 'ro'"><input type="radio" class="one" th:field="*{periapicalDiagnosis}" th:value="'Condensing Osteitis'" th:disabled="${viewOnly}"><span>Condensing Osteitis</span></label></div></div></div>
                     </div>
+                    <div class="form-group"><label>Recommended Treatment</label><input type="text" th:field="*{recommendedTreatment}" th:readonly="${viewOnly}"></div>
 
-                    <!-- Proposed Treatment Plan -->
-                    <div class="treatment-section">
-                        <h3 class="treatment-title">Proposed Treatment Plan:</h3>
+                    <div class="e1-section">Proposed Treatment Plan</div>
+                    <div class="form-group"><label>Emergency Treatment</label><input type="text" th:field="*{emergencyTreatment}" th:readonly="${viewOnly}"></div>
+                    <div class="form-group"><label>Pre-treatment</label><input type="text" th:field="*{pretreatment}" th:readonly="${viewOnly}"></div>
+                    <div class="form-group"><label>Anesthesia <small class="e1-note">tick all that apply, each with its location</small></label>
+                        <input type="hidden" th:field="*{anesthesiaType}" class="multi-store" data-group="anesthesiaType">
+                        <div class="e1-anes">
+                            <div class="e1-anes-row"><div class="e1-chips"><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="anesthesiaType" value="Infiltration" th:disabled="${viewOnly}"><span>Infiltration</span></label></div>
+                                <input type="text" class="e1-anes-loc" data-anes="Infiltration" name="anesthesiaInfiltrationLocation" th:readonly="${viewOnly}" placeholder="Location"
+                                       th:value="${chart.anesthesiaInfiltrationLocation != null ? chart.anesthesiaInfiltrationLocation : (chart.anesthesiaType == 'Infiltration' ? chart.anesthesiaDetail : '')}"></div>
+                            <div class="e1-anes-row"><div class="e1-chips"><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="anesthesiaType" value="Block" th:disabled="${viewOnly}"><span>Block</span></label></div>
+                                <input type="text" class="e1-anes-loc" data-anes="Block" name="anesthesiaBlockLocation" th:readonly="${viewOnly}" placeholder="Location"
+                                       th:value="${chart.anesthesiaBlockLocation != null ? chart.anesthesiaBlockLocation : (chart.anesthesiaType == 'Block' ? chart.anesthesiaDetail : '')}"></div>
+                            <div class="e1-anes-row"><div class="e1-chips"><label th:classappend="${viewOnly} ? 'ro'"><input type="checkbox" data-multi="anesthesiaType" value="Supplemental" th:disabled="${viewOnly}"><span>Supplemental</span></label></div>
+                                <input type="text" class="e1-anes-loc" data-anes="Supplemental" name="anesthesiaSupplementalLocation" th:readonly="${viewOnly}" placeholder="Location"
+                                       th:value="${chart.anesthesiaSupplementalLocation != null ? chart.anesthesiaSupplementalLocation : (chart.anesthesiaType == 'Supplemental' ? chart.anesthesiaDetail : '')}"></div>
+                        </div></div>
+                    <div class="form-group"><label>Proposed Restoration</label><input type="text" th:field="*{proposedRestoration}" th:readonly="${viewOnly}"></div>
+                    <div class="form-group"><label>Consultations Done</label><input type="text" th:field="*{consultationsDone}" th:readonly="${viewOnly}"></div>
 
-                        <div class="form-group">
-                            <label>Emergency Treatment:</label>
-                            <input type="text" th:field="*{emergencyTreatment}" th:readonly="${viewOnly}">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Pre-treatment:</label>
-                            <input type="text" th:field="*{pretreatment}" th:readonly="${viewOnly}">
-                        </div>
-
-                        <div class="anesthesia-row">
-                            <div class="diag-tag">Anesthesia</div>
-                            <div class="anesthesia-options">
-                                <div class="anesthesia-item">
-                                    <select class="select-input exam-select" th:field="*{anesthesiaType}" th:disabled="${viewOnly}">
-                                        <option value="">Select type</option>
-                                        <option value="Infiltration">Infiltration</option>
-                                        <option value="Block">Block</option>
-                                        <option value="Supplemental">Supplemental</option>
-                                    </select>
-                                    <input type="text" placeholder="Details" class="inline-input anesthesia-detail"
-                                           th:field="*{anesthesiaDetail}" th:readonly="${viewOnly}">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Proposed Restoration:</label>
-                            <input type="text" th:field="*{proposedRestoration}" th:readonly="${viewOnly}">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Consultations done:</label>
-                            <input type="text" th:field="*{consultationsDone}" th:readonly="${viewOnly}">
-                        </div>
-                    </div>
-
-                    <!-- Actions -->
                     <div class="form-actions" th:unless="${viewOnly}">
                         <button type="submit" class="btn-next">Save</button>
                     </div>
-
+                    <div class="form-actions" th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
+                        <a th:href="@{/chartsview-clinicmanager/{id}(id=${chart.patient.id})}" class="btn-next">Back to Charts View</a>
+                    </div>
+                    <div class="form-actions review-actions" th:if="${currentUser != null and currentUser.role.name() == 'FACULTY' and chart.faculty != null and chart.faculty.id == currentUser.id and chart.status.name() == 'SUBMITTED'}">
+                        <button type="button" class="btn-revise" th:data-action="@{/endodontics-faculty/{id}/revise(id=${chart.id})}" onclick="openReviseModal(this)">Revise</button>
+                        <button type="button" class="btn-approve" th:data-action="@{/endodontics-faculty/{id}/approve(id=${chart.id})}" onclick="openApproveModal(this)">Approve</button>
+                    </div>
                 </div>
                 </form>
             </div>
@@ -502,9 +260,6 @@ function bindConditional(selectId, inputId, triggerValue) {
     });
 }
 
-bindConditional('radiographicExamSelect',    'radiographicOthersInput',      'Others');
-bindConditional('attachmentApparatusSelect', 'attachmentOthersInput',        'Others');
-bindConditional('clinicalConditionSelect',   'clinicalConditionOthersInput', 'Restoration');
 
 document.querySelector('.menu-icon').onclick = function() {
     document.querySelector('.sidebar').classList.toggle('expanded');
@@ -571,5 +326,53 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
     sus.addEventListener('change', function () { follow = false; });
 })();
 </script>
+<script th:inline="none">
+/* Multi-pick chips: ticked values are joined into the hidden field (", "); a single-pick chip can be tapped again to clear it */
+(function () {
+    document.querySelectorAll('.multi-store').forEach(function (store) {
+        var g = store.dataset.group, boxes = document.querySelectorAll('input[data-multi="' + g + '"]');
+        var have = (store.value || '').split(', ').map(function (x) { return x.trim(); });
+        boxes.forEach(function (b) { b.checked = have.indexOf(b.value) >= 0; });
+        function sync() {
+            var v = []; boxes.forEach(function (b) { if (b.checked) v.push(b.value); });
+            store.value = v.join(', ');
+            /* "Others (specify)" / "Restoration (specify)": shown only while its option is ticked */
+            document.querySelectorAll('[data-other-for="' + g + '"]').forEach(function (o) {
+                o.classList.toggle('on', v.indexOf(o.dataset.otherValue) >= 0);
+            });
+            boxes.forEach(function (b) {
+                var loc = document.querySelector('.e1-anes-loc[data-anes="' + b.value + '"]');
+                if (loc) { loc.classList.toggle('on', b.checked); loc.readOnly = loc.readOnly || false; }
+            });
+        }
+        boxes.forEach(function (b) {
+            b.addEventListener('change', function () {
+                if (!b.checked) {   /* unticked: empty its specify / location box so nothing hidden gets saved */
+                    document.querySelectorAll('[data-other-for="' + g + '"][data-other-value="' + b.value + '"]').forEach(function (o) { o.value = ''; });
+                    var loc = document.querySelector('.e1-anes-loc[data-anes="' + b.value + '"]');
+                    if (loc) loc.value = '';
+                }
+                sync();
+            });
+        });
+        sync();
+    });
+    document.querySelectorAll('input.one').forEach(function (r) {
+        var lab = r.closest('label');
+        lab.addEventListener('mousedown', function () { r._was = r.checked; });
+        lab.addEventListener('touchstart', function () { r._was = r.checked; }, { passive: true });
+        r.addEventListener('click', function () { if (r._was && !r.disabled) { r.checked = false; r._was = false; } });
+    });
+    /* Pain Symptoms Tooth # starts as the Tooth # above */
+    var main = document.querySelector('select[name="toothNumber"]'), pain = document.querySelector('select[name="painToothNumber"]');
+    if (main && pain && !pain.disabled) {
+        var follow = !pain.value || pain.value === main.value;
+        if (!pain.value && main.value) pain.value = main.value;
+        main.addEventListener('change', function () { if (follow) pain.value = main.value; });
+        pain.addEventListener('change', function () { follow = false; });
+    }
+})();
+</script>
+<th:block th:replace="~{fragments/faculty-review :: modals}"></th:block>
 </body>
 </html>

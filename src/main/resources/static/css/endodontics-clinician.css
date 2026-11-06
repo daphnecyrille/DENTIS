@@ -537,3 +537,54 @@ input[readonly].select-input, input[readonly] { color: #333; }
 .diag-table .diag-tooth-row td { background: #f6f8fa; }
 .diag-table select.diag-tooth { width: 100%; padding: 5px 6px; border: 1px solid #ccc; border-radius: 4px; font-family: 'Poppins', sans-serif; font-size: 12px; }
 .diag-table select.diag-tooth:disabled { color: #333; background: #f5f5f5; opacity: 1; }
+
+/* ═══ ENDO1 redesign: even header grid, tap chips, section headings ═══ */
+.e1-head { display: grid; grid-template-columns: 2fr 0.7fr 0.8fr 1.3fr; gap: 14px 12px; }
+.e1-head .form-group, .e1-grid2 .form-group, .e1-grid3 .form-group { min-width: 0; }
+.e1-head .e1-span2 { grid-column: span 2; }
+.e1-head input, .e1-head select, .e1-grid2 input, .e1-grid3 input { width: 100%; box-sizing: border-box; }
+.e1-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.e1-grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.e1-select { padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-family: 'Poppins', sans-serif; font-size: 13px; background: white; color: #333; }
+.e1-select:disabled { background: #f5f5f5; color: #333; opacity: 1; }
+.e1-section { display: flex; align-items: center; gap: 10px; margin: 14px 0 0; padding: 9px 14px; background: #2d4a6b; color: white; border-radius: 6px; font-size: 13.5px; font-weight: 600; }
+.e1-section small { font-weight: 400; opacity: .8; font-size: 12px; }
+.e1-section-tooth { justify-content: space-between; }
+.e1-tooth-pick { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; }
+.e1-tooth-pick .e1-select { padding: 5px 8px; min-width: 100px; }
+.e1-box { border: 1px solid #dfe5ec; border-radius: 8px; padding: 4px 16px; background: #fff; }
+.e1-row { display: grid; grid-template-columns: 200px 1fr; gap: 14px; align-items: start; padding: 11px 0; border-bottom: 1px solid #eef2f6; }
+.e1-row:last-child { border-bottom: none; }
+.e1-rl { font-size: 13px; font-weight: 600; color: #222; padding-top: 7px; }
+.e1-rl small { display: block; font-weight: 400; color: #8a97a8; font-size: 11.5px; }
+.e1-rv { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.e1-chips { display: flex; gap: 7px; flex-wrap: wrap; }
+.e1-chips label { position: relative; cursor: pointer; }
+.e1-chips input { position: absolute; opacity: 0; pointer-events: none; }
+.e1-chips span { display: inline-block; padding: 7px 13px; border: 1.5px solid #c8d1dc; border-radius: 18px; font-size: 13px; color: #2d4a6b; background: white; transition: all .12s; user-select: none; }
+.e1-chips label:hover span { border-color: #2d4a6b; }
+.e1-chips input:checked ~ span { background: #2d4a6b; border-color: #2d4a6b; color: white; }
+.e1-chips label.ro { cursor: default; }
+.e1-chips label.ro:hover span { border-color: #c8d1dc; }
+.e1-chips label.ro input:checked ~ span { border-color: #2d4a6b; }
+.e1-chips.e1-num span { width: 38px; padding: 7px 0; text-align: center; border-radius: 8px; font-weight: 600; }
+.e1-chips.e1-num label:nth-child(n+4) span { color: #a8661a; }
+.e1-chips.e1-num label:nth-child(n+8) span { color: #b02a1e; }
+.e1-chips.e1-num input:checked ~ span { color: white; }
+.e1-other { display: none; max-width: 340px; padding: 7px 10px; border: 1px solid #ccc; border-radius: 6px; font-family: 'Poppins', sans-serif; font-size: 13px; }
+.e1-other.on { display: block; }
+.e1-note { font-weight: 400; color: #8a97a8; font-size: 11.5px; }
+.e1-anes { display: flex; flex-direction: column; gap: 8px; }
+.e1-anes-row { display: grid; grid-template-columns: 150px 1fr; gap: 10px; align-items: center; }
+.e1-anes-row .e1-chips span { width: 100%; text-align: center; box-sizing: border-box; }
+.e1-anes-loc { padding: 7px 10px; border: 1px solid #ccc; border-radius: 6px; font-family: 'Poppins', sans-serif; font-size: 13px; opacity: .45; }
+.e1-anes-loc.on { opacity: 1; }
+/* Diagnostic tests: visible boxes */
+.diag-table tbody input[type="text"] { border: 1px solid #ccc; border-radius: 6px; background: white; padding: 6px 8px; width: 100%; box-sizing: border-box; font-size: 13px; }
+.diag-table tbody input[readonly] { background: #f6f8fa; }
+@media (max-width: 860px) {
+    .e1-head { grid-template-columns: 1fr 1fr; } .e1-head .e1-wide, .e1-head .e1-span2 { grid-column: span 2; }
+    .e1-grid3 { grid-template-columns: 1fr; } .e1-row { grid-template-columns: 1fr; gap: 6px; }
+}
+.e1-anes-row .e1-chips, .e1-anes-row .e1-chips label { width: 100%; }
+.e1-anes-row .e1-chips span { display: block; font-weight: 500; }
