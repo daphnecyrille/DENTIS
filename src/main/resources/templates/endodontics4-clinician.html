@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ENDO4 Informed Consent - DentIS</title>
+    <link rel="stylesheet" href="/css/endodontics2-clinician.css?v=4">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/form-common.css?v=3">
+    <link rel="stylesheet" href="/css/signature.css">
+    <link rel="stylesheet" href="/css/endo-consent.css?v=3">
+</head>
+
+<body>
+<div class="background"></div>
+<div class="endo2-page">
+
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
+                <div class="dropdown-icon">&#9660;</div>
+                <div class="user-dropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul th:if="${currentUser != null and currentUser.role.name() == 'FACULTY'}">
+                    <li class="nav-item"><a href="/faculty-dashboard" class="nav-link"><img src="/images/home-icon.png" alt="Home" class="nav-icon"><span>Home</span></a></li>
+                    <li class="nav-item active"><a href="/faculty-patientlist" class="nav-link"><img src="/images/patient-icon.png" alt="Patient List" class="nav-icon"><span>Patient List</span></a></li>
+                    <li class="nav-item"><a href="/faculty-advisees" class="nav-link"><img src="/images/chart-icon.png" alt="My Advisees" class="nav-icon"><span>My Advisees</span></a></li>
+                </ul>
+                <ul th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
+                    <li class="nav-item"><a href="/dashboard-clinicmanager" class="nav-link"><img src="/images/home-icon.png" alt="Home" class="nav-icon"><span>Home</span></a></li>
+                    <li class="nav-item active"><a href="/patientlist-clinicmanager" class="nav-link"><img src="/images/patient-icon.png" alt="Patient List" class="nav-icon"><span>Patient List</span></a></li>
+                </ul>
+                <ul th:if="${currentUser == null or currentUser.role.name() == 'CLINICIAN'}">
+                    <li class="nav-item"><a href="/clinician-dashboard" class="nav-link"><img src="/images/home-icon.png" alt="Home" class="nav-icon"><span>Home</span></a></li>
+                    <li class="nav-item"><a href="/chartrequest-clinician" class="nav-link"><img src="/images/request-icon.png" alt="Chart" class="nav-icon2"><span>Chart Request</span></a></li>
+                    <li class="nav-item active"><a href="/patientlist-clinician" class="nav-link"><img src="/images/patient-icon.png" alt="Patient" class="nav-icon"><span>Patient List</span></a></li>
+                    <li class="nav-item">
+                        <a href="/evaluations-clinician" class="nav-link" style="position:relative;">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="14" height="17" rx="2" stroke="#333" stroke-width="2"/><path d="M9 4V3h6v1" stroke="#333" stroke-width="2" stroke-linecap="round"/><path d="M8.5 12.5l2.2 2.2 4.8-4.8" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span>Evaluations</span>
+                            <b th:if="${currentUser != null and @notificationService.newEvaluationCount(currentUser) > 0}" th:text="${@notificationService.newEvaluationCount(currentUser)}"
+                               style="position:absolute; top:2px; right:6px; min-width:18px; height:18px; padding:0 5px; box-sizing:border-box; border-radius:9px; background:#c0392b; color:white; font-size:11px; font-weight:700; line-height:18px; text-align:center;">1</b>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" th:with="isClin=${currentUser == null or currentUser.role.name() == 'CLINICIAN'},
+                                            editable=${!viewOnly and chart.consentEditable},
+                                            planLocked=${chart.consentPatientSigned or !chart.consentEditable or viewOnly}">
+            <h2 class="page-title">Clinical Endodontics</h2>
+
+            <div class="form-card">
+                <a th:if="${currentUser != null and currentUser.role.name() == 'FACULTY'}" th:href="@{/chartsview-faculty/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <a th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}" th:href="@{/chartsview-clinicmanager/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <a th:if="${isClin}" th:href="@{/chartsview-clinician/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <div th:if="${param.saved != null}" class="saved-toast" role="status">
+                    <span class="saved-toast-icon">&#10003;</span><span>Changes saved</span>
+                    <button type="button" class="saved-toast-close" aria-label="Close" onclick="this.parentNode.remove()">&times;</button>
+                </div>
+                <div th:if="${param.patientSigned != null}" class="saved-toast" role="status">
+                    <span class="saved-toast-icon">&#10003;</span><span>The patient has signed. Please sign below.</span>
+                    <button type="button" class="saved-toast-close" aria-label="Close" onclick="this.parentNode.remove()">&times;</button>
+                </div>
+                <div th:if="${param.incomplete != null}" class="saved-toast" role="status" style="background:#fdecea; color:#8a1f17;">
+                    <span>The patient&rsquo;s signature wasn&rsquo;t saved. Choose who is signing, write the name, and sign.</span>
+                    <button type="button" class="saved-toast-close" aria-label="Close" onclick="this.parentNode.remove()">&times;</button>
+                </div>
+                <div th:if="${param.signed != null}" class="saved-toast" role="status">
+                    <span class="saved-toast-icon">&#10003;</span><span>Signed. Submit it from the charts view.</span>
+                    <button type="button" class="saved-toast-close" aria-label="Close" onclick="this.parentNode.remove()">&times;</button>
+                </div>
+                <div th:if="${param.restarted != null}" class="saved-toast" role="status">
+                    <span class="saved-toast-icon">&#10003;</span><span>Signatures cleared. Update the plan, then have the patient sign again.</span>
+                    <button type="button" class="saved-toast-close" aria-label="Close" onclick="this.parentNode.remove()">&times;</button>
+                </div>
+
+                <div class="form-banner">Patient Information and Informed Consent</div>
+
+                <div class="form-body">
+                    <div th:if="${chart.form4Status.name() == 'REVISE' and chart.form4RevisionReason != null}" class="c4-revise">
+                        <b>Revision Required</b><span th:text="${chart.form4RevisionReason}"></span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group"><label>Clinician</label>
+                            <input type="text" readonly th:value="${chart.clinician != null ? chart.clinician.fullName : ''}"></div>
+                        <div class="form-group"><label>Chart No.</label>
+                            <input type="text" readonly th:value="${chart.chartNo != null ? #strings.replace(chart.chartNo, '-ENDO1', '-ENDO4') : ''}"></div>
+                    </div>
+                    <div class="form-group"><label>Patient Name</label>
+                        <input type="text" readonly th:value="${chart.patient.surname + ', ' + chart.patient.firstName + (chart.patient.middleInitial != null and !#strings.isEmpty(chart.patient.middleInitial) ? ' ' + chart.patient.middleInitial + '.' : '')}"></div>
+
+                    <!-- Plan and cost (clinician). The consent popup sits inside this form, so the patient's signature saves the plan with it. -->
+                    <form th:action="@{/endodontics4-clinician/{id}(id=${chart.id})}" method="post" id="planForm"
+                          class="c4-step" th:classappend="${chart.consentPatientSigned} ? 'done locked-step'">
+                        <div class="c4-step-head"><h3>Treatment Plan &amp; Cost</h3></div>
+                        <div class="c4-plan">
+                            <div><label>1. Pretreatment</label>
+                                <textarea name="consentPretreatment" th:text="${chart.consentPretreatment}" th:readonly="${planLocked}"></textarea></div>
+                            <div><label>2. Treatment Proper</label>
+                                <textarea name="consentTreatmentProper" th:text="${chart.consentTreatmentProper}" th:readonly="${planLocked}"></textarea></div>
+                            <div><label>3. Post-treatment</label>
+                                <textarea name="consentPostTreatment" th:text="${chart.consentPostTreatment}" th:readonly="${planLocked}"></textarea></div>
+                        </div>
+                        <div class="c4-cost">
+                            <div class="c4-cost-row"><span class="lbl">RCT for tooth #</span>
+                                <select class="c4-tooth" name="consentToothNumber" th:disabled="${planLocked}"><option value="">Tooth #</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="31">31</option><option value="32">32</option><option value="33">33</option><option value="34">34</option><option value="35">35</option><option value="36">36</option><option value="37">37</option><option value="38">38</option><option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option><option value="45">45</option><option value="46">46</option><option value="47">47</option><option value="48">48</option></select>
+                                <span>= PHP</span>
+                                <input type="text" class="md" name="consentRctFee" th:value="${chart.consentRctFee}" th:readonly="${planLocked}" inputmode="decimal" placeholder="0.00">
+                                <span class="due">due before start of RCT</span></div>
+                            <div class="c4-cost-row"><span class="lbl">Radiographs</span>
+                                <input type="text" class="sm" name="consentRadiographs" th:value="${chart.consentRadiographs}" th:readonly="${planLocked}" placeholder="e.g. 4 PA">
+                                <span>= PHP</span>
+                                <input type="text" class="md" name="consentRadiographFee" th:value="${chart.consentRadiographFee}" th:readonly="${planLocked}" inputmode="decimal" placeholder="0.00">
+                                <span class="due">due after RCT</span></div>
+                        </div>
+                        <p class="c4-lock-note" th:if="${chart.consentPatientSigned and editable}">Locked because the patient has signed this plan. To change it, start over and have the patient sign again.</p>
+                        <div class="c4-step-actions" th:if="${editable and !planLocked and isClin}">
+                            <button type="submit" name="action" value="save" class="c4-btn sec">Save</button>
+                        </div>
+
+                        <!-- Consent popup: full screen, large text, for the patient to read and sign on the iPad -->
+                        <div class="pt-modal" id="consentModal" aria-hidden="true">
+                            <div class="pt-top">
+                                <img src="/images/UPMlogo.png" alt="UP Manila">
+                                <div class="t">Patient Information and Informed Consent<small>Oral Medicine Section &middot; Endodontics &middot; UP College of Dentistry</small></div>
+                                <button type="button" class="pt-close" onclick="closeConsent()">Close</button>
+                            </div>
+                            <div class="pt-wrap">
+                                <div class="pt-card">
+                                    <p class="pt-hello" th:text="${'Hello, ' + chart.patient.firstName + '!'}">Hello!</p>
+                                    <p class="pt-lead">Please read this before your root canal treatment. It explains the treatment, your appointments and the cost.
+                                        Your clinician will answer any questions.<span class="pt-sign-only"> When you&rsquo;re done, sign at the bottom.</span></p>
+                                </div>
+                                <div class="pt-card"><th:block th:replace="~{fragments/endo-consent-text :: text}"></th:block></div>
+                                <div class="pt-card">
+                                    <h2>Your Treatment Plan</h2>
+                                    <div class="pt-plan">
+                                        <div><b>1. Pretreatment</b><span data-from="consentPretreatment"></span></div>
+                                        <div><b>2. Treatment Proper</b><span data-from="consentTreatmentProper"></span></div>
+                                        <div><b>3. Post-treatment</b><span data-from="consentPostTreatment"></span></div>
+                                    </div>
+                                </div>
+                                <div class="pt-card">
+                                    <h2>Cost of Treatment</h2>
+                                    <table class="pt-cost">
+                                        <tr><td>RCT for tooth # <b data-from="consentToothNumber"></b><small>Due before the start of RCT</small></td>
+                                            <td class="amt" data-from="consentRctFee" data-prefix="PHP "></td></tr>
+                                        <tr><td>Radiographs <b data-from="consentRadiographs"></b><small>Due after RCT</small></td>
+                                            <td class="amt" data-from="consentRadiographFee" data-prefix="PHP "></td></tr>
+                                    </table>
+                                </div>
+                                <div class="pt-card"><th:block th:replace="~{fragments/endo-consent-text :: release}"></th:block></div>
+
+                                <!-- Once signed: the signatures, like the bottom of the paper form -->
+                                <div class="pt-card" th:if="${chart.consentPatientSigned}">
+                                    <h2>Signatures</h2>
+                                    <div class="pt-signed-grid">
+                                        <div class="pt-signed">
+                                            <img th:src="${chart.consentPatientSignature}" alt="Patient signature">
+                                            <b th:text="${chart.consentSignerName}"></b>
+                                            <span th:text="${chart.signerLabel == 'Patient' ? 'Patient' : chart.signerLabel + ' of the patient'}"></span>
+                                            <small th:text="${#temporals.format(chart.consentPatientSignedAt, 'MMM d, yyyy')}"></small>
+                                        </div>
+                                        <div class="pt-signed" th:if="${chart.consentClinicianSigned}">
+                                            <img th:src="${chart.consentClinicianSignature}" alt="Clinician signature">
+                                            <b th:text="${chart.consentClinicianSignedBy != null ? chart.consentClinicianSignedBy : (chart.clinician != null ? chart.clinician.fullName : '')}"></b>
+                                            <span>Clinician</span>
+                                            <small th:text="${#temporals.format(chart.consentClinicianSignedAt, 'MMM d, yyyy')}"></small>
+                                        </div>
+                                        <div class="pt-signed" th:if="${chart.consentFacultySignature != null}">
+                                            <img th:src="${chart.consentFacultySignature}" alt="Faculty signature">
+                                            <b th:text="${chart.consentFacultySignedBy}"></b>
+                                            <span>Faculty</span>
+                                            <small th:text="${#temporals.format(chart.consentFacultySignedAt, 'MMM d, yyyy')}"></small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="pt-card pt-sign-only" th:if="${editable and isClin and !chart.consentPatientSigned}">
+                                    <h2>Sign</h2>
+                                    <div class="pt-field"><label>I am signing as the</label></div>
+                                    <div class="pt-who">
+                                        <label><input type="radio" name="signerType" value="PATIENT" checked><span>Patient</span></label>
+                                        <label><input type="radio" name="signerType" value="PARENT"><span>Parent</span></label>
+                                        <label><input type="radio" name="signerType" value="GUARDIAN"><span>Guardian</span></label>
+                                    </div>
+                                    <div class="pt-field">
+                                        <label for="signerName">Printed name <span class="pt-name-note">(from the patient record)</span></label>
+                                        <input type="text" id="signerName" name="signerName" autocomplete="off" readonly class="pt-locked"
+                                               th:value="${chart.patient.firstName + ' ' + chart.patient.surname}"
+                                               th:attr="data-patient=${chart.patient.firstName + ' ' + chart.patient.surname}">
+                                    </div>
+                                    <div class="pt-sig">
+                                        <div class="pt-field"><label>Signature</label></div>
+                                        <div id="ptSigPad"></div>
+                                        <div class="sig-btns"><button type="button" class="sig-btn-sec" id="ptSigClear">Clear</button></div>
+                                    </div>
+                                    <p class="pt-date" th:text="${'Date: ' + #temporals.format(#temporals.createNow(), 'MMMM d, yyyy')}"></p>
+                                    <input type="hidden" name="signature" id="ptSignature">
+                                    <button type="submit" name="action" value="patient-sign" class="pt-agree" id="ptAgree" disabled>I have read this and I agree</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Signatures: each box unlocks once the one before it is signed -->
+                    <div class="c4-sig-top"><button type="button" class="c4-btn-text" onclick="openConsent(false)">View consent text</button></div>
+                    <div>
+                        <div class="c4-sigs">
+                            <!-- Patient / parent / guardian -->
+                            <div class="sig-box">
+                                <span class="sig-label">Patient Signature</span>
+                                <div th:if="${chart.consentPatientSigned}" class="sig-signed">
+                                    <img th:src="${chart.consentPatientSignature}" alt="Patient signature">
+                                    <div class="sig-meta" th:text="${'✓ ' + chart.consentSignerName + ' (' + chart.signerLabel + ') · ' + #temporals.format(chart.consentPatientSignedAt, 'MMM d, yyyy, h:mm a')}"></div>
+                                </div>
+                                <div th:if="${!chart.consentPatientSigned and editable and isClin}" class="sig-waiting c4-ready">
+                                    <b>The patient reads the consent and signs</b>
+                                    <button type="button" class="c4-btn" onclick="openConsent(true)">Hand to patient</button>
+                                </div>
+                                <div th:if="${!chart.consentPatientSigned and !(editable and isClin)}" class="sig-waiting"><b>Not signed yet</b></div>
+                            </div>
+                            <!-- Clinician -->
+                            <div class="sig-box">
+                                <span class="sig-label">Clinician Signature</span>
+                                <div th:if="${chart.consentClinicianSigned}" class="sig-signed">
+                                    <img th:src="${chart.consentClinicianSignature}" alt="Clinician signature">
+                                    <div class="sig-meta" th:text="${'✓ ' + (chart.consentClinicianSignedBy != null ? chart.consentClinicianSignedBy : (chart.clinician != null ? chart.clinician.fullName : 'Clinician')) + ' · ' + #temporals.format(chart.consentClinicianSignedAt, 'MMM d, yyyy, h:mm a')}"></div>
+                                </div>
+                                <form th:if="${!chart.consentClinicianSigned and chart.consentPatientSigned and editable and isClin}"
+                                      th:action="@{/endodontics4-clinician/{id}/clinician-sign(id=${chart.id})}" method="post" id="clinSignForm">
+                                    <div id="clinSigPad"></div>
+                                    <input type="hidden" name="signature" id="clinSignature">
+                                    <div class="sig-btns">
+                                        <button type="button" class="sig-btn-sec" id="clinSigClear">Clear</button>
+                                        <button type="submit" class="sig-btn-pri" id="clinSigSubmit" disabled>Sign</button>
+                                    </div>
+                                </form>
+                                <div th:if="${!chart.consentClinicianSigned and !chart.consentPatientSigned}" class="sig-waiting"><b>Waiting for patient</b>The clinician signs after the patient.</div>
+                                <div th:if="${!chart.consentClinicianSigned and chart.consentPatientSigned and !(editable and isClin)}" class="sig-waiting"><b>Not signed yet</b></div>
+                            </div>
+                            <!-- Faculty: signs in the Approve box -->
+                            <div class="sig-box">
+                                <span class="sig-label">Faculty Signature</span>
+                                <div th:if="${chart.consentFacultySignature != null}" class="sig-signed">
+                                    <img th:src="${chart.consentFacultySignature}" alt="Faculty signature">
+                                    <div class="sig-meta" th:text="${'✓ ' + (chart.consentFacultySignedBy != null ? chart.consentFacultySignedBy : 'Faculty') + ' · ' + #temporals.format(chart.consentFacultySignedAt, 'MMM d, yyyy, h:mm a')}"></div>
+                                </div>
+                                <div th:if="${chart.consentFacultySignature == null and chart.form4Status.name() != 'SUBMITTED'}" class="sig-waiting"><b>Waiting for faculty</b>Signed by the faculty when they approve this form.</div>
+                                <th:block th:if="${chart.consentFacultySignature == null and chart.form4Status.name() == 'SUBMITTED'}"
+                                          th:with="myTurn=${currentUser != null and currentUser.role.name() == 'FACULTY' and chart.faculty != null and chart.faculty.id == currentUser.id}">
+                                    <div th:if="${myTurn}" class="sig-waiting c4-myturn"><b>Ready for your signature</b><span>Press <strong>Approve</strong> below to sign and approve this form.</span></div>
+                                    <div th:unless="${myTurn}" class="sig-waiting"><b>Waiting for faculty</b>Signed by the faculty when they approve this form.</div>
+                                </th:block>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Clinician: start over / submit -->
+                    <div class="c4-submit" th:if="${editable and isClin}">
+                        <form th:if="${chart.consentPatientSigned}" th:action="@{/endodontics4-clinician/{id}/restart(id=${chart.id})}" method="post"
+                              onsubmit="return confirm('Start over? Both signatures are cleared and the patient has to sign again.');" style="margin-right:auto;">
+                            <button type="submit" class="c4-btn-link">Start over (change the plan)</button>
+                        </form>
+                    </div>
+
+                    <!-- Faculty: approve (with signature) / revise -->
+                    <div class="form-actions review-actions" th:if="${currentUser != null and currentUser.role.name() == 'FACULTY' and chart.faculty != null and chart.faculty.id == currentUser.id and chart.form4Status.name() == 'SUBMITTED'}">
+                        <button type="button" class="btn-revise"
+                                th:data-action="@{/endodontics4-faculty/{id}/revise(id=${chart.id})}"
+                                onclick="openReviseModal(this)">Revise</button>
+                        <button type="button" class="btn-approve"
+                                th:data-action="@{/endodontics4-faculty/{id}/approve(id=${chart.id})}"
+                                data-sign="true" data-title="Approve the informed consent?"
+                                data-sign-text="Sign below to approve. Your signature goes in the Faculty signature of this consent."
+                                onclick="openApproveModal(this)">Approve</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="/js/signature-pad.js"></script>
+<script th:inline="javascript">var CONSENT_TOOTH = /*[[${chart.consentToothNumber}]]*/ '';</script>
+<script th:inline="none">
+(function () { var t = document.querySelector('select[name="consentToothNumber"]'); if (t && CONSENT_TOOTH) t.value = CONSENT_TOOTH; })();
+/* Consent popup: shows the plan and cost as typed; in signing mode the patient signs at the bottom */
+(function () {
+    var modal = document.getElementById('consentModal'), form = document.getElementById('planForm');
+    var pad = null, hasInk = false;
+    var name = document.getElementById('signerName'), agree = document.getElementById('ptAgree');
+    function update() { if (agree) agree.disabled = !(hasInk && name.value.trim()); }
+
+    window.openConsent = function (signing) {
+        modal.querySelectorAll('[data-from]').forEach(function (el) {
+            var f = form.elements[el.dataset.from], v = f ? f.value.trim() : '';
+            el.textContent = v ? (el.dataset.prefix || '') + v : '\u2014';
+        });
+        modal.classList.toggle('signing', !!signing && !!agree);
+        modal.classList.add('open');
+        modal.scrollTop = 0;
+        document.body.style.overflow = 'hidden';
+        if (signing && agree && !pad) {
+            pad = DentisSignaturePad.create(document.getElementById('ptSigPad'), {
+                hint: 'Sign here', onChange: function (ink) { hasInk = ink; update(); }
+            });
+        }
+        return false;
+    };
+    window.closeConsent = function () { modal.classList.remove('open'); document.body.style.overflow = ''; };
+
+    if (agree) {
+        document.getElementById('ptSigClear').onclick = function () { if (pad) pad.clear(); hasInk = false; update(); };
+        name.addEventListener('input', update);
+        document.querySelectorAll('input[name="signerType"]').forEach(function (r) {
+            r.addEventListener('change', function () {
+                var self = r.value === 'PATIENT';
+                name.readOnly = self;
+                name.classList.toggle('pt-locked', self);
+                name.value = self ? name.dataset.patient : '';
+                name.placeholder = self ? '' : 'Full name of the ' + (r.value === 'PARENT' ? 'parent' : 'guardian');
+                update();
+                document.querySelector('.pt-name-note').style.display = self ? '' : 'none';
+                if (!self) name.focus();
+            });
+        });
+        form.addEventListener('submit', function (e) {
+            var btn = e.submitter;
+            if (!btn || btn.value !== 'patient-sign') return;
+            if (!pad || pad.isEmpty() || !name.value.trim()) { e.preventDefault(); return; }
+            document.getElementById('ptSignature').value = pad.toDataURL();
+        });
+    }
+
+    /* clinician signature (unlocks after the patient signs) */
+    var box = document.getElementById('clinSigPad');
+    if (box) {
+        var btn = document.getElementById('clinSigSubmit');
+        var cpad = DentisSignaturePad.create(box, { hint: 'Sign here', onChange: function (ink) { btn.disabled = !ink; } });
+        document.getElementById('clinSigClear').onclick = function () { cpad.clear(); btn.disabled = true; };
+        document.getElementById('clinSignForm').addEventListener('submit', function (e) {
+            if (cpad.isEmpty()) { e.preventDefault(); return; }
+            document.getElementById('clinSignature').value = cpad.toDataURL();
+        });
+    }
+})();
+document.querySelector('.user-profile').onclick = function (e) { e.stopPropagation(); document.querySelector('.user-dropdown').classList.toggle('show'); };
+document.addEventListener('click', function () { var d = document.querySelector('.user-dropdown'); if (d) d.classList.remove('show'); });
+</script>
+<th:block th:replace="~{fragments/faculty-review :: modals}"></th:block>
+<script src="/js/textarea-min-size.js"></script>
+<script src="/js/sidebar-hover.js?v=3"></script>
+<script src="/js/date-click.js"></script>
+</body>
+</html>

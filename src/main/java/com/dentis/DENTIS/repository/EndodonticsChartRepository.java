@@ -20,12 +20,6 @@ public interface EndodonticsChartRepository extends JpaRepository<EndodonticsCha
     List<EndodonticsChart> findByClinicianAndStatusInOrderByCreatedAtDesc(User clinician, List<EndodonticsChartStatus> statuses);
     List<EndodonticsChart> findByFacultyAndStatusOrderByCreatedAtDesc(User faculty, EndodonticsChartStatus status);
 
-    @Query("SELECT e FROM EndodonticsChart e WHERE e.clinician = :clinician AND e.form2Status IN :statuses ORDER BY e.createdAt DESC")
-    List<EndodonticsChart> findByClinicianAndForm2StatusIn(@Param("clinician") User clinician, @Param("statuses") List<EndodonticsChartStatus> statuses);
-
-    @Query("SELECT e FROM EndodonticsChart e WHERE e.faculty = :faculty AND e.form2Status = :status ORDER BY e.createdAt DESC")
-    List<EndodonticsChart> findByFacultyAndForm2Status(@Param("faculty") User faculty, @Param("status") EndodonticsChartStatus status);
-
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
     List<EndodonticsChart> findAllByOrderByCreatedAtDesc();
 }

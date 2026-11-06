@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ENDO2 Evaluation - DentIS</title>
+    <link rel="stylesheet" href="/css/endodontics2-clinician.css?v=5">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/form-common.css?v=3">
+</head>
+
+<body>
+<div class="background"></div>
+<div class="endo2-page">
+
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
+                <div class="dropdown-icon">&#9660;</div>
+                <div class="user-dropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul th:if="${currentUser != null and currentUser.role.name() == 'FACULTY'}">
+                    <li class="nav-item"><a href="/faculty-dashboard" class="nav-link"><img src="/images/home-icon.png" alt="Home" class="nav-icon"><span>Home</span></a></li>
+                    <li class="nav-item active"><a href="/faculty-patientlist" class="nav-link"><img src="/images/patient-icon.png" alt="Patient List" class="nav-icon"><span>Patient List</span></a></li>
+                    <li class="nav-item"><a href="/faculty-advisees" class="nav-link"><img src="/images/chart-icon.png" alt="My Advisees" class="nav-icon"><span>My Advisees</span></a></li>
+                </ul>
+                <ul th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
+                    <li class="nav-item"><a href="/dashboard-clinicmanager" class="nav-link"><img src="/images/home-icon.png" alt="Home" class="nav-icon"><span>Home</span></a></li>
+                    <li class="nav-item active"><a href="/patientlist-clinicmanager" class="nav-link"><img src="/images/patient-icon.png" alt="Patient List" class="nav-icon"><span>Patient List</span></a></li>
+                </ul>
+                <ul th:if="${currentUser == null or currentUser.role.name() == 'CLINICIAN'}">
+                    <li class="nav-item"><a href="/clinician-dashboard" class="nav-link"><img src="/images/home-icon.png" alt="Home" class="nav-icon"><span>Home</span></a></li>
+                    <li class="nav-item"><a href="/chartrequest-clinician" class="nav-link"><img src="/images/request-icon.png" alt="Chart" class="nav-icon2"><span>Chart Request</span></a></li>
+                    <li class="nav-item active"><a href="/patientlist-clinician" class="nav-link"><img src="/images/patient-icon.png" alt="Patient" class="nav-icon"><span>Patient List</span></a></li>
+                    <li class="nav-item">
+                        <a href="/evaluations-clinician" class="nav-link" style="position:relative;">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="14" height="17" rx="2" stroke="#333" stroke-width="2"/><path d="M9 4V3h6v1" stroke="#333" stroke-width="2" stroke-linecap="round"/><path d="M8.5 12.5l2.2 2.2 4.8-4.8" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span>Evaluations</span>
+                            <b th:if="${currentUser != null and @notificationService.newEvaluationCount(currentUser) > 0}" th:text="${@notificationService.newEvaluationCount(currentUser)}"
+                               style="position:absolute; top:2px; right:6px; min-width:18px; height:18px; padding:0 5px; box-sizing:border-box; border-radius:9px; background:#c0392b; color:white; font-size:11px; font-weight:700; line-height:18px; text-align:center;">1</b>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <h2 class="page-title">Clinical Endodontics</h2>
+
+            <div class="form-card">
+                <!-- Back to Charts + popups -->
+                <a th:if="${currentUser != null and currentUser.role.name() == 'FACULTY'}" th:href="@{/chartsview-faculty/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <a th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}" th:href="@{/chartsview-clinicmanager/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <a th:if="${currentUser == null or currentUser.role.name() == 'CLINICIAN'}" th:href="@{/chartsview-clinician/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <div th:if="${param.saved != null}" class="saved-toast" role="status">
+                    <span class="saved-toast-icon">&#10003;</span><span>Draft saved</span>
+                    <button type="button" class="saved-toast-close" aria-label="Close" onclick="this.parentNode.remove()">&times;</button>
+                </div>
+                <div th:if="${param.sent != null}" class="saved-toast" role="status">
+                    <span class="saved-toast-icon">&#10003;</span><span>Sent to the clinician</span>
+                    <button type="button" class="saved-toast-close" aria-label="Close" onclick="this.parentNode.remove()">&times;</button>
+                </div>
+                <div th:if="${param.recalled != null}" class="saved-toast" role="status">
+                    <span class="saved-toast-icon">&#10003;</span><span>Recalled &mdash; you can edit it again</span>
+                    <button type="button" class="saved-toast-close" aria-label="Close" onclick="this.parentNode.remove()">&times;</button>
+                </div>
+                <div th:if="${param.missing != null}" class="e2-missing" role="alert">
+                    <b>Not sent yet.</b> Still missing: <span th:text="${param.missing}"></span>. Your changes were saved as a draft.
+                </div>
+
+                <div class="form-banner">Endodontic Evaluation &amp; Treatment Planning</div>
+                <div class="e2-code-row">
+                    <span class="e2-code" th:text="${eval.visitNo != null and eval.visitNo > 1 ? 'ENDO2 · #' + eval.visitNo : 'ENDO2'}">ENDO2</span>
+                    <span th:if="${facultyMode and eval.sent}" class="e2-status sent">&#9679; Sent to clinician</span>
+                    <span th:if="${facultyMode and !eval.sent}" class="e2-status draft">&#9679; Draft</span>
+                </div>
+
+                <form th:action="@{/endo-eval-faculty/{id}(id=${eval.id})}" method="post" id="e2Form">
+                <div class="form-body">
+
+                    <div class="form-row">
+                        <div class="form-group"><label>Clinician</label>
+                            <input type="text" readonly th:value="${chart.clinician != null ? chart.clinician.fullName : ''}"></div>
+                        <div class="form-group"><label>Patient #</label>
+                            <input type="text" readonly th:value="${chart.patient.chartNo}"></div>
+                    </div>
+                    <div class="form-group"><label>Patient Name</label>
+                        <input type="text" readonly th:value="${chart.patient.surname + ', ' + chart.patient.firstName + (chart.patient.middleInitial != null and !#strings.isEmpty(chart.patient.middleInitial) ? ' ' + chart.patient.middleInitial + '.' : '')}"></div>
+                    <div class="form-row">
+                        <div class="form-group e2-tooth"><label>Tooth #</label>
+                            <select class="select-input" name="toothNumber" th:disabled="${viewOnly}">
+                                <option value="">Select</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="31">31</option><option value="32">32</option><option value="33">33</option><option value="34">34</option><option value="35">35</option><option value="36">36</option><option value="37">37</option><option value="38">38</option><option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option><option value="45">45</option><option value="46">46</option><option value="47">47</option><option value="48">48</option>
+                            </select></div>
+                        <div class="form-group e2-diag"><label>Diagnosis</label>
+                            <input type="text" name="diagnosis" th:value="${eval.diagnosis}" th:readonly="${viewOnly}"></div>
+                    </div>
+
+                    <!-- Scores -->
+                    <div class="eval-table-wrapper">
+                        <table class="eval-table e2-table">
+                            <thead>
+                                <tr>
+                                    <th class="eval-header-main" colspan="2">Endodontic Evaluation &amp; Treatment Planning &ndash; 6 points</th>
+                                    <th class="eval-header-score">Points</th>
+                                    <th class="eval-header-score">Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="eval-num">1.</td>
+                                    <td>Performs correctly the appropriate diagnostic tests.</td>
+                                    <td class="eval-max">3.0</td>
+                                    <td class="eval-score-cell"><input type="number" class="score-input" name="score1" min="0" max="3.0" step="0.25" inputmode="decimal"
+                                        data-max="3.0" th:value="${eval.score1}" th:readonly="${viewOnly}" th:placeholder="${viewOnly ? '—' : '0 – 3.0'}"></td>
+                                </tr>
+                                <tr>
+                                    <td class="eval-num">2.</td>
+                                    <td>Presents a radiograph with good diagnostic value.</td>
+                                    <td class="eval-max">1.5</td>
+                                    <td class="eval-score-cell"><input type="number" class="score-input" name="score2" min="0" max="1.5" step="0.25" inputmode="decimal"
+                                        data-max="1.5" th:value="${eval.score2}" th:readonly="${viewOnly}" th:placeholder="${viewOnly ? '—' : '0 – 1.5'}"></td>
+                                </tr>
+                                <tr>
+                                    <td class="eval-num">3.</td>
+                                    <td>Is able to identify pre-treatment procedures necessary.</td>
+                                    <td class="eval-max">0.5</td>
+                                    <td class="eval-score-cell"><input type="number" class="score-input" name="score3" min="0" max="0.5" step="0.25" inputmode="decimal"
+                                        data-max="0.5" th:value="${eval.score3}" th:readonly="${viewOnly}" th:placeholder="${viewOnly ? '—' : '0 – 0.5'}"></td>
+                                </tr>
+                                <tr>
+                                    <td class="eval-num">4.</td>
+                                    <td>Formulates a general treatment plan.</td>
+                                    <td class="eval-max">0.5</td>
+                                    <td class="eval-score-cell"><input type="number" class="score-input" name="score4" min="0" max="0.5" step="0.25" inputmode="decimal"
+                                        data-max="0.5" th:value="${eval.score4}" th:readonly="${viewOnly}" th:placeholder="${viewOnly ? '—' : '0 – 0.5'}"></td>
+                                </tr>
+                                <tr>
+                                    <td class="eval-num">5.</td>
+                                    <td>Has the consent form signed.
+                                        <span th:if="${chart.consentPatientSigned}" class="e2-consent ok" th:text="${'✓ ENDO4 signed by the ' + #strings.toLowerCase(chart.signerLabel) + ' · ' + #temporals.format(chart.consentPatientSignedAt, 'MMM d, yyyy')}"></span>
+                                        <span th:unless="${chart.consentPatientSigned}" class="e2-consent no">ENDO4 consent not signed yet</span></td>
+                                    <td class="eval-max">0.5</td>
+                                    <td class="eval-score-cell"><input type="number" class="score-input" name="score5" min="0" max="0.5" step="0.25" inputmode="decimal"
+                                        data-max="0.5" th:value="${eval.score5}" th:readonly="${viewOnly}" th:placeholder="${viewOnly ? '—' : '0 – 0.5'}"></td>
+                                </tr>
+                                <tr class="e2-total-row">
+                                    <td colspan="2">Total</td>
+                                    <td class="eval-max">6.0</td>
+                                    <td class="eval-score-cell"><b id="e2Total">&mdash;</b></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Date / Time + Notes -->
+                    <div class="form-row e2-when-row">
+                        <div class="form-group"><label>Date</label>
+                            <input type="date" name="evalDate" th:value="${eval.evalDate}" th:readonly="${viewOnly}"></div>
+                        <div class="form-group"><label>Time</label>
+                            <input type="time" name="evalTime" th:value="${eval.evalTime}" th:readonly="${viewOnly}"></div>
+                    </div>
+                    <div class="form-group"><label>Notes</label>
+                        <textarea name="notes" rows="5" th:text="${eval.notes}" th:readonly="${viewOnly}"
+                                  th:placeholder="${viewOnly ? '' : 'Comments for the clinician'}"></textarea></div>
+
+                    <!-- EPA level (encircle one) -->
+                    <div class="e2-section-title">Assessed EPA Level for the Performed Procedure</div>
+                    <div class="e2-epa" role="radiogroup">
+                        <label th:each="n : ${#numbers.sequence(1, 5)}" class="e2-epa-opt" th:classappend="${viewOnly} ? 'ro'">
+                            <input type="radio" name="epaLevel" th:value="${'EPA Level ' + n}" th:checked="${eval.epaLevel == 'EPA Level ' + n}" th:disabled="${viewOnly}">
+                            <span th:text="${n}">1</span>
+                        </label>
+                    </div>
+
+                    <div class="form-actions e2-actions" th:if="${!viewOnly}">
+                        <button type="submit" name="action" value="save" class="btn-save e2-btn-sec">Save draft</button>
+                        <button type="submit" name="action" value="send" class="btn-save" id="btnSend">Send to clinician</button>
+                    </div>
+                </div>
+                </form>
+
+                <form th:if="${canGrade and eval.sent}" th:action="@{/endo-eval-faculty/{id}/recall(id=${eval.id})}" method="post" class="e2-recall">
+                    <span>Sent <th:block th:text="${#temporals.format(eval.sentAt, 'MMM d, yyyy, h:mm a')}"></th:block>.
+                        <th:block th:text="${eval.viewedAt != null ? 'The clinician has opened it.' : 'Not opened by the clinician yet.'}"></th:block></span>
+                    <button type="submit" class="e2-btn-recall">Recall to edit</button>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script th:inline="javascript">
+var VIEW_ONLY = /*[[${viewOnly == true}]]*/ false;
+var TOOTH = /*[[${eval.toothNumber}]]*/ '';
+</script>
+<script th:inline="none">
+(function () {
+    var sel = document.querySelector('select[name="toothNumber"]');
+    if (sel) { if (TOOTH) sel.value = TOOTH; sel.classList.toggle('selected', !!sel.value);
+        sel.addEventListener('change', function () { sel.classList.toggle('selected', !!sel.value); }); }
+
+    /* live total, scores kept between 0 and the item's points */
+    var inputs = document.querySelectorAll('.score-input'), totalEl = document.getElementById('e2Total');
+    function total() {
+        var t = 0, any = false;
+        inputs.forEach(function (i) { var v = parseFloat(i.value); if (!isNaN(v)) { t += v; any = true; } });
+        totalEl.textContent = any ? (Math.round(t * 100) / 100) + ' / 6' : '\u2014';
+    }
+    inputs.forEach(function (i) {
+        /* never above the item's points, even while typing */
+        i.addEventListener('input', function () {
+            var m = parseFloat(i.dataset.max), v = parseFloat(i.value);
+            if (!isNaN(v) && v > m) i.value = m;
+            if (!isNaN(v) && v < 0) i.value = 0;
+            total();
+        });
+        i.addEventListener('change', function () {
+            var v = parseFloat(i.value), m = parseFloat(i.dataset.max);
+            if (isNaN(v)) { i.value = ''; } else if (v > m) { i.value = m; } else if (v < 0) { i.value = 0; }
+            total();
+        });
+    });
+    total();
+
+    if (VIEW_ONLY) return;
+    /* empty date / time: fill in now */
+    var now = new Date(), pad2 = function (n) { return (n < 10 ? '0' : '') + n; };
+    var dEl = document.querySelector('input[name="evalDate"]'), tEl = document.querySelector('input[name="evalTime"]');
+    if (dEl && !dEl.value) dEl.value = now.getFullYear() + '-' + pad2(now.getMonth() + 1) + '-' + pad2(now.getDate());
+    if (tEl && !tEl.value) tEl.value = pad2(now.getHours()) + ':' + pad2(now.getMinutes());
+    var form = document.getElementById('e2Form'), lastAction = 'save', dirty = false;
+    form.querySelectorAll('button[name="action"]').forEach(function (b) { b.addEventListener('click', function () { lastAction = b.value; }); });
+    form.addEventListener('submit', function (e) {
+        if (lastAction === 'send') {
+            var missing = [];
+            inputs.forEach(function (i, k) { if (i.value === '') missing.push('score ' + (k + 1)); });
+            if (!form.querySelector('input[name="epaLevel"]:checked')) missing.push('EPA level');
+            if (missing.length) { e.preventDefault(); alert('Before sending, please fill in: ' + missing.join(', ') + '.'); return; }
+            if (!confirm('Send this evaluation to the clinician? It will be locked until you recall it.')) { e.preventDefault(); return; }
+        }
+        dirty = false;
+    });
+    document.addEventListener('input', function () { dirty = true; }, true);
+    document.addEventListener('change', function () { dirty = true; }, true);
+    window.addEventListener('beforeunload', function (e) { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+})();
+
+document.querySelector('.user-profile').onclick = function (e) { e.stopPropagation(); document.querySelector('.user-dropdown').classList.toggle('show'); };
+document.addEventListener('click', function () { var d = document.querySelector('.user-dropdown'); if (d) d.classList.remove('show'); });
+</script>
+<script src="/js/textarea-min-size.js"></script>
+<script src="/js/sidebar-hover.js?v=3"></script>
+<script src="/js/date-click.js"></script>
+</body>
+</html>

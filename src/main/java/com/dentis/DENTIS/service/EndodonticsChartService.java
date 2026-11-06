@@ -13,8 +13,10 @@ import java.util.Optional;
 public class EndodonticsChartService {
 
     private final EndodonticsChartRepository repo;
+    private final com.dentis.DENTIS.repository.EndoEvaluationRepository evalRepo;
 
-    public EndodonticsChartService(EndodonticsChartRepository repo) {
+    public EndodonticsChartService(EndodonticsChartRepository repo, com.dentis.DENTIS.repository.EndoEvaluationRepository evalRepo) {
+        this.evalRepo = evalRepo;
         this.repo = repo;
     }
 
@@ -46,9 +48,21 @@ public class EndodonticsChartService {
      */
     public void reassignFaculty(Patient patient, User faculty) {
         List<EndodonticsChart> charts = findAllByPatient(patient).stream()
-                .filter(c -> !(c.getStatus() == EndodonticsChartStatus.APPROVED && c.getForm2Status() == EndodonticsChartStatus.APPROVED))
+                .filter(c -> !(c.getStatus() == EndodonticsChartStatus.APPROVED && c.getForm4Status() == EndodonticsChartStatus.APPROVED))
                 .toList();
         charts.forEach(c -> c.setFaculty(faculty));
+        repo.saveAll(charts);
+    }
+
+    /** True once the clinician has saved any form of this patient's charts. */
+    public boolean hasStartedForms(Patient patient) {
+        return findAllByPatient(patient).stream().anyMatch(c -> evalRepo.existsByEndoChart(c) || c.getStatus() != EndodonticsChartStatus.CREATED || c.getForm4Status() != EndodonticsChartStatus.CREATED);
+    }
+
+    /** Moves the patient's (not yet started) charts to a newly assigned clinician. */
+    public void reassignClinician(Patient patient, User clinician) {
+        List<EndodonticsChart> charts = findAllByPatient(patient);
+        charts.forEach(c -> c.setClinician(clinician));
         repo.saveAll(charts);
     }
 
@@ -70,17 +84,8 @@ public class EndodonticsChartService {
                 List.of(EndodonticsChartStatus.CREATED, EndodonticsChartStatus.IN_PROGRESS, EndodonticsChartStatus.REVISE));
     }
 
-    public List<EndodonticsChart> findForm2ActionNeededByClinician(User clinician) {
-        return repo.findByClinicianAndForm2StatusIn(clinician,
-                List.of(EndodonticsChartStatus.CREATED, EndodonticsChartStatus.IN_PROGRESS, EndodonticsChartStatus.REVISE));
-    }
-
     public List<EndodonticsChart> findAwaitingApprovalByFaculty(User faculty) {
         return repo.findByFacultyAndStatusOrderByCreatedAtDesc(faculty, EndodonticsChartStatus.SUBMITTED);
-    }
-
-    public List<EndodonticsChart> findAwaitingApproval2ByFaculty(User faculty) {
-        return repo.findByFacultyAndForm2Status(faculty, EndodonticsChartStatus.SUBMITTED);
     }
 
     public EndodonticsChart saveForm1(Long id, EndodonticsChart updated) {
@@ -106,6 +111,9 @@ public class EndodonticsChartService {
         chart.setClinicalConditionOfTooth(updated.getClinicalConditionOfTooth());
         chart.setClinicalConditionOthers(updated.getClinicalConditionOthers());
         chart.setSoftTissueExamination(updated.getSoftTissueExamination());
+        chart.setDiagToothSuspected(updated.getDiagToothSuspected());
+        chart.setDiagToothAdjacent(updated.getDiagToothAdjacent());
+        chart.setDiagToothContralateral(updated.getDiagToothContralateral());
         chart.setDiagPocketSuspected(updated.getDiagPocketSuspected());
         chart.setDiagPocketAdjacent(updated.getDiagPocketAdjacent());
         chart.setDiagPocketContralateral(updated.getDiagPocketContralateral());
@@ -143,29 +151,6 @@ public class EndodonticsChartService {
         return repo.save(chart);
     }
 
-    public EndodonticsChart saveForm2(Long id, EndodonticsChart updated) {
-        EndodonticsChart chart = repo.findById(id).orElseThrow();
-        chart.setEvalToothNumber(updated.getEvalToothNumber());
-        chart.setEvalDiagnosis(updated.getEvalDiagnosis());
-        chart.setEvalScore1(updated.getEvalScore1());
-        chart.setEvalScore2(updated.getEvalScore2());
-        chart.setEvalScore3(updated.getEvalScore3());
-        chart.setEvalScore4(updated.getEvalScore4());
-        chart.setEvalScore5(updated.getEvalScore5());
-        chart.setEvalDate(updated.getEvalDate());
-        chart.setEvalTime(updated.getEvalTime());
-        chart.setEvalNotes(updated.getEvalNotes());
-        chart.setEpaLevel(updated.getEpaLevel());
-        chart.setForm2Status(EndodonticsChartStatus.IN_PROGRESS);
-        return repo.save(chart);
-    }
-
-    public EndodonticsChart submitForm2(Long id) {
-        EndodonticsChart chart = repo.findById(id).orElseThrow();
-        chart.setForm2Status(EndodonticsChartStatus.SUBMITTED);
-        return repo.save(chart);
-    }
-
     public EndodonticsChart submit(Long id) {
         EndodonticsChart chart = repo.findById(id).orElseThrow();
         chart.setStatus(EndodonticsChartStatus.SUBMITTED);
@@ -187,18 +172,96 @@ public class EndodonticsChartService {
         return repo.save(chart);
     }
 
-    public EndodonticsChart approveForm2(Long id) {
-        EndodonticsChart chart = repo.findById(id).orElseThrow();
-        if (chart.getForm2Status() != EndodonticsChartStatus.SUBMITTED) return chart;   // only a submitted chart can be reviewed
-        chart.setForm2Status(EndodonticsChartStatus.APPROVED);
-        return repo.save(chart);
+    // ── Form 4 (ENDO4): Informed Consent ────────────────────────────────────
+
+    /** Consents the clinician still has to finish (not submitted or approved). */
+    public List<EndodonticsChart> findForm4ActionNeededByClinician(User clinician) {
+        return repo.findByClinicianOrderByCreatedAtDesc(clinician).stream().filter(EndodonticsChart::isConsentEditable).toList();
     }
 
-    public EndodonticsChart reviseForm2(Long id, String reason) {
-        EndodonticsChart chart = repo.findById(id).orElseThrow();
-        if (chart.getForm2Status() != EndodonticsChartStatus.SUBMITTED) return chart;   // only a submitted chart can be reviewed
-        chart.setForm2Status(EndodonticsChartStatus.REVISE);
-        chart.setForm2RevisionReason(reason);
-        return repo.save(chart);
+    /** Fills an empty plan from the Patient Workup (shown on the page; saved when the clinician saves). */
+    public void prefillConsent(EndodonticsChart c) {
+        if (c.isConsentPatientSigned()) return;
+        if (blank(c.getConsentPretreatment())) c.setConsentPretreatment(c.getPretreatment());
+        if (blank(c.getConsentTreatmentProper())) c.setConsentTreatmentProper(c.getRecommendedTreatment());
+        if (blank(c.getConsentPostTreatment())) c.setConsentPostTreatment(c.getProposedRestoration());
+        if (blank(c.getConsentToothNumber())) c.setConsentToothNumber(c.getToothNumber());
     }
+
+    public EndodonticsChart saveConsentPlan(Long id, java.util.Map<String, String> p) {
+        EndodonticsChart c = repo.findById(id).orElseThrow();
+        if (!c.isConsentEditable() || c.isConsentPatientSigned()) return c;   // locked once the patient signs
+        c.setConsentPretreatment(trim(p.get("consentPretreatment")));
+        c.setConsentTreatmentProper(trim(p.get("consentTreatmentProper")));
+        c.setConsentPostTreatment(trim(p.get("consentPostTreatment")));
+        c.setConsentToothNumber(trim(p.get("consentToothNumber")));
+        c.setConsentRctFee(trim(p.get("consentRctFee")));
+        c.setConsentRadiographs(trim(p.get("consentRadiographs")));
+        c.setConsentRadiographFee(trim(p.get("consentRadiographFee")));
+        if (c.getForm4Status() == EndodonticsChartStatus.CREATED) c.setForm4Status(EndodonticsChartStatus.IN_PROGRESS);
+        return repo.save(c);
+    }
+
+    public EndodonticsChart patientSignConsent(Long id, String type, String name, String signature) {
+        EndodonticsChart c = repo.findById(id).orElseThrow();
+        if (!c.isConsentEditable() || c.isConsentPatientSigned() || !PeriodonticChartService.isSignature(signature)) return c;
+        if (!"PATIENT".equals(type) && blank(name)) return c;
+        String who = java.util.Set.of("PATIENT", "PARENT", "GUARDIAN").contains(type) ? type : "PATIENT";
+        c.setConsentSignerType(who);
+        // the patient signing for themselves: always the name on their record
+        c.setConsentSignerName("PATIENT".equals(who) && c.getPatient() != null
+                ? c.getPatient().getFirstName() + " " + c.getPatient().getSurname() : name.trim());
+        c.setConsentPatientSignature(signature);
+        c.setConsentPatientSignedAt(java.time.LocalDateTime.now());
+        if (c.getForm4Status() == EndodonticsChartStatus.CREATED) c.setForm4Status(EndodonticsChartStatus.IN_PROGRESS);
+        return repo.save(c);
+    }
+
+    public EndodonticsChart clinicianSignConsent(Long id, String signature, User clinician) {
+        EndodonticsChart c = repo.findById(id).orElseThrow();
+        if (!c.isConsentEditable() || !c.isConsentPatientSigned() || !PeriodonticChartService.isSignature(signature)) return c;
+        c.setConsentClinicianSignature(signature);
+        c.setConsentClinicianSignedAt(java.time.LocalDateTime.now());
+        c.setConsentClinicianSignedBy(clinician != null ? clinician.getFullName() : null);
+        return repo.save(c);
+    }
+
+    /** Clears both signatures so the plan can be changed; the patient signs again. */
+    public EndodonticsChart restartConsent(Long id) {
+        EndodonticsChart c = repo.findById(id).orElseThrow();
+        if (!c.isConsentEditable()) return c;
+        c.setConsentPatientSignature(null); c.setConsentPatientSignedAt(null);
+        c.setConsentSignerType(null); c.setConsentSignerName(null);
+        c.setConsentClinicianSignature(null); c.setConsentClinicianSignedAt(null); c.setConsentClinicianSignedBy(null);
+        c.setForm4Status(EndodonticsChartStatus.IN_PROGRESS);
+        return repo.save(c);
+    }
+
+    public EndodonticsChart submitConsent(Long id) {
+        EndodonticsChart c = repo.findById(id).orElseThrow();
+        if (c.isConsentEditable() && c.isConsentPatientSigned() && c.isConsentClinicianSigned())
+            c.setForm4Status(EndodonticsChartStatus.SUBMITTED);
+        return repo.save(c);
+    }
+
+    public EndodonticsChart approveConsent(Long id, String signature, User faculty) {
+        EndodonticsChart c = repo.findById(id).orElseThrow();
+        if (c.getForm4Status() != EndodonticsChartStatus.SUBMITTED || !PeriodonticChartService.isSignature(signature)) return c;
+        c.setForm4Status(EndodonticsChartStatus.APPROVED);
+        c.setConsentFacultySignature(signature);
+        c.setConsentFacultySignedAt(java.time.LocalDateTime.now());
+        c.setConsentFacultySignedBy(faculty != null ? faculty.getFullName() : null);
+        return repo.save(c);
+    }
+
+    public EndodonticsChart reviseConsent(Long id, String reason) {
+        EndodonticsChart c = repo.findById(id).orElseThrow();
+        if (c.getForm4Status() != EndodonticsChartStatus.SUBMITTED) return c;
+        c.setForm4Status(EndodonticsChartStatus.REVISE);
+        c.setForm4RevisionReason(reason);
+        return repo.save(c);
+    }
+
+    private static boolean blank(String s) { return s == null || s.isBlank(); }
+    private static String trim(String s) { return s == null || s.isBlank() ? null : s.trim(); }
 }

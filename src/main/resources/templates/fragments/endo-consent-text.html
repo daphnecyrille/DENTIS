@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- ENDO FORM-4 consent text (UPCD), shared by the patient signing page and the clinician / faculty view. -->
+<th:block th:fragment="text">
+    <section class="ct-sec">
+        <h3>About Root Canal Treatment</h3>
+        <p>Root canal treatment (RCT) is the dental procedure of removing infected pulp tissue from the tooth. The pulp chamber and the root canals are shaped, cleaned and filled. This procedure aims to retain the tooth that may otherwise require extraction.</p>
+    </section>
+    <section class="ct-sec">
+        <h3>Records, Dental Radiographs and Photographs</h3>
+        <p>Dental radiographs will be taken as necessary and appropriate for examination, diagnosis and treatment. Photographs may be taken to document pertinent clinical findings and/or for teaching purposes. The dental records, radiographs, photographs and other diagnostic aids become the property of the University of the Philippines Manila College of Dentistry (UPCD). Your dental records may be used for instructional or research purposes, and UPCD will use reasonable efforts to keep your identity confidential from individuals not involved in your care and treatment.</p>
+    </section>
+    <section class="ct-sec">
+        <h3>Duration of Treatment and Keeping Appointments</h3>
+        <p>You will be treated by <u>student clinicians</u>, so please expect that more time will be required to finish treatment compared to a licensed dentist. Errors may be committed in spite of the close supervision by the faculty member on duty. The faculty will do their best to prevent or manage such errors.</p>
+        <div class="ct-key">
+            <p>Since your attending clinician will reserve a time slot for you as a valued patient, please be on time for your appointments. <b>A cut-off time for starting endodontic procedures will be strictly enforced.</b> Clinicians will not be allowed to start beyond these cut-off times.</p>
+            <div class="ct-times"><span>Cut-off times</span><b>Morning 9:30 AM</b><b>Afternoon 2:30 PM</b></div>
+            <p>If you find that you will be unable to keep an appointment, please notify your clinician at least 24 hours in advance. <b>A total of three missed appointments or three unsuccessful attempts to arrange an appointment is sufficient cause for discontinuance of your dental treatment.</b> Should this happen, the clinician, faculty and the UPCD will not be responsible for any untoward incident that may result from the unfinished RCT.</p>
+        </div>
+    </section>
+    <section class="ct-sec">
+        <h3>Emergency Treatment and After-hours Care</h3>
+        <p>Emergency dental care may be done to provide relief of severe pain and infection. This type of care is limited by the time available to student clinicians and faculty. It is the patient&rsquo;s responsibility to arrange for follow-up care that may be required to alleviate or resolve the dental problem.</p>
+    </section>
+    <section class="ct-sec">
+        <h3>Completion of Treatment</h3>
+        <p>Placement of a sound permanent restoration after RCT is essential to its success and to the retention of the tooth. <b>This should be done within 30 days of the RCT.</b> You may be referred to the UPCD Operative Dentistry Section for permanent restoration, or you may go to your preferred private dental practitioner for this purpose. Should the permanent restoration be done by a private dentist, you are advised to come back so your clinician can take a radiograph of the tooth for record purposes and to check the restoration.</p>
+        <p>It is your responsibility to take care of your tooth after RCT and restoration. Treat it as you would your natural teeth by brushing and flossing 3x a day and by going to the dentist for regular check up twice a year.</p>
+    </section>
+    <section class="ct-sec">
+        <h3>Prognosis</h3>
+        <p>Root canal treatment is 90% &ndash; 95% successful. However, just as other dental procedures, it may involve risks or unsuccessful results and complications. There are no guarantees made regarding results or cure since these will depend on the details of each case and on individual body response. Those that fall under unsuccessful cases may still be saved by undergoing retreatment or surgical treatment. Approximately 5% of unsuccessful root canal treated teeth may require extraction.</p>
+    </section>
+    <section class="ct-sec">
+        <h3>Patient&rsquo;s Financial Responsibility</h3>
+        <p>You will be charged for RCT based on the clinic&rsquo;s current schedule of fees. Please take note that the clinic charges a fraction of what private dentists charge for RCT. Please refer to the section &ldquo;Cost of Treatment&rdquo; for the schedule of fees. The cost of treatment is for the RCT and the corresponding radiographs taken. Fees for pre-treatment procedures and permanent restoration are not yet included.</p>
+    </section>
+</th:block>
+
+<!-- Release and consent paragraphs (shown right above the signatures) -->
+<th:block th:fragment="release">
+    <section class="ct-sec">
+        <h3>Release and Consent to Treatment</h3>
+        <p>You hereby agree to release, hold harmless and waive all claims, losses or damages resulting from or relating to the treatment rendered hereunder by the student clinician, faculty or the UPCD.</p>
+        <p>Signing this Informed Consent form certifies that you have read and are willing to comply with the foregoing concerning the proposed root canal treatment. In addition, you acknowledge that your student clinician explained to you the above treatment plan and the fee schedule.</p>
+        <p>You agree (as the patient or as the guardian of the patient) to undergo/to have your child/ward undergo root canal treatment.</p>
+    </section>
+</th:block>
+</body>
+</html>

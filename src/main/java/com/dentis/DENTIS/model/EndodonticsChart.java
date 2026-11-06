@@ -42,9 +42,14 @@ public class EndodonticsChart {
     @Enumerated(EnumType.STRING)
     private EndodonticsChartStatus form2Status = EndodonticsChartStatus.CREATED;
 
+    /** Form 4 (ENDO4): Patient Information and Informed Consent. */
+    @Enumerated(EnumType.STRING)
+    private EndodonticsChartStatus form4Status = EndodonticsChartStatus.CREATED;
+
     @PostLoad
     private void onLoad() {
         if (form2Status == null) form2Status = EndodonticsChartStatus.CREATED;
+        if (form4Status == null) form4Status = EndodonticsChartStatus.CREATED;
     }
 
     // ── Form 1: Patient Workup (Clinician) ──────────────────────────────────
@@ -93,6 +98,11 @@ public class EndodonticsChart {
     private String softTissueExamination;
 
     // Diagnostic Tests — 8 rows × 3 columns
+    /** Tooth numbers of the Diagnostic Tests columns (FDI). */
+    private String diagToothSuspected;
+    private String diagToothAdjacent;
+    private String diagToothContralateral;
+
     private String diagPocketSuspected;
     private String diagPocketAdjacent;
     private String diagPocketContralateral;
@@ -148,7 +158,8 @@ public class EndodonticsChart {
     @Column(columnDefinition = "TEXT")
     private String consultationsDone;
 
-    // ── Form 2: Endodontic Evaluation (Faculty) ──────────────────────────────
+    // ── Old Form 2 fields: ENDO2 is now an EndoEvaluation (several per chart). Kept so existing
+    //    data can be moved over once (EndoEvaluationService.moveOldEvaluations), then unused. ──
 
     private String evalToothNumber;
     private String evalDiagnosis;
@@ -175,6 +186,56 @@ public class EndodonticsChart {
 
     @Column(columnDefinition = "TEXT")
     private String form2RevisionReason;
+
+    // ── Form 4 (ENDO4): Patient Information and Informed Consent ─────────────
+    // The clinician fills in the plan and cost, the patient reads and signs, the clinician signs,
+    // then it is submitted and the faculty signs when approving. Plan and cost lock once the patient signs.
+
+    @Column(columnDefinition = "TEXT") private String consentPretreatment;
+    @Column(columnDefinition = "TEXT") private String consentTreatmentProper;
+    @Column(columnDefinition = "TEXT") private String consentPostTreatment;
+    private String consentToothNumber;
+    private String consentRctFee;
+    private String consentRadiographs;
+    private String consentRadiographFee;
+
+    /** PATIENT, PARENT or GUARDIAN */
+    private String consentSignerType;
+    private String consentSignerName;
+    @Column(columnDefinition = "TEXT") private String consentPatientSignature;
+    private LocalDateTime consentPatientSignedAt;
+
+    @Column(columnDefinition = "TEXT") private String consentClinicianSignature;
+    private LocalDateTime consentClinicianSignedAt;
+    private String consentClinicianSignedBy;
+
+    @Column(columnDefinition = "TEXT") private String consentFacultySignature;
+    private LocalDateTime consentFacultySignedAt;
+    private String consentFacultySignedBy;
+
+    @Column(columnDefinition = "TEXT") private String form4RevisionReason;
+
+    public boolean isConsentPatientSigned() { return consentPatientSignature != null; }
+    public boolean isConsentClinicianSigned() { return consentClinicianSignature != null; }
+
+    /** The clinician can still change it (not submitted or approved). */
+    public boolean isConsentEditable() {
+        return form4Status != EndodonticsChartStatus.SUBMITTED && form4Status != EndodonticsChartStatus.APPROVED;
+    }
+
+    /** Same statuses as every other form: Not Started, In Progress, Awaiting Approval, Approved, For Revision. */
+    public String getForm4Label() {
+        return (form4Status == null ? EndodonticsChartStatus.CREATED : form4Status).getDisplayName();
+    }
+
+    public String getForm4Css() {
+        return (form4Status == null ? EndodonticsChartStatus.CREATED : form4Status).getCssClass();
+    }
+
+    public String getSignerLabel() {
+        if (consentSignerType == null) return "Patient";
+        return switch (consentSignerType) { case "PARENT" -> "Parent"; case "GUARDIAN" -> "Guardian"; default -> "Patient"; };
+    }
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

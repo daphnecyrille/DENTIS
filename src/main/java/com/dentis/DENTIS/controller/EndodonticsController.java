@@ -77,47 +77,6 @@ public class EndodonticsController {
         return "endodontics-view-faculty";
     }
 
-    @GetMapping("/endodontics2-view-faculty/{id}")
-    public String viewForm2Faculty(@PathVariable Long id, Model model, Authentication authentication) {
-        EndodonticsChart chart = endodonticsChartService.getById(id);
-        model.addAttribute("currentUser", getCurrentUser(authentication));
-        model.addAttribute("chart", chart);
-        return "endodontics2-view-faculty";
-    }
-
-    // ── Faculty: Form 2 (Endodontic Evaluation) ─────────────────────────────
-
-    @GetMapping("/endodontics2-clinician/{id}")
-    public String form2(@PathVariable Long id, Model model, Authentication authentication) {
-        EndodonticsChart chart = endodonticsChartService.getById(id);
-        model.addAttribute("currentUser", getCurrentUser(authentication));
-        model.addAttribute("chart", chart);
-        model.addAttribute("viewOnly", chart.getForm2Status() == EndodonticsChartStatus.APPROVED);
-        return "endodontics2-clinician";
-    }
-
-    @GetMapping("/endodontics2-clinician/{id}/view")
-    public String viewForm2(@PathVariable Long id, Model model, Authentication authentication) {
-        EndodonticsChart chart = endodonticsChartService.getById(id);
-        model.addAttribute("currentUser", getCurrentUser(authentication));
-        model.addAttribute("chart", chart);
-        model.addAttribute("viewOnly", true);
-        return "endodontics2-clinician";
-    }
-
-    @PostMapping("/endodontics2-clinician/{id}")
-    public String saveForm2(@PathVariable Long id,
-                            @ModelAttribute("chart") EndodonticsChart updated) {
-        endodonticsChartService.saveForm2(id, updated);
-        return "redirect:/endodontics2-clinician/" + id + "?saved";   // Save keeps the user on the form
-    }
-
-    @PostMapping("/endodontics2-clinician/{id}/submit")
-    public String submitForm2(@PathVariable Long id) {
-        EndodonticsChart chart = endodonticsChartService.submitForm2(id);
-        return "redirect:/chartsview-clinician/" + chart.getPatient().getId();
-    }
-
     @PostMapping("/endodontics-faculty/{id}/approve")
     public String approveChart(@PathVariable Long id, Authentication authentication) {
         EndodonticsChart owned = endodonticsChartService.getById(id);   // only the faculty assigned to this chart can approve / revise it
@@ -136,22 +95,96 @@ public class EndodonticsController {
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 
-    @PostMapping("/endodontics2-faculty/{id}/approve")
-    public String approveForm2(@PathVariable Long id, Authentication authentication) {
-        EndodonticsChart owned = endodonticsChartService.getById(id);   // only the faculty assigned to this chart can approve / revise it
-        if (!isAssignedFaculty(owned.getFaculty(), authentication))
-            return "redirect:/chartsview-faculty/" + owned.getPatient().getId() + "?notAssigned";
-        EndodonticsChart chart = endodonticsChartService.approveForm2(id);
-        return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
+    // ── Form 4 (ENDO4): Patient Information and Informed Consent ────────────
+
+    @GetMapping({"/endodontics4-clinician/{id}", "/endodontics4-clinician/{id}/view"})
+    public String consent(@PathVariable Long id, Model model, Authentication authentication,
+                          jakarta.servlet.http.HttpServletRequest request) {
+        EndodonticsChart chart = endodonticsChartService.getById(id);
+        boolean view = request.getRequestURI().endsWith("/view") || !chart.isConsentEditable()
+                || !isAssignedClinician(chart, authentication);   // only the chart's clinician fills in and signs it
+        if (!view) endodonticsChartService.prefillConsent(chart);
+        model.addAttribute("currentUser", getCurrentUser(authentication));
+        model.addAttribute("chart", chart);
+        model.addAttribute("viewOnly", view);
+        return "endodontics4-clinician";
     }
 
-    @PostMapping("/endodontics2-faculty/{id}/revise")
-    public String reviseForm2(@PathVariable Long id, @RequestParam String revisionReason, Authentication authentication) {
-        EndodonticsChart owned = endodonticsChartService.getById(id);   // only the faculty assigned to this chart can approve / revise it
+    /** Save the plan and cost. action=patient-sign (from the consent popup) also saves the patient's signature. */
+    @PostMapping("/endodontics4-clinician/{id}")
+    public String saveConsent(@PathVariable Long id, @RequestParam java.util.Map<String, String> params,
+                              @RequestParam(value = "action", defaultValue = "save") String action,
+                              Authentication authentication) {
+        if (!isAssignedClinician(endodonticsChartService.getById(id), authentication))
+            return "redirect:/endodontics4-clinician/" + id + "/view";
+        endodonticsChartService.saveConsentPlan(id, params);
+        if ("patient-sign".equals(action)) {
+            EndodonticsChart chart = endodonticsChartService.patientSignConsent(id, params.get("signerType"),
+                    params.get("signerName"), params.get("signature"));
+            return "redirect:/endodontics4-clinician/" + id + (chart.isConsentPatientSigned() ? "?patientSigned" : "?incomplete");
+        }
+        return "redirect:/endodontics4-clinician/" + id + "?saved";
+    }
+
+    @PostMapping("/endodontics4-clinician/{id}/clinician-sign")
+    public String consentClinicianSign(@PathVariable Long id, @RequestParam(value = "signature", required = false) String signature,
+                                       Authentication authentication) {
+        if (!isAssignedClinician(endodonticsChartService.getById(id), authentication))
+            return "redirect:/endodontics4-clinician/" + id + "/view";
+        endodonticsChartService.clinicianSignConsent(id, signature, getCurrentUser(authentication));
+        return "redirect:/endodontics4-clinician/" + id + "?signed";
+    }
+
+    @PostMapping("/endodontics4-clinician/{id}/restart")
+    public String consentRestart(@PathVariable Long id, Authentication authentication) {
+        if (!isAssignedClinician(endodonticsChartService.getById(id), authentication))
+            return "redirect:/endodontics4-clinician/" + id + "/view";
+        endodonticsChartService.restartConsent(id);
+        return "redirect:/endodontics4-clinician/" + id + "?restarted";
+    }
+
+    @PostMapping("/endodontics4-clinician/{id}/submit")
+    public String consentSubmit(@PathVariable Long id, Authentication authentication) {
+        if (!isAssignedClinician(endodonticsChartService.getById(id), authentication))
+            return "redirect:/endodontics4-clinician/" + id + "/view";
+        EndodonticsChart chart = endodonticsChartService.submitConsent(id);
+        return "redirect:/chartsview-clinician/" + chart.getPatient().getId();
+    }
+
+    @GetMapping("/endodontics4-view-faculty/{id}")
+    public String consentFaculty(@PathVariable Long id, Model model, Authentication authentication) {
+        EndodonticsChart chart = endodonticsChartService.getById(id);
+        model.addAttribute("currentUser", getCurrentUser(authentication));
+        model.addAttribute("chart", chart);
+        model.addAttribute("viewOnly", true);
+        return "endodontics4-clinician";
+    }
+
+    @PostMapping("/endodontics4-faculty/{id}/approve")
+    public String consentApprove(@PathVariable Long id, @RequestParam(value = "signature", required = false) String signature,
+                                 Authentication authentication) {
+        EndodonticsChart owned = endodonticsChartService.getById(id);
         if (!isAssignedFaculty(owned.getFaculty(), authentication))
             return "redirect:/chartsview-faculty/" + owned.getPatient().getId() + "?notAssigned";
-        EndodonticsChart chart = endodonticsChartService.reviseForm2(id, revisionReason);
-        return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
+        if (!com.dentis.DENTIS.service.PeriodonticChartService.isSignature(signature))
+            return "redirect:/endodontics4-view-faculty/" + id + "?signRequired";
+        endodonticsChartService.approveConsent(id, signature, getCurrentUser(authentication));
+        return "redirect:/chartsview-faculty/" + owned.getPatient().getId();
+    }
+
+    @PostMapping("/endodontics4-faculty/{id}/revise")
+    public String consentRevise(@PathVariable Long id, @RequestParam String revisionReason, Authentication authentication) {
+        EndodonticsChart owned = endodonticsChartService.getById(id);
+        if (!isAssignedFaculty(owned.getFaculty(), authentication))
+            return "redirect:/chartsview-faculty/" + owned.getPatient().getId() + "?notAssigned";
+        endodonticsChartService.reviseConsent(id, revisionReason);
+        return "redirect:/chartsview-faculty/" + owned.getPatient().getId();
+    }
+
+    /** True when the logged-in user is the clinician of this chart. */
+    private boolean isAssignedClinician(EndodonticsChart chart, Authentication authentication) {
+        User me = getCurrentUser(authentication);
+        return me != null && chart.getClinician() != null && chart.getClinician().getId().equals(me.getId());
     }
 
     /** True when the logged-in user is the faculty assigned to the chart. */
