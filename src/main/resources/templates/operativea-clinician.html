@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Operative Dentistry - DentIS</title>
-    <link rel="stylesheet" href="/css/operativea-clinician.css">
+    <link rel="stylesheet" href="/css/operativea-clinician.css?v=5">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/form-common.css">
+    <link rel="stylesheet" href="/css/form-common.css?v=3">
 </head>
 
 <body>
@@ -150,7 +150,7 @@
                 <div class="form-banner">Caries Risk Assessment Form</div>
 
                 <div class="form-body">
-                <div th:style="${viewOnly} ? 'pointer-events:none;' : ''">
+                <div class="form-inner" th:style="${viewOnly} ? 'pointer-events:none;' : ''">
 
                     <!-- Patient Name + Chart Number -->
                     <div class="form-row">
@@ -240,7 +240,6 @@
                     <!-- STEP 3: Caries Risk Matrix -->
                     <div class="step-header">
                         <div class="step-num">STEP 3: Caries Risk Matrix:</div>
-                        <div class="step-desc">Fill in column 1 based on the Risk Factor Assessment (Step 2). Based on the ICDAS highest code observed (Step 1) and number of risk factors, encircle which category (low, moderate or high) the patient falls under.</div>
                     </div>
                     <div style="overflow-x:auto;">
                         <table class="risk-matrix-table">
@@ -255,31 +254,32 @@
                             <tbody>
                                 <tr>
                                     <td>
-                                        <label class="check-cell"><input type="checkbox" th:field="*{riskFactors0}" data-risk-row="0"> 0</label>
+                                        <label class="check-cell check-auto" title="Filled in automatically from Step 2"><input type="checkbox" th:field="*{riskFactors0}" data-risk-row="0" class="auto-cb" tabindex="-1" aria-readonly="true"> 0</label>
                                     </td>
-                                    <td class="cell-low">Low</td>
-                                    <td class="cell-moderate">Moderate</td>
-                                    <td class="cell-moderate">Moderate</td>
+                                    <td class="cell-low" data-cell-row="0" data-cell-col="0"><span class="risk-word">Low</span></td>
+                                    <td class="cell-moderate" data-cell-row="0" data-cell-col="A"><span class="risk-word">Moderate</span></td>
+                                    <td class="cell-moderate" data-cell-row="0" data-cell-col="BC"><span class="risk-word">Moderate</span></td>
                                 </tr>
                                 <tr>
                                     <td>
-                                        <label class="check-cell"><input type="checkbox" th:field="*{riskFactors1or2}" data-risk-row="1or2"> 1 or 2</label>
+                                        <label class="check-cell check-auto" title="Filled in automatically from Step 2"><input type="checkbox" th:field="*{riskFactors1or2}" data-risk-row="1or2" class="auto-cb" tabindex="-1" aria-readonly="true"> 1 or 2</label>
                                     </td>
-                                    <td class="cell-low">Low</td>
-                                    <td class="cell-moderate">Moderate</td>
-                                    <td class="cell-high">High</td>
+                                    <td class="cell-low" data-cell-row="1or2" data-cell-col="0"><span class="risk-word">Low</span></td>
+                                    <td class="cell-moderate" data-cell-row="1or2" data-cell-col="A"><span class="risk-word">Moderate</span></td>
+                                    <td class="cell-high" data-cell-row="1or2" data-cell-col="BC"><span class="risk-word">High</span></td>
                                 </tr>
                                 <tr>
                                     <td>
-                                        <label class="check-cell"><input type="checkbox" th:field="*{riskFactors3orMore}" data-risk-row="3orMore"> 3 or more</label>
+                                        <label class="check-cell check-auto" title="Filled in automatically from Step 2"><input type="checkbox" th:field="*{riskFactors3orMore}" data-risk-row="3orMore" class="auto-cb" tabindex="-1" aria-readonly="true"> 3 or more</label>
                                     </td>
-                                    <td class="cell-moderate">Moderate</td>
-                                    <td class="cell-high">High</td>
-                                    <td class="cell-high">High</td>
+                                    <td class="cell-moderate" data-cell-row="3orMore" data-cell-col="0"><span class="risk-word">Moderate</span></td>
+                                    <td class="cell-high" data-cell-row="3orMore" data-cell-col="A"><span class="risk-word">High</span></td>
+                                    <td class="cell-high" data-cell-row="3orMore" data-cell-col="BC"><span class="risk-word">High</span></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
+                    <p class="risk-result" id="riskResult"></p>
 
                     <!-- STEP 4: Caries Management Recommendation -->
                     <div class="step-header">
@@ -387,7 +387,9 @@
                     <div class="faculty-row">
                         <div class="form-group">
                             <label>Faculty Name</label>
-                            <input type="text" th:value="${chart.faculty != null ? chart.faculty.firstName + ' ' + chart.faculty.lastName : ''}" readonly>
+                            <input type="text" readonly
+                                   th:value="${chart.form2ApprovedBy != null ? chart.form2ApprovedBy + (chart.form2ApprovedAt != null ? ' · ' + #temporals.format(chart.form2ApprovedAt, 'MMM d, yyyy') : '') : ''}"
+                                   th:placeholder="${chart.form2Status.name() == 'SUBMITTED' and currentUser != null and currentUser.role.name() == 'FACULTY' and chart.faculty != null and chart.faculty.id == currentUser.id ? 'Your name is filled in when you approve' : 'Filled in when the faculty approves'}">
                         </div>
                     </div>
 
@@ -473,6 +475,34 @@ document.querySelectorAll('[data-rf]').forEach(function(cb) {
 });
 updateRiskMatrix();
 
+/* Step 3 row ticks are automatic: clicking them does nothing */
+document.querySelectorAll('.auto-cb').forEach(function (cb) {
+    cb.addEventListener('click', function (e) { e.preventDefault(); });
+});
+
+/* Step 3: encircle the category where the risk-factor row (Step 2) meets the ICDAS highest code column (Step 1) */
+function encircleRisk() {
+    var count = document.querySelectorAll('[data-rf]:checked').length;
+    var row = count === 0 ? '0' : (count <= 2 ? '1or2' : '3orMore');
+    var col = null;
+    if (document.querySelector('input[name="icdasHighest0"]:checked')) col = '0';
+    else if (document.querySelector('input[name="icdasHighestA"]:checked')) col = 'A';
+    else if (document.querySelector('input[name="icdasHighestB"]:checked') || document.querySelector('input[name="icdasHighestC"]:checked')) col = 'BC';
+    document.querySelectorAll('[data-cell-row]').forEach(function (td) {
+        td.classList.toggle('encircled', col !== null && td.dataset.cellRow === row && td.dataset.cellCol === col);
+    });
+    var hit = document.querySelector('[data-cell-row].encircled'), out = document.getElementById('riskResult');
+    if (!out) return;
+    if (hit) {
+        var level = hit.textContent.trim();
+        out.innerHTML = 'Caries risk: <b class="lvl-' + level.toLowerCase() + '">' + level + '</b>';
+    } else {
+        out.textContent = 'Tick the ICDAS highest code observed in Step 1 to see the caries risk.';
+    }
+}
+document.querySelectorAll('[data-rf], .icdas-highest').forEach(function (cb) { cb.addEventListener('change', encircleRisk); });
+encircleRisk();
+
 /* Single-select for ICDAS highest code (Step 1) */
 document.querySelectorAll('.icdas-highest').forEach(function(cb) {
     cb.addEventListener('change', function() {
@@ -536,6 +566,7 @@ updateRiskMatrix();
 })();
 </script>
 <script src="/js/sidebar-hover.js?v=3"></script>
+<script src="/js/date-click.js"></script>
 <th:block th:replace="~{fragments/faculty-review :: modals}"></th:block>
 </body>
 </html>

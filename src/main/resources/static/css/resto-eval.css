@@ -1,0 +1,55 @@
+/* Operative evaluation forms (RESTO FORM 1 / 2, NOC) – builds on the ENDO2 styles */
+.re-date { flex: 0 0 180px !important; }
+.re-field { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 4px 0; }
+.re-flabel { font-size: 12.5px; font-weight: 600; color: #333; min-width: 150px; }
+.re-flabel small { font-weight: 400; color: #8a97a8; }
+.re-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.re-chips label { cursor: pointer; position: relative; }
+.re-chips input { position: absolute; opacity: 0; pointer-events: none; }
+.re-chips span { display: inline-block; padding: 7px 14px; border: 1.5px solid #c8d1dc; border-radius: 20px; font-size: 13px; color: #2d4a6b; background: white; transition: all .15s; }
+.re-chips label:hover span { border-color: #2d4a6b; }
+.re-chips input:checked + span { background: #2d4a6b; border-color: #2d4a6b; color: white; }
+.re-chips label.ro { cursor: default; }
+.re-chips label.ro:hover span { border-color: #c8d1dc; }
+.re-chips label.ro input:checked + span { border-color: #2d4a6b; }
+.re-rchips span { min-width: 44px; text-align: center; padding: 7px 10px; }
+.re-part { border: 1.5px solid #dfe5ec; border-radius: 12px; padding: 14px 18px; background: #fff; margin-top: 4px; }
+.re-part-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+.re-part-head b { font-size: 14.5px; color: #061F40; }
+.re-pct { display: inline-block; margin-left: 8px; font-size: 12px; font-weight: 600; color: #2d4a6b; background: #eef2f6; border-radius: 10px; padding: 1px 8px; }
+.re-did { font-size: 12.5px; color: #6b7a8c; margin-top: 2px; text-transform: none; }
+.re-pts { text-align: right; white-space: nowrap; }
+.re-pts-val { font-size: 20px; font-weight: 600; color: #061F40; }
+.re-pts small { display: block; font-size: 11px; color: #8a97a8; }
+.re-rubric { list-style: none; margin: 10px 0 12px; padding: 0; display: grid; gap: 4px; }
+.re-rubric li { display: flex; gap: 10px; font-size: 12.5px; color: #444; line-height: 1.45; }
+.re-rv { flex: none; min-width: 34px; text-align: center; font-size: 11.5px; font-weight: 600; color: #2d4a6b; background: #f2f5f9; border-radius: 6px; padding: 1px 4px; height: fit-content; }
+.re-rate { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border-top: 1px dashed #e1e7ef; padding-top: 10px; }
+.re-rate .re-flabel { min-width: 0; }
+.re-stamp { margin-left: auto; font-size: 11.5px; color: #2e7d32; background: #e8f5e9; border-radius: 10px; padding: 2px 10px; }
+.re-summary { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; }
+.re-summary > div { flex: 1 1 220px; border: 1.5px solid #c8d1dc; border-radius: 12px; padding: 12px 16px; background: #f8fafc; display: flex; flex-direction: column; gap: 2px; }
+.re-summary b { font-size: 22px; color: #061F40; }
+.re-summary small { font-size: 11.5px; color: #8a97a8; }
+.re-fac { max-width: 460px; }
+.re-fac::placeholder { color: #9aa5b1; font-style: italic; }
+/* credit table (reference) */
+.ct-guide { margin-top: 10px; border: 1.5px solid #dfe5ec; border-radius: 10px; background: #fbfcfd; }
+.ct-guide summary { cursor: pointer; padding: 10px 16px; font-size: 13px; font-weight: 600; color: #2d4a6b; }
+.ct-guide[open] summary { border-bottom: 1px solid #e6ebf1; }
+.ct-body { padding: 12px 16px; display: flex; flex-direction: column; gap: 12px; overflow-x: auto; }
+.ct-table { border-collapse: collapse; font-size: 12.5px; min-width: 420px; }
+.ct-table th, .ct-table td { border: 1px solid #d5dbe2; padding: 5px 12px; text-align: center; }
+.ct-table th { background: #2d4a6b; color: white; font-weight: 600; }
+.ct-table td:first-child { text-align: left; color: #555; white-space: nowrap; }
+.ct-table .ct-row-on td { background: #eef4fb; }
+.ct-table td.ct-col-on { background: #eef4fb; }
+.ct-table th.ct-col-on { background: #061F40; }
+.ct-table td.ct-hit { background: #2d4a6b !important; color: white; font-weight: 700; }
+/* NOC: shared rating scale */
+.re-scale { border: 1.5px solid #c8d1dc; border-radius: 12px; padding: 12px 18px; background: #f8fafc; }
+.re-scale-title { font-size: 13px; font-weight: 600; color: #061F40; }
+.re-scale .re-rubric { margin: 8px 0 0; }
+.re-scale .re-rv { min-width: 40px; }
+.re-did.re-did-main { font-size: 13px; color: #444; margin-top: 4px; }
+.re-part .re-rubric + .re-rate, .re-part-head + .re-rate { margin-top: 12px; }

@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Operative Dentistry - DentIS</title>
-    <link rel="stylesheet" href="/css/operativec-clinician.css">
+    <link rel="stylesheet" href="/css/operativec-clinician.css?v=5">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/form-common.css">
+    <link rel="stylesheet" href="/css/form-common.css?v=3">
 </head>
 
 <body>
@@ -124,7 +124,7 @@
                 <div class="form-banner">Assessment Form for Carious Lesions</div>
 
                 <div class="form-body">
-                <div th:style="${viewOnly} ? 'pointer-events:none;' : ''">
+                <div class="form-inner" th:style="${viewOnly} ? 'pointer-events:none;' : ''">
 
                     <!-- DIAGNOSTIC TESTS -->
                     <div class="section-header">Diagnostic Tests</div>
@@ -141,9 +141,9 @@
                             <tbody>
                                 <tr>
                                     <td>Tooth number</td>
-                                    <td><input type="text" th:field="*{diagInvolvedToothNumber}" th:readonly="${viewOnly}"></td>
-                                    <td><input type="text" th:field="*{diagAdjacentToothNumber}" th:readonly="${viewOnly}"></td>
-                                    <td><input type="text" th:field="*{diagContralateralToothNumber}" th:readonly="${viewOnly}"></td>
+                                    <td><select class="tooth-select" th:field="*{diagInvolvedToothNumber}" th:disabled="${viewOnly}"><option value="">Tooth #</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="31">31</option><option value="32">32</option><option value="33">33</option><option value="34">34</option><option value="35">35</option><option value="36">36</option><option value="37">37</option><option value="38">38</option><option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option><option value="45">45</option><option value="46">46</option><option value="47">47</option><option value="48">48</option></select></td>
+                                    <td><select class="tooth-select" th:field="*{diagAdjacentToothNumber}" th:disabled="${viewOnly}"><option value="">Tooth #</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="31">31</option><option value="32">32</option><option value="33">33</option><option value="34">34</option><option value="35">35</option><option value="36">36</option><option value="37">37</option><option value="38">38</option><option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option><option value="45">45</option><option value="46">46</option><option value="47">47</option><option value="48">48</option></select></td>
+                                    <td><select class="tooth-select" th:field="*{diagContralateralToothNumber}" th:disabled="${viewOnly}"><option value="">Tooth #</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="31">31</option><option value="32">32</option><option value="33">33</option><option value="34">34</option><option value="35">35</option><option value="36">36</option><option value="37">37</option><option value="38">38</option><option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option><option value="45">45</option><option value="46">46</option><option value="47">47</option><option value="48">48</option></select></td>
                                 </tr>
                                 <tr>
                                     <td>Pocket Depth / CAL</td>
@@ -191,8 +191,17 @@
                         </table>
                     </div>
 
+
+                </div>
+
+
+                <!-- Reference only (nothing to fill in): folded so the Diagnostic Tests stand out.
+                     Outside the read-only wrapper so it also opens in view mode. -->
+                <details class="ref-guide">
+                    <summary>Show guide: Diagnosing Pulp Status &amp; Direct Pulp Capping</summary>
+                    <div class="ref-guide-body">
                     <!-- GUIDE TO DIAGNOSING PULP STATUS (reference — read-only) -->
-                    <div class="section-header">Guide to Diagnosing Pulp Status</div>
+                    
                     <div class="guide-table-wrapper">
                         <table class="guide-table">
                             <thead>
@@ -280,8 +289,8 @@
                             <li>A clean, uncontaminated operating field is maintained (i.e., by using a rubber dam).</li>
                         </ol>
                     </div>
-
-                </div>
+                    </div>
+                </details>
 
                 <!-- Form Actions -->
                 <div class="form-actions" th:unless="${viewOnly}">
@@ -357,6 +366,7 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 })();
 </script>
 <script src="/js/sidebar-hover.js?v=3"></script>
+<script src="/js/date-click.js"></script>
 <th:block th:replace="~{fragments/faculty-review :: modals}"></th:block>
 </body>
 </html>

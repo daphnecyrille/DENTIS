@@ -230,3 +230,18 @@ body { height: 100vh; overflow: hidden; }
     font-size: 15px; font-weight: 500; transition: background-color 0.3s ease;
 }
 .btn-submit:hover { background: #a00000; }
+.tooth-select { width: 100%; padding: 5px 8px; border: 1px solid #ccc; border-radius: 6px; font-family: 'Poppins', sans-serif; font-size: 13px; background: white; color: #333; }
+.tooth-select:disabled { background: #f5f5f5; color: #333; opacity: 1; }
+
+/* ── Layout polish ── */
+.form-body > .form-inner { display: flex; flex-direction: column; gap: 14px; }
+/* Diagnostic Tests: visible boxes so it's clear the cells can be typed in */
+.diag-table tbody input[type="text"] {
+    border: 1px solid #ccc; border-radius: 6px; background: white; padding: 6px 8px; font-size: 13px; width: 100%; box-sizing: border-box;
+}
+.diag-table tbody input[type="text"]:focus { border-color: #324966; outline: none; }
+.diag-table tbody input[readonly] { background: #f6f8fa; }
+.ref-guide { margin: 4px 0 0; border: 1.5px solid #dfe5ec; border-radius: 10px; background: #fbfcfd; }
+.ref-guide summary { cursor: pointer; padding: 12px 16px; font-size: 13.5px; font-weight: 600; color: #2d4a6b; }
+.ref-guide[open] summary { border-bottom: 1px solid #e6ebf1; }
+.ref-guide-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 14px; }

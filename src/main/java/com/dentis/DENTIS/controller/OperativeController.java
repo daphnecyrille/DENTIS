@@ -232,7 +232,7 @@ public class OperativeController {
         OperativeChart owned = operativeChartService.getById(id);   // only the faculty assigned to this chart can approve / revise it
         if (!isAssignedFaculty(owned.getFaculty(), authentication))
             return "redirect:/chartsview-faculty/" + owned.getPatient().getId() + "?notAssigned";
-        OperativeChart chart = operativeChartService.approveForm2(id);
+        OperativeChart chart = operativeChartService.approveForm2(id, getCurrentUser(authentication));
         return "redirect:/chartsview-faculty/" + chart.getPatient().getId();
     }
 

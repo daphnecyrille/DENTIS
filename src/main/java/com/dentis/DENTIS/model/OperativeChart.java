@@ -44,6 +44,10 @@ public class OperativeChart {
     @Column(name = "form2_status")
     private OperativeChartStatus form2Status = OperativeChartStatus.CREATED;
 
+    /** RESTO6 "Faculty Name": the approving faculty's name and the time, filled in on approval. */
+    private String form2ApprovedBy;
+    private java.time.LocalDateTime form2ApprovedAt;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 

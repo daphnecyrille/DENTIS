@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Operative Dentistry - DentIS</title>
-    <link rel="stylesheet" href="/css/operativeb-clinician.css">
+    <link rel="stylesheet" href="/css/operativeb-clinician.css?v=7">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/form-common.css">
+    <link rel="stylesheet" href="/css/form-common.css?v=3">
 </head>
 
 <body>
@@ -150,51 +150,28 @@
                 <div class="form-banner">Assessment Form for Carious Lesions</div>
 
                 <div class="form-body">
-                <div th:style="${viewOnly} ? 'pointer-events:none;' : ''">
+                <div class="form-inner" th:style="${viewOnly} ? 'pointer-events:none;' : ''">
 
-                    <!-- Patient Name -->
-                    <div class="form-group">
-                        <label>Name of Patient</label>
-                        <div class="split-input">
-                            <input type="text" th:value="${chart.patient?.surname}" placeholder="Surname" readonly>
-                            <input type="text" class="input-wide" th:value="${chart.patient?.firstName}" placeholder="First Name" readonly>
-                            <input type="text" class="input-narrow" th:value="${chart.patient?.middleInitial}" placeholder="M.I." readonly>
-                        </div>
-                    </div>
+                    <!-- Header: patient / clinician details on an even two-row grid -->
+                    <div class="r10-head">
+                        <div class="form-group r10-name"><label>Name of Patient</label>
+                            <input type="text" readonly th:value="${chart.patient != null ? chart.patient.surname + ', ' + chart.patient.firstName + (chart.patient.middleInitial != null and !#strings.isEmpty(chart.patient.middleInitial) ? ' ' + chart.patient.middleInitial + '.' : '') : ''}"></div>
+                        <div class="form-group"><label>Age</label>
+                            <input type="text" readonly th:value="${chart.patient?.age}"></div>
+                        <div class="form-group"><label>Sex</label>
+                            <input type="text" readonly th:value="${chart.patient?.sex}"></div>
+                        <div class="form-group"><label>Chart No.</label>
+                            <input type="text" readonly th:value="${chart.chartNo}"></div>
 
-                    <!-- Age, Sex, Chart No. -->
-                    <div class="form-row">
-                        <div class="form-group col-small">
-                            <label>Age</label>
-                            <input type="text" th:value="${chart.patient?.age}" readonly>
-                        </div>
-                        <div class="form-group col-small">
-                            <label>Sex</label>
-                            <input type="text" th:value="${chart.patient?.sex}" readonly>
-                        </div>
-                        <div class="form-group col-medium">
-                            <label>Chart No.</label>
-                            <input type="text" th:value="${chart.chartNo}" readonly>
-                        </div>
-                    </div>
-
-                    <!-- Clinician, Dent Course, Date -->
-                    <div class="form-row">
-                        <div class="form-group col-large">
-                            <label>Name of Clinician</label>
-                            <input type="text" th:value="${chart.clinician != null ? chart.clinician.firstName + ' ' + chart.clinician.lastName : ''}" readonly>
-                        </div>
-                        <div class="form-group col-medium">
-                            <label>Course</label>
-                            <div class="dent-course-row" style="margin-top:6px;">
-                                <label class="check-item"><input type="checkbox" th:field="*{dent171}"> Dent 171</label>
-                                <label class="check-item"><input type="checkbox" th:field="*{dent172}"> Dent 172</label>
-                            </div>
-                        </div>
-                        <div class="form-group col-small">
-                            <label>Date Accomplished</label>
-                            <input type="date" class="date-picker" th:field="*{visitDate}" th:readonly="${viewOnly}">
-                        </div>
+                        <div class="form-group r10-name"><label>Name of Clinician</label>
+                            <input type="text" readonly th:value="${chart.clinician != null ? chart.clinician.fullName : ''}"></div>
+                        <div class="form-group r10-course"><label>Course</label>
+                            <div class="r10-chips">
+                                <label><input type="checkbox" th:field="*{dent171}" class="r10-course-cb"><span>Dent 171</span></label>
+                                <label><input type="checkbox" th:field="*{dent172}" class="r10-course-cb"><span>Dent 172</span></label>
+                            </div></div>
+                        <div class="form-group"><label>Date Accomplished</label>
+                            <input type="date" class="date-picker" th:field="*{visitDate}" th:readonly="${viewOnly}"></div>
                     </div>
 
                     <!-- Chief Complaint -->
@@ -224,10 +201,11 @@
                     <!-- PAIN SYMPTOMS SECTION -->
                     <div class="section-header">
                         Pain Symptoms &nbsp;&nbsp; TOOTH #:
-                        <input type="text" th:field="*{painToothNumber}" th:readonly="${viewOnly}" placeholder="___">
+                        <select class="tooth-select tooth-select-head" th:field="*{painToothNumber}" th:disabled="${viewOnly}"><option value="">Tooth #</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="31">31</option><option value="32">32</option><option value="33">33</option><option value="34">34</option><option value="35">35</option><option value="36">36</option><option value="37">37</option><option value="38">38</option><option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option><option value="45">45</option><option value="46">46</option><option value="47">47</option><option value="48">48</option></select>
                     </div>
 
-                    <!-- Onset -->
+                    <!-- Onset + the pain grid sit in one box -->
+                    <div class="pain-box">
                     <div class="pain-onset-row">
                         <span class="pain-onset-label">Onset:</span>
                         <label class="check-item"><input type="checkbox" th:field="*{painOnsetProvoked}"> Provoked</label>
@@ -301,9 +279,10 @@
                         <div class="pain-col">
                             <div class="col-header">Level of Intensity:</div>
                             <div class="intensity-text">Scale of 1 (discomfort) to 10 (severe/excruciating):</div>
-                            <input type="number" min="1" max="10" class="intensity-input-sm"
-                                   th:field="*{painIntensity}" th:readonly="${viewOnly}" placeholder="1–10">
+                            <div class="intensity-chips" role="radiogroup" aria-label="Level of intensity"><label><input type="radio" name="painIntensity" value="1" th:checked="${chart.painIntensity != null and chart.painIntensity.toString() == '1'}" th:disabled="${viewOnly}"><span>1</span></label><label><input type="radio" name="painIntensity" value="2" th:checked="${chart.painIntensity != null and chart.painIntensity.toString() == '2'}" th:disabled="${viewOnly}"><span>2</span></label><label><input type="radio" name="painIntensity" value="3" th:checked="${chart.painIntensity != null and chart.painIntensity.toString() == '3'}" th:disabled="${viewOnly}"><span>3</span></label><label><input type="radio" name="painIntensity" value="4" th:checked="${chart.painIntensity != null and chart.painIntensity.toString() == '4'}" th:disabled="${viewOnly}"><span>4</span></label><label><input type="radio" name="painIntensity" value="5" th:checked="${chart.painIntensity != null and chart.painIntensity.toString() == '5'}" th:disabled="${viewOnly}"><span>5</span></label><label><input type="radio" name="painIntensity" value="6" th:checked="${chart.painIntensity != null and chart.painIntensity.toString() == '6'}" th:disabled="${viewOnly}"><span>6</span></label><label><input type="radio" name="painIntensity" value="7" th:checked="${chart.painIntensity != null and chart.painIntensity.toString() == '7'}" th:disabled="${viewOnly}"><span>7</span></label><label><input type="radio" name="painIntensity" value="8" th:checked="${chart.painIntensity != null and chart.painIntensity.toString() == '8'}" th:disabled="${viewOnly}"><span>8</span></label><label><input type="radio" name="painIntensity" value="9" th:checked="${chart.painIntensity != null and chart.painIntensity.toString() == '9'}" th:disabled="${viewOnly}"><span>9</span></label><label><input type="radio" name="painIntensity" value="10" th:checked="${chart.painIntensity != null and chart.painIntensity.toString() == '10'}" th:disabled="${viewOnly}"><span>10</span></label></div>
+                            <button type="button" class="intensity-clear" th:unless="${viewOnly}" onclick="document.querySelectorAll('input[name=painIntensity]').forEach(function(r){r.checked=false;});">Clear</button>
                         </div>
+                    </div>
                     </div>
 
                     <!-- RADIOGRAPHIC EXAMINATION -->
@@ -463,5 +442,14 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 </script>
 <script src="/js/textarea-min-size.js"></script>
 <script src="/js/sidebar-hover.js?v=3"></script>
+<script src="/js/date-click.js"></script>
+<script th:inline="none">
+/* Course: Dent 171 or Dent 172, one at a time */
+document.querySelectorAll('.r10-course-cb').forEach(function (cb) {
+    cb.addEventListener('change', function () {
+        if (cb.checked) document.querySelectorAll('.r10-course-cb').forEach(function (o) { if (o !== cb) o.checked = false; });
+    });
+});
+</script>
 </body>
 </html>

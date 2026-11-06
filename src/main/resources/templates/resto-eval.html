@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${eval.formType.code + ' Evaluation - DentIS'}">Evaluation - DentIS</title>
+    <link rel="stylesheet" href="/css/endodontics2-clinician.css?v=5">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/form-common.css?v=3">
+    <link rel="stylesheet" href="/css/resto-eval.css?v=3">
+</head>
+<!-- RESTO FORM 1 (direct restorations), RESTO FORM 2 (indirect restorations) and the NOC sealant form.
+     The faculty grades it and sends it; the clinician sees it once sent. -->
+<body>
+<div class="background"></div>
+<div class="endo2-page">
+
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="menu-icon">&#9776;</div>
+                <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+                <h1>DentIS</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-profile">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
+                <div class="dropdown-icon">&#9660;</div>
+                <div class="user-dropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul th:if="${currentUser != null and currentUser.role.name() == 'FACULTY'}">
+                    <li class="nav-item"><a href="/faculty-dashboard" class="nav-link"><img src="/images/home-icon.png" alt="Home" class="nav-icon"><span>Home</span></a></li>
+                    <li class="nav-item active"><a href="/faculty-patientlist" class="nav-link"><img src="/images/patient-icon.png" alt="Patient List" class="nav-icon"><span>Patient List</span></a></li>
+                    <li class="nav-item"><a href="/faculty-advisees" class="nav-link"><img src="/images/chart-icon.png" alt="My Advisees" class="nav-icon"><span>My Advisees</span></a></li>
+                </ul>
+                <ul th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
+                    <li class="nav-item"><a href="/dashboard-clinicmanager" class="nav-link"><img src="/images/home-icon.png" alt="Home" class="nav-icon"><span>Home</span></a></li>
+                    <li class="nav-item active"><a href="/patientlist-clinicmanager" class="nav-link"><img src="/images/patient-icon.png" alt="Patient List" class="nav-icon"><span>Patient List</span></a></li>
+                </ul>
+                <ul th:if="${currentUser == null or currentUser.role.name() == 'CLINICIAN'}">
+                    <li class="nav-item"><a href="/clinician-dashboard" class="nav-link"><img src="/images/home-icon.png" alt="Home" class="nav-icon"><span>Home</span></a></li>
+                    <li class="nav-item"><a href="/chartrequest-clinician" class="nav-link"><img src="/images/request-icon.png" alt="Chart" class="nav-icon2"><span>Chart Request</span></a></li>
+                    <li class="nav-item active"><a href="/patientlist-clinician" class="nav-link"><img src="/images/patient-icon.png" alt="Patient" class="nav-icon"><span>Patient List</span></a></li>
+                    <li class="nav-item">
+                        <a href="/evaluations-clinician" class="nav-link" style="position:relative;">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="14" height="17" rx="2" stroke="#333" stroke-width="2"/><path d="M9 4V3h6v1" stroke="#333" stroke-width="2" stroke-linecap="round"/><path d="M8.5 12.5l2.2 2.2 4.8-4.8" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span>Evaluations</span>
+                            <b th:if="${currentUser != null and @notificationService.newEvaluationCount(currentUser) > 0}" th:text="${@notificationService.newEvaluationCount(currentUser)}"
+                               style="position:absolute; top:2px; right:6px; min-width:18px; height:18px; padding:0 5px; box-sizing:border-box; border-radius:9px; background:#c0392b; color:white; font-size:11px; font-weight:700; line-height:18px; text-align:center;">1</b>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" th:with="ft=${eval.formType}, noc=${eval.formType.name() == 'NOC'}">
+            <h2 class="page-title">Operative Dentistry</h2>
+
+            <div class="form-card">
+                <a th:if="${currentUser != null and currentUser.role.name() == 'FACULTY'}" th:href="@{/chartsview-faculty/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <a th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}" th:href="@{/chartsview-clinicmanager/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <a th:if="${currentUser == null or currentUser.role.name() == 'CLINICIAN'}" th:href="@{/chartsview-clinician/{id}(id=${chart.patient.id})}" class="back-arrow" title="Back to Charts"><span class="back-arrow-icon">&larr;</span> Back to Charts</a>
+                <div th:if="${param.saved != null}" class="saved-toast" role="status"><span class="saved-toast-icon">&#10003;</span><span>Draft saved</span>
+                    <button type="button" class="saved-toast-close" aria-label="Close" onclick="this.parentNode.remove()">&times;</button></div>
+                <div th:if="${param.sent != null}" class="saved-toast" role="status"><span class="saved-toast-icon">&#10003;</span><span>Sent to the clinician</span>
+                    <button type="button" class="saved-toast-close" aria-label="Close" onclick="this.parentNode.remove()">&times;</button></div>
+                <div th:if="${param.recalled != null}" class="saved-toast" role="status"><span class="saved-toast-icon">&#10003;</span><span>Recalled &mdash; you can edit it again</span>
+                    <button type="button" class="saved-toast-close" aria-label="Close" onclick="this.parentNode.remove()">&times;</button></div>
+                <div th:if="${param.missing != null}" class="e2-missing" role="alert">
+                    <b>Not sent yet.</b> Still missing: <span th:text="${param.missing}"></span>. Your changes were saved as a draft.</div>
+
+                <div class="form-banner" th:text="${ft.title}">Evaluation Form</div>
+                <div class="e2-code-row">
+                    <span class="e2-code" th:text="${ft.code + (eval.visitNo != null and eval.visitNo > 1 ? ' · #' + eval.visitNo : '')}">RESTO1</span>
+                    <span th:if="${facultyMode and eval.sent}" class="e2-status sent">&#9679; Sent to clinician</span>
+                    <span th:if="${facultyMode and !eval.sent}" class="e2-status draft">&#9679; Draft</span>
+                </div>
+
+                <form th:action="@{/resto-eval-faculty/{id}(id=${eval.id})}" method="post" id="reForm">
+                <div class="form-body">
+                    <div class="form-row">
+                        <div class="form-group"><label>Clinician&rsquo;s Name</label>
+                            <input type="text" readonly th:value="${chart.clinician != null ? chart.clinician.fullName : ''}"></div>
+                        <div class="form-group"><label>Patient&rsquo;s Name</label>
+                            <input type="text" readonly th:value="${chart.patient.surname + ', ' + chart.patient.firstName + (chart.patient.middleInitial != null and !#strings.isEmpty(chart.patient.middleInitial) ? ' ' + chart.patient.middleInitial + '.' : '')}"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Patient #</label>
+                            <input type="text" readonly th:value="${chart.patient.chartNo}"></div>
+                        <div class="form-group"><label th:text="${noc ? 'Tooth No./surface/s' : 'Tooth No., surface/s involved'}">Tooth</label>
+                            <input type="text" name="toothSurface" th:value="${eval.toothSurface}" th:readonly="${viewOnly}"></div>
+                        <div class="form-group re-date"><label>Date</label>
+                            <input type="date" name="evalDate" th:value="${eval.evalDate}" th:readonly="${viewOnly}"></div>
+                    </div>
+
+                    <!-- RESTO1: cavity classification, size (credit multiplier), material -->
+                    <th:block th:if="${ft.name() == 'RESTO1'}">
+                        <div class="re-field"><span class="re-flabel">Cavity classification</span>
+                            <div class="re-chips">
+                                <label th:each="o : ${ {'I/III','II/IV','V','ONLAY'} }" th:classappend="${viewOnly} ? 'ro'">
+                                    <input type="radio" name="cavityClass" th:value="${o}" th:checked="${eval.cavityClass == o}" th:disabled="${viewOnly}" data-credit>
+                                    <span th:text="${o == 'ONLAY' ? 'Direct Onlay' : 'Class ' + o}">I/III</span></label>
+                            </div></div>
+                        <div class="re-field"><span class="re-flabel">Cavity size <small>(credit multiplier)</small></span>
+                            <div class="re-chips">
+                                <label th:each="o : ${ {'SHALLOW_050','SHALLOW_075','MODERATE','EXTENSIVE'} }" th:classappend="${viewOnly} ? 'ro'">
+                                    <input type="radio" name="cavitySize" th:value="${o}" th:checked="${eval.cavitySize == o}" th:disabled="${viewOnly}" data-credit>
+                                    <span th:text="${o == 'SHALLOW_050' ? 'Shallow ×0.5' : o == 'SHALLOW_075' ? 'Shallow ×0.75' : o == 'MODERATE' ? 'Moderate ×1' : 'Extensive ×1.25'}">Shallow</span></label>
+                            </div></div>
+                        <div class="form-group"><label>Resto Material</label>
+                            <input type="text" name="restoMaterial" th:value="${eval.restoMaterial}" th:readonly="${viewOnly}"></div>
+                    </th:block>
+                    <!-- RESTO2: patient or simulation -->
+                    <div class="re-field" th:if="${ft.name() == 'RESTO2'}"><span class="re-flabel">Indirect restoration done on</span>
+                        <div class="re-chips">
+                            <label th:each="o : ${ {'PATIENT','SIMULATED'} }" th:classappend="${viewOnly} ? 'ro'">
+                                <input type="radio" name="caseType" th:value="${o}" th:checked="${eval.caseType == o}" th:disabled="${viewOnly}" data-credit>
+                                <span th:text="${o == 'PATIENT' ? 'Patient' : 'Simulation'}">Patient</span></label>
+                        </div></div>
+
+                    <!-- NOC: the rating scale is one table for all parts, as on the paper -->
+                    <div class="re-scale" th:if="${ft.sharedScale}">
+                        <div class="re-scale-title">The procedure was accomplished:</div>
+                        <ul class="re-rubric">
+                            <li th:each="ln : ${ft.parts[0].rubric()}"><span class="re-rv" th:text="${ln.rating()}">5.0</span><span th:text="${ln.text()}"></span></li>
+                        </ul>
+                    </div>
+
+                    <!-- Graded parts -->
+                    <div class="re-part" th:each="i : ${eval.partIndexes}" th:with="part=${ft.parts[i]}, n=${i + 1}">
+                        <div class="re-part-head">
+                            <div><b th:text="${part.no() + '. ' + part.name()}">I. Diagnosis</b>
+                                <span class="re-pct" th:text="${part.maxLabel() + '%'}">15%</span>
+                                <div class="re-did" th:classappend="${ft.sharedScale} ? 're-did-main'" th:text="${part.did()}"></div></div>
+                            <div class="re-pts"><span class="re-pts-val" th:id="${'pts' + n}">&mdash;</span><small th:text="${noc ? 'rating' : '/ ' + part.maxLabel() + ' pts'}"></small></div>
+                        </div>
+                        <ul class="re-rubric" th:unless="${ft.sharedScale}">
+                            <li th:each="ln : ${part.rubric()}"><span class="re-rv" th:text="${ln.rating()}">5</span><span th:text="${ln.text()}"></span></li>
+                        </ul>
+                        <div class="re-rate">
+                            <span class="re-flabel">Rating</span>
+                            <div class="re-chips re-rchips">
+                                <label th:each="r : ${ft.ratings}" th:classappend="${viewOnly} ? 'ro'">
+                                    <input type="radio" th:name="${'r' + n}" th:value="${r}" th:checked="${eval.getRating(i) == r}" th:disabled="${viewOnly}"
+                                           th:attr="data-part=${n},data-max=${part.max()}">
+                                    <span th:text="${r}">5</span></label>
+                            </div>
+                            <span class="re-stamp" th:if="${ft.stampedPerPart and eval.getStampLabel(i) != null}" th:text="${'Faculty: ' + eval.getStampLabel(i)}"></span>
+                        </div>
+                    </div>
+
+                    <!-- Total -->
+                    <div class="re-summary">
+                        <div><span class="re-flabel">Total Grade</span><b id="reTotal">&mdash;</b><small th:text="${noc ? 'out of 5.0' : 'out of 100'}"></small></div>
+                    </div>
+
+
+                    <!-- Credit table from the paper form, for reference; the cell that applies is highlighted -->
+                    <details class="ct-guide" th:if="${!noc}">
+                        <summary>Show credit table</summary>
+                        <div class="ct-body">
+                            <th:block th:if="${ft.name() == 'RESTO1'}"><table class="ct-table"><thead><tr><th>Total Grade</th><th data-col="I/III">Class I / III</th><th data-col="ONLAY">Direct Onlay</th><th data-col="II/IV">Class II / IV</th><th data-col="V">Class V</th></tr></thead><tbody><tr data-row="0"><td>98–100</td><td data-col="I/III">1</td><td data-col="ONLAY">2</td><td data-col="II/IV">1.5</td><td data-col="V">0.5</td></tr><tr data-row="1"><td>92–97</td><td data-col="I/III">0.96</td><td data-col="ONLAY">1.92</td><td data-col="II/IV">1.45</td><td data-col="V">0.48</td></tr><tr data-row="2"><td>86–91</td><td data-col="I/III">0.9</td><td data-col="ONLAY">1.8</td><td data-col="II/IV">1.4</td><td data-col="V">0.45</td></tr><tr data-row="3"><td>80–85</td><td data-col="I/III">0.84</td><td data-col="ONLAY">1.68</td><td data-col="II/IV">1.3</td><td data-col="V">0.42</td></tr><tr data-row="4"><td>73–79</td><td data-col="I/III">0.78</td><td data-col="ONLAY">1.56</td><td data-col="II/IV">1.2</td><td data-col="V">0.39</td></tr><tr data-row="5"><td>67–72</td><td data-col="I/III">0.72</td><td data-col="ONLAY">1.44</td><td data-col="II/IV">1.1</td><td data-col="V">0.36</td></tr><tr data-row="6"><td>61–66</td><td data-col="I/III">0.66</td><td data-col="ONLAY">1.32</td><td data-col="II/IV">1</td><td data-col="V">0.33</td></tr><tr data-row="7"><td>60</td><td data-col="I/III">0.6</td><td data-col="ONLAY">1.2</td><td data-col="II/IV">0.9</td><td data-col="V">0.3</td></tr><tr data-row="8"><td>below 60</td><td data-col="I/III">0</td><td data-col="ONLAY">0</td><td data-col="II/IV">0</td><td data-col="V">0</td></tr></tbody></table><table class="ct-table ct-mult"><thead><tr><th>Credit multiplier</th><th data-size="SHALLOW_050">Shallow</th><th data-size="SHALLOW_075">Shallow</th><th data-size="MODERATE">Moderate</th><th data-size="EXTENSIVE">Extensive</th></tr></thead><tbody><tr><td>×</td><td data-size="SHALLOW_050">0.5</td><td data-size="SHALLOW_075">0.75</td><td data-size="MODERATE">1</td><td data-size="EXTENSIVE">1.25</td></tr></tbody></table></th:block>
+                            <th:block th:if="${ft.name() == 'RESTO2'}"><table class="ct-table"><thead><tr><th>Total Grade</th><th data-col="PATIENT">Patient</th><th data-col="SIMULATED">Simulated</th></tr></thead><tbody><tr data-row="0"><td>98–100</td><td data-col="PATIENT">4</td><td data-col="SIMULATED">2</td></tr><tr data-row="1"><td>92–97</td><td data-col="PATIENT">3.84</td><td data-col="SIMULATED">1.92</td></tr><tr data-row="2"><td>86–91</td><td data-col="PATIENT">3.6</td><td data-col="SIMULATED">1.8</td></tr><tr data-row="3"><td>80–85</td><td data-col="PATIENT">3.36</td><td data-col="SIMULATED">1.68</td></tr><tr data-row="4"><td>73–79</td><td data-col="PATIENT">3.12</td><td data-col="SIMULATED">1.56</td></tr><tr data-row="5"><td>67–72</td><td data-col="PATIENT">2.88</td><td data-col="SIMULATED">1.44</td></tr><tr data-row="6"><td>61–66</td><td data-col="PATIENT">2.64</td><td data-col="SIMULATED">1.32</td></tr><tr data-row="7"><td>60</td><td data-col="PATIENT">2.4</td><td data-col="SIMULATED">1.2</td></tr><tr data-row="8"><td>below 60</td><td data-col="PATIENT">0</td><td data-col="SIMULATED">0</td></tr></tbody></table></th:block>
+                        </div>
+                    </details>
+
+                    <div class="e2-section-title">Over-all EPA</div>
+                    <div class="e2-epa" role="radiogroup">
+                        <label th:each="k : ${#numbers.sequence(1, 5)}" class="e2-epa-opt" th:classappend="${viewOnly} ? 'ro'">
+                            <input type="radio" name="epaLevel" th:value="${'EPA Level ' + k}" th:checked="${eval.epaLevel == 'EPA Level ' + k}" th:disabled="${viewOnly}">
+                            <span th:text="${k}">1</span></label>
+                    </div>
+
+                    <div class="form-group" th:if="${!noc}" style="margin-top:16px;"><label>Remarks</label>
+                        <textarea name="remarks" rows="3" th:text="${eval.remarks}" th:readonly="${viewOnly}"></textarea></div>
+
+                    <div class="form-group" th:if="${noc}" style="margin-top:16px;"><label>Faculty / Date</label>
+                        <input type="text" readonly class="re-fac"
+                               th:value="${eval.sentBy != null ? eval.sentBy + ' · ' + #temporals.format(eval.sentAt, 'MMM d, yyyy') : ''}"
+                               th:placeholder="${'Filled in when the faculty sends it'}"></div>
+
+                    <div class="form-actions e2-actions" th:if="${!viewOnly}">
+                        <button type="submit" name="action" value="save" class="btn-save e2-btn-sec">Save draft</button>
+                        <button type="submit" name="action" value="send" class="btn-save" id="btnSend">Send to clinician</button>
+                    </div>
+                </div>
+                </form>
+
+                <form th:if="${canGrade and eval.sent}" th:action="@{/resto-eval-faculty/{id}/recall(id=${eval.id})}" method="post" class="e2-recall">
+                    <span>Sent <th:block th:text="${#temporals.format(eval.sentAt, 'MMM d, yyyy, h:mm a')}"></th:block>.
+                        <th:block th:text="${eval.viewedAt != null ? 'The clinician has opened it.' : 'Not opened by the clinician yet.'}"></th:block></span>
+                    <button type="submit" class="e2-btn-recall">Recall to edit</button>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script th:inline="javascript">
+var VIEW_ONLY = /*[[${viewOnly == true}]]*/ false;
+var FORM = /*[[${eval.formType.name()}]]*/ 'RESTO1';
+var PARTS = /*[[${eval.formType.parts.size()}]]*/ 6;
+</script>
+<script th:inline="none">
+(function () {
+    var CREDIT = {
+        'I/III': [1, 0.96, 0.9, 0.84, 0.78, 0.72, 0.66, 0.6, 0], 'ONLAY': [2, 1.92, 1.8, 1.68, 1.56, 1.44, 1.32, 1.2, 0],
+        'II/IV': [1.5, 1.45, 1.4, 1.3, 1.2, 1.1, 1, 0.9, 0], 'V': [0.5, 0.48, 0.45, 0.42, 0.39, 0.36, 0.33, 0.3, 0],
+        'PATIENT': [4, 3.84, 3.6, 3.36, 3.12, 2.88, 2.64, 2.4, 0], 'SIMULATED': [2, 1.92, 1.8, 1.68, 1.56, 1.44, 1.32, 1.2, 0]
+    };
+    var MULT = { SHALLOW_050: 0.5, SHALLOW_075: 0.75, MODERATE: 1, EXTENSIVE: 1.25 };
+    function row(t) { var c = [98, 92, 86, 80, 73, 67, 61, 60]; for (var i = 0; i < c.length; i++) if (t >= c[i]) return i; return 8; }
+    function r2(x) { return Math.round(x * 100) / 100; }
+    function picked(name) { var el = document.querySelector('input[name="' + name + '"]:checked'); return el ? el.value : null; }
+
+    function update() {
+        var total = 0, all = true;
+        for (var n = 1; n <= PARTS; n++) {
+            var el = document.querySelector('input[name="r' + n + '"]:checked');
+            var out = document.getElementById('pts' + n);
+            if (!el) { out.textContent = '\u2014'; all = false; continue; }
+            var r = parseFloat(el.value), max = parseFloat(el.dataset.max);
+            var p = FORM === 'NOC' ? r * max / 100 : r * max / 5;
+            out.textContent = FORM === 'NOC' ? el.value : r2(p);
+            total += p;
+        }
+        var t = r2(total);
+        document.getElementById('reTotal').textContent = all ? t : '\u2014';
+        /* highlight the credit table: row from the total, column from the class / case, multiplier from the size */
+        var colPick = FORM === 'RESTO1' ? picked('cavityClass') : picked('caseType'), rowPick = all ? row(t) : -1;
+        document.querySelectorAll('.ct-table tbody tr[data-row]').forEach(function (tr) { tr.classList.toggle('ct-row-on', +tr.dataset.row === rowPick); });
+        document.querySelectorAll('.ct-table [data-col]').forEach(function (c) {
+            c.classList.toggle('ct-col-on', c.dataset.col === colPick);
+            c.classList.toggle('ct-hit', c.tagName === 'TD' && c.dataset.col === colPick && +c.parentNode.dataset.row === rowPick);
+        });
+        var sizePick = picked('cavitySize');
+        document.querySelectorAll('.ct-mult [data-size]').forEach(function (c) {
+            c.classList.toggle('ct-col-on', c.dataset.size === sizePick);
+            c.classList.toggle('ct-hit', c.tagName === 'TD' && c.dataset.size === sizePick);
+        });
+    }
+    document.querySelectorAll('input[type=radio]').forEach(function (i) { i.addEventListener('change', update); });
+    update();
+
+    if (VIEW_ONLY) return;
+    var d = document.querySelector('input[name="evalDate"]');
+    if (d && !d.value) { var n = new Date(), p2 = function (x) { return (x < 10 ? '0' : '') + x; };
+        d.value = n.getFullYear() + '-' + p2(n.getMonth() + 1) + '-' + p2(n.getDate()); }
+    var form = document.getElementById('reForm'), last = 'save', dirty = false;
+    form.querySelectorAll('button[name="action"]').forEach(function (b) { b.addEventListener('click', function () { last = b.value; }); });
+    form.addEventListener('submit', function (e) {
+        if (last === 'send') {
+            var missing = [];
+            for (var n = 1; n <= PARTS; n++) if (!picked('r' + n)) missing.push('part ' + ['I','II','III','IV','V','VI'][n - 1]);
+            if (FORM === 'RESTO1') { if (!picked('cavityClass')) missing.push('cavity classification'); if (!picked('cavitySize')) missing.push('cavity size'); }
+            if (FORM === 'RESTO2' && !picked('caseType')) missing.push('patient or simulation');
+            if (!picked('epaLevel')) missing.push('Over-all EPA');
+            if (missing.length) { e.preventDefault(); alert('Before sending, please fill in: ' + missing.join(', ') + '.'); return; }
+            if (!confirm('Send this evaluation to the clinician? It will be locked until you recall it.')) { e.preventDefault(); return; }
+        }
+        dirty = false;
+    });
+    document.addEventListener('change', function () { dirty = true; }, true);
+    document.addEventListener('input', function () { dirty = true; }, true);
+    window.addEventListener('beforeunload', function (e) { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+})();
+document.querySelector('.user-profile').onclick = function (e) { e.stopPropagation(); document.querySelector('.user-dropdown').classList.toggle('show'); };
+document.addEventListener('click', function () { var d = document.querySelector('.user-dropdown'); if (d) d.classList.remove('show'); });
+</script>
+<script src="/js/textarea-min-size.js"></script>
+<script src="/js/sidebar-hover.js?v=3"></script>
+<script src="/js/date-click.js"></script>
+</body>
+</html>

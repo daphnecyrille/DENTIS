@@ -12,8 +12,10 @@ import java.util.List;
 public class OperativeChartService {
 
     private final OperativeChartRepository repo;
+    private final com.dentis.DENTIS.repository.RestoEvaluationRepository evalRepo;
 
-    public OperativeChartService(OperativeChartRepository repo) {
+    public OperativeChartService(OperativeChartRepository repo, com.dentis.DENTIS.repository.RestoEvaluationRepository evalRepo) {
+        this.evalRepo = evalRepo;
         this.repo = repo;
     }
 
@@ -44,6 +46,18 @@ public class OperativeChartService {
                 .filter(c -> !(c.getStatus() == OperativeChartStatus.APPROVED && c.getForm2Status() == OperativeChartStatus.APPROVED))
                 .toList();
         charts.forEach(c -> c.setFaculty(faculty));
+        repo.saveAll(charts);
+    }
+
+    /** True once the clinician has saved any form of this patient's charts. */
+    public boolean hasStartedForms(Patient patient) {
+        return findAllByPatient(patient).stream().anyMatch(c -> evalRepo.existsByOperativeChart(c) || c.getStatus() != OperativeChartStatus.CREATED || c.getForm2Status() != OperativeChartStatus.CREATED);
+    }
+
+    /** Moves the patient's (not yet started) charts to a newly assigned clinician. */
+    public void reassignClinician(Patient patient, User clinician) {
+        List<OperativeChart> charts = findAllByPatient(patient);
+        charts.forEach(c -> c.setClinician(clinician));
         repo.saveAll(charts);
     }
 
@@ -261,10 +275,14 @@ public class OperativeChartService {
         return repo.save(c);
     }
 
-    public OperativeChart approveForm2(Long id) {
+    public OperativeChart approveForm2(Long id) { return approveForm2(id, null); }
+
+    public OperativeChart approveForm2(Long id, User faculty) {
         OperativeChart c = repo.findById(id).orElseThrow();
         if (c.getForm2Status() != OperativeChartStatus.SUBMITTED) return c;   // only a submitted chart can be reviewed
         c.setForm2Status(OperativeChartStatus.APPROVED);
+        c.setForm2ApprovedBy(faculty != null ? faculty.getFullName() : null);   // RESTO6 "Faculty Name"
+        c.setForm2ApprovedAt(java.time.LocalDateTime.now());
         return repo.save(c);
     }
 
