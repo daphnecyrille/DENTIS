@@ -120,14 +120,20 @@ public class OralSurgeryChart {
     private String diagnosisTreatmentPlan;
 
     // Checklist
-    private Boolean hasAsChart = true;
-    private Boolean hasIntraoralPhoto = true;
-    private Boolean hasRadiograph = true;
+    private Boolean hasAsChart = false;
+    private Boolean hasIntraoralPhoto = false;
+    private Boolean hasRadiograph = false;
     private String radiographType;
-    private Boolean hasImpression = true;
-    private Boolean hasOtherDiagnosticAids = true;
+    private Boolean hasImpression = false;
+    private Boolean hasOtherDiagnosticAids = false;
     private String otherDiagnosticAids;
-    private String checkedBy;
+    private String checkedBy;   // old typed "Checked By" (kept for existing charts; the faculty signature replaces it)
+
+    /** The approving faculty's name and the time: OSF1 "Faculty", OSF2 "Patient Workup Checked By" (facultySignature is unused). */
+    @Column(columnDefinition = "TEXT")
+    private String facultySignature;
+    private LocalDateTime facultySignedAt;
+    private String facultySignedBy;
 
     @Column(columnDefinition = "TEXT")
     private String revisionReason;

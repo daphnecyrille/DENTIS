@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Clinical Oral Surgery - DentIS</title>
-    <link rel="stylesheet" href="/css/oralsurgery-clinician.css">
-    <link rel="stylesheet" href="/css/form-common.css">
+    <link rel="stylesheet" href="/css/oralsurgery-clinician.css?v=4">
+    <link rel="stylesheet" href="/css/form-common.css?v=3">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 
@@ -249,15 +249,13 @@
                     </div>
 
                     <!-- Diagnosis + Tooth Number -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Diagnosis</label>
-                            <textarea th:field="*{diagnosis}" rows="2" readonly></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Tooth Number</label>
-                            <input type="text" th:field="*{toothNumber}" readonly>
-                        </div>
+                    <div class="form-group os-tooth">
+                        <label>Tooth Number</label>
+                        <input type="text" th:field="*{toothNumber}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Diagnosis</label>
+                        <textarea th:field="*{diagnosis}" rows="4" readonly></textarea>
                     </div>
 
                     <!-- Treatment -->
@@ -284,7 +282,9 @@
                         </div>
                         <div class="form-group">
                             <label>Faculty</label>
-                            <input type="text" th:value="${chart.faculty != null ? chart.faculty.fullName : ''}" readonly>
+                            <input type="text" readonly
+                                   th:value="${chart.facultySignedBy != null ? chart.facultySignedBy + (chart.facultySignedAt != null ? ' · ' + #temporals.format(chart.facultySignedAt, 'MMM d, yyyy') : '') : ''}"
+                                   th:placeholder="${chart.status.name() == 'SUBMITTED' and currentUser != null and currentUser.role.name() == 'FACULTY' and chart.faculty != null and chart.faculty.id == currentUser.id ? 'Your name is filled in when you approve' : 'Filled in when the faculty approves'}">
                         </div>
                     </div>
 
@@ -327,6 +327,7 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 
 <script src="/js/textarea-min-size.js"></script>
 <script src="/js/sidebar-hover.js?v=3"></script>
+<script src="/js/date-click.js"></script>
 <th:block th:replace="~{fragments/faculty-review :: modals}"></th:block>
 </body>
 </html>

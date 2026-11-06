@@ -301,4 +301,11 @@ body {
     transition: background-color 0.3s ease;
 }
 
-.btn-submit:hover { background: #2c5282; }
+.btn-submit:hover { background: #2c5282; }.os2-sig { grid-template-columns: minmax(0, 460px); margin-top: 6px; }
+.os2-sub { font-weight: 400; color: #6b7a8c; font-size: 12px; }
+.os2-myturn { border-color: #d8b24a; background: #fffbea; }
+.os2-myturn b, .os2-myturn strong { color: #8a6d00; }
+.os2-myturn span { color: #6d5a1e; }
+.checklist-inline .input-inline { min-width: 220px; }
+.os2-checked input { max-width: 460px; }
+.os2-checked input::placeholder { color: #9aa5b1; font-style: italic; }

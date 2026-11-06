@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Clinical Oral Surgery - Odontectomy - DentIS</title>
-    <link rel="stylesheet" href="/css/oralsurgery2-clinician.css">
+    <link rel="stylesheet" href="/css/oralsurgery2-clinician.css?v=3">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/form-common.css">
+    <link rel="stylesheet" href="/css/form-common.css?v=3">
 </head>
 
 <body>
@@ -171,7 +171,7 @@
                     <!-- Diagnosis & Treatment Plan -->
                     <div class="form-group">
                         <label>Diagnosis &amp; Treatment Plan</label>
-                        <textarea th:field="*{diagnosisTreatmentPlan}" rows="2" th:readonly="${viewOnly}"></textarea>
+                        <textarea th:field="*{diagnosisTreatmentPlan}" rows="4" th:readonly="${viewOnly}"></textarea>
                     </div>
 
                     <!-- Patient Workup Checklist -->
@@ -184,11 +184,7 @@
                             <div></div>
                             <div class="checklist-inline">
                                 <label class="checkbox-label"><input type="checkbox" th:field="*{hasRadiograph}" th:disabled="${viewOnly}"> Radiograph</label>
-                                <select th:field="*{radiographType}" class="select-input select-small" th:disabled="${viewOnly}">
-                                    <option value="">Indicate what type</option>
-                                    <option value="periapical">Periapical</option>
-                                    <option value="panoramic">Panoramic</option>
-                                </select>
+                                <input type="text" th:field="*{radiographType}" class="input-inline" placeholder="Indicate what type" th:readonly="${viewOnly}">
                             </div>
                             <div></div>
                             <label class="checkbox-label"><input type="checkbox" th:field="*{hasImpression}" th:disabled="${viewOnly}"> Impression/Diagnostic Cast</label>
@@ -201,10 +197,12 @@
                         </div>
                     </div>
 
-                    <!-- Patient Workup Checked By -->
-                    <div class="form-group">
-                        <label>Patient Workup Checked By:</label>
-                        <input type="text" th:field="*{checkedBy}" class="input-medium" th:readonly="${viewOnly}">
+                    <!-- Patient Workup Checked By (Clinical OS Faculty): the approving faculty's name, filled in on approval -->
+                    <div class="form-group os2-checked">
+                        <label>Patient Workup Checked By <span class="os2-sub">(Clinical OS Faculty)</span></label>
+                        <input type="text" readonly
+                               th:value="${chart.facultySignedBy != null ? chart.facultySignedBy + (chart.facultySignedAt != null ? ' · ' + #temporals.format(chart.facultySignedAt, 'MMM d, yyyy') : '') : ''}"
+                               th:placeholder="${chart.status.name() == 'SUBMITTED' and currentUser != null and currentUser.role.name() == 'FACULTY' and chart.faculty != null and chart.faculty.id == currentUser.id ? 'Your name is filled in when you approve' : 'Filled in when the faculty approves'}">
                     </div>
 
                     <!-- Save -->
@@ -225,6 +223,14 @@ document.querySelectorAll('.select-input').forEach(function(sel) {
         this.classList.toggle('selected', !!this.value);
     });
 });
+
+/* empty Date: today (the clinician can still change it) */
+(function () {
+    var d = document.querySelector('input[name="odontectomyDate"]');
+    if (!d || d.readOnly || d.value) return;
+    var n = new Date(), p = function (x) { return (x < 10 ? '0' : '') + x; };
+    d.value = n.getFullYear() + '-' + p(n.getMonth() + 1) + '-' + p(n.getDate());
+})();
 
 document.querySelector('.menu-icon').onclick = function() {
     document.querySelector('.sidebar').classList.toggle('expanded');
@@ -276,5 +282,6 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 </script>
 <script src="/js/textarea-min-size.js"></script>
 <script src="/js/sidebar-hover.js?v=3"></script>
+<script src="/js/date-click.js"></script>
 </body>
 </html>

@@ -25,8 +25,7 @@ public class OralSurgeryChartService {
         chart.setClinician(clinician);
         chart.setFaculty(faculty);
         chart.setChartType(chartType);
-        String suffix = chartType == OralSurgeryChartType.OSF2 ? "OS2" : "OS1";
-        chart.setChartNo(patient.getChartNo() + "-" + suffix);
+        chart.setChartNo(patient.getChartNo() + "-" + chartType.name());   // e.g. 2026-00008-OSF1
         chart.setChiefComplaint(patient.getChiefComplaint());
         return repo.save(chart);
     }
@@ -43,8 +42,23 @@ public class OralSurgeryChartService {
         return repo.findByPatientAndChartType(patient, type);
     }
 
+    /** The patient's OS charts, OSF1 first, then OSF2. */
     public List<OralSurgeryChart> findAllByPatient(Patient patient) {
-        return repo.findByPatientOrderByCreatedAtDesc(patient);
+        return repo.findByPatientOrderByCreatedAtDesc(patient).stream()
+                .sorted(java.util.Comparator.comparing((OralSurgeryChart c) -> c.getChartType() == null ? "" : c.getChartType().name()))
+                .toList();
+    }
+
+    /** One time: charts numbered with the old "-OS1" / "-OS2" endings get "-OSF1" / "-OSF2", like the paper forms. */
+    @org.springframework.context.event.EventListener(org.springframework.boot.context.event.ApplicationReadyEvent.class)
+    public void renumberOldCharts() {
+        for (OralSurgeryChart c : repo.findAll()) {
+            String no = c.getChartNo();
+            if (no != null && (no.endsWith("-OS1") || no.endsWith("-OS2"))) {
+                c.setChartNo(no.substring(0, no.length() - 3) + "OSF" + no.charAt(no.length() - 1));
+                repo.save(c);
+            }
+        }
     }
 
     /**
@@ -56,6 +70,18 @@ public class OralSurgeryChartService {
                 .filter(c -> !(c.getStatus() == OralSurgeryChartStatus.APPROVED))
                 .toList();
         charts.forEach(c -> c.setFaculty(faculty));
+        repo.saveAll(charts);
+    }
+
+    /** True once the clinician has saved any form of this patient's charts. */
+    public boolean hasStartedForms(Patient patient) {
+        return findAllByPatient(patient).stream().anyMatch(c -> c.getStatus() != OralSurgeryChartStatus.CREATED);
+    }
+
+    /** Moves the patient's (not yet started) charts to a newly assigned clinician. */
+    public void reassignClinician(Patient patient, User clinician) {
+        List<OralSurgeryChart> charts = findAllByPatient(patient);
+        charts.forEach(c -> c.setClinician(clinician));
         repo.saveAll(charts);
     }
 
@@ -112,14 +138,14 @@ public class OralSurgeryChartService {
         chart.setToothNumber(updated.getToothNumber());
         chart.setTreatment(updated.getTreatment());
         chart.setFollowUp(updated.getFollowUp());
-        chart.setVisitDate(updated.getVisitDate());
+        chart.setVisitDate(updated.getVisitDate() != null ? updated.getVisitDate() : java.time.LocalDate.now());   // left empty: today
         chart.setStatus(OralSurgeryChartStatus.IN_PROGRESS);
         return repo.save(chart);
     }
 
     public OralSurgeryChart saveForm2(Long id, OralSurgeryChart updated) {
         OralSurgeryChart chart = repo.findById(id).orElseThrow();
-        chart.setOdontectomyDate(updated.getOdontectomyDate());
+        chart.setOdontectomyDate(updated.getOdontectomyDate() != null ? updated.getOdontectomyDate() : java.time.LocalDate.now());   // left empty: today
         chart.setClinicalFindings(updated.getClinicalFindings());
         chart.setOdontectomyRadiographicFindings(updated.getOdontectomyRadiographicFindings());
         chart.setClassificationOfImpaction(updated.getClassificationOfImpaction());
@@ -133,7 +159,6 @@ public class OralSurgeryChartService {
         chart.setOtherDiagnosticAids(updated.getOtherDiagnosticAids());
         chart.setChiefComplaint(updated.getChiefComplaint());
         chart.setHistoryOfPresentIllness(updated.getHistoryOfPresentIllness());
-        chart.setCheckedBy(updated.getCheckedBy());
         chart.setStatus(OralSurgeryChartStatus.IN_PROGRESS);
         return repo.save(chart);
     }
@@ -144,9 +169,15 @@ public class OralSurgeryChartService {
         return repo.save(chart);
     }
 
-    public OralSurgeryChart approve(Long id) {
+    public OralSurgeryChart approve(Long id) { return approve(id, null, null); }
+
+    /** Approves and records who approved it (the faculty) and when. */
+    public OralSurgeryChart approve(Long id, String signature, User faculty) {
         OralSurgeryChart chart = repo.findById(id).orElseThrow();
         if (chart.getStatus() != OralSurgeryChartStatus.SUBMITTED) return chart;   // only a submitted chart can be reviewed
+        // the approving faculty's name and date: OSF1 "Faculty", OSF2 "Patient Workup Checked By"
+        chart.setFacultySignedAt(java.time.LocalDateTime.now());
+        chart.setFacultySignedBy(faculty != null ? faculty.getFullName() : null);
         chart.setStatus(OralSurgeryChartStatus.APPROVED);
         return repo.save(chart);
     }

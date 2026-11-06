@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Clinical Oral Surgery - Odontectomy - Faculty</title>
-    <link rel="stylesheet" href="/css/oralsurgery2-clinician.css">
-    <link rel="stylesheet" href="/css/form-common.css">
+    <link rel="stylesheet" href="/css/oralsurgery2-clinician.css?v=3">
+    <link rel="stylesheet" href="/css/form-common.css?v=3">
+    <link rel="stylesheet" href="/css/signature.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 
@@ -188,7 +189,7 @@
                     <!-- Diagnosis & Treatment Plan -->
                     <div class="form-group">
                         <label>Diagnosis &amp; Treatment Plan</label>
-                        <textarea th:field="*{diagnosisTreatmentPlan}" rows="2" readonly></textarea>
+                        <textarea th:field="*{diagnosisTreatmentPlan}" rows="4" readonly></textarea>
                     </div>
 
                     <!-- Patient Workup Checklist -->
@@ -201,11 +202,7 @@
                             <div></div>
                             <div class="checklist-inline">
                                 <label class="checkbox-label"><input type="checkbox" th:field="*{hasRadiograph}" disabled> Radiograph</label>
-                                <select th:field="*{radiographType}" class="select-input select-small" disabled>
-                                    <option value="">Indicate what type</option>
-                                    <option value="periapical">Periapical</option>
-                                    <option value="panoramic">Panoramic</option>
-                                </select>
+                                <input type="text" th:field="*{radiographType}" class="input-inline" placeholder="Indicate what type" readonly>
                             </div>
                             <div></div>
                             <label class="checkbox-label"><input type="checkbox" th:field="*{hasImpression}" disabled> Impression/Diagnostic Cast</label>
@@ -218,10 +215,12 @@
                         </div>
                     </div>
 
-                    <!-- Patient Workup Checked By -->
-                    <div class="form-group">
-                        <label>Patient Workup Checked By:</label>
-                        <input type="text" th:field="*{checkedBy}" class="input-medium" readonly>
+                    <!-- Patient Workup Checked By (Clinical OS Faculty): the approving faculty's name, filled in on approval -->
+                    <div class="form-group os2-checked">
+                        <label>Patient Workup Checked By <span class="os2-sub">(Clinical OS Faculty)</span></label>
+                        <input type="text" readonly
+                               th:value="${chart.facultySignedBy != null ? chart.facultySignedBy + (chart.facultySignedAt != null ? ' · ' + #temporals.format(chart.facultySignedAt, 'MMM d, yyyy') : '') : ''}"
+                               th:placeholder="${chart.status.name() == 'SUBMITTED' and currentUser != null and currentUser.role.name() == 'FACULTY' and chart.faculty != null and chart.faculty.id == currentUser.id ? 'Your name is filled in when you approve' : 'Filled in when the faculty approves'}">
                     </div>
 
                     <div class="form-actions" th:if="${currentUser != null and currentUser.role.name() == 'CLINIC_MANAGER'}">
@@ -263,6 +262,7 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 
 <script src="/js/textarea-min-size.js"></script>
 <script src="/js/sidebar-hover.js?v=3"></script>
+<script src="/js/date-click.js"></script>
 <th:block th:replace="~{fragments/faculty-review :: modals}"></th:block>
 </body>
 </html>

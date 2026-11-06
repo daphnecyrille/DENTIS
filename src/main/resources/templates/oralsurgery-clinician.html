@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Clinical Oral Surgery - DentIS</title>
-    <link rel="stylesheet" href="/css/oralsurgery-clinician.css">
+    <link rel="stylesheet" href="/css/oralsurgery-clinician.css?v=4">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/form-common.css">
+    <link rel="stylesheet" href="/css/form-common.css?v=3">
 </head>
 
 <body>
@@ -231,16 +231,16 @@
                         <textarea th:field="*{radiographicFindings}" rows="2" th:readonly="${viewOnly}"></textarea>
                     </div>
 
-                    <!-- Diagnosis + Tooth Number -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Diagnosis</label>
-                            <textarea th:field="*{diagnosis}" rows="2" th:readonly="${viewOnly}"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Tooth Number</label>
-                            <input type="number" th:field="*{toothNumber}" th:readonly="${viewOnly}">
-                        </div>
+                    <!-- Tooth Number, then Diagnosis -->
+                    <div class="form-group os-tooth">
+                        <label>Tooth Number</label>
+                        <select th:field="*{toothNumber}" class="select-input" th:disabled="${viewOnly}">
+                                <option value="">Select tooth #</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="31">31</option><option value="32">32</option><option value="33">33</option><option value="34">34</option><option value="35">35</option><option value="36">36</option><option value="37">37</option><option value="38">38</option><option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option><option value="45">45</option><option value="46">46</option><option value="47">47</option><option value="48">48</option>
+                            </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Diagnosis</label>
+                        <textarea th:field="*{diagnosis}" rows="4" th:readonly="${viewOnly}"></textarea>
                     </div>
 
                     <!-- Treatment -->
@@ -267,7 +267,9 @@
                         </div>
                         <div class="form-group">
                             <label>Faculty</label>
-                            <input type="text" th:value="${chart.faculty != null ? chart.faculty.fullName : ''}" readonly>
+                            <input type="text" readonly
+                                   th:value="${chart.facultySignedBy != null ? chart.facultySignedBy + (chart.facultySignedAt != null ? ' · ' + #temporals.format(chart.facultySignedAt, 'MMM d, yyyy') : '') : ''}"
+                                   th:placeholder="${chart.status.name() == 'SUBMITTED' and currentUser != null and currentUser.role.name() == 'FACULTY' and chart.faculty != null and chart.faculty.id == currentUser.id ? 'Your name is filled in when you approve' : 'Filled in when the faculty approves'}">
                         </div>
                     </div>
 
@@ -284,6 +286,18 @@
 </div>
 
 <script>
+/* empty Date: today (the clinician can still change it) */
+(function () {
+    var d = document.querySelector('input[name="visitDate"]');
+    if (!d || d.readOnly || d.value) return;
+    var n = new Date(), p = function (x) { return (x < 10 ? '0' : '') + x; };
+    d.value = n.getFullYear() + '-' + p(n.getMonth() + 1) + '-' + p(n.getDate());
+})();
+document.querySelectorAll('.select-input').forEach(function (sel) {
+    sel.classList.toggle('selected', !!sel.value);
+    sel.addEventListener('change', function () { sel.classList.toggle('selected', !!sel.value); });
+});
+
 document.querySelector('.menu-icon').onclick = function() {
     document.querySelector('.sidebar').classList.toggle('expanded');
 };
@@ -334,5 +348,6 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 </script>
 <script src="/js/textarea-min-size.js"></script>
 <script src="/js/sidebar-hover.js?v=3"></script>
+<script src="/js/date-click.js"></script>
 </body>
 </html>
