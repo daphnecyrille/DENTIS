@@ -2,10 +2,12 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>Clinical Periodontics - DentIS</title>
     <link rel="stylesheet" href="/css/periodonticsc-clinician.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/form-common.css?v=3">
+    <link rel="stylesheet" href="/css/tablet.css?v=1">
 </head>
 
 <body>
@@ -178,7 +180,7 @@
                     <div th:style="${viewOnly} ? 'pointer-events:none;' : ''">
 
                     <!-- ═══════════ DUAL-PANEL PERIODONTAL CHART ═══════════ -->
-                    <div class="perio-chart-c2">
+                    <div class="chart-scroll"><div class="perio-chart-c2">
 
                         <!-- ══ LEFT PANEL — Upper arch (18–28) ══ -->
                         <div class="c-panel left" id="leftPanel">
@@ -299,6 +301,29 @@
                             <div class="cl-spacer"></div>
                         </div>
 
+                        <!-- Second copy of the labels: shown beside the lower arch when the arches are stacked (tablets) -->
+                        <div class="c-labels c-labels-2" aria-hidden="true">
+                            <div class="cl-spacer"></div>
+                            <div class="cl-row">PI</div>
+                            <div class="cl-row">BOP</div>
+                            <div class="cl-row">Mob</div>
+                            <div class="cl-row">CAL</div>
+                            <div class="cl-row">PPD</div>
+                            <div class="cl-row cej">CEJ<br>-GM</div>
+                            <div class="cl-row cl-star-ctrl"><button type="button" class="btn-star" data-side="upper" data-op="add" title="Add * row">+</button><button type="button" class="btn-star" data-side="upper" data-op="remove" title="Remove last * row">&#8722;</button></div>
+                            <div class="cl-star-rows" data-side="upper"></div>
+                            <div class="cl-img-spacer"></div>
+                            <div class="cl-star-rows" data-side="lower"></div>
+                            <div class="cl-row cl-star-ctrl"><button type="button" class="btn-star" data-side="lower" data-op="add" title="Add * row">+</button><button type="button" class="btn-star" data-side="lower" data-op="remove" title="Remove last * row">&#8722;</button></div>
+                            <div class="cl-row cej">CEJ<br>-GM</div>
+                            <div class="cl-row">PPD</div>
+                            <div class="cl-row">CAL</div>
+                            <div class="cl-row">Sup</div>
+                            <div class="cl-row">BOP</div>
+                            <div class="cl-row">PI</div>
+                            <div class="cl-spacer"></div>
+                        </div>
+
                         <!-- ══ RIGHT PANEL — Lower arch (48–38) ══ -->
                         <div class="c-panel right" id="rightPanel">
 
@@ -395,7 +420,7 @@
                         </div>
                         <!-- END RIGHT PANEL -->
 
-                    </div>
+                    </div></div>
                     <!-- ═══════════ END CHART ═══════════ -->
 
                     <div class="chart-hint chart-guide">
@@ -874,10 +899,12 @@ function addStarRow(side) {
     ['leftPanel', 'rightPanel'].forEach(function(panelId) {
         document.querySelector('#' + panelId + ' .c-star-rows[data-side="' + side + '"]').appendChild(makeStarRow());
     });
-    var lbl = document.createElement('div');
-    lbl.className = 'cl-row cl-star-label';
-    lbl.textContent = '*';
-    document.querySelector('.cl-star-rows[data-side="' + side + '"]').appendChild(lbl);
+    document.querySelectorAll('.cl-star-rows[data-side="' + side + '"]').forEach(function(c) {
+        var lbl = document.createElement('div');
+        lbl.className = 'cl-row cl-star-label';
+        lbl.textContent = '*';
+        c.appendChild(lbl);
+    });
 }
 function removeStarRow(side) {
     document.querySelectorAll('.c-star-rows[data-side="' + side + '"], .cl-star-rows[data-side="' + side + '"]').forEach(function(c) {
