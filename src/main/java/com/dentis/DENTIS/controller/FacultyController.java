@@ -272,6 +272,7 @@ public class FacultyController {
                 case "PERIO" -> perioEvalService.sentForClinician(c).size();
                 case "ENDO" -> endoEvalService.sentForClinician(c).size();
                 case "RESTO" -> restoEvalService.sentForClinician(c).size();
+                case "PROSTHO" -> prosthodonticsChartService.clearedForClinician(c).size();   // cases cleared with a grade
                 default -> 0;
             });
             rowsMap.put(c.getId(), rows);
@@ -291,7 +292,7 @@ public class FacultyController {
         var target = targetService.get(sec);
         model.addAttribute("target", target.map(com.dentis.DENTIS.model.SectionTarget::getTarget).orElse(0));
         model.addAttribute("targetInfo", target.orElse(null));
-        model.addAttribute("hasEvals", "PERIO".equals(sec) || "ENDO".equals(sec) || "RESTO".equals(sec));
+        model.addAttribute("hasEvals", "PERIO".equals(sec) || "ENDO".equals(sec) || "RESTO".equals(sec) || "PROSTHO".equals(sec));
         return "faculty-advisees";
     }
 
