@@ -450,6 +450,9 @@ td:last-child { border-right: none; }
 .card-assign.has-items .dash-card-num { color: #2d6fb5; }
 .card-today { border-left-color: #8fcf9a; }
 .card-total { border-left-color: #7fa7d6; }
+.card-reviews { border-left-color: #f2c4bd; }
+.card-reviews.has-items { border-left-color: #c0392b; background: #fdf3f2; }
+.card-reviews.has-items .dash-card-num { color: #c0392b; }
 .btn-admit { display: flex; align-items: center; justify-content: center; padding: 0 22px; border-radius: 10px; background: #2d4a6b; color: white;
              font-weight: 600; font-size: 14px; text-decoration: none; box-shadow: 0 2px 8px rgba(0,0,0,0.15); white-space: nowrap; }
 .btn-admit:hover { background: #1d3550; }
@@ -496,16 +499,16 @@ td:last-child { border-right: none; }
 .progress-card { margin-bottom: 20px; }
 .progress-sub { color: #6b7a8c; font-size: 13px; }
 .progress-sub b { color: #2d4a6b; font-size: 15px; }
-.progress-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.progress-table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; }
-.progress-table th { text-align: center; font-weight: 600; color: #6b7a8c; font-size: 12px; padding: 10px 8px; border-bottom: 2px solid #e3e8ef; white-space: nowrap; }
+.progress-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 10px 15px; }
+.progress-table { width: 100%; }
+.progress-table th { white-space: nowrap; }   /* same header style as the other tables */
 .progress-table th:first-child, .progress-table td.pg-sec { text-align: left; }
-.progress-table td { text-align: center; padding: 10px 8px; border-bottom: 1px solid #eef1f5; color: #333; }
+.progress-table td { text-align: center; }
 .progress-table td.pg-sec { font-weight: 600; color: #2d4a6b; }
 .progress-table td.pg-warn { color: #b7791f; font-weight: 600; }
 .progress-table td.pg-red { color: #c0392b; font-weight: 600; }
 .progress-table td.pg-done { color: #2f855a; font-weight: 700; }
-.progress-table tfoot td { border-top: 2px solid #e3e8ef; border-bottom: none; font-weight: 600; background: #f8fafc; }
+.progress-table tfoot td { border-top: 2px solid #dfe4ea; font-weight: 600; background: #f8fafc; }
 .pg-bar-cell { min-width: 150px; }
 .pg-wrap { display: flex; align-items: center; gap: 8px; }
 .pg-bar { flex: 1; height: 8px; background: #e8edf3; border-radius: 4px; overflow: hidden; }

@@ -41,13 +41,16 @@ public class PatientController {
     private final OperativeChartService operativeChartService;
     private final ProsthodonticsChartService prosthodonticsChartService;
 
+    private final com.dentis.DENTIS.service.ChartFormsService chartForms;
+
     public PatientController(PatientService patientService, ChartRequestService chartRequestService,
                               ClinicianFacultyAssignmentService assignmentService,
                               OralSurgeryChartService oralSurgeryChartService,
                               EndodonticsChartService endodonticsChartService,
                               PeriodonticChartService periodonticChartService,
                               OperativeChartService operativeChartService,
-                              ProsthodonticsChartService prosthodonticsChartService) {
+                              ProsthodonticsChartService prosthodonticsChartService,
+                             com.dentis.DENTIS.service.ChartFormsService chartForms) {
         this.patientService = patientService;
         this.chartRequestService = chartRequestService;
         this.assignmentService = assignmentService;
@@ -56,6 +59,7 @@ public class PatientController {
         this.periodonticChartService = periodonticChartService;
         this.operativeChartService = operativeChartService;
         this.prosthodonticsChartService = prosthodonticsChartService;
+        this.chartForms = chartForms;
     }
 
     @GetMapping("/dashboard-clinicmanager")
@@ -74,7 +78,7 @@ public class PatientController {
         model.addAttribute("requests", pending);
         model.addAttribute("needsFaculty", needsFaculty);
         model.addAttribute("facultyByAdmission", facultyByAdmission);
-        model.addAttribute("recentAdmissions", all.stream().limit(10).toList());
+        model.addAttribute("recentAdmissions", all.stream().limit(5).toList());
         model.addAttribute("statAdmittedToday", all.stream().filter(p -> today.equals(p.getRegistrationDate())
                 || (p.getCreatedAt() != null && today.equals(p.getCreatedAt().toLocalDate()))).count());
         if (facultyAssignedId != null) model.addAttribute("justAssigned", patientService.getPatientById(facultyAssignedId));
@@ -110,6 +114,18 @@ public class PatientController {
             progress.add(progressRow(e.getKey(), v));
         }
         model.addAttribute("progressRows", progress);
+        // Pending reviews: submitted forms the faculty hasn't reviewed yet, oldest first, with how many days each has waited
+        List<java.util.Map<String, Object>> reviewRows = new ArrayList<>();
+        for (var f : chartForms.pendingReview()) {
+            java.util.Map<String, Object> r = new java.util.HashMap<>();
+            r.put("form", f.label()); r.put("chartNo", f.chartNo()); r.put("patient", f.patient());
+            r.put("clinician", f.clinician() != null ? f.clinician() : "—");
+            r.put("faculty", f.faculty() != null ? f.faculty() : "—");
+            r.put("when", f.when());
+            r.put("days", f.when() != null ? java.time.temporal.ChronoUnit.DAYS.between(f.when().toLocalDate(), today) : 0L);
+            reviewRows.add(r);
+        }
+        model.addAttribute("pendingReviews", reviewRows);
         model.addAttribute("progressTotal", progressRow("All sections", tot));
         model.addAttribute("clinicianPatientCounts", patientService.getUniquePatientCountByClinician());
         return "dashboard-clinicmanager";

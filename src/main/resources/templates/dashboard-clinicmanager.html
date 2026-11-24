@@ -33,6 +33,7 @@
                 <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
                 <div class="dropdown-icon">▼</div>
                 <div class="user-dropdown">
+                    <a href="#" class="dropdown-item" data-report-issue>Report an Issue</a>
                     <a href="/logout" class="dropdown-item">Logout</a>
                 </div>
             </div>
@@ -92,71 +93,17 @@
                         <span class="dash-card-num" th:text="${#lists.size(needsFaculty)}">0</span>
                         <span class="dash-card-label">Needs a Faculty</span>
                     </a>
+                    <a href="#reviews" class="dash-card card-reviews" th:classappend="${!#lists.isEmpty(pendingReviews)} ? 'has-items'" title="Submitted forms waiting for the faculty">
+                        <span class="dash-card-num" th:text="${#lists.size(pendingReviews)}">0</span>
+                        <span class="dash-card-label">Pending Reviews</span>
+                    </a>
                     <a href="#recent-admissions" class="dash-card card-today" title="Patients admitted today">
                         <span class="dash-card-num" th:text="${statAdmittedToday}">0</span>
                         <span class="dash-card-label">Admitted Today</span>
                     </a>
-                    <a href="/patientlist-clinicmanager" class="dash-card card-total" title="All patients (original admissions)">
-                        <span class="dash-card-num" th:text="${statTotalPatients}">0</span>
-                        <span class="dash-card-label">Total Patients</span>
-                    </a>
                 </div>
                 <a href="/admitting-clinicmanager" class="btn-admit">+ Admit Patient</a>
             </div>
-
-            <!-- Treatment progress by section: where every admission stands -->
-            <section class="section progress-card">
-                <div class="section-header section-header-row">
-                    <h2>Treatment Progress by Section</h2>
-                    <span class="progress-sub"><b th:text="${statClinicians}">0</b> clinicians</span>
-                </div>
-                <div class="progress-scroll">
-                <table class="progress-table">
-                    <thead>
-                        <tr>
-                            <th>Section</th>
-                            <th title="Admissions in this section">Admitted</th>
-                            <th title="No faculty or clinician assigned yet">Waiting for Assignment</th>
-                            <th title="Clinician is working on the charts">In Treatment</th>
-                            <th title="Submitted, waiting for the faculty">Awaiting Review</th>
-                            <th title="Sent back by the faculty">For Revision</th>
-                            <th title="Every chart approved">Completed</th>
-                            <th>Completion</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="r : ${progressRows}">
-                            <td class="pg-sec" th:text="${r['section']}">OS</td>
-                            <td th:text="${r['admitted']}">0</td>
-                            <td th:classappend="${r['waiting'] > 0} ? 'pg-warn'" th:text="${r['waiting']}">0</td>
-                            <td th:text="${r['inTreatment']}">0</td>
-                            <td th:text="${r['awaiting']}">0</td>
-                            <td th:classappend="${r['revise'] > 0} ? 'pg-red'" th:text="${r['revise']}">0</td>
-                            <td class="pg-done" th:text="${r['completed']}">0</td>
-                            <td class="pg-bar-cell"><div class="pg-wrap">
-                                <div class="pg-bar"><span th:style="'width:' + ${r['pct']} + '%'"></span></div>
-                                <span class="pg-pct" th:text="${r['pct']} + '%'">0%</span>
-                            </div></td>
-                        </tr>
-                    </tbody>
-                    <tfoot th:with="t=${progressTotal}">
-                        <tr>
-                            <td class="pg-sec">All sections</td>
-                            <td th:text="${t['admitted']}">0</td>
-                            <td th:text="${t['waiting']}">0</td>
-                            <td th:text="${t['inTreatment']}">0</td>
-                            <td th:text="${t['awaiting']}">0</td>
-                            <td th:text="${t['revise']}">0</td>
-                            <td class="pg-done" th:text="${t['completed']}">0</td>
-                            <td class="pg-bar-cell"><div class="pg-wrap">
-                                <div class="pg-bar"><span th:style="'width:' + ${t['pct']} + '%'"></span></div>
-                                <span class="pg-pct" th:text="${t['pct']} + '%'">0%</span>
-                            </div></td>
-                        </tr>
-                    </tfoot>
-                </table>
-                </div>
-            </section>
 
             <!-- Pending chart requests: oldest first, accept / deny right here -->
             <section class="section">
@@ -236,6 +183,86 @@
                         </tbody>
                     </table>
                     <button type="button" class="show-all" style="display:none;"></button>
+                </div>
+            </section>
+
+            <!-- Pending reviews: submitted forms the faculty hasn't reviewed yet, oldest first -->
+            <section class="section">
+                <div class="section-header section-header-row">
+                    <h2 id="reviews">Pending Reviews
+                        <span class="new-count" th:if="${!#lists.isEmpty(pendingReviews)}" th:text="${#lists.size(pendingReviews)}">1</span></h2>
+                </div>
+                <div class="table-container">
+                    <table class="dash-table" data-limit="5">
+                        <thead>
+                            <tr><th>Form</th><th>Chart No.</th><th>Patient</th><th>Clinician</th><th>Faculty</th><th>Waiting</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="r : ${pendingReviews}">
+                                <td th:text="${r['form']}"></td>
+                                <td th:text="${r['chartNo']}"></td>
+                                <td th:text="${r['patient']}"></td>
+                                <td th:text="${r['clinician']}"></td>
+                                <td th:text="${r['faculty']}"></td>
+                                <td class="when" th:attr="data-since=${r['when']}" th:text="${r['days'] + (r['days'] == 1 ? ' day' : ' days')}"></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(pendingReviews)}" class="empty-row"><td colspan="6">&#10003; Nothing is waiting for faculty review.</td></tr>
+                        </tbody>
+                    </table>
+                    <button type="button" class="show-all" style="display:none;"></button>
+                </div>
+            </section>
+
+            <!-- Treatment progress by section: where every admission stands -->
+            <section class="section progress-card">
+                <div class="section-header section-header-row">
+                    <h2>Treatment Progress by Section</h2>
+                </div>
+                <div class="progress-scroll">
+                <table class="progress-table">
+                    <thead>
+                        <tr>
+                            <th>Section</th>
+                            <th title="Admissions in this section">Admitted</th>
+                            <th title="No faculty or clinician assigned yet">Waiting for Assignment</th>
+                            <th title="Clinician is working on the charts">In Treatment</th>
+                            <th title="Submitted, waiting for the faculty">Awaiting Review</th>
+                            <th title="Sent back by the faculty">For Revision</th>
+                            <th title="Every chart approved">Completed</th>
+                            <th>Completion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="r : ${progressRows}">
+                            <td class="pg-sec" th:text="${r['section']}">OS</td>
+                            <td th:text="${r['admitted']}">0</td>
+                            <td th:classappend="${r['waiting'] > 0} ? 'pg-warn'" th:text="${r['waiting']}">0</td>
+                            <td th:text="${r['inTreatment']}">0</td>
+                            <td th:text="${r['awaiting']}">0</td>
+                            <td th:classappend="${r['revise'] > 0} ? 'pg-red'" th:text="${r['revise']}">0</td>
+                            <td class="pg-done" th:text="${r['completed']}">0</td>
+                            <td class="pg-bar-cell"><div class="pg-wrap">
+                                <div class="pg-bar"><span th:style="'width:' + ${r['pct']} + '%'"></span></div>
+                                <span class="pg-pct" th:text="${r['pct']} + '%'">0%</span>
+                            </div></td>
+                        </tr>
+                    </tbody>
+                    <tfoot th:with="t=${progressTotal}">
+                        <tr>
+                            <td class="pg-sec">All sections</td>
+                            <td th:text="${t['admitted']}">0</td>
+                            <td th:text="${t['waiting']}">0</td>
+                            <td th:text="${t['inTreatment']}">0</td>
+                            <td th:text="${t['awaiting']}">0</td>
+                            <td th:text="${t['revise']}">0</td>
+                            <td class="pg-done" th:text="${t['completed']}">0</td>
+                            <td class="pg-bar-cell"><div class="pg-wrap">
+                                <div class="pg-bar"><span th:style="'width:' + ${t['pct']} + '%'"></span></div>
+                                <span class="pg-pct" th:text="${t['pct']} + '%'">0%</span>
+                            </div></td>
+                        </tr>
+                    </tfoot>
+                </table>
                 </div>
             </section>
 
@@ -361,5 +388,6 @@ document.querySelectorAll('.dash-table').forEach(function (table) {
     });
 })();
 </script>
+<script src="/js/report-issue.js?v=2"></script>
 </body>
 </html>

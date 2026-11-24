@@ -33,6 +33,7 @@
                 <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
                 <div class="dropdown-icon">▼</div>
                 <div class="user-dropdown">
+                    <a href="#" class="dropdown-item" data-report-issue>Report an Issue</a>
                     <a href="/logout" class="dropdown-item">Logout</a>
                 </div>
             </div>
@@ -240,5 +241,6 @@ function closeModal() {
     render();
 })();
 </script>
+<script src="/js/report-issue.js?v=2"></script>
 </body>
 </html>

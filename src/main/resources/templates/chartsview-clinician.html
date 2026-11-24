@@ -32,6 +32,7 @@
                 <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
                 <div class="dropdown-icon">▼</div>
                 <div class="user-dropdown">
+                    <a href="#" class="dropdown-item" data-report-issue>Report an Issue</a>
                     <a href="/logout" class="dropdown-item">Logout</a>
                 </div>
             </div>
@@ -509,5 +510,6 @@ function confirmProsthoSubmit(btn) {
     This chart belongs to another clinician. You can view it, but only its clinician can edit it.</div>
 <style>.req-banner{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;background:#fff8e1;border:1px solid #f0d27a;border-left:5px solid #e0a800;border-radius:8px;padding:12px 18px;margin:0 0 18px;font-family:'Poppins',sans-serif;font-size:13px;color:#4a3a00}.req-banner b{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#8a6d00}
 .vo-tag{display:inline-block;font-size:11px;color:#6b7a8c;background:#eef2f6;border-radius:10px;padding:2px 8px;white-space:nowrap}</style>
+<script src="/js/report-issue.js?v=2"></script>
 </body>
 </html>

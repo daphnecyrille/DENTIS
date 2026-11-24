@@ -60,6 +60,13 @@
                             <span>Activity Log</span>
                         </a>
                     </li>
+                    <li class="nav-item" th:classappend="${adminPage == 'issues'} ? 'active'">
+                        <a href="/issues-sysadmin" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            <span>Issues</span>
+                            <span class="nav-count" th:if="${openIssueCount != null and openIssueCount > 0}" th:text="${openIssueCount}">0</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
         </aside>
@@ -81,24 +88,7 @@
                 <div class="ad-kpi k-ok"><b th:text="${approvedCount}">0</b><span>Approved</span></div>
             </div>
 
-            <div class="ad-grid">
-                <div class="ad-panel">
-                    <h2>Waiting for review, by faculty</h2>
-                    <div class="ad-body">
-                        <table class="ad-table">
-                            <thead><tr><th>Faculty</th><th style="text-align:center;">Waiting</th><th>Oldest waiting</th></tr></thead>
-                            <tbody>
-                                <tr th:each="f : ${facultyRows}">
-                                    <td th:text="${f['name']}"></td>
-                                    <td style="text-align:center;"><b th:text="${f['count']}"></b></td>
-                                    <td class="since" th:attr="data-since=${f['oldest']}" th:text="${#temporals.format(f['oldest'], 'MMM d, yyyy')}"></td>
-                                </tr>
-                                <tr th:if="${#lists.isEmpty(facultyRows)}"><td colspan="3" class="ad-empty">&#10003; Nothing is waiting for review.</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
+            <div class="ad-grid" style="grid-template-columns:1fr;">
                 <div class="ad-panel">
                     <h2>Patients by section</h2>
                     <div class="ad-body">
@@ -111,26 +101,6 @@
                             <span th:each="y, it : ${years}" th:text="${y.key + ': ' + y.value + (it.last ? '' : ' · ')}"></span>
                             <span th:if="${#maps.isEmpty(years)}">none</span></p>
                     </div>
-                </div>
-            </div>
-
-            <div class="ad-panel">
-                <h2>Longest-waiting reviews</h2>
-                <div class="ad-body">
-                    <table class="ad-table">
-                        <thead><tr><th>Form</th><th>Chart No.</th><th>Patient</th><th>Clinician</th><th>Faculty</th><th>Waiting</th></tr></thead>
-                        <tbody>
-                            <tr th:each="w : ${waiting}">
-                                <td th:text="${w.label}"></td>
-                                <td th:text="${w.chartNo}"></td>
-                                <td th:text="${w.patient}"></td>
-                                <td th:text="${w.clinician != null ? w.clinician : '—'}"></td>
-                                <td th:text="${w.faculty != null ? w.faculty : '—'}"></td>
-                                <td class="since" th:attr="data-since=${w.when}" th:text="${w.when != null ? #temporals.format(w.when, 'MMM d, yyyy') : '—'}"></td>
-                            </tr>
-                            <tr th:if="${#lists.isEmpty(waiting)}"><td colspan="6" class="ad-empty">&#10003; Nothing is waiting for review.</td></tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
 

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Issues - DentIS</title>
+    <link rel="stylesheet" href="/css/dashboard-sysadmin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/tablet.css?v=1">
+</head>
+<body>
+<div class="background"></div>
+<div class="sysadmin-dashboard">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="menu-icon" id="menuToggle">&#9776;</div>
+            <img src="/images/UPMlogo.png" alt="UPM Logo" class="upm-logo">
+            <h1>DentIS</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-profile" id="userProfileBtn">
+                <div class="user-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor"/>
+                        <path d="M12 14C7.59 14 4 17.59 4 22H20C20 17.59 16.41 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (System Admin)' : 'System Admin'}">Admin</span>
+                <div class="dropdown-icon">&#9660;</div>
+                <div class="user-dropdown" id="userDropdown">
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item" th:classappend="${adminPage == null or adminPage == 'users'} ? 'active'">
+                        <a href="/dashboard-sysadmin" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <span>Users</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" th:classappend="${adminPage == 'overview'} ? 'active'">
+                        <a href="/overview-sysadmin" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+                            <span>Clinic Overview</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" th:classappend="${adminPage == 'activity'} ? 'active'">
+                        <a href="/activity-sysadmin" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+                            <span>Activity Log</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" th:classappend="${adminPage == 'issues'} ? 'active'">
+                        <a href="/issues-sysadmin" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            <span>Issues</span>
+                            <span class="nav-count" th:if="${openIssueCount != null and openIssueCount > 0}" th:text="${openIssueCount}">0</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <div class="ad-head"><h1>Reported Issues</h1></div>
+            <div class="ad-panel">
+                <div class="ad-filters" id="isFilters">
+                    <button type="button" class="ad-chip on" data-st="active">Open &amp; In Progress</button>
+                    <button type="button" class="ad-chip" data-st="OPEN">Open</button>
+                    <button type="button" class="ad-chip" data-st="IN_PROGRESS">In Progress</button>
+                    <button type="button" class="ad-chip" data-st="RESOLVED">Resolved</button>
+                    <button type="button" class="ad-chip" data-st="all">All</button>
+                    <input type="text" id="isSearch" placeholder="Search subject, description, person or page" autocomplete="off">
+                </div>
+                <div class="ad-body">
+                    <table class="ad-table is-table">
+                        <thead><tr><th style="width:130px;">Reported</th><th style="width:180px;">By</th><th>Issue</th><th style="width:300px;">Status &amp; Reply</th></tr></thead>
+                        <tbody id="isBody">
+                            <tr th:each="r : ${issues}" class="is-row" th:id="'issue-' + ${r.id}" th:attr="data-st=${r.status.name()}"
+                                th:classappend="${param.saved != null and param.saved[0] == '' + r.id} ? 'just-saved'">
+                                <td><span th:text="${#temporals.format(r.createdAt, 'MMM d, yyyy')}"></span><span class="ad-sub" th:text="${#temporals.format(r.createdAt, 'h:mm a')}"></span></td>
+                                <td><span th:text="${r.reporter != null ? r.reporter.fullName : 'Unknown'}"></span>
+                                    <span class="ad-sub" th:text="${r.reporter != null ? r.reporter.role.displayName + ' · ' + r.reporter.email : ''}"></span></td>
+                                <td>
+                                    <div class="is-subject" th:text="${r.subject}">Subject</div>
+                                    <div class="is-desc" th:if="${r.description != null}" th:text="${r.description}"></div>
+                                    <div class="ad-sub" th:if="${r.page != null}" th:text="${'Page: ' + r.page}"></div>
+                                </td>
+                                <td>
+                                    <form method="post" th:action="@{/issues-sysadmin/{id}(id=${r.id})}" class="is-form">
+                                        <select name="status" th:classappend="${'st-' + r.status.name()}">
+                                            <option value="OPEN" th:selected="${r.status.name() == 'OPEN'}">Open</option>
+                                            <option value="IN_PROGRESS" th:selected="${r.status.name() == 'IN_PROGRESS'}">In Progress</option>
+                                            <option value="RESOLVED" th:selected="${r.status.name() == 'RESOLVED'}">Resolved</option>
+                                        </select>
+                                        <textarea name="adminNote" rows="2" placeholder="Reply to the reporter (optional)" th:text="${r.adminNote}"></textarea>
+                                        <div class="is-actions">
+                                            <button type="submit" class="is-save">Save</button>
+                                            <span class="ad-sub" th:if="${r.handledBy != null and r.updatedAt != null}"
+                                                  th:text="${'Updated by ' + r.handledBy.fullName + ', ' + #temporals.format(r.updatedAt, 'MMM d')}"></span>
+                                        </div>
+                                    </form>
+                                </td>
+                            </tr>
+                            <tr id="isEmpty" style="display:none;"><td colspan="4" class="ad-empty">Nothing matches.</td></tr>
+                            <tr th:if="${#lists.isEmpty(issues)}"><td colspan="4" class="ad-empty">No issues reported yet. Users can report a problem from the menu under their name.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<script>
+document.getElementById('menuToggle').addEventListener('click', function () {
+    document.getElementById('sidebar').classList.toggle('expanded');
+    document.getElementById('mainContent').classList.toggle('shifted');
+});
+document.getElementById('userProfileBtn').addEventListener('click', function (e) { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('show'); });
+document.addEventListener('click', function () { document.getElementById('userDropdown').classList.remove('show'); });
+</script>
+<script src="/js/sidebar-hover.js?v=3"></script>
+<script src="/js/date-click.js"></script>
+<script>
+(function () {
+    var rows = Array.prototype.slice.call(document.querySelectorAll('#isBody tr.is-row')), st = 'active', q = '';
+    rows.forEach(function (tr) { tr._t = tr.textContent.replace(/\s+/g, ' ').toLowerCase(); });
+    if (document.querySelector('tr.just-saved')) st = 'all';
+    function match(tr) {
+        var s = tr.dataset.st;
+        var okSt = st === 'all' || (st === 'active' ? s !== 'RESOLVED' : s === st);
+        return okSt && (!q || tr._t.indexOf(q) >= 0);
+    }
+    function render() {
+        var n = 0;
+        rows.forEach(function (tr) { var ok = match(tr); tr.style.display = ok ? '' : 'none'; if (ok) n++; });
+        document.getElementById('isEmpty').style.display = rows.length && !n ? '' : 'none';
+        document.querySelectorAll('#isFilters .ad-chip').forEach(function (c) { c.classList.toggle('on', c.dataset.st === st); });
+    }
+    document.querySelectorAll('#isFilters .ad-chip').forEach(function (c) { c.addEventListener('click', function () { st = c.dataset.st; render(); }); });
+    document.getElementById('isSearch').addEventListener('input', function () { q = this.value.trim().toLowerCase(); render(); });
+    render();
+})();
+</script>
+</body>
+</html>

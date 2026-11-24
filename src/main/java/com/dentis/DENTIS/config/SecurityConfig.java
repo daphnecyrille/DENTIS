@@ -60,7 +60,8 @@ public class SecurityConfig {
                     "/create-user-sysadmin", "/edit-user-sysadmin", "/toggle-status-sysadmin",
                     "/usermanagement-sysadmin",
                     "/activity-sysadmin", "/overview-sysadmin", "/import-users-sysadmin",
-                    "/semester-promote-sysadmin", "/semester-deactivate-sysadmin"
+                    "/semester-promote-sysadmin", "/semester-deactivate-sysadmin",
+                    "/issues-sysadmin", "/issues-sysadmin/**"
                 ).hasRole("ADMIN")
                 .requestMatchers(
                     "/clinician-dashboard", "/chartsview-clinician/**", "/chartrequest-clinician",

@@ -34,6 +34,7 @@
                 <span class="username" th:text="${currentUser != null ? currentUser.fullName + ' (' + currentUser.role.displayName + ')' : 'Guest'}">User</span>
                 <div class="dropdown-icon">▼</div>
                 <div class="user-dropdown">
+                    <a href="#" class="dropdown-item" data-report-issue>Report an Issue</a>
                     <a href="/logout" class="dropdown-item">Logout</a>
                 </div>
             </div>
@@ -220,5 +221,6 @@ document.querySelector('.user-dropdown').addEventListener('click', function(e) {
 <div th:if="${param.alreadyStarted != null}" role="alert" onclick="this.remove()"
      style="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#8a1f17;color:#fff;font-family:'Poppins',sans-serif;font-size:13px;padding:12px 20px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.18);z-index:500;max-width:90vw;cursor:pointer">
     This patient can&rsquo;t be reassigned: their clinician has already started their forms.</div>
+<script src="/js/report-issue.js?v=2"></script>
 </body>
 </html>

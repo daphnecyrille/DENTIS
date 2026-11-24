@@ -401,3 +401,23 @@ tbody td { padding: 11px 14px; color: #333; }
 .ad-pill.ok { background: #e8f5e9; border-color: #b7dfba; color: #1e5e24; }
 .long { color: #a87700; font-weight: 600; }
 @media (max-width: 1000px) { .ad-grid { grid-template-columns: 1fr; } .ad-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ── Reported issues (4c) ── */
+.nav-link .nav-count { margin-left: auto; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: #c0392b;
+                       color: #fff; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+.sidebar:not(.expanded) .nav-link .nav-count { position: absolute; top: 4px; right: 8px; min-width: 16px; height: 16px; font-size: 10px; padding: 0 4px; }
+.sidebar .nav-link { position: relative; }
+#isFilters { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+#isSearch { margin-left: auto; min-width: 240px; padding: 8px 12px; border: 1px solid #ccd5df; border-radius: 6px; font: 13px Poppins, sans-serif; }
+.is-table td { vertical-align: top; }
+.is-subject { font-weight: 600; color: #2d4a6b; margin-bottom: 4px; }
+.is-desc { white-space: pre-wrap; color: #333; font-size: 13px; margin-bottom: 4px; }
+.is-form { display: flex; flex-direction: column; gap: 6px; }
+.is-form select { padding: 6px 8px; border-radius: 6px; border: 1px solid #ccd5df; font: 600 13px Poppins, sans-serif; }
+.is-form select.st-OPEN { color: #c0392b; border-color: #e7b3ad; background: #fdf3f2; }
+.is-form select.st-IN_PROGRESS { color: #b7791f; border-color: #ecd3a5; background: #fdf8ee; }
+.is-form select.st-RESOLVED { color: #2f855a; border-color: #b5dcc5; background: #f1f9f4; }
+.is-form textarea { padding: 6px 8px; border-radius: 6px; border: 1px solid #ccd5df; font: 13px Poppins, sans-serif; resize: vertical; }
+.is-actions { display: flex; align-items: center; gap: 10px; }
+.is-save { background: #2d4a6b; color: #fff; border: none; border-radius: 6px; padding: 6px 16px; font: 600 13px Poppins, sans-serif; cursor: pointer; }
+.is-row.just-saved { background: #f1f9f4; }

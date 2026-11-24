@@ -1,5 +1,7 @@
 package com.dentis.DENTIS.controller;
 
+import com.dentis.DENTIS.service.ChartFormsService;
+
 import com.dentis.DENTIS.model.AccountStatus;
 import com.dentis.DENTIS.model.Role;
 import com.dentis.DENTIS.model.User;
@@ -27,6 +29,7 @@ public class SysAdminController {
     private final com.dentis.DENTIS.service.PeriodonticChartService perioService;
     private final com.dentis.DENTIS.service.OperativeChartService operativeService;
     private final com.dentis.DENTIS.service.ProsthodonticsChartService prosthoService;
+    private final ChartFormsService chartForms;
 
     public SysAdminController(UserRepository userRepository,
                               com.dentis.DENTIS.service.ActivityLogService activity,
@@ -36,7 +39,8 @@ public class SysAdminController {
                               com.dentis.DENTIS.service.EndodonticsChartService endoService,
                               com.dentis.DENTIS.service.PeriodonticChartService perioService,
                               com.dentis.DENTIS.service.OperativeChartService operativeService,
-                              com.dentis.DENTIS.service.ProsthodonticsChartService prosthoService) {
+                              com.dentis.DENTIS.service.ProsthodonticsChartService prosthoService,
+                              ChartFormsService chartForms) {
         this.userRepository = userRepository;
         this.activity = activity;
         this.patientService = patientService;
@@ -46,6 +50,7 @@ public class SysAdminController {
         this.perioService = perioService;
         this.operativeService = operativeService;
         this.prosthoService = prosthoService;
+        this.chartForms = chartForms;
     }
 
     private User getCurrentUser(Authentication authentication) {
@@ -275,31 +280,17 @@ public class SysAdminController {
 
     // ── Clinic Overview ──────────────────────────────────────────────────────
 
-    /** One chart form, for the overview. */
-    public record Form(String label, String chartNo, String patient, String clinician, String faculty, Long facultyId,
-                       String status, java.time.LocalDateTime when) { }
 
     @GetMapping("/overview-sysadmin")
     public String overview(Model model, Authentication authentication) {
         model.addAttribute("currentUser", getCurrentUser(authentication));
         model.addAttribute("adminPage", "overview");
-        List<Form> forms = allForms();
-        List<Form> waiting = forms.stream().filter(f -> "SUBMITTED".equals(f.status()))
-                .sorted(Comparator.comparing(Form::when, Comparator.nullsLast(Comparator.naturalOrder()))).toList();
-        model.addAttribute("waiting", waiting.stream().limit(10).toList());
-        model.addAttribute("waitingCount", waiting.size());
+        List<ChartFormsService.Form> forms = chartForms.all();
+        model.addAttribute("waitingCount", forms.stream().filter(f -> "SUBMITTED".equals(f.status())).count());
         model.addAttribute("reviseCount", forms.stream().filter(f -> "REVISE".equals(f.status())).count());
         model.addAttribute("progressCount", forms.stream().filter(f -> "CREATED".equals(f.status()) || "IN_PROGRESS".equals(f.status())).count());
         model.addAttribute("approvedCount", forms.stream().filter(f -> "APPROVED".equals(f.status())).count());
 
-        // waiting per faculty, most first, with the oldest wait
-        java.util.Map<String, List<Form>> byFac = new java.util.TreeMap<>();
-        for (Form f : waiting) byFac.computeIfAbsent(f.faculty() != null ? f.faculty() : "No faculty", k -> new java.util.ArrayList<>()).add(f);
-        List<java.util.Map<String, Object>> facRows = new java.util.ArrayList<>();
-        byFac.forEach((name, list) -> facRows.add(java.util.Map.of("name", name, "count", list.size(),
-                "oldest", list.get(0).when() != null ? list.get(0).when() : java.time.LocalDateTime.now())));
-        facRows.sort((a, b) -> Integer.compare((Integer) b.get("count"), (Integer) a.get("count")));
-        model.addAttribute("facultyRows", facRows);
 
         // patients per section (admissions) and clinicians per year
         java.util.Map<String, Long> sections = new java.util.LinkedHashMap<>();
@@ -334,31 +325,4 @@ public class SysAdminController {
         };
     }
 
-    private List<Form> allForms() {
-        List<Form> out = new java.util.ArrayList<>();
-        java.util.function.Function<com.dentis.DENTIS.model.Patient, String> nm = p -> p == null ? "—" : p.getSurname() + ", " + p.getFirstName();
-        java.util.function.Function<User, String> un = u -> u == null ? null : u.getFullName();
-        java.util.function.Function<User, Long> ui = u -> u == null ? null : u.getId();
-        for (var c : osService.findAllOrderByCreatedAtDesc())
-            out.add(new Form(c.getChartType() != null ? c.getChartType().getDisplayName() : "Oral Surgery", c.getChartNo(), nm.apply(c.getPatient()),
-                    un.apply(c.getClinician()), un.apply(c.getFaculty()), ui.apply(c.getFaculty()), c.getStatus().name(), c.getUpdatedAt()));
-        for (var c : endoService.findAllOrderByCreatedAtDesc()) {
-            out.add(new Form("Endo – Patient Workup", c.getChartNo(), nm.apply(c.getPatient()), un.apply(c.getClinician()), un.apply(c.getFaculty()), ui.apply(c.getFaculty()), c.getStatus().name(), c.getUpdatedAt()));
-            out.add(new Form("Endo – Informed Consent", c.getChartNo() != null ? c.getChartNo().replace("-ENDO1", "-ENDO4") : null, nm.apply(c.getPatient()), un.apply(c.getClinician()), un.apply(c.getFaculty()), ui.apply(c.getFaculty()), c.getForm4Status().name(), c.getUpdatedAt()));
-        }
-        for (var c : perioService.findAllOrderByCreatedAtDesc()) {
-            String no = c.getChartNo() != null ? c.getChartNo() : "";
-            out.add(new Form("Perio – PF1", no, nm.apply(c.getPatient()), un.apply(c.getClinician()), un.apply(c.getFaculty()), ui.apply(c.getFaculty()), c.getStatus().name(), c.getUpdatedAt()));
-            out.add(new Form("Perio – PF2", no.replace("-PF1", "-PF2"), nm.apply(c.getPatient()), un.apply(c.getClinician()), un.apply(c.getFaculty()), ui.apply(c.getFaculty()), c.getFormCStatus().name(), c.getUpdatedAt()));
-            out.add(new Form("Perio – PF3", no.replace("-PF1", "-PF3"), nm.apply(c.getPatient()), un.apply(c.getClinician()), un.apply(c.getFaculty()), ui.apply(c.getFaculty()), c.getPf3Status().name(), c.getUpdatedAt()));
-        }
-        for (var c : operativeService.findAllOrderByCreatedAtDesc()) {
-            String no = c.getChartNo() != null ? c.getChartNo() : "";
-            out.add(new Form("Operative – Assessment Form for Carious Lesions (RESTO10)", no, nm.apply(c.getPatient()), un.apply(c.getClinician()), un.apply(c.getFaculty()), ui.apply(c.getFaculty()), c.getStatus().name(), c.getUpdatedAt()));
-            out.add(new Form("Operative – RESTO6", no.replace("-RESTO10", "-RESTO6"), nm.apply(c.getPatient()), un.apply(c.getClinician()), un.apply(c.getFaculty()), ui.apply(c.getFaculty()), c.getForm2Status().name(), c.getUpdatedAt()));
-        }
-        for (var c : prosthoService.findAllOrderByCreatedAtDesc())
-            out.add(new Form("Prostho – Case Booklet", c.getChartNo(), nm.apply(c.getPatient()), un.apply(c.getClinician()), un.apply(c.getFaculty()), ui.apply(c.getFaculty()), c.getStatus().name(), c.getUpdatedAt()));
-        return out;
-    }
 }
