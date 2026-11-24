@@ -33,6 +33,10 @@ public class FacultyController {
     private final UserRepository userRepository;
     private final ClinicianFacultyAssignmentService assignmentService;
     private final ProsthodonticsChartService prosthodonticsChartService;
+    private final com.dentis.DENTIS.service.SectionTargetService targetService;
+    private final com.dentis.DENTIS.service.PerioEvaluationService perioEvalService;
+    private final com.dentis.DENTIS.service.EndoEvaluationService endoEvalService;
+    private final com.dentis.DENTIS.service.RestoEvaluationService restoEvalService;
 
     public FacultyController(PatientService patientService,
                              OralSurgeryChartService oralSurgeryChartService,
@@ -41,7 +45,11 @@ public class FacultyController {
                              PeriodonticChartService periodonticChartService,
                              UserRepository userRepository,
                              ClinicianFacultyAssignmentService assignmentService,
-                             ProsthodonticsChartService prosthodonticsChartService) {
+                             ProsthodonticsChartService prosthodonticsChartService,
+                             com.dentis.DENTIS.service.SectionTargetService targetService,
+                             com.dentis.DENTIS.service.PerioEvaluationService perioEvalService,
+                             com.dentis.DENTIS.service.EndoEvaluationService endoEvalService,
+                             com.dentis.DENTIS.service.RestoEvaluationService restoEvalService) {
         this.patientService = patientService;
         this.oralSurgeryChartService = oralSurgeryChartService;
         this.endodonticsChartService = endodonticsChartService;
@@ -50,6 +58,10 @@ public class FacultyController {
         this.userRepository = userRepository;
         this.assignmentService = assignmentService;
         this.prosthodonticsChartService = prosthodonticsChartService;
+        this.targetService = targetService;
+        this.perioEvalService = perioEvalService;
+        this.endoEvalService = endoEvalService;
+        this.restoEvalService = restoEvalService;
     }
 
     private User getCurrentUser(Authentication authentication) {
@@ -255,6 +267,13 @@ public class FacultyController {
                 }
                 if (Boolean.TRUE.equals(r.get("done"))) n.merge("done", 1, Integer::sum);
             }
+            // evaluations this advisee has received in the section (graded and sent to them)
+            n.put("evals", switch (sec) {
+                case "PERIO" -> perioEvalService.sentForClinician(c).size();
+                case "ENDO" -> endoEvalService.sentForClinician(c).size();
+                case "RESTO" -> restoEvalService.sentForClinician(c).size();
+                default -> 0;
+            });
             rowsMap.put(c.getId(), rows);
             countsMap.put(c.getId(), n);
         }
@@ -268,7 +287,23 @@ public class FacultyController {
         model.addAttribute("rowsMap", rowsMap);
         model.addAttribute("countsMap", countsMap);
         model.addAttribute("section", section);
+        // target number of completed cases per clinician in this section (objective 2f)
+        var target = targetService.get(sec);
+        model.addAttribute("target", target.map(com.dentis.DENTIS.model.SectionTarget::getTarget).orElse(0));
+        model.addAttribute("targetInfo", target.orElse(null));
+        model.addAttribute("hasEvals", "PERIO".equals(sec) || "ENDO".equals(sec) || "RESTO".equals(sec));
         return "faculty-advisees";
+    }
+
+    /** Faculty set the target number of completed cases for their own section. */
+    @PostMapping("/faculty-advisees/target")
+    public String setTarget(@RequestParam int target, Authentication authentication) {
+        User faculty = getCurrentUser(authentication);
+        if (faculty != null && faculty.getRole() == com.dentis.DENTIS.model.Role.FACULTY
+                && faculty.getSection() != null && !faculty.getSection().isBlank()) {
+            targetService.set(faculty.getSection(), target, faculty);
+        }
+        return "redirect:/faculty-advisees?targetSaved";
     }
 
     @GetMapping("/faculty-assign")

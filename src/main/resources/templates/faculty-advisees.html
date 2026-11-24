@@ -85,6 +85,22 @@
                 <span class="adv-sub" th:text="${#lists.size(advisees) + (#lists.size(advisees) == 1 ? ' clinician' : ' clinicians')}">0 clinicians</span>
             </div>
 
+            <!-- Target number of completed cases per clinician in this section (set by the section's faculty) -->
+            <form class="target-bar" method="post" th:action="@{/faculty-advisees/target}">
+                <div class="target-text">
+                    <strong>Target per clinician</strong>
+                    <span th:if="${target > 0}" th:text="${target + (target == 1 ? ' completed case' : ' completed cases') + ' in ' + section}">3 completed cases</span>
+                    <span th:if="${target == 0}" class="muted">Not set yet. Set how many completed cases each clinician should reach in this section.</span>
+                    <span th:if="${targetInfo != null and targetInfo.updatedBy != null}" class="target-by"
+                          th:text="${'Last set by ' + targetInfo.updatedBy.fullName + (targetInfo.updatedAt != null ? ', ' + #temporals.format(targetInfo.updatedAt, 'MMM d, yyyy') : '')}"></span>
+                </div>
+                <div class="target-edit">
+                    <input type="number" name="target" min="0" max="99" th:value="${target}" aria-label="Target completed cases">
+                    <button type="submit" class="btn-target">Save Target</button>
+                </div>
+                <span th:if="${param.targetSaved}" class="target-saved">&#10003; Saved</span>
+            </form>
+
             <div class="empty-state" th:if="${#lists.isEmpty(advisees)}">
                 <p>No clinicians are assigned to you yet for the <strong th:text="${section}"></strong> section.</p>
             </div>
@@ -104,6 +120,10 @@
                             <span class="adv-main">
                                 <span class="adv-name" th:text="${a.fullName}"></span>
                                 <span class="adv-meta" th:text="${(a.studentNumber != null ? a.studentNumber : '—') + ' · ' + n['patients'] + (n['patients'] == 1 ? ' patient' : ' patients')}"></span>
+                                <span th:if="${target > 0}" class="adv-target" th:classappend="${n['done'] >= target} ? 'met'">
+                                    <span class="mini-bar"><span th:style="'width:' + ${n['done'] >= target ? 100 : n['done'] * 100 / target} + '%'"></span></span>
+                                    <span th:text="${n['done'] + '/' + target + ' cases'}">0/3 cases</span>
+                                </span>
                                 <span class="adv-pills">
                                     <span th:if="${n['awaiting'] > 0}" class="pill pill-await" th:text="${n['awaiting'] + ' awaiting'}"></span>
                                     <span th:if="${n['revise'] > 0}" class="pill pill-revise" th:text="${n['revise'] + ' for revision'}"></span>
@@ -135,6 +155,22 @@
                             <div class="adv-stat stat-revise" th:classappend="${n['revise'] > 0} ? 'has-items'"><b th:text="${n['revise']}">0</b><span>For Revision</span></div>
                             <div class="adv-stat stat-progress"><b th:text="${n['progress']}">0</b><span>In Progress</span></div>
                             <div class="adv-stat stat-done"><b th:text="${n['done'] + ' / ' + n['patients']}">0</b><span>Patients Completed</span></div>
+                        </div>
+                        <!-- Competency summary: progress toward the section target, and evaluations received -->
+                        <div class="adv-progress">
+                            <div class="adv-prog-main" th:if="${target > 0}">
+                                <div class="adv-prog-label">
+                                    <span>Progress toward target</span>
+                                    <b th:text="${n['done'] + ' of ' + target + ' completed cases'}">0 of 3</b>
+                                    <span th:if="${n['done'] >= target}" class="met-tag">&#10003; Target met</span>
+                                    <span th:if="${n['done'] < target}" class="left-tag" th:text="${(target - n['done']) + ' to go'}">3 to go</span>
+                                </div>
+                                <div class="prog-bar"><span th:style="'width:' + ${n['done'] >= target ? 100 : n['done'] * 100 / target} + '%'"></span></div>
+                            </div>
+                            <div class="adv-prog-main muted" th:if="${target == 0}">No target set for this section yet.</div>
+                            <div class="adv-prog-evals" th:if="${hasEvals}">
+                                <b th:text="${n['evals']}">0</b><span th:text="${n['evals'] == 1 ? 'evaluation received' : 'evaluations received'}">evaluations received</span>
+                            </div>
                         </div>
 
                         <div class="table-container">

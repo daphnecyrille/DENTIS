@@ -241,3 +241,31 @@ td:last-child { border-right: none; }
     .adv-items { max-height: 280px; }
     .adv-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* Section target (2f) and competency summary (2e) */
+.target-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 20px; background: #fff; border-radius: 10px;
+              padding: 12px 18px; margin: 0 0 16px; box-shadow: 0 1px 3px rgba(0,0,0,.06); border-left: 4px solid #2d4a6b; }
+.target-text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 220px; font-size: 13px; color: #333; }
+.target-text strong { color: #2d4a6b; font-size: 14px; }
+.target-text .muted, .adv-prog-main.muted { color: #7a8796; }
+.target-by { font-size: 11px; color: #8a97a8; }
+.target-edit { display: flex; align-items: center; gap: 8px; }
+.target-edit input { width: 72px; padding: 8px 10px; border: 1px solid #ccd5df; border-radius: 6px; font: 600 15px Poppins, sans-serif; text-align: center; }
+.btn-target { background: #2d4a6b; color: #fff; border: none; border-radius: 6px; padding: 9px 16px; font: 600 13px Poppins, sans-serif; cursor: pointer; }
+.btn-target:hover { background: #22394f; }
+.target-saved { color: #2f855a; font-weight: 600; font-size: 13px; }
+.adv-target { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #6b7a8c; margin-top: 3px; }
+.adv-target.met { color: #2f855a; font-weight: 600; }
+.mini-bar { width: 60px; height: 5px; background: #e5eaf0; border-radius: 3px; overflow: hidden; }
+.mini-bar span, .prog-bar span { display: block; height: 100%; background: #2d4a6b; border-radius: 3px; }
+.adv-target.met .mini-bar span { background: #2f855a; }
+.adv-progress { display: flex; align-items: center; gap: 16px; padding: 10px 20px 6px; flex-wrap: wrap; }
+.adv-prog-main { flex: 1; min-width: 240px; font-size: 13px; }
+.adv-prog-label { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; color: #555; }
+.adv-prog-label b { color: #2d4a6b; }
+.met-tag { color: #2f855a; font-weight: 600; font-size: 12px; }
+.left-tag { color: #b7791f; font-weight: 600; font-size: 12px; }
+.prog-bar { height: 10px; background: #e5eaf0; border-radius: 5px; overflow: hidden; }
+.adv-prog-evals { display: flex; flex-direction: column; align-items: center; padding: 6px 16px; background: #f6f8fb; border-radius: 8px; }
+.adv-prog-evals b { font-size: 20px; color: #2d4a6b; line-height: 1.2; }
+.adv-prog-evals span { font-size: 11px; color: #555; }
