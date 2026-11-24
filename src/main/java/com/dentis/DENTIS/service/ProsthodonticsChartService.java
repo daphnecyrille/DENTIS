@@ -265,35 +265,55 @@ public class ProsthodonticsChartService {
         if (fields == null || fields.isEmpty()) return;
         ProsthodonticsChart c = repo.findById(id).orElseThrow();
         if (c.getStatus() == ProsthodonticsChartStatus.APPROVED) return;
-        for (String f : fields) {
-            switch (f) {
-                case "patientConsent" -> c.setPatientConsentFilePath(null);
-                case "patientWorkup" -> c.setPatientWorkupFilePath(null);
-                case "primaryImpression" -> c.setPrimaryImpressionFilePath(null);
-                case "individualTray" -> c.setIndividualTrayFilePath(null);
-                case "finalImpression" -> c.setFinalImpressionFilePath(null);
-                case "waxPatternLab" -> c.setWaxPatternLabFilePath(null);
-                case "waxPatternDiag" -> c.setWaxPatternDiagFilePath(null);
-                case "metalFramework" -> c.setMetalFrameworkFilePath(null);
-                case "trialDentureBase" -> c.setTrialDentureBaseFilePath(null);
-                case "ocr" -> c.setOcrFilePath(null);
-                case "positionalRelations" -> c.setPositionalRelationsFilePath(null);
-                case "mounting" -> c.setMountingFilePath(null);
-                case "anteriorSetup" -> c.setAnteriorSetupFilePath(null);
-                case "anteriorTryIn" -> c.setAnteriorTryInFilePath(null);
-                case "anteriorTryInSignature" -> c.setAnteriorTryInSignaturePath(null);
-                case "posteriorSetup" -> c.setPosteriorSetupFilePath(null);
-                case "posteriorTryIn" -> c.setPosteriorTryInFilePath(null);
-                case "posteriorTryInSignature" -> c.setPosteriorTryInSignaturePath(null);
-                case "waxUp" -> c.setWaxUpFilePath(null);
-                case "processing" -> c.setProcessingFilePath(null);
-                case "cef" -> c.setCefFilePath(null);
-                case "installation" -> c.setInstallationFilePath(null);
-                case "postInstallation" -> c.setPostInstallationFilePath(null);
-                default -> { }
-            }
+        for (String f : fields) setFile(c, f, null);
+        repo.save(c);
+    }
+
+    /** Files the browser already uploaded to storage: each entry is "field|/attachments/prosthodontics/{id}/...". */
+    public void applyUploads(Long id, List<String> uploads) {
+        if (uploads == null || uploads.isEmpty()) return;
+        ProsthodonticsChart c = repo.findById(id).orElseThrow();
+        if (c.getStatus() == ProsthodonticsChartStatus.APPROVED) return;
+        String prefix = "/attachments/prosthodontics/" + id + "/";
+        for (String u : uploads) {
+            int bar = u.indexOf('|');
+            if (bar < 0) continue;
+            String field = u.substring(0, bar), path = u.substring(bar + 1);
+            if (!path.startsWith(prefix) || !FileStorage.isSafeKey(path.substring("/attachments/".length()))) continue;
+            setFile(c, field, path);
         }
         repo.save(c);
+    }
+
+    private static void setFile(ProsthodonticsChart c, String field, String value) {
+        switch (field) {
+            case "patientConsent" -> c.setPatientConsentFilePath(value);
+            case "patientWorkup" -> c.setPatientWorkupFilePath(value);
+            case "primaryImpression" -> c.setPrimaryImpressionFilePath(value);
+            case "individualTray" -> c.setIndividualTrayFilePath(value);
+            case "finalImpression" -> c.setFinalImpressionFilePath(value);
+            case "waxPatternLab" -> c.setWaxPatternLabFilePath(value);
+            case "waxPatternDiag" -> c.setWaxPatternDiagFilePath(value);
+            case "metalFramework" -> c.setMetalFrameworkFilePath(value);
+            case "trialDentureBase" -> c.setTrialDentureBaseFilePath(value);
+            case "ocr" -> c.setOcrFilePath(value);
+            case "positionalRelations" -> c.setPositionalRelationsFilePath(value);
+            case "mounting" -> c.setMountingFilePath(value);
+            case "anteriorSetup" -> c.setAnteriorSetupFilePath(value);
+            case "anteriorTryIn" -> c.setAnteriorTryInFilePath(value);
+            case "anteriorTryInSignature" -> c.setAnteriorTryInSignaturePath(value);
+            case "posteriorSetup" -> c.setPosteriorSetupFilePath(value);
+            case "posteriorTryIn" -> c.setPosteriorTryInFilePath(value);
+            case "posteriorTryInSignature" -> c.setPosteriorTryInSignaturePath(value);
+            case "waxUp" -> c.setWaxUpFilePath(value);
+            case "processing" -> c.setProcessingFilePath(value);
+            case "cef" -> c.setCefFilePath(value);
+            case "installation" -> c.setInstallationFilePath(value);
+            case "postInstallation" -> c.setPostInstallationFilePath(value);
+            case "installationSignature" -> c.setInstallationSignaturePath(value);
+            case "postInstallationSignature" -> c.setPostInstallationSignaturePath(value);
+            default -> { }
+        }
     }
 
     // ── Clinician: cleared cases (the grade) show with their evaluations ─────

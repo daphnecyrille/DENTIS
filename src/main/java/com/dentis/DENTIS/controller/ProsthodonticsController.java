@@ -88,6 +88,7 @@ public class ProsthodonticsController {
                        @RequestParam(required = false) MultipartFile postInstallationFile,
                        @RequestParam(required = false) MultipartFile postInstallationSignatureFile,
                        @RequestParam(required = false) java.util.List<String> removeFiles,
+                       @RequestParam(required = false) java.util.List<String> uploadedFiles,
                        @RequestParam(required = false, defaultValue = "save") String action) throws IOException {
 
         chartService.removeFiles(id, removeFiles);   // files removed with the Remove button (a new upload in the same row still wins)
@@ -101,6 +102,7 @@ public class ProsthodonticsController {
                 waxUpFile, processingFile, cefFile,
                 installationFile, installationSignatureFile,
                 postInstallationFile, postInstallationSignatureFile);
+        chartService.applyUploads(id, uploadedFiles);   // files the browser sent straight to storage
 
         if ("submit".equals(action)) {
             chartService.submit(id);

@@ -131,5 +131,76 @@
         tr.addEventListener('change', function () { updateRow(tr); });
         updateRow(tr);
     });
+
+    /* ── Saving: chosen files go straight to storage first (no size limit from the web host),
+          then the form is sent with just each file's address in "uploadedFiles" ── */
+    var form = table.closest('form');
+    var m = form && (form.getAttribute('action') || '').match(/prosthodontics-clinician\/(\d+)/);
+    if (form && m && !VIEW_ONLY) {
+        var chartId = m[1];
+        var status = document.createElement('div');
+        status.className = 'upl-status';
+        status.style.cssText = 'display:none;position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:9999;' +
+            'background:#2d4a6b;color:#fff;padding:12px 20px;border-radius:8px;font:600 14px Poppins,sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.25)';
+        document.body.appendChild(status);
+        function say(text, isError) {
+            status.textContent = text;
+            status.style.background = isError ? '#c0392b' : '#2d4a6b';
+            status.style.display = 'block';
+        }
+
+        form.addEventListener('submit', function (e) {
+            if (form._uploadsDone) return;
+            var picked = Array.prototype.filter.call(
+                table.querySelectorAll('input.upload-input[type="file"]'), function (i) { return i.files && i.files[0]; });
+            if (!picked.length) return;
+            e.preventDefault();
+            var submitter = e.submitter || null;
+            var buttons = form.querySelectorAll('button, input[type="submit"]');
+            buttons.forEach(function (b) { b.disabled = true; });
+
+            var done = 0;
+            (function next(k) {
+                if (k >= picked.length) {
+                    form._uploadsDone = true;
+                    buttons.forEach(function (b) { b.disabled = false; });
+                    say('Saving…');
+                    if (submitter && submitter.name) {
+                        var h = document.createElement('input');
+                        h.type = 'hidden'; h.name = submitter.name; h.value = submitter.value;
+                        form.appendChild(h);
+                    }
+                    HTMLFormElement.prototype.submit.call(form);
+                    return;
+                }
+                var input = picked[k], file = input.files[0];
+                var field = input.name.replace(/File$/, '');
+                say('Uploading ' + (k + 1) + ' of ' + picked.length + ': ' + file.name);
+                var fd = new FormData();
+                fd.append('chartId', chartId); fd.append('field', field); fd.append('name', file.name);
+                fetch('/attachments/sign', { method: 'POST', body: fd, credentials: 'same-origin' })
+                    .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || 'Upload refused'); return j; }); })
+                    .then(function (j) {
+                        return fetch(j.uploadUrl, {
+                            method: 'PUT', body: file, credentials: j.uploadUrl.charAt(0) === '/' ? 'same-origin' : 'omit',
+                            headers: { 'Content-Type': file.type || 'application/octet-stream' }
+                        }).then(function (r) {
+                            if (!r.ok) throw new Error('Upload failed (' + r.status + ')');
+                            var h = document.createElement('input');
+                            h.type = 'hidden'; h.name = 'uploadedFiles'; h.value = field + '|' + j.path;
+                            form.appendChild(h);
+                            input.value = '';          /* the file itself is not sent with the form */
+                            done++;
+                            next(k + 1);
+                        });
+                    })
+                    .catch(function (err) {
+                        buttons.forEach(function (b) { b.disabled = false; });
+                        say('Could not upload ' + file.name + ': ' + err.message + '. Nothing was saved; try again.', true);
+                        setTimeout(function () { status.style.display = 'none'; }, 7000);
+                    });
+            })(0);
+        });
+    }
     table.classList.add('booklet-table');
 })();
