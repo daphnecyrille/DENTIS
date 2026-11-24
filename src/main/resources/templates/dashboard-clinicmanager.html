@@ -104,16 +104,59 @@
                 <a href="/admitting-clinicmanager" class="btn-admit">+ Admit Patient</a>
             </div>
 
-            <!-- Patients by section -->
-            <div class="section-strip">
-                <span class="strip-label">Patients by section</span>
-                <span class="strip-item"><b th:text="${statOS}">0</b> OS</span>
-                <span class="strip-item"><b th:text="${statENDO}">0</b> Endo</span>
-                <span class="strip-item"><b th:text="${statPERIO}">0</b> Perio</span>
-                <span class="strip-item"><b th:text="${statRESTO}">0</b> Resto</span>
-                <span class="strip-item"><b th:text="${statPROSTHO}">0</b> Prostho</span>
-                <span class="strip-item muted"><b th:text="${statClinicians}">0</b> clinicians</span>
-            </div>
+            <!-- Treatment progress by section: where every admission stands -->
+            <section class="section progress-card">
+                <div class="section-header section-header-row">
+                    <h2>Treatment Progress by Section</h2>
+                    <span class="progress-sub"><b th:text="${statClinicians}">0</b> clinicians</span>
+                </div>
+                <div class="progress-scroll">
+                <table class="progress-table">
+                    <thead>
+                        <tr>
+                            <th>Section</th>
+                            <th title="Admissions in this section">Admitted</th>
+                            <th title="No faculty or clinician assigned yet">Waiting for Assignment</th>
+                            <th title="Clinician is working on the charts">In Treatment</th>
+                            <th title="Submitted, waiting for the faculty">Awaiting Review</th>
+                            <th title="Sent back by the faculty">For Revision</th>
+                            <th title="Every chart approved">Completed</th>
+                            <th>Completion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="r : ${progressRows}">
+                            <td class="pg-sec" th:text="${r['section']}">OS</td>
+                            <td th:text="${r['admitted']}">0</td>
+                            <td th:classappend="${r['waiting'] > 0} ? 'pg-warn'" th:text="${r['waiting']}">0</td>
+                            <td th:text="${r['inTreatment']}">0</td>
+                            <td th:text="${r['awaiting']}">0</td>
+                            <td th:classappend="${r['revise'] > 0} ? 'pg-red'" th:text="${r['revise']}">0</td>
+                            <td class="pg-done" th:text="${r['completed']}">0</td>
+                            <td class="pg-bar-cell"><div class="pg-wrap">
+                                <div class="pg-bar"><span th:style="'width:' + ${r['pct']} + '%'"></span></div>
+                                <span class="pg-pct" th:text="${r['pct']} + '%'">0%</span>
+                            </div></td>
+                        </tr>
+                    </tbody>
+                    <tfoot th:with="t=${progressTotal}">
+                        <tr>
+                            <td class="pg-sec">All sections</td>
+                            <td th:text="${t['admitted']}">0</td>
+                            <td th:text="${t['waiting']}">0</td>
+                            <td th:text="${t['inTreatment']}">0</td>
+                            <td th:text="${t['awaiting']}">0</td>
+                            <td th:text="${t['revise']}">0</td>
+                            <td class="pg-done" th:text="${t['completed']}">0</td>
+                            <td class="pg-bar-cell"><div class="pg-wrap">
+                                <div class="pg-bar"><span th:style="'width:' + ${t['pct']} + '%'"></span></div>
+                                <span class="pg-pct" th:text="${t['pct']} + '%'">0%</span>
+                            </div></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                </div>
+            </section>
 
             <!-- Pending chart requests: oldest first, accept / deny right here -->
             <section class="section">

@@ -87,6 +87,30 @@ public class PatientController {
                 + patientService.countBySection("FPD"));
         model.addAttribute("statPendingRequests", chartRequestService.getPendingRequests().size());
         model.addAttribute("statClinicians", patientService.getAllClinicians().size());
+        // Treatment progress by section: where every admission stands (waiting, in treatment, awaiting review, for revision, completed)
+        java.util.Map<Long, java.util.Map<String, Object>> chartRows = chartRowsByPatient();
+        java.util.Map<String, long[]> prog = new java.util.LinkedHashMap<>();
+        for (String sec : new String[] {"OS", "Endo", "Perio", "Resto", "Prostho"}) prog.put(sec, new long[6]);
+        for (Patient p : all) {
+            long[] v = prog.get(sectionLabel(p.getServiceCode()));
+            if (v == null) continue;
+            java.util.Map<String, Object> c = chartRows.get(p.getId());
+            v[0]++;
+            if (p.getAssignedFaculty() == null || p.getAssignedClinician() == null) v[1]++;
+            else if (c != null && Boolean.TRUE.equals(c.get("done"))) v[5]++;
+            else if (c != null && Boolean.TRUE.equals(c.get("revise"))) v[4]++;
+            else if (c != null && Boolean.TRUE.equals(c.get("awaiting"))) v[3]++;
+            else v[2]++;
+        }
+        List<java.util.Map<String, Object>> progress = new ArrayList<>();
+        long[] tot = new long[6];
+        for (var e : prog.entrySet()) {
+            long[] v = e.getValue();
+            for (int i = 0; i < 6; i++) tot[i] += v[i];
+            progress.add(progressRow(e.getKey(), v));
+        }
+        model.addAttribute("progressRows", progress);
+        model.addAttribute("progressTotal", progressRow("All sections", tot));
         model.addAttribute("clinicianPatientCounts", patientService.getUniquePatientCountByClinician());
         return "dashboard-clinicmanager";
     }
@@ -189,13 +213,7 @@ public class PatientController {
     public String patientList(Model model) {
         model.addAttribute("clinicianPatientCounts", patientService.getUniquePatientCountByClinician());
         // chart status tags of every admission, from all charts
-        java.util.Map<Long, java.util.Map<String, Object>> chartRows = new java.util.HashMap<>();
-        for (var r : com.dentis.DENTIS.service.PatientRowBuilder.build(
-                oralSurgeryChartService.findAllOrderByCreatedAtDesc(), endodonticsChartService.findAllOrderByCreatedAtDesc(),
-                periodonticChartService.findAllOrderByCreatedAtDesc(), operativeChartService.findAllOrderByCreatedAtDesc(),
-                prosthodonticsChartService.findAllOrderByCreatedAtDesc())) {
-            chartRows.put(((Patient) r.get("patient")).getId(), r);
-        }
+        java.util.Map<Long, java.util.Map<String, Object>> chartRows = chartRowsByPatient();
         // one row per admission (original or readmission), newest first
         List<java.util.Map<String, Object>> rows = new ArrayList<>();
         for (Patient p : patientService.getAllPatients()) {
@@ -217,6 +235,27 @@ public class PatientController {
         }
         model.addAttribute("patientRows", rows);
         return "patientlist-clinicmanager";
+    }
+
+    private static java.util.Map<String, Object> progressRow(String section, long[] v) {
+        java.util.Map<String, Object> r = new java.util.HashMap<>();
+        r.put("section", section);
+        r.put("admitted", v[0]); r.put("waiting", v[1]); r.put("inTreatment", v[2]);
+        r.put("awaiting", v[3]); r.put("revise", v[4]); r.put("completed", v[5]);
+        r.put("pct", v[0] == 0 ? 0 : Math.round(v[5] * 100.0 / v[0]));
+        return r;
+    }
+
+    /** Chart status summary of every admission (tags, revise / awaiting / done flags), keyed by patient id. */
+    private java.util.Map<Long, java.util.Map<String, Object>> chartRowsByPatient() {
+        java.util.Map<Long, java.util.Map<String, Object>> chartRows = new java.util.HashMap<>();
+        for (var r : com.dentis.DENTIS.service.PatientRowBuilder.build(
+                oralSurgeryChartService.findAllOrderByCreatedAtDesc(), endodonticsChartService.findAllOrderByCreatedAtDesc(),
+                periodonticChartService.findAllOrderByCreatedAtDesc(), operativeChartService.findAllOrderByCreatedAtDesc(),
+                prosthodonticsChartService.findAllOrderByCreatedAtDesc())) {
+            chartRows.put(((Patient) r.get("patient")).getId(), r);
+        }
+        return chartRows;
     }
 
     /** Section of a service code, as used by the filters ("CD", "RPD", "FPD" are Prostho). */
